@@ -158,6 +158,13 @@ struct HistoryListView: View {
         }
     }
 
+    /// Doc 14 « Profils partagés », phase 2 — distingue une partie reçue de l'appareil d'un ami
+    /// (`MatchRecord.isImportedSummary`) de celles jouées ici, sans écran ni icône séparés.
+    private func dateLabel(for match: MatchRecord) -> String {
+        let date = match.startedAt.formatted(date: .abbreviated, time: .omitted)
+        return match.isImportedSummary ? "\(date) · Reçue" : date
+    }
+
     private func filterLabel(_ text: String) -> some View {
         Label(text, systemImage: "line.3.horizontal.decrease.circle")
             .font(.label)
@@ -175,7 +182,7 @@ struct HistoryListView: View {
                 .frame(width: 32)
             VStack(alignment: .leading, spacing: Space.xxs) {
                 Text(model.gameName(for: match)).font(.h6).foregroundStyle(.textPrimary)
-                Text(match.startedAt.formatted(date: .abbreviated, time: .omitted))
+                Text(dateLabel(for: match))
                     .font(.bodySmall)
                     .foregroundStyle(.textSecondary)
             }

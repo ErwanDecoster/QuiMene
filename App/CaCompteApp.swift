@@ -49,6 +49,13 @@ struct CaCompteApp: App {
                     .environment(settings)
                     .environment(deepLinkRouter)
                     .modelContainer(container)
+                    // Doc 14 « Profils partagés », phase 2 — pousse/récupère les résumés en
+                    // attente dès que le conteneur est prêt, puis à chaque retour au premier
+                    // plan (voir `.onChange(of: scenePhase)` plus bas) : même déclencheur que
+                    // `MatchConnectionCoordinator`, pas de minuteur propre à inventer.
+                    .task {
+                        await SharedProfileSyncCoordinator.shared.sync(context: container.mainContext)
+                    }
                 } else {
                     ProgressView()
                         .task {
@@ -76,6 +83,9 @@ struct CaCompteApp: App {
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .background {
                     WidgetCenter.shared.reloadAllTimelines()
+                }
+                if newPhase == .active, let container {
+                    Task { await SharedProfileSyncCoordinator.shared.sync(context: container.mainContext) }
                 }
             }
             // Doc utilisateur « Handoff » (P9) — reprise sur un autre appareil connecté au même

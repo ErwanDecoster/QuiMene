@@ -21,6 +21,14 @@ public final class MatchRecord {
     /// Identifiant d'appareil créateur — utile en sync (Phase 8), placeholder en attendant.
     public var deviceOrigin: String = "local"
     public var eventLogData: Data = Data()
+    /// Doc 14 « Profils partagés », phase 2 — `true` dès la conclusion si au moins un participant
+    /// est lié à l'installation d'un ami, jusqu'à ce que le résumé lui soit poussé avec succès.
+    public var pendingSharedProfileSync: Bool = false
+    /// Doc 14 — cette partie n'a pas été jouée sur cet appareil : c'est un résumé reçu de
+    /// l'installation d'un ami (`MatchRepository.materializeSharedSummary`). Pas de journal
+    /// d'événements exploitable (`eventLogData` est un tableau vide valide, jamais rejoué) —
+    /// seuls `ParticipantRecord.finalRank`/`finalScore` portent le résultat.
+    public var isImportedSummary: Bool = false
 
     // CloudKit exige que les relations vers plusieurs soient elles-mêmes optionnelles (au-delà
     // d'avoir une valeur par défaut) — d'où ce stockage optionnel, masqué derrière `participants`

@@ -104,45 +104,61 @@ Aucune table Supabase pour cette phase — le payload du QR se suffit à lui-mê
 un `JoinLink` aujourd'hui. Risque et coût d'implémentation minimaux ; testable et livrable seule,
 sans que la phase 2 existe encore.
 
-### Phase 2 — la partie apparaît chez l'ami
+### Phase 2 — la partie apparaît chez l'ami ✅
 
 À la fin d'une partie (`.ended` ou `.abandoned` — jamais en cours, pour éviter tout merge
 incrémental dans le stockage SwiftData de quelqu'un d'autre pendant que la partie tourne), pour
-chaque participant dont la fiche porte un `sharedProfileID` : pousser un résumé compact vers une
-nouvelle table Supabase, `cacompte_shared_match_summaries` :
+chaque participant dont la fiche porte un `sharedProfileID` : pousser un résumé compact vers la
+table Supabase `cacompte_shared_match_summaries` :
 
 ```sql
 create table cacompte_shared_match_summaries (
-  id uuid primary key default gen_random_uuid(),
-  shared_profile_id uuid not null,
-  payload jsonb not null,      -- jeu, date, manches jouées, classement complet (pseudo,
-                                -- avatar léger, rang, score) — pas le journal d'événements
-  created_at timestamptz not null default now()
+    match_id uuid not null,
+    shared_profile_id uuid not null,
+    payload jsonb not null,      -- jeu, version de règles, date, classement complet (pseudo,
+                                  -- avatar léger, rang, score) — pas le journal d'événements
+    created_at timestamptz not null default now(),
+    primary key (match_id, shared_profile_id)
 );
 ```
 
-Même politique RLS que le reste (`anon`, connaître l'id suffit — cohérent avec le seuil de
-sécurité déjà accepté doc 09). Purge de sécurité à 30 jours (comme `cacompte_open_games`, en plus
-généreux puisqu'un ami peut rester hors ligne des semaines) pour le cas où personne ne vient
-jamais la récupérer.
+Clé primaire composite plutôt qu'un `id` généré, pour que le push soit un `upsert` idempotent
+(`SharedProfileTransport.push`) : une tentative retentée après une réponse perdue ne duplique
+jamais la ligne, même si le serveur avait bien reçu la première. Même politique RLS que le reste
+(`anon`, connaître l'id suffit — cohérent avec le seuil de sécurité déjà accepté doc 09). Purge de
+sécurité à 30 jours (comme `cacompte_open_games`, en plus généreux puisqu'un ami peut rester hors
+ligne des semaines) pour le cas où personne ne vient jamais la récupérer — l'index existe
+(`cacompte_shared_match_summaries_created_at_idx`), le job de purge lui-même reste à brancher
+séparément (même remarque que `cacompte-live-activity-sweep`, hors de ce dépôt).
 
-Côté ami, au premier plan (même déclencheur que `MatchConnectionCoordinator` :
-`willEnterForegroundNotification`) : interroger les résumés en attente pour son propre
-`sharedProfileID`, les matérialiser en `MatchRecord` local, puis **supprimer** la ligne côté
-serveur — la table ne sert que de boîte aux lettres transitoire, jamais de copie durable. C'est
-la même discipline que `cacompte_open_games` : Supabase est un relais, jamais la source de vérité.
+`MatchRecord.pendingSharedProfileSync` marque une partie conclue avec au moins un participant lié,
+mis à jour à chaque conclusion (`MatchRepository.persist`, jamais figé à la création). Côté ami,
+au lancement et à chaque retour au premier plan (`SharedProfileSyncCoordinator`, même déclencheur
+que `MatchConnectionCoordinator`, pas de minuteur propre) : pousser les parties en attente,
+interroger les résumés en attente pour ses propres fiches liées, les matérialiser en `MatchRecord`
+local (`MatchRepository.materializeSharedSummary`), puis **supprimer** la ligne côté serveur — la
+table ne sert que de boîte aux lettres transitoire, jamais de copie durable. Même discipline que
+`cacompte_open_games` : Supabase est un relais, jamais la source de vérité. `SharedMatchSummaryPayload`
+vit dans `Domain` (pas `Store` ni `Sync`) : les deux en ont besoin, aucun des deux ne dépend de
+l'autre.
 
-**Ce qui est matérialisé n'est pas une partie rejouable.** Le `MatchRecord` reçu a un journal
-d'événements minimal (pas de manches) ; seuls `ParticipantRecord.finalRank`/`finalScore` sont
-renseignés depuis le résumé. C'est délibéré et suffisant : `LeaderboardRepository` et
-`ProfileRepository` (parties jouées, victoires, taux de victoire, rang moyen normalisé) ne lisent
-que ces deux champs, jamais le détail manche par manche — les statistiques de l'ami restent donc
-justes sans qu'il ait besoin du journal complet. Seul l'écran de résultats détaillé (courbe,
-manche par manche, badges) resterait indisponible pour une partie reçue ; `HistoryListView`
-distinguerait visuellement ces entrées (« reçue de Marion », pas de bouton Abandonner puisque ce
-n'est jamais « en cours » localement).
+**Ce qui est matérialisé n'est pas une partie rejouable.** Le `MatchRecord` reçu
+(`isImportedSummary = true`) a un journal d'événements vide, jamais rejoué (`HistoryDetailView`
+s'en assure explicitement — le rejouer planterait, `MatchEngine.replay` exige un premier événement
+`matchCreated`) ; seuls `ParticipantRecord.finalRank`/`finalScore` sont renseignés depuis le
+résumé. C'est délibéré et suffisant : `LeaderboardRepository` et `ProfileRepository` (parties
+jouées, victoires, taux de victoire, rang moyen normalisé) ne lisent que ces deux champs, jamais
+le détail manche par manche — les statistiques de l'ami restent donc justes sans qu'il ait besoin
+du journal complet. `ReceivedMatchDetailView` remplace `ResultsView` pour ces parties (un podium
+simple à partir des *snapshots*, pas de courbe ni de manche par manche) ; `HistoryListView` les
+distingue d'un simple « · Reçue » à côté de la date.
 
-Ce choix — résumé, pas copie intégrale — est le point du design le plus arbitraire de ce document
+Simplification par rapport à l'esquisse initiale : le nombre de manches n'est pas transporté (pas
+de champ pour le stocker côté matérialisé, et il n'était pas indispensable au besoin — voir
+« marches jouées » plus haut, laissé de côté plutôt que d'ajouter un champ pour une valeur
+d'affichage secondaire).
+
+Ce choix — résumé, pas copie intégrale — reste le point du design le plus arbitraire de ce document
 (voir « Décisions ouvertes »).
 
 ### Synergie avec l'onglet « Rejoindre »
@@ -160,19 +176,24 @@ supplémentaire.
   produit un trafic négligeable face à la fenêtre de purge de 24 h déjà en place pour
   `cacompte_open_games`.
 - Hors ligne à la fin d'une partie : la tentative d'envoi échoue simplement et se met en attente
-  (un indicateur sur `MatchRecord`, ex. `pendingProfileSyncParticipantIDs`), rejouée au prochain
-  retour au premier plan avec réseau — même patron que `scheduleAutoRetry`
-  (`MatchConnectionCoordinator.swift`), pas un nouveau système de synchronisation à inventer.
+  (`MatchRecord.pendingSharedProfileSync` reste `true`), rejouée au prochain retour au premier
+  plan avec réseau — même patron que `scheduleAutoRetry` (`MatchConnectionCoordinator.swift`), pas
+  un nouveau système de synchronisation à inventer.
 
 ## Phasage
 
-1. **Phase 1** — champ `sharedProfileID`, UI de partage/liaison, réutilisation de `JoinLink` +
-   `QRCodeView`/`QRScannerView`. Livrable et testable seul, sans backend.
-2. **Phase 2** — table `cacompte_shared_match_summaries`, envoi à la fin d'une partie, réception
-   au premier plan, matérialisation en `MatchRecord` minimal.
+1. **Phase 1** ✅ — champ `sharedProfileID`, UI de partage/liaison, réutilisation de `JoinLink` +
+   `QRCodeView`/`QRScannerView`.
+2. **Phase 2** ✅ — table `cacompte_shared_match_summaries`, envoi à la conclusion d'une partie
+   (`SharedProfileSyncCoordinator`), réception au premier plan, matérialisation en `MatchRecord`
+   minimal (`isImportedSummary`), écran de détail dédié (`ReceivedMatchDetailView`).
 3. **Plus tard, si demandé** — copie intégrale rejouable (journal d'événements complet plutôt
    qu'un résumé) ; alimente aussi « Statistiques de groupe » ([roadmap](12-roadmap.md), face-à-face
    entre profils liés).
+
+Reste manuel, hors de ce dépôt : brancher une purge programmée (30 jours) sur
+`cacompte_shared_match_summaries`, comme `cacompte-live-activity-sweep` pour les Live Activity —
+l'index existe, pas le job.
 
 ## Décisions ouvertes
 

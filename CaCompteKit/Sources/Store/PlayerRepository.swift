@@ -79,6 +79,22 @@ public struct PlayerRepository {
         try context.save()
     }
 
+    /// Doc 14, phase 2 — toutes les fiches liées sur cet appareil, qu'elles représentent un ami
+    /// (j'ai partagé/scanné pour lui) ou moi-même sur l'installation de quelqu'un d'autre.
+    /// `SharedProfileSyncCoordinator` interroge la boîte aux lettres distante pour chacune.
+    public func allSharedProfileIDs() throws -> [UUID] {
+        let descriptor = FetchDescriptor<PlayerRecord>(predicate: #Predicate { $0.sharedProfileID != nil })
+        return try context.fetch(descriptor).compactMap(\.sharedProfileID)
+    }
+
+    /// La première fiche locale liée à cet identifiant, si elle existe — sert à retrouver quel
+    /// joueur *local* correspond à une entrée du classement reçu (doc 14, phase 2).
+    public func player(withSharedProfileID id: UUID) throws -> PlayerRecord? {
+        var descriptor = FetchDescriptor<PlayerRecord>(predicate: #Predicate { $0.sharedProfileID == id })
+        descriptor.fetchLimit = 1
+        return try context.fetch(descriptor).first
+    }
+
     /// Ordre manuel de la liste des joueurs (`sortIndex`) — SwiftData ne préserve l'ordre
     /// d'aucune collection (doc 03, contrainte CloudKit n°5).
     public func reorder(_ players: [PlayerRecord]) throws {

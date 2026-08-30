@@ -196,7 +196,7 @@ Par valeur décroissante, sans engagement de calendrier :
 | 5 | **Apple Watch** — saisie au poignet, WatchConnectivity |
 | 6 | **Export/import `.cacompte`** — anticipé pour Android, utile aussi entre utilisateurs Apple |
 | 7 | **macOS** — la cible SwiftUI existe déjà, coût faible, valeur faible |
-| 8 | **Profils partagés entre appareils** — qu'une partie créée sur mon téléphone apparaisse dans l'historique d'un ami qui y participait. Phase 1 (lier deux fiches par QR) ✅ ; phase 2 (la partie apparaît vraiment chez l'ami) reste à faire : [14](14-profils-partages.md) |
+| 8 | **Profils partagés entre appareils** — qu'une partie créée sur mon téléphone apparaisse dans l'historique d'un ami qui y participait. Phases 1 et 2 ✅ (lier deux fiches par QR, la partie apparaît chez l'ami sous forme de résumé) ; copie intégrale rejouable reste à faire si demandée : [14](14-profils-partages.md) |
 
 ## Risques
 

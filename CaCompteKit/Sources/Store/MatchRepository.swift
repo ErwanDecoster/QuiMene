@@ -219,6 +219,61 @@ public struct MatchRepository {
         return counts
     }
 
+    /// Doc 14, phase 2 — parties conclues avec au moins un participant lié, dont le résumé n'a
+    /// pas encore été confirmé poussé (`SharedProfileSyncCoordinator` les retente à chaque retour
+    /// au premier plan).
+    public func matchesPendingSharedProfileSync() throws -> [MatchRecord] {
+        let descriptor = FetchDescriptor<MatchRecord>(predicate: #Predicate { $0.pendingSharedProfileSync })
+        return try context.fetch(descriptor)
+    }
+
+    public func markSharedProfileSyncComplete(_ match: MatchRecord) throws {
+        match.pendingSharedProfileSync = false
+        try context.save()
+    }
+
+    /// Doc 14, phase 2 — matérialise le résumé reçu de l'installation d'un ami en une partie
+    /// locale minimale : un journal d'événements vide (jamais rejoué, voir
+    /// `MatchRecord.isImportedSummary`), seuls `finalRank`/`finalScore` portent le résultat, comme
+    /// ce que `LeaderboardRepository`/`ProfileRepository` lisent déjà pour toute autre partie.
+    /// Sans effet si cette partie est déjà connue localement (c'est cet appareil qui l'a jouée et
+    /// poussée — l'appelant doit alors seulement nettoyer la boîte aux lettres distante).
+    public func materializeSharedSummary(_ payload: SharedMatchSummaryPayload, matchID: UUID) throws {
+        guard try match(withID: matchID) == nil else { return }
+
+        let playerRepository = PlayerRepository(context: context)
+        var participants: [ParticipantRecord] = []
+        for (index, entry) in payload.standings.enumerated() {
+            let linkedPlayer = try entry.sharedProfileID.flatMap { try playerRepository.player(withSharedProfileID: $0) }
+            participants.append(ParticipantRecord(
+                player: linkedPlayer,
+                nicknameSnapshot: entry.nickname,
+                avatarKindSnapshot: entry.avatarKind,
+                avatarValueSnapshot: entry.avatarValue,
+                paletteIDSnapshot: entry.paletteID,
+                seatIndex: index,
+                finalRank: entry.rank,
+                finalScore: entry.score
+            ))
+        }
+
+        let match = MatchRecord(
+            id: matchID,
+            gameID: payload.gameID,
+            rulesVersion: payload.rulesVersion,
+            variantsData: Data(),
+            startedAt: payload.playedAt,
+            endedAt: payload.playedAt,
+            status: .ended,
+            deviceOrigin: "shared-profile-import",
+            eventLogData: try JSONEncoder().encode([StampedEvent]()),
+            participants: participants
+        )
+        match.isImportedSummary = true
+        context.insert(match)
+        try context.save()
+    }
+
     /// Doc 09 — le journal complet d'une partie, tel que `LiveSession` en a besoin pour s'y
     /// resynchroniser (`syncHostLog`) ou pour accueillir un nouveau pair (`welcome`).
     public func currentLog(for match: MatchRecord) throws -> [StampedEvent] {
@@ -262,6 +317,10 @@ public struct MatchRepository {
         if state.status == .ended || state.status == .abandoned {
             match.endedAt = Date()
             applyFinalStandings(state: state, match: match, catalog: catalog)
+            // Doc 14, phase 2 — un seul appel suffit même si le lien a été fait après coup entre
+            // deux manches : ce drapeau est réévalué à chaque conclusion, jamais figé à la
+            // création de la partie.
+            match.pendingSharedProfileSync = match.participants.contains { $0.player?.sharedProfileID != nil }
         } else {
             match.endedAt = nil
         }
