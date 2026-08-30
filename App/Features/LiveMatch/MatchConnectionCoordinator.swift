@@ -18,7 +18,7 @@ import UIKit
 ///
 /// Reste du même patron qu'avant (app-lifetime, comme `DeepLinkRouter.shared`) pour la même
 /// raison : à la réouverture après un arrêt complet du processus, SwiftUI ne restaure pas
-/// `JoinMatchView` tout seul — la Live Activity ne se remettrait donc jamais à jour tant que
+/// `JoinTabView` tout seul — la Live Activity ne se remettrait donc jamais à jour tant que
 /// l'utilisateur n'a pas manuellement rouvert l'écran de partage.
 @MainActor
 @Observable
@@ -61,7 +61,7 @@ final class MatchConnectionCoordinator {
     }
 
     /// Point d'entrée unique pour rejoindre une partie — appelé aussi bien pour la connexion
-    /// initiale (`JoinMatchView`) que pour une reconnexion manuelle ou après un relancement.
+    /// initiale (`JoinTabView`) que pour une reconnexion manuelle ou après un relancement.
     @discardableResult
     func join(code: String, deviceName: String, requestedRole: Role, appVersion: String) async throws -> Role {
         try await rejoin(PersistedSession(pairingCode: code, role: requestedRole, deviceName: deviceName, appVersion: appVersion))

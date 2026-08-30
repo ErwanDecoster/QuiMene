@@ -13,6 +13,7 @@ struct HistoryDetailView: View {
     private let definition: GameDefinition
     private let standings: [Standing]
     private let participantRecords: [ParticipantRecord]
+    private let playedAt: Date
 
     init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
         let repository = MatchRepository(context: context)
@@ -21,6 +22,7 @@ struct HistoryDetailView: View {
         state = try! repository.loadState(match, catalog: catalog)
         standings = rules.standings(state, definition: definition)
         participantRecords = match.participants.sorted { $0.seatIndex < $1.seatIndex }
+        playedAt = match.endedAt ?? match.startedAt
     }
 
     var body: some View {
@@ -28,7 +30,8 @@ struct HistoryDetailView: View {
             state: state,
             definition: definition,
             standings: standings,
-            participantRecords: participantRecords
+            participantRecords: participantRecords,
+            playedAt: playedAt
         )
     }
 }

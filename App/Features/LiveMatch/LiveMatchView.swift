@@ -55,10 +55,17 @@ struct LiveMatchView: View {
             }
 
             Section {
-                ForEach(Array(model.participants.enumerated()), id: \.element.id) { index, participant in
+                let rankByID = Dictionary(uniqueKeysWithValues: model.currentStandings.map { ($0.participantID, $0.rank) })
+                ForEach(rankedParticipants(rankByID: rankByID)) { participant in
                     HStack(spacing: Space.md) {
+                        if let rank = rankByID[participant.id] {
+                            Text("\(rank)")
+                                .font(.label)
+                                .foregroundStyle(.textSecondary)
+                                .frame(minWidth: 18, alignment: .leading)
+                        }
                         Text(participant.displayName)
-                            .font(index == model.activeSeatIndex ? .h6 : .bodyText)
+                            .font(participant.id == model.currentParticipant?.id ? .h6 : .bodyText)
                             .foregroundStyle(.textPrimary)
                         Spacer()
                         Text((model.totals[participant.id] ?? 0).formatted())
@@ -124,20 +131,20 @@ struct LiveMatchView: View {
                     }
                 }
                 Spacer()
-                Button(model.actionLabelTitle) {
-                    advance()
+                Button("Terminé") {
+                    finishRound()
                 }
             }
         }
         // Doc utilisateur — la barre d'accessoires du clavier (juste au-dessus) disparaît avec
         // lui : sur iPad notamment, le bouton natif de fermeture du clavier laissait l'écran sans
         // aucun moyen de valider la manche en cours (bug remonté). Ce bouton prend le relais,
-        // mais uniquement quand le clavier est masqué — sinon il doublonne le « Suivant » déjà
+        // mais uniquement quand le clavier est masqué — sinon il doublonne le « Terminé » déjà
         // présent juste au-dessus (remontée utilisateur).
         .safeAreaInset(edge: .bottom) {
             if !keyboardObserver.isVisible {
-                Button(model.actionLabelTitle) {
-                    advance()
+                Button("Terminé") {
+                    finishRound()
                 }
                 .buttonStyle(.primary(size: .medium))
                 .frame(maxWidth: .infinity)
@@ -215,6 +222,19 @@ struct LiveMatchView: View {
         }
     }
 
+    /// Doc utilisateur — savoir d'un coup d'œil qui est premier, deuxième… pendant la saisie,
+    /// plutôt qu'attendre l'écran de résultats. Les sièges à égalité gardent le même rang (doc 03
+    /// `Standing.sharedWith`) ; l'ordre des sièges départage l'affichage entre eux (arbitraire mais
+    /// stable, pour ne pas faire sauter les lignes d'une manche à l'autre sans raison).
+    private func rankedParticipants(rankByID: [Participant.ID: Int]) -> [Participant] {
+        model.participants.sorted { lhs, rhs in
+            let l = rankByID[lhs.id] ?? .max
+            let r = rankByID[rhs.id] ?? .max
+            if l != r { return l < r }
+            return lhs.seatIndex < rhs.seatIndex
+        }
+    }
+
     /// Charte §5.4 — jamais vide en apparence (placeholder `0`), bordure au focus uniquement.
     /// Clavier système (`.numberPad`) : pas de touche « − », d'où le bouton de signe dans la
     /// barre d'accessoires pour les jeux qui acceptent les valeurs négatives.
@@ -266,8 +286,11 @@ struct LiveMatchView: View {
         }
     }
 
-    private func advance() {
-        let committed = model.advance()
+    /// Doc utilisateur — les joueurs n'annoncent jamais leur score dans l'ordre des sièges :
+    /// « Terminé » est donc toujours disponible et valide directement la manche avec ce qui a
+    /// été saisi, plutôt que d'avancer champ par champ jusqu'au dernier joueur.
+    private func finishRound() {
+        let committed = model.commitRound()
         if committed {
             draftTexts = [:]
         }

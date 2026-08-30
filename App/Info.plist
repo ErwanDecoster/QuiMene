@@ -23,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Ça Compte utilise l'appareil photo pour scanner le code d'appairage d'une partie partagée.</string>
+	<string>Ça Compte utilise l'appareil photo pour scanner un code d'appairage de partie ou de profil partagé.</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>

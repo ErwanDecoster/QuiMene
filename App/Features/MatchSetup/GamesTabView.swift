@@ -18,11 +18,12 @@ struct GamesTabView: View {
     @State private var currentScrollOffset: CGFloat = 0
     @State private var hasTriggeredSearchFromPull = false
     @State private var selectedDefinition: GameDefinition?
+    /// `String` (l'id du jeu) plutôt que `GameDefinition` — `.navigationDestination(item:)`
+    /// exige `Hashable`, que `GameDefinition` n'a pas besoin de porter par ailleurs.
+    @State private var leaderboardGameID: String?
     @State private var activeMatch: MatchRecord?
     @State private var inProgressMatch: MatchRecord?
     @State private var matchPendingAbandon: MatchRecord?
-    @State private var isPresentingJoin = false
-    @State private var joinPayloadForSheet: JoinLink.Payload?
     /// Doc 09 « Fin de partie » — une session de partage démarrée depuis une partie survit à sa
     /// fin (`LiveShareCoordinator`) : ce bouton laisse l'hôte la retrouver (code, pairs connectés,
     /// « Arrêter le partage ») même en revenant ici entre deux parties, sans avoir à en rouvrir
@@ -48,9 +49,18 @@ struct GamesTabView: View {
         }
     }
 
+    // Doc utilisateur — le vérificateur de types de Swift met un temps déraisonnable à résoudre
+    // une seule très longue chaîne de modificateurs SwiftUI ; scindée en deux (`listView` /
+    // `withNavigationHandling`) pour que chaque moitié reste vérifiable indépendamment plutôt
+    // qu'en une seule expression géante (même raison que `gameRow`/`leaderboardSwipeAction`).
     var body: some View {
         NavigationStack {
-            List {
+            withNavigationHandling(listView)
+        }
+    }
+
+    private var listView: some View {
+        List {
                 // Doc 01 : reprendre une partie en cours reste possible, mais en simple
                 // suggestion — un onglet qu'on revisite pour parcourir le catalogue ne doit pas
                 // y être redirigé de force à chaque fois.
@@ -74,12 +84,7 @@ struct GamesTabView: View {
                 if !games.isEmpty {
                     Section {
                         ForEach(games) { definition in
-                            Button {
-                                selectedDefinition = definition
-                            } label: {
-                                row(for: definition)
-                            }
-                            .buttonStyle(.plain)
+                            gameRow(for: definition)
                         }
                     }
                 } else if inProgressMatch == nil {
@@ -96,13 +101,6 @@ struct GamesTabView: View {
                         } label: {
                             Label("Session partagée en cours", systemImage: "wifi.circle.fill")
                         }
-                    }
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        isPresentingJoin = true
-                    } label: {
-                        Label("Rejoindre une partie", systemImage: "wifi")
                     }
                 }
             }
@@ -141,25 +139,28 @@ struct GamesTabView: View {
                     activeMatch = match
                 }
             }
-            .sheet(isPresented: $isPresentingJoin) {
-                JoinMatchView(catalog: catalog, initialPayload: joinPayloadForSheet)
-            }
             .sheet(isPresented: $isPresentingActiveShare) {
                 ShareSessionView(startAction: nil)
             }
-            // Doc utilisateur — un lien `cacompte://` ouvert depuis l'appareil photo système
-            // arrive ici, potentiellement alors qu'on est sur un autre onglet ou déjà dans un
-            // autre écran ; `DeepLinkRouter` fait le pont depuis `.onOpenURL` (CaCompteApp).
-            // `CaCompteApp.selectedTab` garantit que cet onglet est déjà construit quand l'un de
-            // ces quatre événements arrive — reste à le consommer, ici et dans `.onAppear`
-            // ci-dessous pour le cas où il était déjà en attente au moment du montage (remontée
-            // utilisateur : le scan d'un QR code app fermée n'ouvrait rien de visible).
-            .onChange(of: deepLinkRouter.pendingJoin) { _, _ in consumePendingDeepLinks() }
+    }
+
+    // Doc utilisateur — Handoff/App Intents (« Commence »/« Reprends ») arrivent ici,
+    // potentiellement alors qu'on est sur un autre onglet ; `DeepLinkRouter` fait le pont depuis
+    // `.onContinueUserActivity`/`perform()` (CaCompteApp). Le lien `cacompte://join` est consommé
+    // par `JoinTabView`, pas ici (doc utilisateur — onglet dédié). `CaCompteApp.selectedTab`
+    // garantit que cet onglet est déjà construit quand l'un de ces événements arrive — reste à le
+    // consommer, ici et dans `.onAppear` ci-dessous pour le cas où il était déjà en attente au
+    // moment du montage.
+    private func withNavigationHandling<Content: View>(_ content: Content) -> some View {
+        content
             .onChange(of: deepLinkRouter.pendingContinuedMatchID) { _, _ in consumePendingDeepLinks() }
             .onChange(of: deepLinkRouter.pendingGameID) { _, _ in consumePendingDeepLinks() }
             .onChange(of: deepLinkRouter.wantsResume) { _, _ in consumePendingDeepLinks() }
             .navigationDestination(item: $activeMatch) { match in
                 MatchPlayView(match: match, context: modelContext, catalog: catalog)
+            }
+            .navigationDestination(item: $leaderboardGameID) { gameID in
+                GameLeaderboardView(gameID: gameID, gameName: gameName(forGameID: gameID))
             }
             .onAppear {
                 refreshInProgressMatch()
@@ -188,7 +189,6 @@ struct GamesTabView: View {
             } message: {
                 Text("La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée.")
             }
-        }
     }
 
     /// Doc utilisateur — un seul point qui vérifie les quatre déclencheurs possibles
@@ -196,11 +196,6 @@ struct GamesTabView: View {
     /// chaque `.onChange` (nouvel événement pendant que cet onglet est déjà affiché) que depuis
     /// `.onAppear` (événement déjà arrivé avant que cet onglet n'existe).
     private func consumePendingDeepLinks() {
-        if let payload = deepLinkRouter.pendingJoin {
-            joinPayloadForSheet = payload
-            deepLinkRouter.pendingJoin = nil
-            isPresentingJoin = true
-        }
         if let matchID = deepLinkRouter.pendingContinuedMatchID {
             deepLinkRouter.pendingContinuedMatchID = nil
             activeMatch = try? MatchRepository(context: modelContext).match(withID: matchID)
@@ -243,6 +238,37 @@ struct GamesTabView: View {
 
     private func gameName(for match: MatchRecord) -> String {
         (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.fr ?? match.gameID
+    }
+
+    private func gameName(forGameID gameID: String) -> String {
+        catalog.allGames.first { $0.id == gameID }?.name.fr ?? gameID
+    }
+
+    // Doc utilisateur — remontée : le bouton trophée à côté de chaque ligne rendait la liste
+    // encombrée (deux cibles de tap par jeu, « pas idéal »). Un swipe pour révéler « Meilleurs
+    // joueurs » libère la ligne pour son seul rôle (démarrer une partie), sans faire disparaître
+    // l'accès au classement. Extrait en fonctions dédiées (plutôt qu'en ligne dans le `ForEach`) :
+    // au-delà d'un certain nombre de modificateurs chaînés, le vérificateur de types de Swift met
+    // un temps déraisonnable à résoudre une seule grosse expression.
+    private func gameRow(for definition: GameDefinition) -> some View {
+        Button {
+            selectedDefinition = definition
+        } label: {
+            row(for: definition)
+        }
+        .buttonStyle(.plain)
+        .swipeActions(edge: .trailing) {
+            leaderboardSwipeAction(for: definition)
+        }
+    }
+
+    private func leaderboardSwipeAction(for definition: GameDefinition) -> some View {
+        Button {
+            leaderboardGameID = definition.id
+        } label: {
+            Label("Meilleurs joueurs", systemImage: "trophy")
+        }
+        .tint(.brandBrass)
     }
 
     private func row(for definition: GameDefinition) -> some View {

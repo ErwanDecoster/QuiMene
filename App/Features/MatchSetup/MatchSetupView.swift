@@ -7,7 +7,6 @@ import SwiftUI
 struct MatchSetupView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var model: MatchSetupModel
-    private let availablePlayers: [PlayerRecord]
     private let onStart: (MatchRecord) -> Void
 
     init(
@@ -16,7 +15,6 @@ struct MatchSetupView: View {
         context: ModelContext,
         onStart: @escaping (MatchRecord) -> Void
     ) {
-        self.availablePlayers = availablePlayers
         _model = State(initialValue: MatchSetupModel(definition: definition, availablePlayers: availablePlayers, context: context))
         self.onStart = onStart
     }
@@ -25,7 +23,7 @@ struct MatchSetupView: View {
         NavigationStack {
             Form {
                 Section("Joueurs") {
-                    ForEach(availablePlayers) { player in
+                    ForEach(model.orderedAvailablePlayers) { player in
                         Button {
                             model.toggle(player)
                         } label: {

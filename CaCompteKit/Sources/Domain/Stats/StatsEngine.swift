@@ -51,11 +51,38 @@ public struct StatsEngine: Sendable {
         if winners.count == 1 {
             add(.winner, to: winners[0].id)
 
-            // Photo finish : moins de 3 points d'écart avec le deuxième.
             let sortedTotals = totals.values.sorted(by: direction == .highestWins ? (>) : (<))
-            if sortedTotals.count >= 2, abs(sortedTotals[0] - sortedTotals[1]) < 3 {
-                add(.photoFinish, to: winners[0].id)
+            if sortedTotals.count >= 2 {
+                let gap = Double(abs(sortedTotals[0] - sortedTotals[1]))
+
+                // Photo finish : moins de 3 points d'écart avec le deuxième.
+                if gap < 3 {
+                    add(.photoFinish, to: winners[0].id)
+                }
+
+                // Le Fossé : victoire écrasante — l'écart au deuxième dépasse largement la
+                // dispersion habituelle des manches. Symétrique de Photo finish.
+                let allValues = rounds.flatMap { $0.entries.map { Double($0.computedValue) } }
+                let mean = allValues.reduce(0, +) / Double(max(allValues.count, 1))
+                let spread = standardDeviation(of: allValues, mean: mean)
+                if spread > 0, gap / spread > 3 {
+                    add(.landslide, to: winners[0].id)
+                }
             }
+        }
+
+        // Le Sniper : détient le meilleur tour du match, dans le sens favorable au jeu —
+        // symétrique du Kamikaze. Non attribué dans les jeux à cible exacte (Mölkky…), où
+        // « meilleur tour » n'a pas de sens univoque.
+        if direction != .targetExact,
+           let (participantID, _, _) = extremeSingleRound(rounds: rounds, pick: direction == .highestWins ? .max : .min) {
+            add(.sniper, to: participantID)
+        }
+
+        // Le Boulet : détient le pire tour du match dans un jeu où le plus haut gagne —
+        // pendant du Kamikaze pour l'autre sens de jeu (déjà couvert plus bas).
+        if direction == .highestWins, let (participantID, _, _) = extremeSingleRound(rounds: rounds, pick: .min) {
+            add(.boulet, to: participantID)
         }
 
         // Le Métronome / Les montagnes russes.
@@ -94,7 +121,10 @@ public struct StatsEngine: Sendable {
         }
 
         // Priorité : le badge le plus rare l'emporte, un seul par joueur.
-        let rarityOrder: [Badge.Kind] = [.photoFinish, .comeback, .rollercoaster, .metronome, .unshakeable, .kamikaze, .winner]
+        let rarityOrder: [Badge.Kind] = [
+            .landslide, .photoFinish, .comeback, .rollercoaster, .sniper, .boulet,
+            .kamikaze, .metronome, .unshakeable, .winner
+        ]
         return candidates.compactMap { participantID, kinds -> Badge? in
             guard let kind = rarityOrder.first(where: { kinds.contains($0) }) else { return nil }
             return Badge(kind: kind, participantID: participantID)
@@ -268,22 +298,35 @@ public struct StatsEngine: Sendable {
 
     private enum Extreme { case max, min }
 
+    /// `nil` aussi bien en l'absence de manches qu'en cas d'égalité entre au moins deux joueurs
+    /// distincts sur la valeur extrême — si tout le monde (ou plusieurs joueurs) a signé le même
+    /// « plus gros tour », il n'y a justement plus personne à désigner : mieux vaut ne pas afficher
+    /// la statistique que d'en attribuer le mérite au premier trouvé par hasard de l'ordre des
+    /// manches.
     private func extremeSingleRound(rounds: [Round], pick: Extreme) -> (Participant.ID, Double, Int)? {
-        var best: (Participant.ID, Double, Int)?
+        var extremeValue: Double?
         for round in rounds {
             for entry in round.entries {
                 let value = Double(entry.computedValue)
-                guard let current = best else {
-                    best = (entry.participantID, value, round.index)
-                    continue
-                }
-                let better = pick == .max ? value > current.1 : value < current.1
-                if better {
-                    best = (entry.participantID, value, round.index)
+                if let current = extremeValue {
+                    if pick == .max ? value > current : value < current {
+                        extremeValue = value
+                    }
+                } else {
+                    extremeValue = value
                 }
             }
         }
-        return best
+        guard let extremeValue else { return nil }
+
+        var holder: (Participant.ID, Double, Int)?
+        for round in rounds {
+            for entry in round.entries where Double(entry.computedValue) == extremeValue {
+                if let holder, holder.0 != entry.participantID { return nil }
+                if holder == nil { holder = (entry.participantID, extremeValue, round.index) }
+            }
+        }
+        return holder
     }
 
     private func standardDeviation(of values: [Double], mean: Double) -> Double {

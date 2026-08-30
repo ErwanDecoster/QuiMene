@@ -11,6 +11,11 @@ struct ResultsView: View {
     let definition: GameDefinition
     let standings: [Standing]
     let participantRecords: [ParticipantRecord]
+    /// Doc utilisateur — date réelle de la partie pour la carte partagée, quand elle est connue
+    /// (`HistoryDetailView`, rejouant une partie ancienne). `nil` juste après la fin d'une partie
+    /// (`LiveMatchView` et consorts) : la carte retombe alors sur la date du jour, qui est déjà la
+    /// bonne dans ce cas.
+    var playedAt: Date? = nil
 
     private let statsEngine = StatsEngine()
 
@@ -47,7 +52,10 @@ struct ResultsView: View {
                     item: ResultsShareCard(
                         gameName: definition.name.fr,
                         standings: sortedStandings,
-                        recordByID: recordByID
+                        recordByID: recordByID,
+                        badgeByParticipant: badgeByParticipant,
+                        roundCount: state.rounds.count,
+                        playedAt: playedAt ?? Date()
                     ).renderedImage(),
                     preview: SharePreview("Résultats — \(definition.name.fr)")
                 ) {
@@ -216,7 +224,7 @@ struct ResultsView: View {
     }
 }
 
-private extension Badge.Kind {
+extension Badge.Kind {
     var label: String {
         switch self {
         case .winner: "Vainqueur"
@@ -226,6 +234,9 @@ private extension Badge.Kind {
         case .kamikaze: "Le kamikaze"
         case .unshakeable: "Imperturbable"
         case .photoFinish: "Photo finish"
+        case .sniper: "Le Sniper"
+        case .boulet: "Le Boulet"
+        case .landslide: "Le Fossé"
         }
     }
 }

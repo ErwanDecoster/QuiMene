@@ -94,16 +94,18 @@ final class LiveMatchModel {
         return participants[activeSeatIndex]
     }
 
-    var isLastParticipant: Bool { activeSeatIndex == participants.count - 1 }
-    var actionLabelTitle: LocalizedStringResource { isLastParticipant ? "Valider" : "Suivant" }
-
     var requiresCloserSelection: Bool {
         definition.scoring.modifiers.contains { $0.kind == .exclusiveFlag && $0.required }
     }
 
-    var finalStandings: [Standing] {
+    /// Classement courant, recalculé à chaque manche validée (mêmes règles — y compris le
+    /// départage — qu'au moment de conclure la partie). Sert aussi bien à `finalStandings` qu'à
+    /// trier/annoter la liste de saisie en direct, avant que la partie soit conclue.
+    var currentStandings: [Standing] {
         rules.standings(state, definition: definition)
     }
+
+    var finalStandings: [Standing] { currentStandings }
 
     /// `.ended` (fin normale) et `.abandoned` (abandon volontaire) affichent tous deux
     /// `ResultsView` — seule une partie encore réellement jouable montre le pavé numérique.
@@ -111,10 +113,11 @@ final class LiveMatchModel {
         state.status == .ended || state.status == .abandoned
     }
 
-    /// Doc 05 « Jeu libre » et tout jeu `manualStop` : la fin ne peut être détectée
-    /// automatiquement, elle est proposée dès qu'au moins une manche a été jouée.
+    /// Doc utilisateur — quel que soit le jeu, on doit pouvoir arrêter une partie quand on veut
+    /// plutôt que seulement ceux qui déclarent `manualStop` (Scrabble, Qwirkle…) : une seule manche
+    /// jouée suffit à produire un classement qui a du sens.
     var canEndManually: Bool {
-        !state.rounds.isEmpty && definition.end.conditions.contains { $0.type == .manualStop }
+        !state.rounds.isEmpty
     }
 
     func endManually() {
@@ -138,21 +141,12 @@ final class LiveMatchModel {
         pendingScores.removeValue(forKey: participantID)
     }
 
-    /// Le clavier système permet de passer d'un champ à l'autre par un tap direct, pas seulement
-    /// via le bouton « Suivant » — l'index courant doit rester synchronisé avec le focus réel.
+    /// Doc utilisateur — les scores ne sont jamais annoncés dans l'ordre des sièges autour de la
+    /// table : chaque champ se remplit par un tap direct, dans n'importe quel ordre. `activeSeatIndex`
+    /// ne sert plus qu'à mettre en valeur le champ actuellement focus, plus à séquencer la saisie.
     func focus(on participantID: Participant.ID) {
         guard let index = participants.firstIndex(where: { $0.id == participantID }) else { return }
         activeSeatIndex = index
-    }
-
-    /// `true` si l'avancée a validé et persisté la manche (dernier joueur atteint).
-    @discardableResult
-    func advance() -> Bool {
-        guard isLastParticipant else {
-            activeSeatIndex += 1
-            return false
-        }
-        return commitRound()
     }
 
     @discardableResult

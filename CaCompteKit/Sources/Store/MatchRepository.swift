@@ -202,6 +202,23 @@ public struct MatchRepository {
             .compactMap(\.player)
     }
 
+    /// Nombre de parties jouées (terminées ou abandonnées), tous jeux confondus, par joueur — sert
+    /// à faire remonter les habitués en tête de la présélection d'une nouvelle partie (comportement
+    /// calqué sur culnugame, doc utilisateur).
+    public func participationCounts() throws -> [UUID: Int] {
+        let descriptor = FetchDescriptor<MatchRecord>(
+            predicate: #Predicate { $0.statusRaw == "ended" || $0.statusRaw == "abandoned" }
+        )
+        var counts: [UUID: Int] = [:]
+        for match in try context.fetch(descriptor) {
+            for participant in match.participants {
+                guard let player = participant.player else { continue }
+                counts[player.id, default: 0] += 1
+            }
+        }
+        return counts
+    }
+
     /// Doc 09 — le journal complet d'une partie, tel que `LiveSession` en a besoin pour s'y
     /// resynchroniser (`syncHostLog`) ou pour accueillir un nouveau pair (`welcome`).
     public func currentLog(for match: MatchRecord) throws -> [StampedEvent] {

@@ -9,6 +9,7 @@ struct PlayerEditorView: View {
     @State private var model: PlayerEditorModel
     @State private var photoPickerItem: PhotosPickerItem?
     @State private var isPresentingDeleteConfirmation = false
+    @State private var isPresentingProfileScanner = false
 
     init(mode: PlayerEditorMode, context: ModelContext) {
         _model = State(initialValue: PlayerEditorModel(mode: mode, context: context))
@@ -32,6 +33,37 @@ struct PlayerEditorView: View {
                 }
 
                 if model.isEditing {
+                    Section {
+                        if let shareURL = model.shareURL {
+                            VStack(spacing: Space.sm) {
+                                QRCodeView(url: shareURL)
+                                    .frame(width: 160, height: 160)
+                                Text("Fais scanner ce code par l'ami que cette fiche représente, depuis sa propre fiche « Lier un profil reçu ».")
+                                    .font(.bodySmall)
+                                    .foregroundStyle(.textSecondary)
+                                    .multilineTextAlignment(.center)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, Space.sm)
+                        } else {
+                            Button("Partager ce profil") {
+                                model.ensureSharedProfileID()
+                            }
+                        }
+                        Button(model.shareURL == nil ? "Lier un profil reçu" : "Lier un autre profil") {
+                            isPresentingProfileScanner = true
+                        }
+                        if model.shareURL != nil {
+                            Button("Ne plus partager", role: .destructive) {
+                                model.unlinkProfile()
+                            }
+                        }
+                    } header: {
+                        Text("Profil partagé")
+                    } footer: {
+                        Text("Relie cette fiche à l'installation d'un ami : les parties jouées ensemble pourront apparaître dans son propre historique.")
+                    }
+
                     Section {
                         if model.isArchivedPlayer {
                             Button("Supprimer ce joueur", role: .destructive) {
@@ -77,6 +109,31 @@ struct PlayerEditorView: View {
                 }
                 model.setPhotoData(AvatarPhotoProcessor.process(data))
             }
+            .fullScreenCover(isPresented: $isPresentingProfileScanner) {
+                profileScannerCover
+            }
+        }
+    }
+
+    /// Doc 14 « Profils partagés » — même patron que le scanner de code d'appairage
+    /// (`JoinTabView`) : caméra plein écran, un bouton de fermeture superposé.
+    private var profileScannerCover: some View {
+        ZStack(alignment: .topTrailing) {
+            QRScannerView { code in
+                isPresentingProfileScanner = false
+                guard let url = URL(string: code), let payload = ProfileShareLink.parse(url) else { return }
+                model.linkProfile(id: payload.id)
+            }
+            .ignoresSafeArea()
+
+            Button {
+                isPresentingProfileScanner = false
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(.white, .black.opacity(0.5))
+            }
+            .padding()
         }
     }
 

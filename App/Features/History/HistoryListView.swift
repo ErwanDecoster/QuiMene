@@ -10,6 +10,7 @@ struct HistoryListView: View {
     @State private var isPresentingSettings = false
     @State private var editMode: EditMode = .inactive
     @State private var selectedMatchIDs = Set<UUID>()
+    @Environment(DeepLinkRouter.self) private var deepLinkRouter
 
     init(context: ModelContext, catalog: GameCatalog) {
         _model = State(initialValue: HistoryListModel(context: context, catalog: catalog))
@@ -87,8 +88,20 @@ struct HistoryListView: View {
             .sheet(isPresented: $isPresentingSettings) {
                 SettingsView()
             }
-            .onAppear { model.reload() }
+            .onAppear {
+                model.reload()
+                consumePendingHistoryFilter()
+            }
+            .onChange(of: deepLinkRouter.pendingHistoryGameID) { _, _ in consumePendingHistoryFilter() }
         }
+    }
+
+    /// Doc utilisateur — arrivée depuis « Meilleurs joueurs » (`GameLeaderboardView`) : la partie
+    /// commencée par un swipe sur l'onglet Jeux se termine ici, déjà filtrée sur ce jeu.
+    private func consumePendingHistoryFilter() {
+        guard let gameID = deepLinkRouter.pendingHistoryGameID else { return }
+        deepLinkRouter.pendingHistoryGameID = nil
+        model.selectedGameID = gameID
     }
 
     @Environment(\.modelContext) private var modelContext

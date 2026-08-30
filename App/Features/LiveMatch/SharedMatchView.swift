@@ -19,7 +19,6 @@ struct SharedMatchView: View {
     @State private var draftTexts: [Participant.ID: String] = [:]
     @State private var closedParticipantID: Participant.ID?
     @FocusState private var focusedParticipantID: Participant.ID?
-    @State private var activeIndex = 0
     @State private var isPresentingRoundHistory = false
     @State private var keyboardObserver = KeyboardObserver()
 
@@ -134,19 +133,19 @@ struct SharedMatchView: View {
             if model.canPropose {
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
-                    Button(isLastField ? "Envoyer" : "Suivant") {
-                        advanceFocus()
+                    Button("Envoyer") {
+                        Task { await sendRound() }
                     }
                 }
             }
         }
         // Doc utilisateur — même bug que `LiveMatchView` : la barre d'accessoires du clavier
         // disparaît avec lui, laissant l'écran sans moyen de valider la manche. Masqué quand le
-        // clavier est visible pour ne pas doublonner son propre bouton « Suivant/Envoyer ».
+        // clavier est visible pour ne pas doublonner son propre bouton « Envoyer ».
         .safeAreaInset(edge: .bottom) {
             if model.canPropose, !keyboardObserver.isVisible {
-                Button(isLastField ? "Envoyer" : "Suivant") {
-                    advanceFocus()
+                Button("Envoyer") {
+                    Task { await sendRound() }
                 }
                 .buttonStyle(.primary(size: .medium))
                 .frame(maxWidth: .infinity)
@@ -169,26 +168,6 @@ struct SharedMatchView: View {
             }
         }
         .animation(.default, value: model.roundExplanationMessage)
-        .onChange(of: focusedParticipantID) { _, newValue in
-            guard let newValue, let index = model.participants.firstIndex(where: { $0.id == newValue }) else { return }
-            activeIndex = index
-        }
-    }
-
-    /// Doc utilisateur (recette iPad) — sans cette barre d'accessoires, chaque champ devait être
-    /// tapé à la main l'un après l'autre. `LiveMatchView` (l'hôte) a déjà cet enchaînement ;
-    /// `SharedMatchView` en avait été privée par oubli, pas par choix.
-    private var isLastField: Bool {
-        activeIndex >= model.participants.count - 1
-    }
-
-    private func advanceFocus() {
-        guard isLastField else {
-            activeIndex += 1
-            focusedParticipantID = model.participants[activeIndex].id
-            return
-        }
-        Task { await sendRound() }
     }
 
     private func scoreField(for participant: Participant) -> some View {

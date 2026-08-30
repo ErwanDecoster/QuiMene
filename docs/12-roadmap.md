@@ -192,10 +192,11 @@ Par valeur décroissante, sans engagement de calendrier :
 | 1 | **Vagues 1.1 et 1.2 du catalogue** — 10 jeux de plus ([05](05-catalogue-jeux.md)) |
 | 2 | **Mode week-end** — classement cumulé sur plusieurs parties, demandé explicitement par le persona « groupe du week-end » |
 | 3 | **Saisie assistée** — grille Skyjo 3×4, dés du Yams, calcul du Tarot pas à pas |
-| 4 | **Statistiques de groupe** — face-à-face, évolution sur l'année, records collectifs |
+| 4 | **Statistiques de groupe** — face-à-face, évolution sur l'année, records collectifs. Classement par jeu ✅ ([06](06-statistiques.md)) ; face-à-face et évolution sur l'année restent à faire |
 | 5 | **Apple Watch** — saisie au poignet, WatchConnectivity |
 | 6 | **Export/import `.cacompte`** — anticipé pour Android, utile aussi entre utilisateurs Apple |
 | 7 | **macOS** — la cible SwiftUI existe déjà, coût faible, valeur faible |
+| 8 | **Profils partagés entre appareils** — qu'une partie créée sur mon téléphone apparaisse dans l'historique d'un ami qui y participait. Phase 1 (lier deux fiches par QR) ✅ ; phase 2 (la partie apparaît vraiment chez l'ami) reste à faire : [14](14-profils-partages.md) |
 
 ## Risques
 

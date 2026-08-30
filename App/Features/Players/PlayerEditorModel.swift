@@ -41,6 +41,17 @@ final class PlayerEditorModel {
 
     var photoData: Data?
 
+    /// Doc 14 « Profils partagés » — `nil` tant que cette fiche n'a jamais été partagée ni liée
+    /// à l'installation d'un ami.
+    private(set) var sharedProfileID: UUID?
+
+    /// Lien QR à faire scanner par l'ami que cette fiche représente — recalculé depuis
+    /// `sharedProfileID` et le pseudo courant, jamais stocké séparément.
+    var shareURL: URL? {
+        guard let sharedProfileID else { return nil }
+        return ProfileShareLink.url(id: sharedProfileID, name: nickname)
+    }
+
     var paletteID: String {
         didSet {
             guard oldValue != paletteID, !isRegeneratingProgrammatically else { return }
@@ -89,12 +100,14 @@ final class PlayerEditorModel {
             photoData = nil
             paletteID = String(generated.palette.index)
             hasManualAvatarOverride = false
+            sharedProfileID = nil
         case .edit(let player):
             nickname = player.nickname
             avatarKind = player.avatarKind == "photo" ? "photo" : "emoji"
             emojiValue = player.avatarKind == "emoji" ? player.avatarValue : (Avatar.curatedEmoji.first ?? "🙂")
             photoData = player.avatarKind == "photo" ? player.avatarPhoto : nil
             paletteID = player.paletteID
+            sharedProfileID = player.sharedProfileID
 
             // Un joueur existant dont l'emoji/la couleur ne correspond plus à ce que le hachage
             // du pseudo produirait aujourd'hui a forcément été personnalisé à la main.
@@ -158,6 +171,31 @@ final class PlayerEditorModel {
             player.paletteID = paletteID
             try repository.save()
         }
+    }
+
+    private var editedPlayer: PlayerRecord? {
+        if case .edit(let player) = mode { return player }
+        return nil
+    }
+
+    /// Doc 14 — génère l'identifiant partageable de cette fiche s'il n'existe pas encore, pour
+    /// que « Partager ce profil » ait un QR à afficher immédiatement après le tap.
+    func ensureSharedProfileID() {
+        guard let player = editedPlayer else { return }
+        sharedProfileID = try? repository.sharedProfileID(for: player)
+    }
+
+    /// Doc 14 — lie cette fiche à l'identifiant scanné sur le téléphone d'un ami.
+    func linkProfile(id: UUID) {
+        guard let player = editedPlayer else { return }
+        try? repository.linkSharedProfile(id, for: player)
+        sharedProfileID = id
+    }
+
+    func unlinkProfile() {
+        guard let player = editedPlayer else { return }
+        try? repository.unlinkSharedProfile(for: player)
+        sharedProfileID = nil
     }
 
     func archive() throws {

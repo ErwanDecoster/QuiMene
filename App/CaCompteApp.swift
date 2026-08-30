@@ -6,12 +6,12 @@ import SwiftUI
 import WidgetKit
 
 /// Doc utilisateur — onglets adressables par un deep link (`CaCompteApp.selectedTab`) : sans ça,
-/// un lien `cacompte://`/Handoff/App Intent qui arrive alors que « Jeux » n'est pas l'onglet actif
+/// un lien `cacompte://`/Handoff/App Intent qui arrive alors que l'onglet visé n'est pas actif
 /// pouvait rester sans effet visible — `TabView` ne construit un onglet non sélectionné qu'à la
-/// demande, `GamesTabView` n'existait donc pas encore pour recevoir l'événement (remontée
+/// demande, la vue cible n'existait donc pas encore pour recevoir l'événement (remontée
 /// utilisateur : « le scan du QR code ouvre bien l'application mais rien ne se passe »).
 private enum AppTab: Hashable {
-    case players, games, history
+    case players, games, join, history
 }
 
 @main
@@ -39,6 +39,9 @@ struct CaCompteApp: App {
                         GamesTabView()
                             .tabItem { Label("Jeux", systemImage: "die.face.5.fill") }
                             .tag(AppTab.games)
+                        JoinTabView()
+                            .tabItem { Label("Rejoindre", systemImage: "qrcode.viewfinder") }
+                            .tag(AppTab.join)
                         HistoryListView(context: container.mainContext, catalog: .embedded)
                             .tabItem { Label("Historique", systemImage: "clock.arrow.circlepath") }
                             .tag(AppTab.history)
@@ -54,7 +57,7 @@ struct CaCompteApp: App {
                 }
             }
             // Doc utilisateur — code d'appairage scanné par l'appareil photo système (schéma
-            // `cacompte://`, doc 09) : `DeepLinkRouter` fait le pont jusqu'à `GamesTabView`,
+            // `cacompte://`, doc 09) : `DeepLinkRouter` fait le pont jusqu'à `JoinTabView`,
             // potentiellement affichée sur un autre onglet au moment où le lien s'ouvre.
             .onOpenURL { url in
                 // Doc utilisateur — Widget (P9) : tap sur la carte de partie en cours
@@ -81,12 +84,12 @@ struct CaCompteApp: App {
                 guard let matchID = MatchContinuation.matchID(from: activity) else { return }
                 deepLinkRouter.pendingContinuedMatchID = matchID
             }
-            // Doc utilisateur — ces quatre déclencheurs (lien, Handoff, App Intents « Commence »/
-            // « Reprends ») veulent tous dire la même chose : montrer l'onglet Jeux. Posé ici (le
-            // `Group` racine, toujours monté dès le lancement) plutôt que dans `GamesTabView` :
-            // c'est justement ce qui manquait pour que l'onglet soit *construit* à temps.
+            // Doc utilisateur — chacun de ces déclencheurs (lien, Handoff, App Intents « Commence »/
+            // « Reprends », classement → historique) vise un onglet précis. Posé ici (le `Group`
+            // racine, toujours monté dès le lancement) plutôt que dans la vue cible : c'est
+            // justement ce qui manquait pour que l'onglet soit *construit* à temps.
             .onChange(of: deepLinkRouter.pendingJoin) { _, newValue in
-                if newValue != nil { selectedTab = .games }
+                if newValue != nil { selectedTab = .join }
             }
             .onChange(of: deepLinkRouter.pendingContinuedMatchID) { _, newValue in
                 if newValue != nil { selectedTab = .games }
@@ -96,6 +99,9 @@ struct CaCompteApp: App {
             }
             .onChange(of: deepLinkRouter.wantsResume) { _, newValue in
                 if newValue { selectedTab = .games }
+            }
+            .onChange(of: deepLinkRouter.pendingHistoryGameID) { _, newValue in
+                if newValue != nil { selectedTab = .history }
             }
         }
     }

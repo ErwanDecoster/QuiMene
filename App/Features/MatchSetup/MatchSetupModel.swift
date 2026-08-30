@@ -8,6 +8,10 @@ import SwiftUI
 @Observable
 final class MatchSetupModel {
     let definition: GameDefinition
+    /// Doc utilisateur — les habitués en tête de la liste, comme sur culnugame : sans ça, un
+    /// groupe de 8+ joueurs doit chercher les mêmes 4-5 noms dans une liste triée arbitrairement à
+    /// chaque nouvelle partie.
+    let orderedAvailablePlayers: [PlayerRecord]
     var selectedPlayers: [PlayerRecord] = []
     /// Doc 05 : chaque jeu déclare ses propres variantes (`skyjo.json` a `threshold` et
     /// `doublePenalty`, `yams.json` a `upperBonusThreshold`…) — un dictionnaire générique plutôt
@@ -37,6 +41,13 @@ final class MatchSetupModel {
     init(definition: GameDefinition, availablePlayers: [PlayerRecord], context: ModelContext) {
         self.definition = definition
         self.repository = MatchRepository(context: context)
+        let counts = (try? repository.participationCounts()) ?? [:]
+        self.orderedAvailablePlayers = availablePlayers.sorted { lhs, rhs in
+            let l = counts[lhs.id] ?? 0
+            let r = counts[rhs.id] ?? 0
+            if l != r { return l > r }
+            return lhs.sortIndex < rhs.sortIndex
+        }
         for variant in definition.variants {
             variantValues[variant.id] = variant.defaultValue
         }

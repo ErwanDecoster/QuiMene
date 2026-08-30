@@ -120,9 +120,12 @@ raison de regarder l'écran de résultats en entier.
 | 🎢 **Les montagnes russes** | plus fort écart-type, et > 160 % de la moyenne |
 | 🚀 **La remontada** | gain ≥ 3 places depuis le pire rang atteint |
 | 💥 **Le kamikaze** | détient le plus gros tour dans un jeu où le plus bas gagne |
-| 🎯 **Chirurgien** | Wizard : ≥ 75 % d'annonces exactes ; Mölkky : aucun dépassement |
+| 🎯 **Chirurgien** | Wizard : ≥ 75 % d'annonces exactes ; Mölkky : aucun dépassement — **non codé** (Wizard n'est pas encore au catalogue, voir [05](05-catalogue-jeux.md)) |
 | 🧊 **Imperturbable** | leader pendant ≥ 80 % des manches |
 | 🍀 **Photo finish** | vainqueur avec moins de 3 points d'écart |
+| 🏹 **Le Sniper** | détient le meilleur tour du match, dans le sens favorable au jeu — symétrique du Kamikaze, non attribué dans les jeux à cible exacte (Mölkky…) |
+| 🪨 **Le Boulet** | détient le pire tour du match, dans un jeu où le plus haut gagne — pendant du Kamikaze pour l'autre sens de jeu |
+| 🌊 **Le Fossé** | victoire écrasante : l'écart avec le deuxième dépasse 3× la dispersion habituelle des manches — symétrique de Photo finish |
 
 Règles d'attribution : un joueur ne reçoit qu'un badge (le plus rare l'emporte) ; un badge dont
 la condition n'est remplie par personne n'est pas affiché ; aucun badge n'est décerné avant
@@ -148,6 +151,26 @@ gagner à 8. La fiche affiche donc aussi le **rang moyen normalisé**
 Pas de classement Elo en v1 : sur des groupes de 4 à 8 personnes qui jouent quelques dizaines
 de parties par an, il produirait un chiffre instable et illisible. Réévaluable si le volume
 de données le justifie un jour.
+
+## Classement par jeu
+
+Doc roadmap [12](12-roadmap.md), item « Statistiques de groupe » (après la v1) — qui est le/la
+meilleur(e) à un jeu donné, tous joueurs confondus, à travers toutes leurs parties terminées.
+`LeaderboardRepository` (`CaCompteKit/Sources/Store`) agrège toutes les `ParticipantRecord` d'un
+`gameID`, groupées par joueur : parties jouées, victoires, taux de victoire, rang moyen normalisé
+(même mesure que la fiche de profil, ci-dessus). Tri par taux de victoire, puis rang moyen
+normalisé, puis nombre de parties — jamais par ordre d'itération d'un dictionnaire (doc 03 n°5).
+
+Accessible depuis deux points d'entrée :
+
+- **Onglet Jeux** (`GamesTabView`) — une icône trophée sur chaque ligne de jeu ouvre son
+  classement, sans passer par la fiche d'un joueur.
+- **Fiche joueur** (`ProfileView`, section « Par jeu ») — chaque jeu devient un lien vers son
+  classement ; un jeu où ce joueur est en tête affiche un badge « Meilleur joueur » directement
+  dans la liste, dès lors qu'au moins un autre joueur a aussi joué ce jeu (sinon un classement de
+  un ne veut rien dire — même garde-fou que la Némésis, qui exige cinq parties communes).
+
+Même politique de calcul que le reste des statistiques : à la demande, aucun agrégat persisté.
 
 ## Performance
 

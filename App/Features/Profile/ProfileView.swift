@@ -14,6 +14,9 @@ struct ProfileView: View {
 
     @Environment(\.modelContext) private var modelContext
     @State private var stats: ProfileStats = .empty
+    /// Doc 06 « Statistiques de groupe » — jeux où ce joueur est en tête du classement
+    /// (`LeaderboardRepository`), pour la mention « Meilleur joueur » dans `byGameSection`.
+    @State private var topGameIDs: Set<String> = []
     @State private var isPresentingEditor = false
     /// Doc utilisateur — le mois en cours par défaut, l'année en un tap : `stats.activity`
     /// couvre déjà 12 mois (doc 06), rien à recalculer, seule la présentation change.
@@ -63,7 +66,24 @@ struct ProfileView: View {
     }
 
     private func load() {
-        stats = (try? ProfileRepository(context: modelContext).stats(for: player, catalog: catalog)) ?? .empty
+        let newStats = (try? ProfileRepository(context: modelContext).stats(for: player, catalog: catalog)) ?? .empty
+        stats = newStats
+        topGameIDs = computeTopGameIDs(for: newStats)
+    }
+
+    /// Doc utilisateur — « voir facilement dans quel jeu on est le meilleur » : un jeu ne compte
+    /// que si au moins un autre joueur l'a aussi joué (classement de 1, sinon, ne veut rien dire —
+    /// même logique de seuil que la Némésis, doc 06).
+    private func computeTopGameIDs(for stats: ProfileStats) -> Set<String> {
+        let repository = LeaderboardRepository(context: modelContext)
+        var result: Set<String> = []
+        for game in stats.byGame {
+            guard let entries = try? repository.leaderboard(for: game.gameID), entries.count >= 2 else { continue }
+            if entries[0].playerID == player.id {
+                result.insert(game.gameID)
+            }
+        }
+        return result
     }
 
     private var header: some View {
@@ -102,24 +122,36 @@ struct ProfileView: View {
         VStack(alignment: .leading, spacing: Space.md) {
             Text("Par jeu").font(.h4).foregroundStyle(.textPrimary)
             ForEach(stats.byGame, id: \.gameID) { game in
-                Card {
-                    VStack(alignment: .leading, spacing: Space.xs) {
-                        Text(game.gameName).font(.h6).foregroundStyle(.textPrimary)
-                        Text("\(game.played) partie(s) · \(game.wins) victoire(s) · \(game.winRate.formatted(.percent.precision(.fractionLength(0))))")
-                            .font(.bodySmall)
-                            .foregroundStyle(.textSecondary)
-                        if let best = game.bestScore {
-                            Text("Meilleur score : \(best.value) — \(best.date.formatted(date: .abbreviated, time: .omitted))")
+                NavigationLink {
+                    GameLeaderboardView(gameID: game.gameID, gameName: game.gameName)
+                } label: {
+                    Card {
+                        VStack(alignment: .leading, spacing: Space.xs) {
+                            HStack(spacing: Space.xs) {
+                                Text(game.gameName).font(.h6).foregroundStyle(.textPrimary)
+                                if topGameIDs.contains(game.gameID) {
+                                    Label("Meilleur joueur", systemImage: "crown.fill")
+                                        .font(.label)
+                                        .foregroundStyle(.brandBrass)
+                                }
+                            }
+                            Text("\(game.played) partie(s) · \(game.wins) victoire(s) · \(game.winRate.formatted(.percent.precision(.fractionLength(0))))")
                                 .font(.bodySmall)
                                 .foregroundStyle(.textSecondary)
-                        }
-                        if let worst = game.worstScore {
-                            Text("Pire score : \(worst.value) — \(worst.date.formatted(date: .abbreviated, time: .omitted))")
-                                .font(.bodySmall)
-                                .foregroundStyle(.textSecondary)
+                            if let best = game.bestScore {
+                                Text("Meilleur score : \(best.value) — \(best.date.formatted(date: .abbreviated, time: .omitted))")
+                                    .font(.bodySmall)
+                                    .foregroundStyle(.textSecondary)
+                            }
+                            if let worst = game.worstScore {
+                                Text("Pire score : \(worst.value) — \(worst.date.formatted(date: .abbreviated, time: .omitted))")
+                                    .font(.bodySmall)
+                                    .foregroundStyle(.textSecondary)
+                            }
                         }
                     }
                 }
+                .buttonStyle(.plain)
             }
         }
     }

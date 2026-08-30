@@ -9,14 +9,25 @@ struct ResultsShareCard: View {
     let gameName: String
     let standings: [Standing]
     let recordByID: [Participant.ID: ParticipantRecord]
+    /// Doc utilisateur — remontée : la carte partagée ne disait presque rien de la partie qui
+    /// vient de se jouer. Le badge du podium, le nombre de manches et la date en disent davantage
+    /// à qui reçoit l'image sans avoir suivi la partie en direct.
+    let badgeByParticipant: [Participant.ID: Badge]
+    let roundCount: Int
+    let playedAt: Date
 
     private let pointSize = CGSize(width: 360, height: 450)
 
     var body: some View {
-        VStack(spacing: Space.xl) {
-            Text(gameName)
-                .font(.h2)
-                .foregroundStyle(.textPrimary)
+        VStack(spacing: Space.lg) {
+            VStack(spacing: Space.xxs) {
+                Text(gameName)
+                    .font(.h2)
+                    .foregroundStyle(.textPrimary)
+                Text("\(roundCount) manche(s) · \(playedAt.formatted(date: .abbreviated, time: .omitted))")
+                    .font(.bodySmall)
+                    .foregroundStyle(.textSecondary)
+            }
 
             VStack(spacing: Space.md) {
                 ForEach(standings.prefix(3), id: \.participantID) { standing in
@@ -26,11 +37,21 @@ struct ResultsShareCard: View {
                                 .font(.h4)
                                 .foregroundStyle(standing.rank == 1 ? .brandBrass : .textSecondary)
                             AvatarView(avatar: record.avatar, size: .medium)
-                            Text(record.nicknameSnapshot).font(.h5).foregroundStyle(.textPrimary)
+                            VStack(alignment: .leading, spacing: Space.xxs) {
+                                Text(record.nicknameSnapshot).font(.h5).foregroundStyle(.textPrimary)
+                                if let badge = badgeByParticipant[standing.participantID] {
+                                    Text(badge.kind.label).font(.label).foregroundStyle(.brandBrass)
+                                }
+                            }
                             Spacer()
                             Text(standing.score.formatted()).font(.scoreL).foregroundStyle(.textSecondary)
                         }
                     }
+                }
+                if standings.count > 3 {
+                    Text("+ \(standings.count - 3) autre(s) joueur(s)")
+                        .font(.bodySmall)
+                        .foregroundStyle(.textTertiary)
                 }
             }
 

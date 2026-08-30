@@ -17,6 +17,10 @@ public final class PlayerRecord {
     public var createdAt: Date = Date()
     public var isArchived: Bool = false
     public var sortIndex: Int = 0
+    /// Doc 14 « Profils partagés » — identifiant permanent, partagé avec la fiche d'un ami sur
+    /// son propre appareil (jamais régénéré une fois posé : un lien déjà distribué en QR doit
+    /// rester valable). `nil` tant que cette fiche n'a jamais été partagée ni liée.
+    public var sharedProfileID: UUID?
 
     /// Inverse de `ParticipantRecord.player` — indispensable dès que CloudKit est actif : une
     /// relation sans inverse déclarée des deux côtés fait planter l'ouverture du container

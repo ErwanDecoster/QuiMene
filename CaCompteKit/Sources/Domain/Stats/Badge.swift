@@ -8,6 +8,9 @@ public struct Badge: Sendable, Equatable {
         case kamikaze
         case unshakeable
         case photoFinish
+        case sniper
+        case boulet
+        case landslide
     }
 
     public let kind: Kind

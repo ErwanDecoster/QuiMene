@@ -54,6 +54,31 @@ public struct PlayerRepository {
         try context.save()
     }
 
+    /// Doc 14 « Profils partagés » — génère l'identifiant partageable de cette fiche s'il
+    /// n'existe pas encore. Jamais régénéré ensuite : un QR déjà distribué à un ami doit rester
+    /// valable tant que la fiche n'est pas explicitement déliée.
+    @discardableResult
+    public func sharedProfileID(for player: PlayerRecord) throws -> UUID {
+        if let existing = player.sharedProfileID { return existing }
+        let id = UUID()
+        player.sharedProfileID = id
+        try context.save()
+        return id
+    }
+
+    /// Lie cette fiche à l'identifiant scanné depuis l'appareil d'un ami (doc 14) — écrase un
+    /// éventuel identifiant précédent, cette fiche ne peut être liée qu'à une seule personne à
+    /// la fois.
+    public func linkSharedProfile(_ id: UUID, for player: PlayerRecord) throws {
+        player.sharedProfileID = id
+        try context.save()
+    }
+
+    public func unlinkSharedProfile(for player: PlayerRecord) throws {
+        player.sharedProfileID = nil
+        try context.save()
+    }
+
     /// Ordre manuel de la liste des joueurs (`sortIndex`) — SwiftData ne préserve l'ordre
     /// d'aucune collection (doc 03, contrainte CloudKit n°5).
     public func reorder(_ players: [PlayerRecord]) throws {
