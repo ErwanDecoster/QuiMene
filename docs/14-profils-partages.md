@@ -378,6 +378,23 @@ avertissement distinct s'affiche quand le scan changerait vraiment de personne, 
 pseudo ou son avatar) ne déclenche pas cet avertissement — comparaison sur l'identifiant scanné, pas
 seulement sur le fait qu'un lien existe déjà.
 
+### Phase 4, suite — « Lier » renommé « Suivre », et un bouton qui ne disait pas son importance ✅
+
+Deux remontées de vocabulaire. D'une part, « Lier » (le verbe utilisé pour suivre un ami) et
+« Ne plus suivre » (déjà présent pour délier) désignaient la même relation avec deux mots
+différents — incohérence qui n'aidait pas à comprendre le concept. D'autre part, sur une fiche
+déjà liée, le bouton « Lier un autre profil » ne laissait rien deviner de son importance :
+tapé, il remplace le suivi actuel (voir l'entrée précédente) sans que le libellé du bouton
+lui-même ne l'annonce — seul l'écran de confirmation, une étape plus loin, en parlait.
+
+Corrigé en renommant « Lier » en « Suivre » partout (boutons, titre de l'écran de confirmation,
+textes d'avertissement) — le vocabulaire est désormais celui déjà utilisé par « Ne plus suivre »,
+qui n'a pas changé. Le bouton de remplacement rappelle en plus directement le nom de la personne
+actuellement suivie : « Suivre quelqu'un d'autre (remplace Théo) », pour que l'enjeu soit visible
+avant même d'ouvrir le scanner, pas seulement à la confirmation. Le texte d'explication en pied de
+section (« Profil partagé ») a aussi été simplifié : une phrase par action, à l'impératif, plutôt
+qu'une seule phrase dense mêlant les deux notions.
+
 ## Décisions ouvertes
 
 Ce que ce document tranche par hypothèse plutôt que par confirmation — à valider avant la phase

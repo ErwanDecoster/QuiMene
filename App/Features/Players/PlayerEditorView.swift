@@ -36,12 +36,12 @@ struct PlayerEditorView: View {
                     Section {
                         if let shareURL = model.shareURL {
                             // Doc 14, phase 4 — c'est *la* fiche que cet appareil partage comme la
-                            // sienne : ni « Lier un profil reçu » (elle ne peut pas aussi suivre
+                            // sienne : ni « Suivre un profil reçu » (elle ne peut pas aussi suivre
                             // quelqu'un d'autre), une seule action possible, la délier.
                             VStack(spacing: Space.sm) {
                                 QRCodeView(url: shareURL)
                                     .frame(width: 160, height: 160)
-                                Text("Fais scanner ce code par l'ami avec qui tu veux partager ton historique, depuis sa propre fiche « Lier un profil reçu ».")
+                                Text("Fais scanner ce code par l'ami avec qui tu veux partager ton historique, depuis sa propre fiche « Suivre un profil reçu ».")
                                     .font(.bodySmall)
                                     .foregroundStyle(.textSecondary)
                                     .multilineTextAlignment(.center)
@@ -55,11 +55,16 @@ struct PlayerEditorView: View {
                             // Doc 14, phase 4 — remontée : cette fiche suit déjà un ami, elle ne
                             // doit plus pouvoir être partagée comme si c'était la mienne (elle
                             // rediffuserait l'identité de l'ami, pas la sienne propre) — pas de
-                            // bouton « Partager » ici, seulement « Lier un autre » ou délier.
-                            Text("Liée à **\(linkedName)**, le \(linkedDate.formatted(date: .abbreviated, time: .omitted))")
+                            // bouton « Partager » ici, seulement « Suivre quelqu'un d'autre » ou
+                            // délier.
+                            // Doc utilisateur — remontée : « Lier un autre profil » ne laissait pas
+                            // deviner qu'il s'agit d'une action importante (elle remplace le suivi
+                            // actuel) ; le nom de la personne actuellement suivie est maintenant
+                            // rappelé directement dans le bouton, avant même d'ouvrir le scanner.
+                            Text("Tu suis **\(linkedName)**, depuis le \(linkedDate.formatted(date: .abbreviated, time: .omitted))")
                                 .font(.bodySmall)
                                 .foregroundStyle(.textSecondary)
-                            Button("Lier un autre profil") {
+                            Button("Suivre quelqu'un d'autre (remplace \(linkedName))") {
                                 isPresentingProfileScanner = true
                             }
                             Button("Ne plus suivre ce profil", role: .destructive) {
@@ -77,14 +82,17 @@ struct PlayerEditorView: View {
                                     .font(.bodySmall)
                                     .foregroundStyle(.semanticError)
                             }
-                            Button("Lier un profil reçu") {
+                            Button("Suivre un profil reçu") {
                                 isPresentingProfileScanner = true
                             }
                         }
                     } header: {
                         Text("Profil partagé")
                     } footer: {
-                        Text("« Partager » désigne cette fiche comme la tienne — une seule par appareil. « Lier » relie cette fiche à celle d'un ami sur son propre appareil : les parties jouées ensemble pourront apparaître dans son historique, sans lui montrer tes autres parties.")
+                        // Doc utilisateur — remontée : la phrase précédente (deux notions denses
+                        // dans une seule phrase à tiret) était difficile à suivre. Une phrase par
+                        // action, à l'impératif comme les boutons eux-mêmes.
+                        Text("Partage ta fiche pour que tes amis puissent te suivre. Suis un ami pour retrouver vos parties jouées ensemble dans son historique.")
                     }
 
                     Section {
@@ -263,7 +271,7 @@ private struct ConfirmProfileLinkView: View {
     let onCancel: () -> Void
 
     @State private var adoptNameAndAvatar = true
-    /// Doc utilisateur — remontée : rien n'indiquait qu'un tap sur « Lier » avait été pris en
+    /// Doc utilisateur — remontée : rien n'indiquait qu'un tap sur « Suivre » avait été pris en
     /// compte, ce qui pouvait se lire comme un écran figé. `Task { @MainActor in }` cède la main
     /// une fois avant d'appeler `onConfirm` (potentiellement bloquant — écriture SwiftData) pour
     /// laisser SwiftUI le temps d'afficher cet indicateur avant que le travail ne démarre.
@@ -273,8 +281,8 @@ private struct ConfirmProfileLinkView: View {
 
     private var confirmButtonTitle: String {
         if existingLinkName != nil { return "Remplacer le lien" }
-        if conflictingPlayerName != nil { return "Lier quand même" }
-        return "Lier"
+        if conflictingPlayerName != nil { return "Suivre quand même" }
+        return "Suivre"
     }
 
     var body: some View {
@@ -299,7 +307,7 @@ private struct ConfirmProfileLinkView: View {
 
                 if let existingLinkName {
                     Section {
-                        Text("Cette fiche est actuellement liée à « \(existingLinkName) ». La lier à « \(payload.name) » remplacera ce lien : \(existingLinkName) ne recevra plus les parties jouées avec cette fiche.")
+                        Text("Cette fiche suit actuellement **\(existingLinkName)**. Continuer la fera suivre **\(payload.name)** à la place : \(existingLinkName) ne recevra plus les parties jouées avec cette fiche.")
                             .font(.bodySmall)
                             .foregroundStyle(.semanticError)
                     }
@@ -307,7 +315,7 @@ private struct ConfirmProfileLinkView: View {
 
                 if let conflictingPlayerName {
                     Section {
-                        Text("Ce profil est déjà lié à la fiche « \(conflictingPlayerName) » sur cet appareil. Continuer liera aussi celle-ci — à ne faire que si c'est la même personne (par exemple une fiche recréée).")
+                        Text("Ce profil est déjà suivi par la fiche « \(conflictingPlayerName) » sur cet appareil. Continuer le fera suivre aussi par celle-ci — à ne faire que si c'est la même personne (par exemple une fiche recréée).")
                             .font(.bodySmall)
                             .foregroundStyle(.semanticError)
                     }
@@ -323,7 +331,7 @@ private struct ConfirmProfileLinkView: View {
                     }
                 }
             }
-            .navigationTitle("Lier ce profil ?")
+            .navigationTitle("Suivre ce profil ?")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
