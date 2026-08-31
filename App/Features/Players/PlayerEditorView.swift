@@ -10,7 +10,6 @@ struct PlayerEditorView: View {
     @State private var photoPickerItem: PhotosPickerItem?
     @State private var isPresentingDeleteConfirmation = false
     @State private var isPresentingProfileScanner = false
-    @State private var pendingProfileLink: ProfileShareLink.Payload?
 
     init(mode: PlayerEditorMode, context: ModelContext) {
         _model = State(initialValue: PlayerEditorModel(mode: mode, context: context))
@@ -52,16 +51,24 @@ struct PlayerEditorView: View {
                             Button("Ne plus partager", role: .destructive) {
                                 model.unlinkProfile()
                             }
-                        } else {
-                            // Doc 14, phase 4 — cette fiche n'est pas *la mienne* (elle peut déjà
-                            // suivre un ami, ou n'être encore ni l'un ni l'autre) : les deux
-                            // actions restent possibles, au choix (« c'est moi » vs « je suis en
-                            // train de suivre quelqu'un »).
-                            if let linkedName = model.linkedProfileName, let linkedDate = model.linkedProfileDate {
-                                Text("Liée à **\(linkedName)**, le \(linkedDate.formatted(date: .abbreviated, time: .omitted))")
-                                    .font(.bodySmall)
-                                    .foregroundStyle(.textSecondary)
+                        } else if let linkedName = model.linkedProfileName, let linkedDate = model.linkedProfileDate {
+                            // Doc 14, phase 4 — remontée : cette fiche suit déjà un ami, elle ne
+                            // doit plus pouvoir être partagée comme si c'était la mienne (elle
+                            // rediffuserait l'identité de l'ami, pas la sienne propre) — pas de
+                            // bouton « Partager » ici, seulement « Lier un autre » ou délier.
+                            Text("Liée à **\(linkedName)**, le \(linkedDate.formatted(date: .abbreviated, time: .omitted))")
+                                .font(.bodySmall)
+                                .foregroundStyle(.textSecondary)
+                            Button("Lier un autre profil") {
+                                isPresentingProfileScanner = true
                             }
+                            Button("Ne plus suivre ce profil", role: .destructive) {
+                                model.unlinkProfile()
+                            }
+                        } else {
+                            // Doc 14, phase 4 — fiche encore vierge : les deux choix restent
+                            // possibles, au choix (« c'est moi » vs « je suis en train de suivre
+                            // quelqu'un »).
                             Button("Partager ce profil (c'est moi)") {
                                 model.ensureSharedProfileID()
                             }
@@ -70,13 +77,8 @@ struct PlayerEditorView: View {
                                     .font(.bodySmall)
                                     .foregroundStyle(.semanticError)
                             }
-                            Button(model.linkedProfileName == nil ? "Lier un profil reçu" : "Lier un autre profil") {
+                            Button("Lier un profil reçu") {
                                 isPresentingProfileScanner = true
-                            }
-                            if model.linkedProfileName != nil {
-                                Button("Ne plus suivre ce profil", role: .destructive) {
-                                    model.unlinkProfile()
-                                }
                             }
                         }
                     } header: {
@@ -130,18 +132,15 @@ struct PlayerEditorView: View {
                 }
                 model.setPhotoData(AvatarPhotoProcessor.process(data))
             }
+            // Doc 14, phase 4 — remontée : scanner puis confirmer utilisait deux présentations
+            // système distinctes (plein écran, puis feuille) — les enchaîner dans le même geste
+            // faisait sensiblement traîner la transition (SwiftUI attend que la première se
+            // referme avant d'ouvrir la seconde). Une seule présentation, dont le contenu bascule
+            // en interne entre scan et confirmation, plus rien à attendre entre les deux.
             .fullScreenCover(isPresented: $isPresentingProfileScanner) {
-                profileScannerCover
-            }
-            // Doc 14, phase 3 « Limites de confiance » — remontée : rien n'affichait le pseudo
-            // scanné avant de lier, un scan malencontreux (mauvais code, code retransmis) passait
-            // inaperçu. Confirmation systématique, avec le choix d'adopter aussi le pseudo/avatar
-            // de la personne représentée.
-            .sheet(item: $pendingProfileLink) { payload in
-                ConfirmProfileLinkView(
-                    payload: payload,
-                    conflictingPlayerName: model.conflictingPlayerName(forSharedProfileID: payload.id)
-                ) { adoptNameAndAvatar in
+                ProfileLinkScanFlow(
+                    conflictingPlayerName: { model.conflictingPlayerName(forSharedProfileID: $0) }
+                ) { payload, adoptNameAndAvatar in
                     model.linkProfile(
                         id: payload.id,
                         name: payload.name,
@@ -150,33 +149,8 @@ struct PlayerEditorView: View {
                         paletteID: payload.paletteID,
                         adoptNameAndAvatar: adoptNameAndAvatar
                     )
-                    pendingProfileLink = nil
-                } onCancel: {
-                    pendingProfileLink = nil
                 }
             }
-        }
-    }
-
-    /// Doc 14 « Profils partagés » — même patron que le scanner de code d'appairage
-    /// (`JoinTabView`) : caméra plein écran, un bouton de fermeture superposé.
-    private var profileScannerCover: some View {
-        ZStack(alignment: .topTrailing) {
-            QRScannerView { code in
-                isPresentingProfileScanner = false
-                guard let url = URL(string: code), let payload = ProfileShareLink.parse(url) else { return }
-                pendingProfileLink = payload
-            }
-            .ignoresSafeArea()
-
-            Button {
-                isPresentingProfileScanner = false
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.system(size: 32))
-                    .foregroundStyle(.white, .black.opacity(0.5))
-            }
-            .padding()
         }
     }
 
@@ -281,6 +255,11 @@ private struct ConfirmProfileLinkView: View {
     let onCancel: () -> Void
 
     @State private var adoptNameAndAvatar = true
+    /// Doc utilisateur — remontée : rien n'indiquait qu'un tap sur « Lier » avait été pris en
+    /// compte, ce qui pouvait se lire comme un écran figé. `Task { @MainActor in }` cède la main
+    /// une fois avant d'appeler `onConfirm` (potentiellement bloquant — écriture SwiftData) pour
+    /// laisser SwiftUI le temps d'afficher cet indicateur avant que le travail ne démarre.
+    @State private var isLinking = false
 
     private var canAdoptAvatar: Bool { payload.avatarKind != "photo" }
 
@@ -327,14 +306,64 @@ private struct ConfirmProfileLinkView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Annuler") { onCancel() }
+                        .disabled(isLinking)
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button(conflictingPlayerName == nil ? "Lier" : "Lier quand même") {
-                        onConfirm(adoptNameAndAvatar)
+                    if isLinking {
+                        ProgressView()
+                    } else {
+                        Button(conflictingPlayerName == nil ? "Lier" : "Lier quand même") {
+                            isLinking = true
+                            Task { @MainActor in
+                                onConfirm(adoptNameAndAvatar)
+                            }
+                        }
                     }
                 }
             }
         }
-        .presentationDetents([.medium])
+    }
+}
+
+/// Doc 14, phase 4 — remontée : scanner puis confirmer utilisait deux présentations système
+/// distinctes (plein écran, puis feuille) — les enchaîner faisait parfois sensiblement traîner la
+/// transition. Un seul plein écran, dont le contenu bascule en interne entre scan et
+/// confirmation : plus de seconde présentation système à attendre.
+private struct ProfileLinkScanFlow: View {
+    let conflictingPlayerName: (UUID) -> String?
+    let onConfirm: (ProfileShareLink.Payload, _ adoptNameAndAvatar: Bool) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var scannedPayload: ProfileShareLink.Payload?
+
+    var body: some View {
+        if let scannedPayload {
+            ConfirmProfileLinkView(
+                payload: scannedPayload,
+                conflictingPlayerName: conflictingPlayerName(scannedPayload.id)
+            ) { adoptNameAndAvatar in
+                onConfirm(scannedPayload, adoptNameAndAvatar)
+                dismiss()
+            } onCancel: {
+                dismiss()
+            }
+        } else {
+            ZStack(alignment: .topTrailing) {
+                QRScannerView { code in
+                    guard let url = URL(string: code), let payload = ProfileShareLink.parse(url) else { return }
+                    scannedPayload = payload
+                }
+                .ignoresSafeArea()
+
+                Button {
+                    dismiss()
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 32))
+                        .foregroundStyle(.white, .black.opacity(0.5))
+                }
+                .padding()
+            }
+        }
     }
 }

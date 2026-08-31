@@ -215,6 +215,10 @@ final class PlayerEditorModel {
             isMyOwnSharedProfile = true
         } catch PlayerRepositoryError.alreadySharingAnotherProfile(let nickname) {
             shareConflictMessage = "Tu partages déjà ta fiche « \(nickname) » comme la tienne. Une seule fiche par appareil peut l'être — délie-la d'abord si tu veux la remplacer par celle-ci."
+        } catch PlayerRepositoryError.cannotShareALinkedProfile {
+            // Doc 14, phase 4 — ne devrait plus arriver : la vue ne propose plus ce bouton sur
+            // une fiche déjà liée à un ami. Filet de sécurité si jamais appelé autrement.
+            shareConflictMessage = "Cette fiche suit déjà un ami : elle ne peut pas aussi être partagée comme la tienne."
         } catch {
             sharedProfileID = nil
         }

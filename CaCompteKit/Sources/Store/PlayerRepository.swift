@@ -5,6 +5,12 @@ import SwiftData
 /// tenter d'en partager une seconde est un vrai refus, pas un cas silencieusement ignoré.
 public enum PlayerRepositoryError: Error, Sendable, Equatable {
     case alreadySharingAnotherProfile(nickname: String)
+    /// Doc 14, phase 4 — remontée : une fiche déjà liée à l'identifiant d'un ami (elle *suit*
+    /// quelqu'un) pouvait quand même être « partagée » — `sharedProfileID(for:)` retournait tout
+    /// simplement l'identifiant déjà présent, celui de l'ami, sans jamais vérifier qu'il
+    /// s'agissait bien du sien. Ça permettait de rediffuser l'identité d'un ami comme si c'était
+    /// la sienne propre.
+    case cannotShareALinkedProfile
 }
 
 /// Doc 02 : les écritures interactives (peu d'objets, latence nulle) restent sur le
@@ -69,7 +75,12 @@ public struct PlayerRepository {
     /// rester valable tant que la fiche n'est pas explicitement déliée.
     @discardableResult
     public func sharedProfileID(for player: PlayerRecord) throws -> UUID {
-        if let existing = player.sharedProfileID { return existing }
+        if let existing = player.sharedProfileID {
+            guard player.sharedProfileIsMine else {
+                throw PlayerRepositoryError.cannotShareALinkedProfile
+            }
+            return existing
+        }
         if let existingMine = try myOwnSharedPlayer(), existingMine.id != player.id {
             throw PlayerRepositoryError.alreadySharingAnotherProfile(nickname: existingMine.nickname)
         }

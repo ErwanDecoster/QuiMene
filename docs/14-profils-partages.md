@@ -337,6 +337,31 @@ tête des listes de joueurs (`PlayersListView`, présélection de `MatchSetupMod
 le tri par ailleurs choisi — c'est la seule fiche qui représente l'utilisateur de cet appareil,
 elle ne doit pas se perdre dans un tri par fréquence ou alphabétique.
 
+### Phase 4, suite — un vrai trou dans « une seule fiche partageable », et le scan qui traînait ✅
+
+Deux remontées après coup sur la phase 4.
+
+**« Partager » restait possible sur une fiche qui suit déjà un ami.** `sharedProfileID(for:)`
+retournait tout simplement l'identifiant déjà présent dès qu'il y en avait un, sans vérifier qu'il
+s'agissait bien du sien — sur une fiche *liée* à un ami (donc déjà pourvue d'un identifiant, celui
+de l'ami), ça revenait à rediffuser l'identité de l'ami comme si c'était la sienne propre :
+exactement l'usurpation par pseudo décrite plus haut, mais auto-infligée par inadvertance.
+Corrigé à deux niveaux : `sharedProfileID(for:)` refuse désormais explicitement
+(`PlayerRepositoryError.cannotShareALinkedProfile`) si l'identifiant déjà présent n'est pas celui
+que cette fiche partage elle-même ; `PlayerEditorView` ne propose même plus le bouton
+« Partager » sur une fiche déjà liée à un ami (trois cas désormais distingués : la mienne, celle
+qui suit un ami, celle qui n'est encore ni l'une ni l'autre).
+
+**Scanner puis confirmer transitionnait lentement.** Deux présentations système enchaînées dans
+le même geste (`.fullScreenCover` pour la caméra, puis `.sheet` pour la confirmation) — SwiftUI
+doit terminer de refermer la première avant d'ouvrir la seconde, ce qui pouvait se lire comme un
+écran qui ne réagit plus. `ProfileLinkScanFlow` remplace les deux par une seule présentation dont
+le contenu bascule en interne (scan → confirmation), sans seconde transition système à attendre.
+Le bouton « Lier » affiche en plus un indicateur de chargement pendant l'écriture (`Task { @MainActor
+in }` cède la main une fois pour laisser SwiftUI l'afficher avant qu'un travail potentiellement
+bloquant ne démarre) — pour toute latence encore perceptible au-delà de cette transition (écriture
+SwiftData sous CloudKit, par exemple).
+
 ## Décisions ouvertes
 
 Ce que ce document tranche par hypothèse plutôt que par confirmation — à valider avant la phase
