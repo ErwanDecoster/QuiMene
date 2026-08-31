@@ -30,6 +30,7 @@
 		5F0AAA9466CE0936F3BAA6B1 /* QRCodeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D90C5383931C73460C54F4F3 /* QRCodeView.swift */; };
 		60FC842FC3B1BA12ED6EC82B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DC2275071173C4FD737F895 /* SettingsView.swift */; };
 		6389CCBC2E955F0259E97312 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9BB59FBD1B31E852B0902041 /* Assets.xcassets */; };
+		5F633A43AE7C4EE4BACFCB7C /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1FD83055930B42098109B9DD /* Localizable.xcstrings */; };
 		79D0E3EDB4F4CE6D1B24E750 /* MatchSetupModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC066611F334B03347B64CF /* MatchSetupModel.swift */; };
 		7E2DCF48E4B0EF1AFC137EEC /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 1C6B054AB4DCB332805D9C75 /* DesignSystem */; };
 		7E89996D555AE0DAB9395FCE /* HistoryListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28E50786A288307CA348EB4C /* HistoryListView.swift */; };
@@ -132,6 +133,7 @@
 		96207CDBA3609DE06C4239DF /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		995D8274A3CEAA3E755A72E6 /* PlayerRecord+Avatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerRecord+Avatar.swift"; sourceTree = "<group>"; };
 		9BB59FBD1B31E852B0902041 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		1FD83055930B42098109B9DD /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		A44F1408763A46ADA3A64F4D /* ArchivedMatchesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivedMatchesView.swift; sourceTree = "<group>"; };
 		A9DA809DE7377203DF8A1FC3 /* MatchConnectionCoordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MatchConnectionCoordinator.swift; sourceTree = "<group>"; };
 		AA1F1AA1301A3C0E002E85F9 /* CaCompte.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CaCompte.entitlements; sourceTree = "<group>"; };
@@ -207,6 +209,7 @@
 			isa = PBXGroup;
 			children = (
 				9BB59FBD1B31E852B0902041 /* Assets.xcassets */,
+				1FD83055930B42098109B9DD /* Localizable.xcstrings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -449,6 +452,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				fr,
+				en,
 				Base,
 			);
 			mainGroup = B9FCD9EC037C18578EE32853;
@@ -478,6 +482,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6389CCBC2E955F0259E97312 /* Assets.xcassets in Resources */,
+				5F633A43AE7C4EE4BACFCB7C /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

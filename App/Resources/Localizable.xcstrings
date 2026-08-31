@@ -1,0 +1,94 @@
+{
+  "sourceLanguage" : "fr",
+  "strings" : {
+    "Automatique" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic"
+          }
+        }
+      }
+    },
+    "Automatique : les joueurs les plus actifs (nombre de parties jouées) en premier. Manuel : réordonne-les toi-même dans l'onglet Joueurs." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatic: your most active players (by matches played) come first. Manual: reorder them yourself in the Players tab."
+          }
+        }
+      }
+    },
+    "Fermer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
+          }
+        }
+      }
+    },
+    "Manuel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual"
+          }
+        }
+      }
+    },
+    "Réglages" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
+    "Synchronisation iCloud" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud Sync"
+          }
+        }
+      }
+    },
+    "Synchronise les joueurs et les parties entre tes appareils via iCloud. Désactivée, l'app reste pleinement fonctionnelle en local. Le changement s'applique au prochain lancement de l'app." : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Syncs players and matches across your devices via iCloud. When off, the app stays fully functional locally. The change takes effect the next time you launch the app."
+          }
+        }
+      }
+    },
+    "Tri des joueurs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Player Sorting"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
