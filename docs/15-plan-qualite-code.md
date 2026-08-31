@@ -25,7 +25,7 @@ propre passage — tests UI, localisation).
 | Logging | (non spécifié explicitement, mais `print()` incompatible avec un produit livré) | 10 `print(...)` dans `Sync/LiveActivityPushClient.swift` et `App/MatchLiveActivityController.swift`, dont un littéral `"BUILD-MARKER-MINIMAL-FIX"` — résidu de debug |
 | Gestion d'erreur | `try!` toléré seulement s'il est un fail-fast volontaire et documenté | 3 `try!` justifiés par commentaire (`GameCatalog+Embedded.swift`) ; 5 non justifiés, côté app (`CaCompteApp.swift:149`, `HistoryDetailView.swift`, `LiveMatchView.swift`, `YamsSheetView.swift`, `BeloteRoundView.swift`) |
 | Documentation | Le README est la porte d'entrée du projet | Non modifié depuis le premier commit substantiel (`3d0d899`, 2026-07-30) alors que 38 commits l'ont suivi, dont le remplacement complet du transport Wi-Fi/BLE par Supabase Realtime — jamais répercuté |
-| Localisation | « Toutes les chaînes sont dans le catalogue, français et anglais » — définition de « terminé » ([10](10-tests-et-qualite.md)) | Aucun `.xcstrings` n'existait ; 68 `Text("...")` en français codé en dur dans `App/Features`, 10 usages de `String(localized:)`/`LocalizedStringResource`. **Démarré, voir ci-dessous.** |
+| Localisation | « Toutes les chaînes sont dans le catalogue, français et anglais » — définition de « terminé » ([10](10-tests-et-qualite.md)) | Aucun `.xcstrings` n'existait ; 68 `Text("...")` en français codé en dur dans `App/Features` (sous-estimé — 184 chaînes au total sur tout le projet), 10 usages de `String(localized:)`/`LocalizedStringResource`. **Corrigé, voir ci-dessous.** |
 | Périmètre de `Domain` | « `Domain` n'importe que `Foundation` » ([02](02-architecture.md), ADR-0002) | `Domain/LiveActivity/MatchActivityAttributes.swift` importe aussi `ActivityKit` — écart mineur, vraisemblablement nécessaire (le protocole `ActivityAttributes` doit être visible du widget), jamais documenté comme exception |
 | Secrets | `.gitignore` exclut `*.p8`, `.env.local` | Vérifié : **jamais commités** (`git log --all -- '*.p8' '.env.local'` vide). Bonne hygiène, rien à corriger |
 | Build | `SWIFT_TREAT_WARNINGS_AS_ERRORS = YES` sur toutes les configs | Vérifié : `swift build` et `xcodebuild` (scheme `CaCompte`) passent à 0 avertissement |
@@ -110,8 +110,9 @@ erreurs) passent tous les deux à 0 avertissement après ces changements. Aucun 
 `InMemoryTransport`) : la vérification du fix de concurrence repose sur la compilation stricte,
 pas sur une exécution — limite à garder en tête, voir Phase C.
 
-- 🔶 **Phase G — Catalogue de localisation, démarré** (`App/Resources/Localizable.xcstrings`,
-  feature gabarit `Settings` migrée, 8 chaînes). Constat qui change la portée du chantier : les
+- ✅ **Phase G — Catalogue de localisation, terminé** (`App/Resources/Localizable.xcstrings`).
+  Démarré avec une feature gabarit (`Settings`, 8 chaînes). Constat qui change la portée du
+  chantier : les
   initialiseurs SwiftUI qui prennent un littéral (`Text("…")`, `Toggle("…", isOn:)`,
   `Button("…")`, `.navigationTitle("…")`…) résolvent déjà `LocalizedStringKey` contre le
   catalogue **sans aucun changement de code** — `SettingsView.swift` n'a pas été touché, seul le
@@ -130,12 +131,32 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
   build. Vérifié : `xcodebuild` (scheme `CaCompte`) réussit, `xcstringstool` compile le catalogue
   en `en.lproj/Localizable.strings` et `fr.lproj/Localizable.strings` dans le bundle avec les
   bonnes valeurs (inspecté avec `plutil -p`) ; le fichier source `.xcstrings` reste à 8 clés après
-  un build CLI — `xcodebuild` ne le réécrit pas automatiquement avec les chaînes du reste du
-  projet (cette auto-extraction est un comportement de l'éditeur Xcode, pas du build headless).
+  un build CLI classique — `xcodebuild build` ne le réécrit pas automatiquement avec les chaînes
+  du reste du projet (cette auto-extraction est un comportement de l'éditeur Xcode).
 
-  Reste à faire : étendre aux ~14 autres vues (~60 chaînes), en repérant au passage les collisions
-  de clé (un même littéral français réutilisé avec un sens différent ailleurs se ferait attribuer
-  la même traduction).
+  **Découverte qui a changé la portée du reste de la Phase G** : `xcodebuild -exportLocalizations`
+  (contrairement à `-build`) synchronise réellement le catalogue avec le code source avant
+  d'exporter — il a ajouté d'un coup les ~176 chaînes restantes du projet entier (pas seulement
+  les 14 vues visées), avec entrée vide (= la clé française fait foi) pour les littéraux simples,
+  et une localisation `fr` explicite à spécificateurs de format positionnels (`%1$@`, `%2$lld`…)
+  calculée automatiquement pour les chaînes interpolées — exactement le calcul que j'aurais dû
+  reproduire à la main (et risqué de mal faire) pour des chaînes comme
+  `"\(entry.played) partie(s) · \(entry.wins) victoire(s)"`. Reproductible : `xcodebuild
+  -exportLocalizations -project App/CaCompte.xcodeproj -localizationPath <dir> -exportLanguage fr`.
+
+  Les 176 clés ont ensuite été traduites en anglais (contexte de chaque chaîne ambiguë vérifié par
+  `grep` sur le site d'appel avant traduction, pas deviné), appliquées par script plutôt qu'à la
+  main pour éviter une erreur de recopie sur 176 entrées. **184 chaînes au total** (176 + les 8 de
+  Settings), seules 5 laissées sans traduction anglaise à dessein (`""`, `"—"`, `"%@"`, `"%lld"`,
+  `"0"` — symboles/placeholders neutres, aucune information à traduire). Convention adoptée pour
+  coller au style français existant (« partie(s) », « victoire(s) ») plutôt qu'au pluriel anglais
+  standard : « match(es) », « win(s) », « round(s) », « player(s) ».
+
+  Vérifié : `xcodebuild` (scheme `CaCompte`) réussit, `en.lproj`/`fr.lproj` compilés contiennent
+  les 184/179 entrées attendues avec les bonnes valeurs (`plutil -p`, échantillon vérifié), le
+  fichier source n'a pas été ré-étendu par le rebuild qui a suivi, aucun autre fichier du projet
+  touché par l'export (`git status` — un seul fichier modifié), et les 195 tests du package
+  restent verts.
 
 ## Reste au plan
 
@@ -155,16 +176,16 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
 **Fini quand** : `App/Features` a une couverture de tests non nulle sur ses 3 flux `@Observable`,
 et les 3 parcours XCUITest passent en CI.
 
-### Phase G — Catalogue de localisation (démarré, voir « Corrigé dans cet audit »)
+### Phase G — Catalogue de localisation — ✅ terminée (voir « Corrigé dans cet audit »)
 
-- ✅ `Localizable.xcstrings` créé et câblé au target `CaCompte`.
-- ✅ Feature gabarit migrée (Settings, 8 chaînes) — le pattern est : ajouter la paire fr/en au
-  catalogue, aucun changement de vue nécessaire pour un littéral SwiftUI direct.
-- Reste à étendre fonctionnalité par fonctionnalité — ~60 chaînes restantes dans `App/Features`,
-  réparties sur ~14 vues.
+Complétée au-delà du plan initial : les 184 chaînes du projet entier (pas seulement Settings)
+ont une traduction anglaise. Voir le détail dans « Corrigé dans cet audit ».
 
-Chantier volontairement étalé, pas traité en un seul passage vu son ampleur : c'est le plus gros
-écart entre la doctrine (« définition de terminé » exige FR+EN pour toute chaîne) et l'état
+Chantier qui, en pratique, s'est avéré traitable en un seul passage — la portée initialement
+redoutée (« le plus gros écart avec la doctrine, réécriture de ~14 vues ») ne s'est pas
+matérialisée : `xcodebuild -exportLocalizations` a fait l'extraction et le calcul des spécificateurs
+de format à la place d'un travail manuel par fichier, ce qui a ramené le chantier à de la
+traduction pure. Sans cet outil, l'étalement en plusieurs passages serait resté justifié.
 actuel (app monolingue française).
 
 **Fini quand** : `grep -rn 'Text("' App/Features` ne trouve plus de littéral français —
