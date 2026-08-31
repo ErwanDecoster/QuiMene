@@ -51,6 +51,20 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         previewLayer?.frame = view.bounds
+        updateVideoRotation()
+    }
+
+    // Doc utilisateur — remontée : sur iPad, l'aperçu caméra restait dans l'orientation par
+    // défaut du capteur (mis en boîtier en paysage) quel que soit celui de l'écran, y compris
+    // après rotation. `AVCaptureVideoPreviewLayer` ne suit jamais l'orientation de l'interface
+    // tout seul — contrairement à ce qu'on pourrait attendre, il faut le lui dire explicitement
+    // (`videoRotationAngle`, iOS 17+) et le refaire à chaque rotation, pas seulement une fois au
+    // démarrage.
+    override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { [weak self] _ in
+            self?.updateVideoRotation()
+        })
     }
 
     private var previewLayer: AVCaptureVideoPreviewLayer?
@@ -72,11 +86,25 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
         layer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(layer)
         previewLayer = layer
+        updateVideoRotation()
 
         if !session.isRunning {
             let session = session
             DispatchQueue.global(qos: .userInitiated).async { session.startRunning() }
         }
+    }
+
+    private func updateVideoRotation() {
+        guard let connection = previewLayer?.connection else { return }
+        let angle: CGFloat
+        switch view.window?.windowScene?.interfaceOrientation {
+        case .landscapeLeft: angle = 180
+        case .landscapeRight: angle = 0
+        case .portraitUpsideDown: angle = 270
+        default: angle = 90 // portrait, et repli si l'orientation n'est pas encore connue
+        }
+        guard connection.isVideoRotationAngleSupported(angle) else { return }
+        connection.videoRotationAngle = angle
     }
 
     // `AVCaptureMetadataOutputObjectsDelegate` n'est pas isolé à un acteur (API AVFoundation,

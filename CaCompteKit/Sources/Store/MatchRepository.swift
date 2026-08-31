@@ -142,9 +142,13 @@ public struct MatchRepository {
         try context.save()
     }
 
+    /// Doc utilisateur — remontée : rien n'empêche de démarrer plusieurs parties sans terminer la
+    /// précédente ; toutes doivent rester reprenables, pas seulement la première trouvée. Triées
+    /// par date de début, la plus récente d'abord (même convention que `finishedMatches`).
     public func inProgressMatches() throws -> [MatchRecord] {
         let descriptor = FetchDescriptor<MatchRecord>(
-            predicate: #Predicate { $0.statusRaw == "inProgress" || $0.statusRaw == "finalRound" }
+            predicate: #Predicate { $0.statusRaw == "inProgress" || $0.statusRaw == "finalRound" },
+            sortBy: [SortDescriptor(\.startedAt, order: .reverse)]
         )
         return try context.fetch(descriptor)
     }

@@ -22,7 +22,9 @@ struct GamesTabView: View {
     /// exige `Hashable`, que `GameDefinition` n'a pas besoin de porter par ailleurs.
     @State private var leaderboardGameID: String?
     @State private var activeMatch: MatchRecord?
-    @State private var inProgressMatch: MatchRecord?
+    /// Doc utilisateur — remontée : rien n'empêche de démarrer plusieurs parties sans terminer la
+    /// précédente ; toutes doivent apparaître ici, pas seulement la première trouvée.
+    @State private var inProgressMatches: [MatchRecord] = []
     @State private var matchPendingAbandon: MatchRecord?
     /// Doc 09 « Fin de partie » — une session de partage démarrée depuis une partie survit à sa
     /// fin (`LiveShareCoordinator`) : ce bouton laisse l'hôte la retrouver (code, pairs connectés,
@@ -64,18 +66,19 @@ struct GamesTabView: View {
                 // Doc 01 : reprendre une partie en cours reste possible, mais en simple
                 // suggestion — un onglet qu'on revisite pour parcourir le catalogue ne doit pas
                 // y être redirigé de force à chaque fois.
-                if let inProgressMatch {
+                if !inProgressMatches.isEmpty {
                     Section {
-                        Button {
-                            activeMatch = inProgressMatch
-                            self.inProgressMatch = nil
-                        } label: {
-                            resumeRow(for: inProgressMatch)
-                        }
-                        .buttonStyle(.plain)
-                        .swipeActions {
-                            Button("Abandonner", role: .destructive) {
-                                matchPendingAbandon = inProgressMatch
+                        ForEach(inProgressMatches, id: \.id) { match in
+                            Button {
+                                activeMatch = match
+                            } label: {
+                                resumeRow(for: match)
+                            }
+                            .buttonStyle(.plain)
+                            .swipeActions {
+                                Button("Abandonner", role: .destructive) {
+                                    matchPendingAbandon = match
+                                }
                             }
                         }
                     }
@@ -87,7 +90,7 @@ struct GamesTabView: View {
                             gameRow(for: definition)
                         }
                     }
-                } else if inProgressMatch == nil {
+                } else if inProgressMatches.isEmpty {
                     EmptyState(icon: "magnifyingglass", message: "Aucun jeu ne correspond à ta recherche.")
                         .listRowSeparator(.hidden)
                 }
@@ -163,15 +166,15 @@ struct GamesTabView: View {
                 GameLeaderboardView(gameID: gameID, gameName: gameName(forGameID: gameID))
             }
             .onAppear {
-                refreshInProgressMatch()
+                refreshInProgressMatches()
                 consumePendingDeepLinks()
             }
             .onChange(of: activeMatch) { oldValue, newValue in
-                // La partie ouverte via la bannière peut s'être terminée entre-temps : on
-                // rafraîchit dès le retour à la liste plutôt que de garder une référence figée
-                // (sinon la bannière reste affichée indéfiniment après une partie terminée).
+                // La partie ouverte via la bannière peut s'être terminée (ou une autre abandonnée)
+                // entre-temps : on rafraîchit dès le retour à la liste plutôt que de garder une
+                // référence figée (sinon la bannière reste affichée indéfiniment après coup).
                 if newValue == nil, oldValue != nil {
-                    refreshInProgressMatch()
+                    refreshInProgressMatches()
                 }
             }
             .confirmationDialog(
@@ -184,7 +187,7 @@ struct GamesTabView: View {
                         _ = try? MatchRepository(context: modelContext).abandonMatch(match, catalog: catalog)
                     }
                     matchPendingAbandon = nil
-                    refreshInProgressMatch()
+                    refreshInProgressMatches()
                 }
             } message: {
                 Text("La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée.")
@@ -206,17 +209,18 @@ struct GamesTabView: View {
         }
         if deepLinkRouter.wantsResume {
             deepLinkRouter.wantsResume = false
-            refreshInProgressMatch()
-            if let inProgressMatch {
-                activeMatch = inProgressMatch
-                self.inProgressMatch = nil
+            refreshInProgressMatches()
+            // Doc utilisateur — Widget/App Intent « Reprends » : sans précision de laquelle,
+            // reprend la plus récemment démarrée (déjà l'ordre de `inProgressMatches`).
+            if let mostRecent = inProgressMatches.first {
+                activeMatch = mostRecent
             }
         }
     }
 
-    private func refreshInProgressMatch() {
+    private func refreshInProgressMatches() {
         let repository = MatchRepository(context: modelContext)
-        inProgressMatch = try? repository.inProgressMatches().first
+        inProgressMatches = (try? repository.inProgressMatches()) ?? []
     }
 
     private func resumeRow(for match: MatchRecord) -> some View {

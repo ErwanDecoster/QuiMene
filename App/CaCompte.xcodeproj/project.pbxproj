@@ -19,7 +19,7 @@
 		34DA3F2811B551DE7804DAA3 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = B55D3B84D88AC66AE349B7FA /* Domain */; };
 		399BEAEE80010D1CAE1085DA /* SharedMatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9F5EDAC041F9E23EED5B5D /* SharedMatchView.swift */; };
 		3F3546CAAB8E926419CC8851 /* LiveMatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7326A3B54C2A7022BFF31D /* LiveMatchView.swift */; };
-		07F5C90600AF4C9EADF52690 /* ScoreKeypad.swift in Sources */ = {isa = PBXBuildFile; fileRef = F66C2CB4D2344C06B66CDF29 /* ScoreKeypad.swift */; };
+		1C0AC5F7DB9C7CCDF5852C46 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4069F1BD7B30DB92C9BF1AB /* KeyboardObserver.swift */; };
 		44387B906D7D533A7BC3DE2C /* MatchWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5423929B035410EC56001A4 /* MatchWidget.swift */; };
 		449D14BD722EA2711E98EFEC /* PlayerRecord+Avatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995D8274A3CEAA3E755A72E6 /* PlayerRecord+Avatar.swift */; };
 		4A2C78824B135828FE2E5FC6 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E465C66E83BEDE023DDBDBFB /* QRScannerView.swift */; };
@@ -122,7 +122,7 @@
 		768FEE4048903956BFB3FB2B /* CaCompteWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = CaCompteWidget.entitlements; sourceTree = "<group>"; };
 		7A4AA12BF22916E17C286D79 /* ShareSessionView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareSessionView.swift; sourceTree = "<group>"; };
 		7A7326A3B54C2A7022BFF31D /* LiveMatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveMatchView.swift; sourceTree = "<group>"; };
-		F66C2CB4D2344C06B66CDF29 /* ScoreKeypad.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ScoreKeypad.swift; sourceTree = "<group>"; };
+		B4069F1BD7B30DB92C9BF1AB /* KeyboardObserver.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyboardObserver.swift; sourceTree = "<group>"; };
 		7EF5EB3CCD9611F48C73CA25 /* ResultsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultsView.swift; sourceTree = "<group>"; };
 		849F62578BC9685EEC910AC8 /* HistoryListModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryListModel.swift; sourceTree = "<group>"; };
 		8DE229A134D6300341412C0E /* DeepLinkRouter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DeepLinkRouter.swift; sourceTree = "<group>"; };
@@ -297,6 +297,7 @@
 				D6A7FA038D13457691C09E07 /* MatchShortcuts.swift */,
 				528F4F1174DBC240F83F45EB /* CaCompteWidget */,
 				08AE0320DC761E1775EBBD52 /* MatchLiveActivityController.swift */,
+				B4069F1BD7B30DB92C9BF1AB /* KeyboardObserver.swift */,
 			);
 			name = "";
 			sourceTree = "<group>";
@@ -314,7 +315,6 @@
 			children = (
 				0F88BAB91585ED031873F11E /* LiveMatchModel.swift */,
 				7A7326A3B54C2A7022BFF31D /* LiveMatchView.swift */,
-				F66C2CB4D2344C06B66CDF29 /* ScoreKeypad.swift */,
 				25AA1BD3EAD4A3DC5B516CC7 /* MatchPlayView.swift */,
 				BADA2645FCD7DF45BDBEF1A4 /* YamsSheetModel.swift */,
 				105261167430649BF69A491B /* YamsSheetView.swift */,
@@ -495,7 +495,7 @@
 				23BC6769A3DEA226BAAC6BA9 /* MatchSetupView.swift in Sources */,
 				9DE96A014697BE8E4D320CD8 /* LiveMatchModel.swift in Sources */,
 				3F3546CAAB8E926419CC8851 /* LiveMatchView.swift in Sources */,
-				07F5C90600AF4C9EADF52690 /* ScoreKeypad.swift in Sources */,
+				1C0AC5F7DB9C7CCDF5852C46 /* KeyboardObserver.swift in Sources */,
 				1A4A5AF525AF7E3744290706 /* ParticipantRecord+Avatar.swift in Sources */,
 				86FE3227B5C52B9EA27E1603 /* ResultsView.swift in Sources */,
 				BB1F56D622DFABC00CB8B98C /* ResultsShareCard.swift in Sources */,

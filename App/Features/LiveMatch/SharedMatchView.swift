@@ -18,8 +18,9 @@ struct SharedMatchView: View {
     @State private var reconnectFailed = false
     @State private var draftTexts: [Participant.ID: String] = [:]
     @State private var closedParticipantID: Participant.ID?
-    @State private var focusedParticipantID: Participant.ID?
+    @FocusState private var focusedParticipantID: Participant.ID?
     @State private var isPresentingRoundHistory = false
+    @State private var keyboardObserver = KeyboardObserver()
 
     var body: some View {
         Group {
@@ -129,34 +130,41 @@ struct SharedMatchView: View {
                     Label("Voir les manches", systemImage: "list.bullet")
                 }
             }
-        }
-        // Doc utilisateur — remontée : le bouton +/- manquait entièrement ici (un contributeur
-        // ne pouvait pas saisir de score négatif). Même pavé custom que `LiveMatchView`, qui
-        // porte le signe comme une touche parmi les chiffres plutôt que dans une barre
-        // d'accessoires séparée.
-        .safeAreaInset(edge: .bottom) {
+            // Doc utilisateur — remontée : ce bouton manquait entièrement ici (un contributeur ne
+            // pouvait jamais saisir de score négatif) — même bouton que `LiveMatchView`, juste
+            // absent par oubli jusqu'ici.
             if model.canPropose {
-                VStack(spacing: 0) {
-                    if let focusedParticipantID {
-                        ScoreKeypad(
-                            allowsNegative: definition.scoring.entry.allowsNegative,
-                            onDigit: { appendDigit($0, for: focusedParticipantID) },
-                            onToggleSign: { toggleSign(for: focusedParticipantID) },
-                            onDelete: { deleteLastDigit(for: focusedParticipantID) }
-                        )
+                ToolbarItemGroup(placement: .keyboard) {
+                    if definition.scoring.entry.allowsNegative, let focusedParticipantID {
+                        Button {
+                            toggleSign(for: focusedParticipantID)
+                        } label: {
+                            Image(systemName: "plusminus")
+                        }
                     }
+                    Spacer()
                     Button("Envoyer") {
                         Task { await sendRound() }
                     }
-                    .buttonStyle(.primary(size: .medium))
-                    .frame(maxWidth: .infinity)
-                    .padding(.horizontal, Space.lg)
-                    .padding(.vertical, Space.sm)
-                    .background(.bar)
                 }
             }
         }
-        .animation(.default, value: focusedParticipantID)
+        // Doc utilisateur — même bug que `LiveMatchView` : la barre d'accessoires du clavier
+        // disparaît avec lui, laissant l'écran sans moyen de valider la manche. Masqué quand le
+        // clavier est visible pour ne pas doublonner son propre bouton « Envoyer ».
+        .safeAreaInset(edge: .bottom) {
+            if model.canPropose, !keyboardObserver.isVisible {
+                Button("Envoyer") {
+                    Task { await sendRound() }
+                }
+                .buttonStyle(.primary(size: .medium))
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, Space.lg)
+                .padding(.vertical, Space.sm)
+                .background(.bar)
+            }
+        }
+        .animation(.default, value: keyboardObserver.isVisible)
         .sheet(isPresented: $isPresentingRoundHistory) {
             RoundHistoryView(state: state, definition: definition)
         }
@@ -173,30 +181,30 @@ struct SharedMatchView: View {
     }
 
     private func scoreField(for participant: Participant) -> some View {
-        let text = draftTexts[participant.id] ?? ""
-        return Text(text.isEmpty ? "0" : text)
-            .font(.scoreM)
-            .foregroundStyle(text.isEmpty ? .textTertiary : .textPrimary)
+        TextField("0", text: textBinding(for: participant.id))
+            .keyboardType(.numberPad)
             .multilineTextAlignment(.trailing)
+            .font(.scoreM)
+            .foregroundStyle(.textPrimary)
             .padding(.horizontal, Space.md)
-            .frame(width: 88, height: ButtonHeight.medium, alignment: .trailing)
+            .frame(width: 88, height: ButtonHeight.medium)
             .background(.neutralFill, in: .rect(cornerRadius: Radius.sm))
             .overlay {
                 RoundedRectangle(cornerRadius: Radius.sm)
                     .strokeBorder(.brandInk, lineWidth: focusedParticipantID == participant.id ? 2 : 0)
             }
-            .contentShape(Rectangle())
-            .onTapGesture { focusedParticipantID = participant.id }
+            .focused($focusedParticipantID, equals: participant.id)
     }
 
-    private func appendDigit(_ digit: Int, for participantID: Participant.ID) {
-        draftTexts[participantID] = (draftTexts[participantID] ?? "") + String(digit)
-    }
-
-    private func deleteLastDigit(for participantID: Participant.ID) {
-        guard var text = draftTexts[participantID], !text.isEmpty else { return }
-        text.removeLast()
-        draftTexts[participantID] = text
+    private func textBinding(for participantID: Participant.ID) -> Binding<String> {
+        Binding(
+            get: { draftTexts[participantID] ?? "" },
+            set: { newValue in
+                let sign = newValue.hasPrefix("-") ? "-" : ""
+                let digits = newValue.filter(\.isNumber)
+                draftTexts[participantID] = digits.isEmpty ? sign : sign + digits
+            }
+        )
     }
 
     private func toggleSign(for participantID: Participant.ID) {
