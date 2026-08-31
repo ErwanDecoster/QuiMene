@@ -195,6 +195,106 @@ Reste manuel, hors de ce dépôt : brancher une purge programmée (30 jours) sur
 `cacompte_shared_match_summaries`, comme `cacompte-live-activity-sweep` pour les Live Activity —
 l'index existe, pas le job.
 
+## Limites de confiance — ce que `sharedProfileID` prouve, et ce qu'il ne prouve pas
+
+Question posée après coup, en relisant les phases 1/2 avec un œil critique : *un ami pourrait
+créer sur son téléphone une fiche nommée « Erwan » et partager ce lien à d'autres personnes —
+est-ce que je pourrais alors lier mon propre téléphone à cette fiche ? Quelles sont les limites
+réelles du partage de profil ?*
+
+### Ce qui se passe mécaniquement
+
+Rien dans le code n'empêche ce scénario. `sharedProfileID` est un `UUID` nu : n'importe quel
+appareil qui l'a vu (par QR, capture d'écran, lien retransmis) peut l'écrire dans
+`PlayerRecord.sharedProfileID` via « Lier un profil reçu ». Aucune limite au nombre d'appareils
+qui peuvent partager le même `UUID`, et c'est volontaire — c'est précisément ce qui permet à
+plusieurs amis de suivre la même personne chacun depuis sa propre fiche (Théo *et* Marie lient
+chacun leur fiche « Erwan » au vrai code d'Erwan : les deux verront ses parties, c'est le
+fonctionnement voulu).
+
+Le problème n'est donc pas « trop d'appareils liés à un même identifiant » — c'est qu'**aucune
+vérification ne relie un `UUID` à la personne réelle qu'il prétend représenter**. Un pseudo est
+une chaîne de caractères libre, jamais authentifiée. Si un ami crée une fiche « Erwan » qui n'est
+pas la mienne et la partage, c'est un `UUID` entièrement différent du mien — je n'ai littéralement
+aucun moyen de savoir qu'il existe, encore moins de le lier à mon téléphone (je ne peux lier que
+ce que je scanne moi-même). Le risque réel n'est donc pas que *je* sois piégé, mais que **d'autres
+lient leur fiche « Erwan » à cette fausse identité en croyant que c'est la mienne** — leurs
+statistiques et leur historique s'y retrouveraient mélangés à des parties que je n'ai jamais
+jouées, sans que je le sache ni que je puisse le corriger.
+
+### D'où vient la confiance, en pratique
+
+Le lien n'est fiable que si le QR est scanné directement depuis l'écran de la personne
+concernée — le contexte physique (« je suis avec Théo, je scanne son téléphone ») *est* la
+vérification, il n'y en a pas d'autre. Un lien retransmis (capture d'écran envoyée dans un groupe,
+« scanne ça pour me lier ») perd cette garantie et redevient un pur acte de confiance envers qui
+l'a transmis. C'est exactement le modèle déjà assumé par le partage en direct (doc 09,
+« quiconque connaît le code peut rejoindre ») — les profils partagés en héritent, avec un
+identifiant permanent plutôt qu'une session d'une soirée.
+
+### Les limites, énumérées
+
+1. **Aucune preuve cryptographique de propriété.** Un `UUID` connu = un `UUID` qu'on peut lier.
+   Rien ne distingue « la bonne personne l'a partagé » de « quelqu'un l'a vu passer ».
+2. **Aucune visibilité sur qui est lié.** Une fois `sharedProfileID` posé, rien n'indique dans
+   l'app à qui (quel appareil, quel pseudo au moment du scan) cette fiche est liée. Impossible
+   d'auditer, de remarquer une liaison inattendue.
+3. **Le pseudo transporté par le QR n'est même pas utilisé.** `ProfileShareLink.Payload.name` est
+   décodé (`PlayerEditorView.swift`) puis jeté — aucune confirmation n'est montrée avant de lier
+   (« Tu es sur le point de lier cette fiche à *Marie* » n'existe pas). Un scan accidentel du
+   mauvais code n'est jamais signalé.
+4. **Pas de garde contre une double liaison sur le même appareil.**
+   `PlayerRepository.linkSharedProfile` écrit `sharedProfileID` sans vérifier qu'il n'est pas déjà
+   utilisé par une *autre* fiche locale — un scan malencontreux de son propre code, ou de deux
+   codes différents sur la même fiche, ne produit aucun avertissement.
+5. **Aucune révocation qui compte vraiment.** « Ne plus partager » efface `sharedProfileID`
+   *localement* — l'`UUID` lui-même reste valable pour quiconque l'a déjà lié ailleurs. Impossible
+   de dire « cet identifiant est désormais invalide partout » puisque rien ne sait qui d'autre le
+   détient (voir point 2).
+6. **Pas de notion de « c'est moi ».** Une fiche qui représente un ami et une fiche qui me
+   représente moi-même sont structurellement identiques — rien ne permet à l'app (ni à
+   l'utilisateur, d'un coup d'œil) de distinguer les deux.
+
+### Ce qu'on ne peut pas corriger sans compte réel — et pourquoi ce n'est pas grave
+
+Empêcher purement et simplement qu'un pseudo mente sur qui il représente exigerait une
+authentification — Option C déjà écartée plus haut, pour de bonnes raisons (connexion, gestion de
+session, RGPD, surface de revue de sécurité, alors que le besoin ne demande qu'une identité stable
+entre deux appareils précis). Ce n'est **pas** une régression à corriger : c'est la même limite
+que doc 09 assume déjà pour le partage en direct, dans un contexte — des amis qui jouent
+ensemble — où le coût d'une usurpation réussie reste faible (des statistiques de jeu de société,
+pas des données sensibles) face au coût d'ajouter des comptes.
+
+### Ce qu'on peut améliorer sans compte, en restant dans la philosophie actuelle
+
+| # | Amélioration | Répond à | Coût |
+|---|---|---|---|
+| 1 | Afficher le pseudo (et l'avatar) scannés avant de confirmer la liaison (« Lier cette fiche à *Marie* ? ») ✅ | Limite 3 | Trivial — le champ existe déjà, juste jamais lu |
+| 2 | Mémoriser localement un libellé « Lié à *Marie*, le 2 sept. 2026 » sur la fiche ✅ | Limite 2 | Faible — deux champs de plus sur `PlayerRecord` |
+| 3 | Bloquer (avec confirmation explicite pour passer outre) la liaison à un `UUID` déjà utilisé par une *autre* fiche locale ✅ | Limite 4 | Faible — une vérification dans `PlayerRepository` |
+| 4 | Marquer une fiche comme « C'est moi » (une seule par appareil) | Limite 6 | Modéré — un champ, une action dans `PlayerEditorView`, une mise en avant dans `PlayersListView` |
+| 5 | Registre léger côté serveur : qui a revendiqué mon `UUID`, et quand (nouvelle table, sur le modèle de `cacompte_open_games`) | Limite 2 et 5 (partiellement) | Modéré à élevé — nouvelle table, UI de consultation, ne détecte que les liaisons sur *mon propre* identifiant, jamais une fausse fiche créée sous un `UUID` distinct |
+
+Le point 5 mérite une précision importante : il ne répond **pas** au scénario initial (une fausse
+fiche « Erwan » créée sous un `UUID` différent du mien reste invisible pour moi, quel que soit le
+registre) — il aide seulement à détecter une utilisation *inattendue* de mon propre lien une fois
+partagé (ex. je l'ai partagé une fois à Théo, je vois pourtant trois appareils l'avoir revendiqué).
+
+**Implémenté (points 1-3)** : `ProfileShareLink.Payload` transporte maintenant aussi l'avatar
+(`avatarKind`/`avatarValue`/`paletteID`, jamais une photo — trop lourde pour un QR), pas
+seulement le pseudo. Scanner un code n'écrit plus rien directement : une feuille de confirmation
+(`ConfirmProfileLinkView`) montre le pseudo et l'avatar avant toute écriture, avec un choix
+« Adopter aussi son pseudo et son avatar » (adopte les deux plutôt que de garder ceux,
+potentiellement approximatifs, déjà choisis sur la fiche locale — reprend le pseudo seul si
+l'avatar de l'autre est une photo). Si l'identifiant scanné est déjà utilisé par une *autre* fiche
+locale, la feuille avertit et demande une confirmation supplémentaire (« Lier quand même ») plutôt
+que de bloquer sans recours ou de lier en silence. `PlayerRecord.sharedProfileLinkedName`/
+`sharedProfileLinkedAt` retiennent le pseudo et la date connus au moment de la liaison, affichés
+sur `PlayerEditorView` (« Liée à Marie, le … ») — jamais mis à jour ensuite, puisque rien ne
+prévient cet appareil si l'ami renomme sa propre fiche par la suite.
+
+Les points 4 et 5 restent à faire, si demandés — voir « Décisions ouvertes ».
+
 ## Décisions ouvertes
 
 Ce que ce document tranche par hypothèse plutôt que par confirmation — à valider avant la phase

@@ -21,6 +21,12 @@ public final class PlayerRecord {
     /// son propre appareil (jamais régénéré une fois posé : un lien déjà distribué en QR doit
     /// rester valable). `nil` tant que cette fiche n'a jamais été partagée ni liée.
     public var sharedProfileID: UUID?
+    /// Doc 14, phase 3 — pseudo tel que scanné au moment de la liaison (jamais mis à jour
+    /// ensuite) : cet appareil n'a aucun moyen de savoir si l'ami a changé de pseudo depuis.
+    /// `nil` pour une fiche jamais liée par scan (y compris une fiche seulement *partagée*, dont
+    /// l'appareil d'origine ne sait jamais qui l'a réclamée — doc 14 « Limites de confiance »).
+    public var sharedProfileLinkedName: String?
+    public var sharedProfileLinkedAt: Date?
 
     /// Inverse de `ParticipantRecord.player` — indispensable dès que CloudKit est actif : une
     /// relation sans inverse déclarée des deux côtés fait planter l'ouverture du container

@@ -10,6 +10,7 @@ struct PlayerEditorView: View {
     @State private var photoPickerItem: PhotosPickerItem?
     @State private var isPresentingDeleteConfirmation = false
     @State private var isPresentingProfileScanner = false
+    @State private var pendingProfileLink: ProfileShareLink.Payload?
 
     init(mode: PlayerEditorMode, context: ModelContext) {
         _model = State(initialValue: PlayerEditorModel(mode: mode, context: context))
@@ -49,6 +50,11 @@ struct PlayerEditorView: View {
                             Button("Partager ce profil") {
                                 model.ensureSharedProfileID()
                             }
+                        }
+                        if let linkedName = model.linkedProfileName, let linkedDate = model.linkedProfileDate {
+                            Text("Liée à **\(linkedName)**, le \(linkedDate.formatted(date: .abbreviated, time: .omitted))")
+                                .font(.bodySmall)
+                                .foregroundStyle(.textSecondary)
                         }
                         Button(model.shareURL == nil ? "Lier un profil reçu" : "Lier un autre profil") {
                             isPresentingProfileScanner = true
@@ -112,6 +118,28 @@ struct PlayerEditorView: View {
             .fullScreenCover(isPresented: $isPresentingProfileScanner) {
                 profileScannerCover
             }
+            // Doc 14, phase 3 « Limites de confiance » — remontée : rien n'affichait le pseudo
+            // scanné avant de lier, un scan malencontreux (mauvais code, code retransmis) passait
+            // inaperçu. Confirmation systématique, avec le choix d'adopter aussi le pseudo/avatar
+            // de la personne représentée.
+            .sheet(item: $pendingProfileLink) { payload in
+                ConfirmProfileLinkView(
+                    payload: payload,
+                    conflictingPlayerName: model.conflictingPlayerName(forSharedProfileID: payload.id)
+                ) { adoptNameAndAvatar in
+                    model.linkProfile(
+                        id: payload.id,
+                        name: payload.name,
+                        avatarKind: payload.avatarKind,
+                        avatarValue: payload.avatarValue,
+                        paletteID: payload.paletteID,
+                        adoptNameAndAvatar: adoptNameAndAvatar
+                    )
+                    pendingProfileLink = nil
+                } onCancel: {
+                    pendingProfileLink = nil
+                }
+            }
         }
     }
 
@@ -122,7 +150,7 @@ struct PlayerEditorView: View {
             QRScannerView { code in
                 isPresentingProfileScanner = false
                 guard let url = URL(string: code), let payload = ProfileShareLink.parse(url) else { return }
-                model.linkProfile(id: payload.id)
+                pendingProfileLink = payload
             }
             .ignoresSafeArea()
 
@@ -221,5 +249,77 @@ struct PlayerEditorView: View {
             }
             .padding(.horizontal, Space.xs)
         }
+    }
+}
+
+/// Doc 14, phase 3 « Limites de confiance » — dernier moment où un scan malencontreux (mauvais
+/// code, code retransmis par quelqu'un d'autre que la personne concernée) peut encore être
+/// rattrapé : montre qui le lien prétend représenter avant d'écrire quoi que ce soit, avec le
+/// choix d'adopter aussi son pseudo/avatar plutôt que de garder ceux déjà choisis sur cette fiche.
+private struct ConfirmProfileLinkView: View {
+    let payload: ProfileShareLink.Payload
+    /// Non-`nil` si un identifiant déjà utilisé par une *autre* fiche locale — probablement une
+    /// erreur (cette fiche-ci et l'autre représenteraient alors la même personne), mais pas
+    /// bloqué en dur : peut arriver légitimement après une fiche recréée.
+    let conflictingPlayerName: String?
+    let onConfirm: (_ adoptNameAndAvatar: Bool) -> Void
+    let onCancel: () -> Void
+
+    @State private var adoptNameAndAvatar = true
+
+    private var canAdoptAvatar: Bool { payload.avatarKind != "photo" }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    VStack(spacing: Space.md) {
+                        if canAdoptAvatar {
+                            AvatarView(
+                                avatar: Avatar(
+                                    kind: .emoji(payload.avatarValue),
+                                    palette: PlayerPalette(index: Int(payload.paletteID) ?? 1)
+                                ),
+                                size: .large
+                            )
+                        }
+                        Text(payload.name).font(.h4).foregroundStyle(.textPrimary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, Space.sm)
+                }
+
+                if let conflictingPlayerName {
+                    Section {
+                        Text("Ce profil est déjà lié à la fiche « \(conflictingPlayerName) » sur cet appareil. Continuer liera aussi celle-ci — à ne faire que si c'est la même personne (par exemple une fiche recréée).")
+                            .font(.bodySmall)
+                            .foregroundStyle(.semanticError)
+                    }
+                }
+
+                Section {
+                    Toggle("Adopter aussi son pseudo et son avatar", isOn: $adoptNameAndAvatar)
+                        .tint(.brandInk)
+                    if !canAdoptAvatar {
+                        Text("Son avatar est une photo : seul le pseudo peut être repris.")
+                            .font(.label)
+                            .foregroundStyle(.textTertiary)
+                    }
+                }
+            }
+            .navigationTitle("Lier ce profil ?")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Annuler") { onCancel() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(conflictingPlayerName == nil ? "Lier" : "Lier quand même") {
+                        onConfirm(adoptNameAndAvatar)
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium])
     }
 }

@@ -68,14 +68,20 @@ public struct PlayerRepository {
 
     /// Lie cette fiche à l'identifiant scanné depuis l'appareil d'un ami (doc 14) — écrase un
     /// éventuel identifiant précédent, cette fiche ne peut être liée qu'à une seule personne à
-    /// la fois.
-    public func linkSharedProfile(_ id: UUID, for player: PlayerRecord) throws {
+    /// la fois. `name` est celui du QR au moment du scan (doc 14, phase 3 « Limites de
+    /// confiance ») : la seule trace locale de qui est de l'autre côté, jamais mise à jour
+    /// ensuite.
+    public func linkSharedProfile(_ id: UUID, name: String, for player: PlayerRecord) throws {
         player.sharedProfileID = id
+        player.sharedProfileLinkedName = name
+        player.sharedProfileLinkedAt = Date()
         try context.save()
     }
 
     public func unlinkSharedProfile(for player: PlayerRecord) throws {
         player.sharedProfileID = nil
+        player.sharedProfileLinkedName = nil
+        player.sharedProfileLinkedAt = nil
         try context.save()
     }
 

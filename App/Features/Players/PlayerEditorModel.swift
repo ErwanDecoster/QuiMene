@@ -44,12 +44,24 @@ final class PlayerEditorModel {
     /// Doc 14 « Profils partagés » — `nil` tant que cette fiche n'a jamais été partagée ni liée
     /// à l'installation d'un ami.
     private(set) var sharedProfileID: UUID?
+    /// Doc 14, phase 3 — pseudo connu au moment de la liaison (jamais mis à jour ensuite) : la
+    /// seule trace locale de qui est de l'autre côté du lien, tant qu'aucun registre serveur
+    /// n'existe (« Limites de confiance »). `nil` si cette fiche a seulement été *partagée*
+    /// (généré un identifiant), jamais liée par scan.
+    private(set) var linkedProfileName: String?
+    private(set) var linkedProfileDate: Date?
 
     /// Lien QR à faire scanner par l'ami que cette fiche représente — recalculé depuis
-    /// `sharedProfileID` et le pseudo courant, jamais stocké séparément.
+    /// `sharedProfileID`/le pseudo/l'avatar courants, jamais stocké séparément.
     var shareURL: URL? {
         guard let sharedProfileID else { return nil }
-        return ProfileShareLink.url(id: sharedProfileID, name: nickname)
+        return ProfileShareLink.url(
+            id: sharedProfileID,
+            name: nickname,
+            avatarKind: avatarKind,
+            avatarValue: avatarKind == "photo" ? "" : emojiValue,
+            paletteID: paletteID
+        )
     }
 
     var paletteID: String {
@@ -101,6 +113,8 @@ final class PlayerEditorModel {
             paletteID = String(generated.palette.index)
             hasManualAvatarOverride = false
             sharedProfileID = nil
+            linkedProfileName = nil
+            linkedProfileDate = nil
         case .edit(let player):
             nickname = player.nickname
             avatarKind = player.avatarKind == "photo" ? "photo" : "emoji"
@@ -108,6 +122,8 @@ final class PlayerEditorModel {
             photoData = player.avatarKind == "photo" ? player.avatarPhoto : nil
             paletteID = player.paletteID
             sharedProfileID = player.sharedProfileID
+            linkedProfileName = player.sharedProfileLinkedName
+            linkedProfileDate = player.sharedProfileLinkedAt
 
             // Un joueur existant dont l'emoji/la couleur ne correspond plus à ce que le hachage
             // du pseudo produirait aujourd'hui a forcément été personnalisé à la main.
@@ -185,17 +201,43 @@ final class PlayerEditorModel {
         sharedProfileID = try? repository.sharedProfileID(for: player)
     }
 
-    /// Doc 14 — lie cette fiche à l'identifiant scanné sur le téléphone d'un ami.
-    func linkProfile(id: UUID) {
+    /// Doc 14, phase 3 « Limites de confiance » — si cet identifiant est déjà utilisé par une
+    /// *autre* fiche locale, la vue doit avertir avant de continuer plutôt que lier en silence
+    /// (rien ne distingue sinon un scan malencontreux d'une liaison volontaire).
+    func conflictingPlayerName(forSharedProfileID id: UUID) -> String? {
+        guard let player = editedPlayer,
+              let existing = try? repository.player(withSharedProfileID: id),
+              existing.id != player.id else { return nil }
+        return existing.nickname
+    }
+
+    /// Doc 14 — lie cette fiche à l'identifiant scanné sur le téléphone d'un ami. `adoptNameAndAvatar`
+    /// reprend le pseudo et l'avatar tels que connus au moment du scan (jamais une photo, qui ne
+    /// transite pas par le QR — voir `ProfileShareLink`) plutôt que de garder ceux, potentiellement
+    /// approximatifs, choisis à la création de cette fiche.
+    func linkProfile(id: UUID, name: String, avatarKind: String, avatarValue: String, paletteID: String, adoptNameAndAvatar: Bool) {
         guard let player = editedPlayer else { return }
-        try? repository.linkSharedProfile(id, for: player)
+        try? repository.linkSharedProfile(id, name: name, for: player)
         sharedProfileID = id
+        linkedProfileName = name
+        linkedProfileDate = Date()
+
+        guard adoptNameAndAvatar else { return }
+        hasManualAvatarOverride = true // posé avant les changements ci-dessous : l'avatar adopté ne doit pas se faire écraser par la régénération automatique du pseudo.
+        nickname = name
+        if avatarKind != "photo" {
+            self.avatarKind = "emoji"
+            emojiValue = avatarValue
+            self.paletteID = paletteID
+        }
     }
 
     func unlinkProfile() {
         guard let player = editedPlayer else { return }
         try? repository.unlinkSharedProfile(for: player)
         sharedProfileID = nil
+        linkedProfileName = nil
+        linkedProfileDate = nil
     }
 
     func archive() throws {
