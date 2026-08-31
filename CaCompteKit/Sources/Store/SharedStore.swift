@@ -7,11 +7,11 @@ import Foundation
 /// `ModelConfiguration`, seul le widget perd sa source de données — même philosophie de
 /// dégradation silencieuse que l'app sans iCloud (doc 03).
 public enum SharedStore {
-    public static let appGroupIdentifier = "group.com.cacompte.app"
+  public static let appGroupIdentifier = "group.com.cacompte.app"
 
-    public static var storeURL: URL? {
-        FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?
-            .appending(path: "CaCompte.sqlite")
-    }
+  public static var storeURL: URL? {
+    FileManager.default
+      .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?
+      .appending(path: "CaCompte.sqlite")
+  }
 }

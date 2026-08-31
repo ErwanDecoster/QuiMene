@@ -4,7 +4,7 @@ import Domain
 /// entièrement de l'extension par défaut de `GameRules`. Sert tous les jeux dont
 /// `"engine": "generic.sum.v1"`.
 public struct GenericSumRules: GameRules {
-    public static let engineID = "generic.sum.v1"
+  public static let engineID = "generic.sum.v1"
 
-    public init() {}
+  public init() {}
 }

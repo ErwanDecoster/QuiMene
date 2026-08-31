@@ -9,29 +9,32 @@ import Foundation
 /// Une connexion établie. Transporte des octets déjà chiffrés (`WireCodec` s'en charge dans
 /// `LiveSession`) — ce protocole ne connaît ni `WireMessage` ni le code d'appairage.
 public protocol TransportSession: Sendable {
-    var incoming: AsyncStream<Data> { get }
-    func send(_ data: Data) async throws
-    func close() async
+  var incoming: AsyncStream<Data> { get }
+  func send(_ data: Data) async throws
+  func close() async
 }
 
 /// Doc 09 — contexte d'annonce plafonné : ce qu'un pair voit avant de rejoindre, jamais
 /// l'instantané de partie. Résolu via `cacompte_open_games` (Supabase) à partir d'un code d'appairage,
 /// plutôt que découvert par scan réseau/Bluetooth.
 public struct DiscoveredHost: Sendable, Identifiable, Equatable {
-    /// L'identifiant de la **session de partage** (`WireMessage.sessionID`), pas de la partie
-    /// courante — c'est lui qui adresse le canal Realtime (`session:<id>`), stable même si l'hôte
-    /// enchaîne une autre partie après coup (doc 09 « Fin de partie »).
-    public let id: UUID
-    public let deviceName: String
-    public let gameID: String
-    public let participantCount: Int
-    public let platform: WireMessage.Platform
+  /// L'identifiant de la **session de partage** (`WireMessage.sessionID`), pas de la partie
+  /// courante — c'est lui qui adresse le canal Realtime (`session:<id>`), stable même si l'hôte
+  /// enchaîne une autre partie après coup (doc 09 « Fin de partie »).
+  public let id: UUID
+  public let deviceName: String
+  public let gameID: String
+  public let participantCount: Int
+  public let platform: WireMessage.Platform
 
-    public init(id: UUID, deviceName: String, gameID: String, participantCount: Int, platform: WireMessage.Platform) {
-        self.id = id
-        self.deviceName = deviceName
-        self.gameID = gameID
-        self.participantCount = participantCount
-        self.platform = platform
-    }
+  public init(
+    id: UUID, deviceName: String, gameID: String, participantCount: Int,
+    platform: WireMessage.Platform
+  ) {
+    self.id = id
+    self.deviceName = deviceName
+    self.gameID = gameID
+    self.participantCount = participantCount
+    self.platform = platform
+  }
 }

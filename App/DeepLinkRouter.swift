@@ -13,13 +13,13 @@ import Observation
 @MainActor
 @Observable
 final class DeepLinkRouter {
-    static let shared = DeepLinkRouter()
+  static let shared = DeepLinkRouter()
 
-    var pendingJoin: JoinLink.Payload?
-    var pendingContinuedMatchID: UUID?
-    var pendingGameID: String?
-    var wantsResume = false
-    /// Doc utilisateur — bascule sur l'onglet Historique, déjà filtré sur ce jeu (déclenché depuis
-    /// `GameLeaderboardView`, même patron que les autres signaux de cette classe).
-    var pendingHistoryGameID: String?
+  var pendingJoin: JoinLink.Payload?
+  var pendingContinuedMatchID: UUID?
+  var pendingGameID: String?
+  var wantsResume = false
+  /// Doc utilisateur — bascule sur l'onglet Historique, déjà filtré sur ce jeu (déclenché depuis
+  /// `GameLeaderboardView`, même patron que les autres signaux de cette classe).
+  var pendingHistoryGameID: String?
 }

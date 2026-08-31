@@ -12,28 +12,29 @@ import Foundation
 /// propose « Ouvrir dans Ça Compte » pour un schéma personnalisé si l'app est installée) ; le
 /// scanner intégré (`QRScannerView`) reste le chemin fiable sur toutes les plateformes.
 enum JoinLink {
-    private static let scheme = "cacompte"
-    private static let host = "join"
+  private static let scheme = "cacompte"
+  private static let host = "join"
 
-    struct Payload: Equatable {
-        let pairingCode: String
-    }
+  struct Payload: Equatable {
+    let pairingCode: String
+  }
 
-    static func url(pairingCode: String) -> URL? {
-        var components = URLComponents()
-        components.scheme = scheme
-        components.host = host
-        components.queryItems = [
-            URLQueryItem(name: "code", value: pairingCode),
-        ]
-        return components.url
-    }
+  static func url(pairingCode: String) -> URL? {
+    var components = URLComponents()
+    components.scheme = scheme
+    components.host = host
+    components.queryItems = [
+      URLQueryItem(name: "code", value: pairingCode)
+    ]
+    return components.url
+  }
 
-    static func parse(_ url: URL) -> Payload? {
-        guard url.scheme == scheme, url.host == host,
-              let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-              let items = components.queryItems,
-              let code = items.first(where: { $0.name == "code" })?.value else { return nil }
-        return Payload(pairingCode: code)
-    }
+  static func parse(_ url: URL) -> Payload? {
+    guard url.scheme == scheme, url.host == host,
+      let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+      let items = components.queryItems,
+      let code = items.first(where: { $0.name == "code" })?.value
+    else { return nil }
+    return Payload(pairingCode: code)
+  }
 }

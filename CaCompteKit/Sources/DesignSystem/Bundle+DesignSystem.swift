@@ -1,5 +1,5 @@
 import Foundation
 
 extension Bundle {
-    static let designSystem = Bundle.module
+  static let designSystem = Bundle.module
 }

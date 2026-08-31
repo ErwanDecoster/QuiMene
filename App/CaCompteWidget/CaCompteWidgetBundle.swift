@@ -1,10 +1,10 @@
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 @main
 struct CaCompteWidgetBundle: WidgetBundle {
-    var body: some Widget {
-        MatchWidget()
-        MatchLiveActivityWidget()
-    }
+  var body: some Widget {
+    MatchWidget()
+    MatchLiveActivityWidget()
+  }
 }
