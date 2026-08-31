@@ -9,12 +9,12 @@ import UIKit
 struct LiveMatchView: View {
     @State private var model: LiveMatchModel
     @State private var draftTexts: [Participant.ID: String] = [:]
-    @FocusState private var focusedParticipantID: Participant.ID?
+    @State private var focusedParticipantID: Participant.ID?
     @State private var isConfirmingManualEnd = false
     @State private var isConfirmingAbandon = false
+    @State private var isConfirmingShareSwitch = false
     @State private var isPresentingShareSession = false
     @State private var isPresentingRoundHistory = false
-    @State private var keyboardObserver = KeyboardObserver()
 
     init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
         _model = State(initialValue: try! LiveMatchModel(match: match, context: context, catalog: catalog))
@@ -122,27 +122,20 @@ struct LiveMatchView: View {
                     Image(systemName: "ellipsis.circle")
                 }
             }
-            ToolbarItemGroup(placement: .keyboard) {
-                if model.definition.scoring.entry.allowsNegative, let current = model.currentParticipant {
-                    Button {
-                        toggleSign(for: current.id)
-                    } label: {
-                        Image(systemName: "plusminus")
-                    }
-                }
-                Spacer()
-                Button("Terminé") {
-                    finishRound()
-                }
-            }
         }
-        // Doc utilisateur — la barre d'accessoires du clavier (juste au-dessus) disparaît avec
-        // lui : sur iPad notamment, le bouton natif de fermeture du clavier laissait l'écran sans
-        // aucun moyen de valider la manche en cours (bug remonté). Ce bouton prend le relais,
-        // mais uniquement quand le clavier est masqué — sinon il doublonne le « Terminé » déjà
-        // présent juste au-dessus (remontée utilisateur).
+        // Doc utilisateur — remplace le clavier système : le pavé numérique (charte §6) porte le
+        // signe comme une touche parmi les chiffres, plutôt que dans une barre d'accessoires
+        // séparée (remontée utilisateur — trop loin des chiffres pour un usage pratique).
         .safeAreaInset(edge: .bottom) {
-            if !keyboardObserver.isVisible {
+            VStack(spacing: 0) {
+                if let focusedParticipantID {
+                    ScoreKeypad(
+                        allowsNegative: model.definition.scoring.entry.allowsNegative,
+                        onDigit: { appendDigit($0, for: focusedParticipantID) },
+                        onToggleSign: { toggleSign(for: focusedParticipantID) },
+                        onDelete: { deleteLastDigit(for: focusedParticipantID) }
+                    )
+                }
                 Button("Terminé") {
                     finishRound()
                 }
@@ -153,9 +146,14 @@ struct LiveMatchView: View {
                 .background(.bar)
             }
         }
-        .animation(.default, value: keyboardObserver.isVisible)
+        .animation(.default, value: focusedParticipantID)
         .onAppear {
             focusedParticipantID = model.currentParticipant?.id
+            if model.needsShareSwitchConfirmation {
+                isConfirmingShareSwitch = true
+            } else {
+                model.attachToActiveSessionIfNeeded()
+            }
         }
         .onChange(of: focusedParticipantID) { _, newValue in
             guard let newValue else { return }
@@ -177,6 +175,22 @@ struct LiveMatchView: View {
             }
         } message: {
             Text("Le classement final sera calculé à partir des manches jouées. Cette action ne peut pas être annulée.")
+        }
+        // Doc utilisateur — remontée : ouvrir cet écran alors qu'une session partage déjà une
+        // *autre* partie encore en cours substituait ce que voient les pairs connectés sans
+        // prévenir. Ne s'affiche jamais pour l'enchaînement volontaire (doc 09) — seulement
+        // quand la partie remplacée est, elle aussi, encore en cours.
+        .confirmationDialog(
+            "Remplacer la partie partagée ?",
+            isPresented: $isConfirmingShareSwitch,
+            titleVisibility: .visible
+        ) {
+            Button("Partager cette partie à la place") {
+                model.confirmShareSwitch()
+            }
+            Button("Annuler", role: .cancel) {}
+        } message: {
+            Text("Une session est en cours de partage sur \(model.pendingShareSwitchGameName ?? "une autre partie"). Continuer ici la remplacera : les personnes connectées verront cette partie à la place.")
         }
         .confirmationDialog(
             "Abandonner cette partie ?",
@@ -235,40 +249,34 @@ struct LiveMatchView: View {
         }
     }
 
-    /// Charte §5.4 — jamais vide en apparence (placeholder `0`), bordure au focus uniquement.
-    /// Clavier système (`.numberPad`) : pas de touche « − », d'où le bouton de signe dans la
-    /// barre d'accessoires pour les jeux qui acceptent les valeurs négatives.
+    /// Charte §5.4 — jamais vide en apparence (`0` en `text/tertiary`), bordure au focus
+    /// uniquement. Un tap ouvre le pavé numérique custom (`ScoreKeypad`) plutôt que le clavier
+    /// système, qui n'a pas de touche « − ».
     private func scoreField(for participant: Participant) -> some View {
-        TextField("0", text: textBinding(for: participant.id))
-            .keyboardType(.numberPad)
-            .multilineTextAlignment(.trailing)
+        let text = draftTexts[participant.id] ?? ""
+        return Text(text.isEmpty ? "0" : text)
             .font(.scoreM)
-            .foregroundStyle(.textPrimary)
+            .foregroundStyle(text.isEmpty ? .textTertiary : .textPrimary)
+            .multilineTextAlignment(.trailing)
             .padding(.horizontal, Space.md)
-            .frame(width: 88, height: ButtonHeight.medium)
+            .frame(width: 88, height: ButtonHeight.medium, alignment: .trailing)
             .background(.neutralFill, in: .rect(cornerRadius: Radius.sm))
             .overlay {
                 RoundedRectangle(cornerRadius: Radius.sm)
                     .strokeBorder(.brandInk, lineWidth: focusedParticipantID == participant.id ? 2 : 0)
             }
-            .focused($focusedParticipantID, equals: participant.id)
+            .contentShape(Rectangle())
+            .onTapGesture { focusedParticipantID = participant.id }
     }
 
-    private func textBinding(for participantID: Participant.ID) -> Binding<String> {
-        Binding(
-            get: { draftTexts[participantID] ?? "" },
-            set: { newValue in
-                let sign = newValue.hasPrefix("-") ? "-" : ""
-                let digits = newValue.filter(\.isNumber)
-                let normalized = digits.isEmpty ? sign : sign + digits
-                draftTexts[participantID] = normalized
-                if let value = Int(normalized) {
-                    model.setScore(value, for: participantID)
-                } else {
-                    model.clearScore(for: participantID)
-                }
-            }
-        )
+    private func appendDigit(_ digit: Int, for participantID: Participant.ID) {
+        updateDraft((draftTexts[participantID] ?? "") + String(digit), for: participantID)
+    }
+
+    private func deleteLastDigit(for participantID: Participant.ID) {
+        guard var text = draftTexts[participantID], !text.isEmpty else { return }
+        text.removeLast()
+        updateDraft(text, for: participantID)
     }
 
     private func toggleSign(for participantID: Participant.ID) {
@@ -278,6 +286,10 @@ struct LiveMatchView: View {
         } else {
             text = "-" + text
         }
+        updateDraft(text, for: participantID)
+    }
+
+    private func updateDraft(_ text: String, for participantID: Participant.ID) {
         draftTexts[participantID] = text
         if let value = Int(text) {
             model.setScore(value, for: participantID)

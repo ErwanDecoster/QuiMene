@@ -38,6 +38,22 @@ final class LiveShareCoordinator {
     private(set) var allowsContributors = true
     var isSharing: Bool { session != nil }
 
+    /// Doc utilisateur — remontée : ouvrir l'écran d'une partie substituait silencieusement ce
+    /// que voient les pairs connectés dès qu'une session diffusait déjà une *autre* partie encore
+    /// en cours. `LiveMatchModel` s'en sert pour savoir si un tel rattachement doit être proposé
+    /// tel quel (enchaînement voulu, doc 09 « Fin de partie ») ou demander confirmation d'abord
+    /// (deux parties bien distinctes, encore en cours toutes les deux).
+    var attachedMatchIsConcluded: Bool {
+        guard let match else { return true }
+        return match.status == .ended || match.status == .abandoned
+    }
+
+    /// Nom du jeu actuellement diffusé — pour le message de confirmation avant de le remplacer.
+    var attachedGameName: String? {
+        guard let match else { return nil }
+        return (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.fr ?? match.gameID
+    }
+
     /// Doc utilisateur — un `LiveMatchModel` se recrée à chaque partie ; les flux de `LiveSession`
     /// sont documentés à usage unique (voir `SharedMatchModel`, bug BLE-era d'un second abonné
     /// privé du flux), donc ce coordinateur en reste l'unique consommateur pour toute la durée de

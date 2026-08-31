@@ -51,6 +51,19 @@ final class LiveMatchModel {
     var pairingCode: String? { isSharing ? shareCoordinator.pairingCode : nil }
     var connectedPeers: [LiveSession.ConnectedPeer] { isSharing ? shareCoordinator.connectedPeers : [] }
 
+    /// Doc utilisateur — `true` seulement quand rattacher cette partie remplacerait, pour les
+    /// pairs déjà connectés, une *autre* partie encore en cours : jamais vrai pour l'enchaînement
+    /// volontaire déjà documenté (doc 09 « Fin de partie », la partie précédente est alors
+    /// conclue). `LiveMatchView` demande confirmation avant `confirmShareSwitch()` uniquement
+    /// dans ce cas.
+    var needsShareSwitchConfirmation: Bool {
+        shareCoordinator.isSharing
+            && shareCoordinator.attachedMatchID != match.id
+            && !shareCoordinator.attachedMatchIsConcluded
+    }
+
+    var pendingShareSwitchGameName: String? { shareCoordinator.attachedGameName }
+
     init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) throws {
         self.match = match
         self.context = context
@@ -60,10 +73,11 @@ final class LiveMatchModel {
         self.rules = try catalog.rules(for: match.gameID, version: match.rulesVersion)
         self.state = try repository.loadState(match, catalog: catalog)
         refreshLiveActivity()
-        // Doc 09 « Fin de partie » — no-op si aucune session n'est active, no-op si cette partie
-        // est déjà attachée ; sinon c'est cet appel qui fait qu'une nouvelle partie rejoint
-        // automatiquement une session déjà en cours, sans repasser par « Partager en direct ».
-        Task { await LiveShareCoordinator.shared.attach(match: match, context: context) }
+        // Doc utilisateur — remontée : rattacher automatiquement ici, sans condition, substituait
+        // silencieusement ce que voient les pairs connectés dès qu'on rouvrait l'écran d'une
+        // *autre* partie encore en cours pendant qu'une session en diffusait déjà une. Le
+        // rattachement se fait maintenant depuis la vue (`attachToActiveSessionIfNeeded()`),
+        // seulement quand `needsShareSwitchConfirmation` est faux.
     }
 
     /// Doc 09 « Fin de partie » — donne à `MatchLiveActivityController` la clé d'Activity qui
@@ -207,6 +221,21 @@ final class LiveMatchModel {
     /// `Sync` ni `CaCompteKit` ne peuvent lire `UIDevice` (la cible compile aussi pour macOS).
     func startSharing(deviceName: String, allowsContributors: Bool = true) async throws {
         try await shareCoordinator.startSharing(match: match, context: context, deviceName: deviceName, allowsContributors: allowsContributors)
+    }
+
+    /// Appelée depuis `.onAppear` : rattache tout de suite si aucune confirmation n'est
+    /// nécessaire (aucune session active, déjà attachée, ou enchaînement depuis une partie
+    /// conclue) — ne fait jamais rien silencieusement quand `needsShareSwitchConfirmation` est
+    /// vrai, la vue doit alors demander confirmation puis appeler `confirmShareSwitch()`.
+    func attachToActiveSessionIfNeeded() {
+        guard !needsShareSwitchConfirmation else { return }
+        Task { await shareCoordinator.attach(match: match, context: context) }
+    }
+
+    /// Rattachement explicitement confirmé par l'utilisateur malgré le remplacement d'une autre
+    /// partie encore en cours.
+    func confirmShareSwitch() {
+        Task { await shareCoordinator.attach(match: match, context: context) }
     }
 
     /// Doc utilisateur P9 — s'applique aux prochaines connexions, pas aux contributeurs déjà
