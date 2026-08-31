@@ -71,16 +71,38 @@ final class SharedProfileSyncCoordinator {
     }
 
     /// `materializeSharedSummary` est déjà un no-op si cette partie est connue localement (c'est
-    /// cet appareil qui l'a jouée et poussée) — reste alors juste à nettoyer la boîte aux lettres.
+    /// cet appareil qui l'a jouée et poussée).
     private func pull(context: ModelContext) async {
         let playerRepository = PlayerRepository(context: context)
         let matchRepository = MatchRepository(context: context)
         guard let linkedIDs = try? playerRepository.allSharedProfileIDs(), !linkedIDs.isEmpty else { return }
         guard let rows = try? await transport.fetchPending(for: linkedIDs) else { return }
 
+        let myOwnID = (try? playerRepository.myOwnSharedPlayer())?.sharedProfileID
+
         for row in rows {
-            try? matchRepository.materializeSharedSummary(row.payload, matchID: row.matchID)
-            try? await transport.delete(matchID: row.matchID, sharedProfileID: row.sharedProfileID)
+            let isMyOwnIdentity = row.sharedProfileID == myOwnID
+            // Doc 14, phase 4 — remontée : suivre un ami donnait accès à *toutes* ses parties,
+            // même jouées avec des tiers sans rapport. Une fiche qui suit un ami (pas la mienne)
+            // ne matérialise donc une partie que si j'y étais moi-même — mon propre identifiant
+            // partagé apparaît alors parmi les *autres* participants du résumé. Ma propre fiche
+            // partagée, elle, reçoit tout sans filtre : je veux consolider l'intégralité de mes
+            // parties, où qu'elles aient été jouées.
+            let isRelevant = isMyOwnIdentity || row.payload.standings.contains { $0.sharedProfileID == myOwnID }
+            if isRelevant {
+                try? matchRepository.materializeSharedSummary(row.payload, matchID: row.matchID)
+            }
+
+            // Doc 14, phase 4 — remontée : supprimer après chaque lecture, quel que soit
+            // l'appareil, faisait perdre la partie aux autres appareils qui suivent la même
+            // personne si l'un d'eux la lisait (et donc la supprimait) en premier — plusieurs
+            // amis peuvent suivre la même personne (doc 14 « Limites de confiance »). Seul
+            // l'appareil qui fait autorité sur cet identifiant (le sien — une seule fiche
+            // partagée par appareil, phase 4) nettoie la boîte aux lettres ; les autres laissent
+            // la purge programmée (30 jours, hors de ce dépôt) s'en charger.
+            if isMyOwnIdentity {
+                try? await transport.delete(matchID: row.matchID, sharedProfileID: row.sharedProfileID)
+            }
         }
     }
 }

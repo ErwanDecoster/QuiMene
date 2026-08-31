@@ -36,38 +36,53 @@ struct PlayerEditorView: View {
                 if model.isEditing {
                     Section {
                         if let shareURL = model.shareURL {
+                            // Doc 14, phase 4 — c'est *la* fiche que cet appareil partage comme la
+                            // sienne : ni « Lier un profil reçu » (elle ne peut pas aussi suivre
+                            // quelqu'un d'autre), une seule action possible, la délier.
                             VStack(spacing: Space.sm) {
                                 QRCodeView(url: shareURL)
                                     .frame(width: 160, height: 160)
-                                Text("Fais scanner ce code par l'ami que cette fiche représente, depuis sa propre fiche « Lier un profil reçu ».")
+                                Text("Fais scanner ce code par l'ami avec qui tu veux partager ton historique, depuis sa propre fiche « Lier un profil reçu ».")
                                     .font(.bodySmall)
                                     .foregroundStyle(.textSecondary)
                                     .multilineTextAlignment(.center)
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, Space.sm)
-                        } else {
-                            Button("Partager ce profil") {
-                                model.ensureSharedProfileID()
-                            }
-                        }
-                        if let linkedName = model.linkedProfileName, let linkedDate = model.linkedProfileDate {
-                            Text("Liée à **\(linkedName)**, le \(linkedDate.formatted(date: .abbreviated, time: .omitted))")
-                                .font(.bodySmall)
-                                .foregroundStyle(.textSecondary)
-                        }
-                        Button(model.shareURL == nil ? "Lier un profil reçu" : "Lier un autre profil") {
-                            isPresentingProfileScanner = true
-                        }
-                        if model.shareURL != nil {
                             Button("Ne plus partager", role: .destructive) {
                                 model.unlinkProfile()
+                            }
+                        } else {
+                            // Doc 14, phase 4 — cette fiche n'est pas *la mienne* (elle peut déjà
+                            // suivre un ami, ou n'être encore ni l'un ni l'autre) : les deux
+                            // actions restent possibles, au choix (« c'est moi » vs « je suis en
+                            // train de suivre quelqu'un »).
+                            if let linkedName = model.linkedProfileName, let linkedDate = model.linkedProfileDate {
+                                Text("Liée à **\(linkedName)**, le \(linkedDate.formatted(date: .abbreviated, time: .omitted))")
+                                    .font(.bodySmall)
+                                    .foregroundStyle(.textSecondary)
+                            }
+                            Button("Partager ce profil (c'est moi)") {
+                                model.ensureSharedProfileID()
+                            }
+                            if let shareConflictMessage = model.shareConflictMessage {
+                                Text(shareConflictMessage)
+                                    .font(.bodySmall)
+                                    .foregroundStyle(.semanticError)
+                            }
+                            Button(model.linkedProfileName == nil ? "Lier un profil reçu" : "Lier un autre profil") {
+                                isPresentingProfileScanner = true
+                            }
+                            if model.linkedProfileName != nil {
+                                Button("Ne plus suivre ce profil", role: .destructive) {
+                                    model.unlinkProfile()
+                                }
                             }
                         }
                     } header: {
                         Text("Profil partagé")
                     } footer: {
-                        Text("Relie cette fiche à l'installation d'un ami : les parties jouées ensemble pourront apparaître dans son propre historique.")
+                        Text("« Partager » désigne cette fiche comme la tienne — une seule par appareil. « Lier » relie cette fiche à celle d'un ami sur son propre appareil : les parties jouées ensemble pourront apparaître dans son historique, sans lui montrer tes autres parties.")
                     }
 
                     Section {

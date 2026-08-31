@@ -16,13 +16,29 @@ struct PlayersListView: View {
     /// tri manuel (glisser-déposer) en option — réglable dans Réglages.
     private var activePlayers: [PlayerRecord] {
         let filtered = allPlayers.filter { !$0.isArchived }
-        guard settings.playerSortMode == .automatic else { return filtered }
-        return filtered.sorted { lhs, rhs in
-            let lhsCount = matchesPlayedCount(for: lhs)
-            let rhsCount = matchesPlayedCount(for: rhs)
-            guard lhsCount == rhsCount else { return lhsCount > rhsCount }
-            return lhs.sortIndex < rhs.sortIndex
+        let sorted: [PlayerRecord]
+        if settings.playerSortMode == .automatic {
+            sorted = filtered.sorted { lhs, rhs in
+                let lhsCount = matchesPlayedCount(for: lhs)
+                let rhsCount = matchesPlayedCount(for: rhs)
+                guard lhsCount == rhsCount else { return lhsCount > rhsCount }
+                return lhs.sortIndex < rhs.sortIndex
+            }
+        } else {
+            sorted = filtered
         }
+        return pinningMine(in: sorted)
+    }
+
+    /// Doc utilisateur — la fiche que cet appareil partage comme la sienne (doc 14, phase 4)
+    /// reste toujours en tête, quel que soit le tri choisi par ailleurs : c'est la seule qui
+    /// représente l'utilisateur de cet appareil, elle ne se perd pas dans le tri des habitués.
+    private func pinningMine(in players: [PlayerRecord]) -> [PlayerRecord] {
+        guard let mineIndex = players.firstIndex(where: { $0.sharedProfileIsMine }), mineIndex != 0 else { return players }
+        var reordered = players
+        let mine = reordered.remove(at: mineIndex)
+        reordered.insert(mine, at: 0)
+        return reordered
     }
 
     private var archivedCount: Int { allPlayers.count { $0.isArchived } }

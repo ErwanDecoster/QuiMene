@@ -42,11 +42,21 @@ final class MatchSetupModel {
         self.definition = definition
         self.repository = MatchRepository(context: context)
         let counts = (try? repository.participationCounts()) ?? [:]
-        self.orderedAvailablePlayers = availablePlayers.sorted { lhs, rhs in
+        let sorted = availablePlayers.sorted { lhs, rhs in
             let l = counts[lhs.id] ?? 0
             let r = counts[rhs.id] ?? 0
             if l != r { return l > r }
             return lhs.sortIndex < rhs.sortIndex
+        }
+        // Doc utilisateur — la fiche que cet appareil partage comme la sienne (doc 14, phase 4)
+        // reste en tête ici aussi, avant même les habitués les plus fréquents.
+        if let mineIndex = sorted.firstIndex(where: { $0.sharedProfileIsMine }), mineIndex != 0 {
+            var reordered = sorted
+            let mine = reordered.remove(at: mineIndex)
+            reordered.insert(mine, at: 0)
+            self.orderedAvailablePlayers = reordered
+        } else {
+            self.orderedAvailablePlayers = sorted
         }
         for variant in definition.variants {
             variantValues[variant.id] = variant.defaultValue

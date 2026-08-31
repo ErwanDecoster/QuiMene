@@ -272,7 +272,7 @@ pas des données sensibles) face au coût d'ajouter des comptes.
 | 1 | Afficher le pseudo (et l'avatar) scannés avant de confirmer la liaison (« Lier cette fiche à *Marie* ? ») ✅ | Limite 3 | Trivial — le champ existe déjà, juste jamais lu |
 | 2 | Mémoriser localement un libellé « Lié à *Marie*, le 2 sept. 2026 » sur la fiche ✅ | Limite 2 | Faible — deux champs de plus sur `PlayerRecord` |
 | 3 | Bloquer (avec confirmation explicite pour passer outre) la liaison à un `UUID` déjà utilisé par une *autre* fiche locale ✅ | Limite 4 | Faible — une vérification dans `PlayerRepository` |
-| 4 | Marquer une fiche comme « C'est moi » (une seule par appareil) | Limite 6 | Modéré — un champ, une action dans `PlayerEditorView`, une mise en avant dans `PlayersListView` |
+| 4 | Marquer une fiche comme « C'est moi » (une seule par appareil) ✅ — voir plus bas, simplifié | Limite 6 | Modéré — un champ, une action dans `PlayerEditorView`, une mise en avant dans `PlayersListView` |
 | 5 | Registre léger côté serveur : qui a revendiqué mon `UUID`, et quand (nouvelle table, sur le modèle de `cacompte_open_games`) | Limite 2 et 5 (partiellement) | Modéré à élevé — nouvelle table, UI de consultation, ne détecte que les liaisons sur *mon propre* identifiant, jamais une fausse fiche créée sous un `UUID` distinct |
 
 Le point 5 mérite une précision importante : il ne répond **pas** au scénario initial (une fausse
@@ -293,7 +293,49 @@ que de bloquer sans recours ou de lier en silence. `PlayerRecord.sharedProfileLi
 sur `PlayerEditorView` (« Liée à Marie, le … ») — jamais mis à jour ensuite, puisque rien ne
 prévient cet appareil si l'ami renomme sa propre fiche par la suite.
 
-Les points 4 et 5 restent à faire, si demandés — voir « Décisions ouvertes ».
+Le point 5 reste à faire, si demandé — voir « Décisions ouvertes ».
+
+### Phase 4 — « C'est moi » implicite, et une vraie fuite entre amis corrigée ✅
+
+Question posée après coup : si je lie mon profil à l'appareil d'un ami pour partager notre
+historique commun, et que je joue ensuite une partie avec un *autre* ami — cette partie-là est-
+elle aussi poussée vers le premier ami, alors qu'il n'y était pour rien ?
+
+**Oui, avant cette phase.** `SharedProfileSyncCoordinator.pull` matérialisait tout ce qui était
+poussé vers un identifiant détenu localement, sans se demander si *cette partie précise*
+concernait l'appareil récepteur. Suivre un ami donnait donc accès à l'intégralité de son
+historique, pas seulement aux parties jouées ensemble — plus que ce que le besoin initial
+demandait, et une vraie fuite d'information (un ami apprend que j'ai joué avec quelqu'un d'autre,
+sans y avoir participé).
+
+**La correction retenue est plus simple que le point 4 initialement esquissé** (un champ « C'est
+moi » séparé, à cocher explicitement) : plutôt qu'une désignation à part, *partager* une fiche
+**est** la désignation. Une seule fiche par appareil peut être partagée
+(`PlayerRepository.sharedProfileID(for:)` refuse d'en désigner une seconde,
+`PlayerRecord.sharedProfileIsMine`) — *lier* une fiche à l'identifiant d'un ami reste possible en
+nombre, mais ne pose jamais ce drapeau. L'origine de l'identifiant (généré ici vs scanné ailleurs)
+suffit donc à distinguer « mon identité » de « un ami que je suis », sans action supplémentaire à
+retenir pour l'utilisateur.
+
+`SharedProfileSyncCoordinator.pull` applique désormais un filtre : une partie n'est matérialisée
+sans condition que pour *ma propre* fiche partagée (je veux tout consolider, où que ce soit
+joué) ; pour une fiche qui *suit* un ami, une partie n'est matérialisée que si mon propre
+identifiant partagé apparaît aussi parmi les *autres* participants du résumé — autrement dit,
+seulement si j'y étais moi-même. La partie jouée avec un autre ami n'est simplement jamais
+matérialisée sur l'appareil du premier.
+
+**Effet de bord corrigé en même temps, découvert en construisant ce filtre** : la boîte aux
+lettres supprimait chaque résumé dès sa première lecture, par n'importe quel appareil — si
+plusieurs amis suivent la même personne (cas normal et voulu, voir plus haut), le premier à lire
+supprimait la ligne avant que les autres n'aient pu la récupérer, leur faisant perdre la partie
+silencieusement. Seul l'appareil qui fait autorité sur un identifiant (le sien, jamais partagé par
+construction désormais) supprime après lecture ; les autres laissent la purge programmée (30
+jours, toujours hors de ce dépôt) s'en charger.
+
+**Effet de bord additionnel** : la fiche partagée d'un appareil apparaît maintenant toujours en
+tête des listes de joueurs (`PlayersListView`, présélection de `MatchSetupModel`), quel que soit
+le tri par ailleurs choisi — c'est la seule fiche qui représente l'utilisateur de cet appareil,
+elle ne doit pas se perdre dans un tri par fréquence ou alphabétique.
 
 ## Décisions ouvertes
 
