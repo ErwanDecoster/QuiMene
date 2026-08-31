@@ -11,92 +11,99 @@ import SwiftData
 @MainActor
 @Observable
 final class YamsSheetModel {
-    private(set) var state: MatchState {
-        didSet { MatchLiveActivityController.refresh(definition: definition, rules: rules, state: state) }
+  private(set) var state: MatchState {
+    didSet {
+      MatchLiveActivityController.refresh(definition: definition, rules: rules, state: state)
     }
+  }
 
-    private(set) var validationErrorMessage: String?
+  private(set) var validationErrorMessage: String?
 
-    let definition: GameDefinition
-    private let rules: any GameRules
-    private let match: MatchRecord
-    private let repository: MatchRepository
-    private let catalog: GameCatalog
+  let definition: GameDefinition
+  private let rules: any GameRules
+  private let match: MatchRecord
+  private let repository: MatchRepository
+  private let catalog: GameCatalog
 
-    init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) throws {
-        self.match = match
-        self.repository = MatchRepository(context: context)
-        self.catalog = catalog
-        self.definition = try catalog.definition(for: match.gameID, version: match.rulesVersion)
-        self.rules = try catalog.rules(for: match.gameID, version: match.rulesVersion)
-        self.state = try repository.loadState(match, catalog: catalog)
-        MatchLiveActivityController.refresh(definition: definition, rules: rules, state: state)
-    }
+  init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) throws {
+    self.match = match
+    self.repository = MatchRepository(context: context)
+    self.catalog = catalog
+    self.definition = try catalog.definition(for: match.gameID, version: match.rulesVersion)
+    self.rules = try catalog.rules(for: match.gameID, version: match.rulesVersion)
+    self.state = try repository.loadState(match, catalog: catalog)
+    MatchLiveActivityController.refresh(definition: definition, rules: rules, state: state)
+  }
 
-    var participants: [Participant] {
-        state.participants.sorted { $0.seatIndex < $1.seatIndex }
-    }
+  var participants: [Participant] {
+    state.participants.sorted { $0.seatIndex < $1.seatIndex }
+  }
 
-    var participantRecords: [ParticipantRecord] {
-        match.participants.sorted { $0.seatIndex < $1.seatIndex }
-    }
+  var participantRecords: [ParticipantRecord] {
+    match.participants.sorted { $0.seatIndex < $1.seatIndex }
+  }
 
-    var categories: [GameDefinition.Category] {
-        definition.scoring.entry.categories ?? []
-    }
+  var categories: [GameDefinition.Category] {
+    definition.scoring.entry.categories ?? []
+  }
 
-    var finalStandings: [Standing] {
-        rules.standings(state, definition: definition)
-    }
+  var finalStandings: [Standing] {
+    rules.standings(state, definition: definition)
+  }
 
-    var isConcluded: Bool {
-        state.status == .ended || state.status == .abandoned
-    }
+  var isConcluded: Bool {
+    state.status == .ended || state.status == .abandoned
+  }
 
-    func abandon() {
-        state = (try? repository.abandonMatch(match, catalog: catalog)) ?? state
-    }
+  func abandon() {
+    state = (try? repository.abandonMatch(match, catalog: catalog)) ?? state
+  }
 
-    /// Catégories déjà remplies pour ce joueur, indexées par `categoryID`.
-    func filledCategories(for participantID: Participant.ID) -> [String: ScoreEntry] {
-        var result: [String: ScoreEntry] = [:]
-        for round in state.rounds {
-            for entry in round.entries where entry.participantID == participantID {
-                if let id = categoryID(from: entry.detail) {
-                    result[id] = entry
-                }
-            }
+  /// Catégories déjà remplies pour ce joueur, indexées par `categoryID`.
+  func filledCategories(for participantID: Participant.ID) -> [String: ScoreEntry] {
+    var result: [String: ScoreEntry] = [:]
+    for round in state.rounds {
+      for entry in round.entries where entry.participantID == participantID {
+        if let id = categoryID(from: entry.detail) {
+          result[id] = entry
         }
-        return result
+      }
+    }
+    return result
+  }
+
+  func submit(rawValue: Int, participantID: Participant.ID, categoryID: String) {
+    // Doc utilisateur (audit qualité, 15) — `try!` volontaire : `YamsCategoryDetail` n'a
+    // qu'une propriété `String`, `JSONEncoder` ne peut pas échouer dessus (pas de `Double`
+    // non fini, pas de type exotique). Même convention que `GameCatalog+Embedded.swift`.
+    let detail = ScoreDetail(
+      payload: try! JSONEncoder().encode(YamsCategoryDetail(categoryID: categoryID)))
+    let draft = RoundDraft(
+      index: state.rounds.count,
+      inputs: [ScoreInput(participantID: participantID, rawValue: rawValue, detail: detail)]
+    )
+
+    if case .invalid(let errors) = rules.validate(draft, in: state, definition: definition) {
+      validationErrorMessage = errors.first?.message
+      return
     }
 
-    func submit(rawValue: Int, participantID: Participant.ID, categoryID: String) {
-        let detail = ScoreDetail(payload: try! JSONEncoder().encode(YamsCategoryDetail(categoryID: categoryID)))
-        let draft = RoundDraft(
-            index: state.rounds.count,
-            inputs: [ScoreInput(participantID: participantID, rawValue: rawValue, detail: detail)]
-        )
-
-        if case .invalid(let errors) = rules.validate(draft, in: state, definition: definition) {
-            validationErrorMessage = errors.first?.message
-            return
-        }
-
-        do {
-            state = try repository.commitRound(draft, to: match, catalog: catalog)
-            validationErrorMessage = nil
-        } catch {
-            validationErrorMessage = "La saisie n'a pas pu être enregistrée."
-        }
+    do {
+      state = try repository.commitRound(draft, to: match, catalog: catalog)
+      validationErrorMessage = nil
+    } catch {
+      validationErrorMessage = "La saisie n'a pas pu être enregistrée."
     }
+  }
 
-    func dismissError() {
-        validationErrorMessage = nil
-    }
+  func dismissError() {
+    validationErrorMessage = nil
+  }
 
-    private func categoryID(from detail: ScoreDetail?) -> String? {
-        guard let payload = detail?.payload,
-              let decoded = try? JSONDecoder().decode(YamsCategoryDetail.self, from: payload) else { return nil }
-        return decoded.categoryID
-    }
+  private func categoryID(from detail: ScoreDetail?) -> String? {
+    guard let payload = detail?.payload,
+      let decoded = try? JSONDecoder().decode(YamsCategoryDetail.self, from: payload)
+    else { return nil }
+    return decoded.categoryID
+  }
 }
