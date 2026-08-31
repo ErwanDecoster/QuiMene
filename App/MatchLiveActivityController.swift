@@ -3,6 +3,7 @@ import Domain
 import Foundation
 import Store
 import Sync
+import os
 
 /// Doc utilisateur — Live Activity (roadmap P9) : point d'entrée unique pour les trois écrans de
 /// saisie (`LiveMatchModel`, `YamsSheetModel`, `BeloteRoundModel`), qui partagent tous la même
@@ -29,144 +30,156 @@ import Sync
 /// à jour.
 @MainActor
 enum MatchLiveActivityController {
-    private static var activities: [String: Activity<MatchActivityAttributes>] = [:]
-    private static var pushTokenTasks: [String: Task<Void, Never>] = [:]
-    /// Résout un `matchID` vers la clé d'activité sous laquelle il est actuellement suivi —
-    /// `stopTracking(matchID:)`/`markStale(matchID:)` ne connaissent que le `matchID` (leurs
-    /// appelants, `SharedMatchModel`, n'ont pas besoin de savoir si une session est active), cette
-    /// table leur évite de le recalculer.
-    private static var keysByMatchID: [UUID: String] = [:]
+  private static let logger = Logger(
+    subsystem: "com.cacompte.app", category: "MatchLiveActivityController")
+  private static var activities: [String: Activity<MatchActivityAttributes>] = [:]
+  private static var pushTokenTasks: [String: Task<Void, Never>] = [:]
+  /// Résout un `matchID` vers la clé d'activité sous laquelle il est actuellement suivi —
+  /// `stopTracking(matchID:)`/`markStale(matchID:)` ne connaissent que le `matchID` (leurs
+  /// appelants, `SharedMatchModel`, n'ont pas besoin de savoir si une session est active), cette
+  /// table leur évite de le recalculer.
+  private static var keysByMatchID: [UUID: String] = [:]
 
-    private static func activityKey(matchID: UUID, sessionID: UUID?) -> String {
-        if let sessionID {
-            return "session:\(sessionID.uuidString)"
-        }
-        return "match:\(matchID.uuidString)"
+  private static func activityKey(matchID: UUID, sessionID: UUID?) -> String {
+    if let sessionID {
+      return "session:\(sessionID.uuidString)"
+    }
+    return "match:\(matchID.uuidString)"
+  }
+
+  /// `sessionID` — fourni par l'appelant quand cette partie est diffusée par une session de
+  /// partage active (hôte : `LiveShareCoordinator.shared.sessionID` ; pair :
+  /// `LiveSession.currentSessionID()`), `nil` sinon (partie solo).
+  static func refresh(
+    definition: GameDefinition, rules: any GameRules, state: MatchState,
+    isAuthoritative: Bool = false, sessionID: UUID? = nil
+  ) {
+    guard ActivityAuthorizationInfo().areActivitiesEnabled else {
+      logger.info("Live Activities disabled by system/user")
+      return
     }
 
-    /// `sessionID` — fourni par l'appelant quand cette partie est diffusée par une session de
-    /// partage active (hôte : `LiveShareCoordinator.shared.sessionID` ; pair :
-    /// `LiveSession.currentSessionID()`), `nil` sinon (partie solo).
-    static func refresh(definition: GameDefinition, rules: any GameRules, state: MatchState, isAuthoritative: Bool = false, sessionID: UUID? = nil) {
-        guard ActivityAuthorizationInfo().areActivitiesEnabled else {
-            print("[MatchLiveActivityController] Live Activities disabled by system/user")
-            return
+    let names = Dictionary(uniqueKeysWithValues: state.participants.map { ($0.id, $0.displayName) })
+    let standings = rules.standings(state, definition: definition)
+      .sorted { $0.rank < $1.rank }
+      .prefix(4)
+      .map {
+        MatchActivityAttributes.ContentState.Standing(
+          id: $0.participantID, name: names[$0.participantID] ?? "", score: $0.score)
+      }
+    let matchID = state.matchID
+    let content = MatchActivityAttributes.ContentState(
+      matchID: matchID,
+      gameName: definition.name.fr,
+      gameSymbol: definition.symbol,
+      roundNumber: state.rounds.count,
+      standings: Array(standings)
+    )
+    let hasEnded = state.status == .ended || state.status == .abandoned
+    let key = activityKey(matchID: matchID, sessionID: sessionID)
+
+    // Doc utilisateur — tout le travail (y compris la lecture/écriture d'`activities`) se
+    // fait à l'intérieur de cette tâche : `Activity` n'est pas `Sendable` côté SDK, donc le
+    // capturer depuis l'extérieur pour l'utiliser ici violerait la vérification « sending »
+    // de Swift 6. `activities` reste protégé par `@MainActor`, pas par cette tâche elle-même.
+    Task { @MainActor in
+      // Doc utilisateur : `Activity` (ActivityKit) n'est pas `Sendable` côté SDK alors que
+      // `update`/`end` sont `nonisolated async` — `nonisolated(unsafe)` est l'échappatoire
+      // documentée pour ce décalage précis, pas un contournement maison.
+      if hasEnded {
+        // Doc utilisateur — remontée : `.default` gardait la carte affichée un moment
+        // après la fin de partie (comportement voulu au départ, « voir le score final »),
+        // mais ça se lisait comme un bug (« la partie est finie, pourquoi c'est encore
+        // là ? »). Retrait immédiat, comme `stopTracking` ci-dessous.
+        pushTokenTasks.removeValue(forKey: key)?.cancel()
+        keysByMatchID[matchID] = nil
+        guard let found = activities.removeValue(forKey: key) else { return }
+        nonisolated(unsafe) let activity = found
+        await activity.end(
+          ActivityContent(state: content, staleDate: nil), dismissalPolicy: .immediate)
+        if isAuthoritative {
+          await LiveActivityPushClient.push(activityKey: key, event: "end", contentState: content)
         }
+        return
+      }
 
-        let names = Dictionary(uniqueKeysWithValues: state.participants.map { ($0.id, $0.displayName) })
-        let standings = rules.standings(state, definition: definition)
-            .sorted { $0.rank < $1.rank }
-            .prefix(4)
-            .map { MatchActivityAttributes.ContentState.Standing(id: $0.participantID, name: names[$0.participantID] ?? "", score: $0.score) }
-        let matchID = state.matchID
-        let content = MatchActivityAttributes.ContentState(
-            matchID: matchID,
-            gameName: definition.name.fr,
-            gameSymbol: definition.symbol,
-            roundNumber: state.rounds.count,
-            standings: Array(standings)
-        )
-        let hasEnded = state.status == .ended || state.status == .abandoned
-        let key = activityKey(matchID: matchID, sessionID: sessionID)
+      keysByMatchID[matchID] = key
 
-        // Doc utilisateur — tout le travail (y compris la lecture/écriture d'`activities`) se
-        // fait à l'intérieur de cette tâche : `Activity` n'est pas `Sendable` côté SDK, donc le
-        // capturer depuis l'extérieur pour l'utiliser ici violerait la vérification « sending »
-        // de Swift 6. `activities` reste protégé par `@MainActor`, pas par cette tâche elle-même.
-        Task { @MainActor in
-            // Doc utilisateur : `Activity` (ActivityKit) n'est pas `Sendable` côté SDK alors que
-            // `update`/`end` sont `nonisolated async` — `nonisolated(unsafe)` est l'échappatoire
-            // documentée pour ce décalage précis, pas un contournement maison.
-            if hasEnded {
-                // Doc utilisateur — remontée : `.default` gardait la carte affichée un moment
-                // après la fin de partie (comportement voulu au départ, « voir le score final »),
-                // mais ça se lisait comme un bug (« la partie est finie, pourquoi c'est encore
-                // là ? »). Retrait immédiat, comme `stopTracking` ci-dessous.
-                pushTokenTasks.removeValue(forKey: key)?.cancel()
-                keysByMatchID[matchID] = nil
-                guard let found = activities.removeValue(forKey: key) else { return }
-                nonisolated(unsafe) let activity = found
-                await activity.end(ActivityContent(state: content, staleDate: nil), dismissalPolicy: .immediate)
-                if isAuthoritative {
-                    await LiveActivityPushClient.push(activityKey: key, event: "end", contentState: content)
-                }
-                return
-            }
-
-            keysByMatchID[matchID] = key
-
-            if let found = activities[key] {
-                nonisolated(unsafe) let activity = found
-                await activity.update(ActivityContent(state: content, staleDate: nil))
-            } else {
-                // Doc utilisateur : `Activity.request` échoue si les Live Activities sont
-                // refusées dans les réglages système, ou si le budget d'activités simultanées
-                // est épuisé — la partie reste jouable sans, seul l'écran verrouillé n'affiche
-                // rien de plus.
-                let activity: Activity<MatchActivityAttributes>
-                do {
-                    activity = try Activity.request(
-                        attributes: MatchActivityAttributes(activityKey: key),
-                        content: ActivityContent(state: content, staleDate: nil),
-                        pushType: .token
-                    )
-                } catch {
-                    print("[MatchLiveActivityController] Activity.request FAILED: \(error)")
-                    return
-                }
-                activities[key] = activity
-                nonisolated(unsafe) let startedActivity = activity
-                pushTokenTasks[key] = Task {
-                    let deviceID = DeviceIdentity.current
-                    print("[MatchLiveActivityController] waiting for pushTokenUpdates key=\(key) device=\(deviceID)")
-                    for await tokenData in startedActivity.pushTokenUpdates {
-                        let pushToken = tokenData.map { String(format: "%02x", $0) }.joined()
-                        print("[MatchLiveActivityController] got push token: \(pushToken)")
-                        await LiveActivityPushClient.registerToken(activityKey: key, deviceID: deviceID, pushToken: pushToken)
-                    }
-                    print("[MatchLiveActivityController] pushTokenUpdates stream ended key=\(key)")
-                }
-            }
-
-            if isAuthoritative {
-                await LiveActivityPushClient.push(activityKey: key, event: "update", contentState: content)
-            }
+      if let found = activities[key] {
+        nonisolated(unsafe) let activity = found
+        await activity.update(ActivityContent(state: content, staleDate: nil))
+      } else {
+        // Doc utilisateur : `Activity.request` échoue si les Live Activities sont
+        // refusées dans les réglages système, ou si le budget d'activités simultanées
+        // est épuisé — la partie reste jouable sans, seul l'écran verrouillé n'affiche
+        // rien de plus.
+        let activity: Activity<MatchActivityAttributes>
+        do {
+          activity = try Activity.request(
+            attributes: MatchActivityAttributes(activityKey: key),
+            content: ActivityContent(state: content, staleDate: nil),
+            pushType: .token
+          )
+        } catch {
+          logger.error("Activity.request FAILED: \(error, privacy: .public)")
+          return
         }
+        activities[key] = activity
+        nonisolated(unsafe) let startedActivity = activity
+        pushTokenTasks[key] = Task {
+          let deviceID = DeviceIdentity.current
+          logger.debug(
+            "waiting for pushTokenUpdates key=\(key, privacy: .public) device=\(deviceID, privacy: .public)"
+          )
+          for await tokenData in startedActivity.pushTokenUpdates {
+            let pushToken = tokenData.map { String(format: "%02x", $0) }.joined()
+            logger.debug("got push token for key=\(key, privacy: .public)")
+            await LiveActivityPushClient.registerToken(
+              activityKey: key, deviceID: deviceID, pushToken: pushToken)
+          }
+          logger.debug("pushTokenUpdates stream ended key=\(key, privacy: .public)")
+        }
+      }
+
+      if isAuthoritative {
+        await LiveActivityPushClient.push(activityKey: key, event: "update", contentState: content)
+      }
     }
+  }
 
-    /// Doc utilisateur — un pair qui quitte une partie partagée sans qu'elle soit terminée (P9,
-    /// remontée utilisateur) : retrait immédiat, même logique que la fin de partie ci-dessus.
-    static func stopTracking(matchID: UUID) {
-        Task { @MainActor in
-            guard let key = keysByMatchID.removeValue(forKey: matchID) else { return }
-            pushTokenTasks.removeValue(forKey: key)?.cancel()
-            guard let found = activities.removeValue(forKey: key) else { return }
-            nonisolated(unsafe) let activity = found
-            await activity.end(nil, dismissalPolicy: .immediate)
-        }
+  /// Doc utilisateur — un pair qui quitte une partie partagée sans qu'elle soit terminée (P9,
+  /// remontée utilisateur) : retrait immédiat, même logique que la fin de partie ci-dessus.
+  static func stopTracking(matchID: UUID) {
+    Task { @MainActor in
+      guard let key = keysByMatchID.removeValue(forKey: matchID) else { return }
+      pushTokenTasks.removeValue(forKey: key)?.cancel()
+      guard let found = activities.removeValue(forKey: key) else { return }
+      nonisolated(unsafe) let activity = found
+      await activity.end(nil, dismissalPolicy: .immediate)
     }
+  }
 
-    /// Doc utilisateur — remontée : une connexion perdue côté pair (hôte arrêté, coupure réseau
-    /// prolongée) sans rien faire laissait l'écran verrouillé afficher le dernier score reçu comme
-    /// s'il était toujours en direct.
-    /// Republie le même contenu marqué `isStale`, plutôt que de le deviner depuis `staleDate` seul
-    /// (peu visible pour du contenu statique) — `refresh` efface le marqueur de lui-même dès que
-    /// de nouveaux événements arrivent (reconnexion réussie).
-    static func markStale(matchID: UUID) {
-        Task { @MainActor in
-            guard let key = keysByMatchID[matchID], let found = activities[key] else { return }
-            nonisolated(unsafe) let activity = found
-            let current = activity.content.state
-            guard !current.isStale else { return }
-            let staleContent = MatchActivityAttributes.ContentState(
-                matchID: current.matchID,
-                gameName: current.gameName,
-                gameSymbol: current.gameSymbol,
-                roundNumber: current.roundNumber,
-                standings: current.standings,
-                isStale: true
-            )
-            await activity.update(ActivityContent(state: staleContent, staleDate: .now))
-        }
+  /// Doc utilisateur — remontée : une connexion perdue côté pair (hôte arrêté, coupure réseau
+  /// prolongée) sans rien faire laissait l'écran verrouillé afficher le dernier score reçu comme
+  /// s'il était toujours en direct.
+  /// Republie le même contenu marqué `isStale`, plutôt que de le deviner depuis `staleDate` seul
+  /// (peu visible pour du contenu statique) — `refresh` efface le marqueur de lui-même dès que
+  /// de nouveaux événements arrivent (reconnexion réussie).
+  static func markStale(matchID: UUID) {
+    Task { @MainActor in
+      guard let key = keysByMatchID[matchID], let found = activities[key] else { return }
+      nonisolated(unsafe) let activity = found
+      let current = activity.content.state
+      guard !current.isStale else { return }
+      let staleContent = MatchActivityAttributes.ContentState(
+        matchID: current.matchID,
+        gameName: current.gameName,
+        gameSymbol: current.gameSymbol,
+        roundNumber: current.roundNumber,
+        standings: current.standings,
+        isStale: true
+      )
+      await activity.update(ActivityContent(state: staleContent, staleDate: .now))
     }
+  }
 }
