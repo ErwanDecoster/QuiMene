@@ -130,6 +130,16 @@ Assumé explicitement, pour ne pas dépenser l'effort au mauvais endroit :
 - **Mode langage Swift 6, concurrence stricte**, sur toutes les cibles. Aucune exception,
   aucun `@unchecked Sendable`, aucun `@preconcurrency import`. Ces trois interdits sont
   vérifiés par une règle de revue, pas par un outil.
+
+  **Exception actée** (audit qualité, [15](15-plan-qualite-code.md)) : `App/Features/MatchSetup/QRScannerView.swift`
+  importe `AVFoundation` avec `@preconcurrency`. `AVCaptureMetadataOutputObjectsDelegate` est une
+  API pré-Swift-concurrency non auditée `Sendable` par Apple — retirer l'import casse la
+  compilation sans qu'aucun changement côté projet ne puisse le corriger ; c'est le fix-it que
+  Xcode lui-même propose pour ce cas précis. Le fichier isole déjà le risque au minimum
+  (`nonisolated func metadataOutput`, saut explicite vers `@MainActor` pour toute mutation
+  d'état). Les deux `@unchecked Sendable` trouvés par le même audit (`SupabaseTransport`,
+  `SupabaseTransportSession`) ont en revanche été corrigés pour de vrai plutôt que documentés
+  comme exception — voir [15](15-plan-qualite-code.md).
 - **Avertissements = erreurs** (`SWIFT_TREAT_WARNINGS_AS_ERRORS`) sur le package.
 - **swift-format** avec la configuration par défaut d'Apple, appliqué à la validation.
 - Aucune dépendance tierce. Toute proposition d'en ajouter une passe par un ADR.
