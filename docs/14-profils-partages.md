@@ -362,6 +362,22 @@ in }` cède la main une fois pour laisser SwiftUI l'afficher avant qu'un travail
 bloquant ne démarre) — pour toute latence encore perceptible au-delà de cette transition (écriture
 SwiftData sous CloudKit, par exemple).
 
+### Phase 4, suite — re-lier une fiche remplaçait son lien existant en silence ✅
+
+Remontée : après avoir lié une fiche à Théo, la relier (« Lier un autre profil ») à Marie
+remplaçait le lien vers Théo sans le dire — rien ne distinguait ce cas d'un premier lien. Théo
+continuait de croire que cette fiche lui restait associée, alors qu'elle ne recevrait plus les
+parties jouées ensemble. `ConfirmProfileLinkView` n'avait qu'un seul avertissement possible
+(`conflictingPlayerName` : l'identifiant scanné appartient déjà à une *autre* fiche locale) — rien
+ne portait sur le lien *propre* de la fiche en cours d'édition.
+
+Corrigé en faisant remonter jusqu'à `ConfirmProfileLinkView` le lien déjà en place sur cette fiche
+(`currentlyLinkedID`/`currentlyLinkedName`, portés par `ProfileLinkScanFlow`) : un second
+avertissement distinct s'affiche quand le scan changerait vraiment de personne, et le bouton devient
+« Remplacer le lien ». Rescanner le code de la même personne (par exemple pour rafraîchir son
+pseudo ou son avatar) ne déclenche pas cet avertissement — comparaison sur l'identifiant scanné, pas
+seulement sur le fait qu'un lien existe déjà.
+
 ## Décisions ouvertes
 
 Ce que ce document tranche par hypothèse plutôt que par confirmation — à valider avant la phase

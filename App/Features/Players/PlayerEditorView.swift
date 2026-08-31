@@ -139,6 +139,8 @@ struct PlayerEditorView: View {
             // en interne entre scan et confirmation, plus rien à attendre entre les deux.
             .fullScreenCover(isPresented: $isPresentingProfileScanner) {
                 ProfileLinkScanFlow(
+                    currentlyLinkedID: model.sharedProfileID,
+                    currentlyLinkedName: model.linkedProfileName,
                     conflictingPlayerName: { model.conflictingPlayerName(forSharedProfileID: $0) }
                 ) { payload, adoptNameAndAvatar in
                     model.linkProfile(
@@ -251,6 +253,12 @@ private struct ConfirmProfileLinkView: View {
     /// erreur (cette fiche-ci et l'autre représenteraient alors la même personne), mais pas
     /// bloqué en dur : peut arriver légitimement après une fiche recréée.
     let conflictingPlayerName: String?
+    /// Doc utilisateur — remontée : re-lier une fiche déjà liée à un ami (Théo) vers un autre
+    /// profil (Marie) remplaçait le lien existant sans le dire — Théo continuait de croire
+    /// recevoir les parties jouées avec cette fiche. Non-`nil` uniquement quand ce lien change
+    /// vraiment de personne : rescanner le code de la même personne (pour rafraîchir son pseudo
+    /// ou son avatar) ne déclenche pas cet avertissement — voir `ProfileLinkScanFlow`.
+    let existingLinkName: String?
     let onConfirm: (_ adoptNameAndAvatar: Bool) -> Void
     let onCancel: () -> Void
 
@@ -262,6 +270,12 @@ private struct ConfirmProfileLinkView: View {
     @State private var isLinking = false
 
     private var canAdoptAvatar: Bool { payload.avatarKind != "photo" }
+
+    private var confirmButtonTitle: String {
+        if existingLinkName != nil { return "Remplacer le lien" }
+        if conflictingPlayerName != nil { return "Lier quand même" }
+        return "Lier"
+    }
 
     var body: some View {
         NavigationStack {
@@ -281,6 +295,14 @@ private struct ConfirmProfileLinkView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, Space.sm)
+                }
+
+                if let existingLinkName {
+                    Section {
+                        Text("Cette fiche est actuellement liée à « \(existingLinkName) ». La lier à « \(payload.name) » remplacera ce lien : \(existingLinkName) ne recevra plus les parties jouées avec cette fiche.")
+                            .font(.bodySmall)
+                            .foregroundStyle(.semanticError)
+                    }
                 }
 
                 if let conflictingPlayerName {
@@ -312,7 +334,7 @@ private struct ConfirmProfileLinkView: View {
                     if isLinking {
                         ProgressView()
                     } else {
-                        Button(conflictingPlayerName == nil ? "Lier" : "Lier quand même") {
+                        Button(confirmButtonTitle) {
                             isLinking = true
                             Task { @MainActor in
                                 onConfirm(adoptNameAndAvatar)
@@ -330,6 +352,12 @@ private struct ConfirmProfileLinkView: View {
 /// transition. Un seul plein écran, dont le contenu bascule en interne entre scan et
 /// confirmation : plus de seconde présentation système à attendre.
 private struct ProfileLinkScanFlow: View {
+    /// Identifiant et nom du lien déjà en place sur cette fiche, le cas échéant (doc utilisateur —
+    /// remontée : re-lier une fiche déjà liée à un ami vers un autre profil le remplaçait sans
+    /// avertissement). `currentlyLinkedID` sert à distinguer un vrai changement de personne d'un
+    /// simple rescan du même code.
+    let currentlyLinkedID: UUID?
+    let currentlyLinkedName: String?
     let conflictingPlayerName: (UUID) -> String?
     let onConfirm: (ProfileShareLink.Payload, _ adoptNameAndAvatar: Bool) -> Void
 
@@ -340,7 +368,8 @@ private struct ProfileLinkScanFlow: View {
         if let scannedPayload {
             ConfirmProfileLinkView(
                 payload: scannedPayload,
-                conflictingPlayerName: conflictingPlayerName(scannedPayload.id)
+                conflictingPlayerName: conflictingPlayerName(scannedPayload.id),
+                existingLinkName: scannedPayload.id == currentlyLinkedID ? nil : currentlyLinkedName
             ) { adoptNameAndAvatar in
                 onConfirm(scannedPayload, adoptNameAndAvatar)
                 dismiss()
