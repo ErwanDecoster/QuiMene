@@ -1,6 +1,6 @@
 {
   "goldenId": "skyjo-02-egalite-finale",
-  "description": "Cas limite du classement. Deux joueurs terminent à égalité parfaite (105) et tous les départages échouent : même meilleure manche (50), même nombre de manches fermées (1). Le classement doit produire un rang 1 partagé, puis un rang 3 — jamais un rang 2. Vérifie aussi que deux joueurs franchissant le seuil sur la même manche ne provoquent pas de double déclenchement de fin.",
+  "description": "Cas limite du classement. Deux joueurs terminent à égalité parfaite (105) et tous les départages échouent : même meilleure manche (50), même nombre de manches fermées (1). Le classement doit produire un rang 1 partagé, puis un rang 3 — jamais un rang 2. Vérifie aussi que deux joueurs franchissant le seuil sur la même manche ne provoquent pas de double déclenchement de fin. Cette même égalité de manche (50 pour p1 et p2) est aussi pourquoi l'insight bestRoundScore est volontairement absent de expected.insights : extremeSingleRound refuse de désigner un gagnant quand l'extrême est atteint par deux joueurs distincts, précisément le cas ici — ne pas le rajouter.",
   "gameId": "skyjo",
   "rulesVersion": 1,
 
@@ -68,7 +68,6 @@
 
     "insights": [
       { "id": "highestRoundScore", "participant": "p3", "value": 62, "round": 1 },
-      { "id": "bestRoundScore", "participant": "p1", "value": 50, "round": 0 },
       { "id": "finalGap", "value": 0 },
       { "id": "roundsClosed", "values": { "p1": 1, "p2": 1, "p3": 0 } },
       { "id": "doublingsSuffered", "values": { "p1": 0, "p2": 0, "p3": 0 } }
