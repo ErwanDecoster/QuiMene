@@ -18,14 +18,14 @@ exactement les mêmes scores.
 | **Plateformes v1** | iPhone + iPad, une cible SwiftUI adaptative, iOS 18 minimum |
 | **UI** | SwiftUI, pattern MV avec `@Observable`, Liquid Glass en amélioration progressive iOS 26+ (repli Material iOS 18-25), HIG natives |
 | **Persistance** | SwiftData, modèle compatible CloudKit dès le départ |
-| **Sync** | CloudKit privé (entre les appareils du propriétaire) + transport hybride Wi-Fi/BLE (partie partagée autour de la table, sans Internet, interopérable Apple/Android) |
+| **Sync** | CloudKit privé (entre les appareils du propriétaire) + Supabase Realtime pour la partie partagée autour de la table (un canal par session, presence + broadcast, découverte par code via `cacompte_open_games`) — remplace le transport Wi-Fi/BLE fait maison d'origine, voir [15](docs/15-plan-qualite-code.md) et `Package.swift` |
 | **Cœur métier** | Swift pur, `Sendable`, zéro dépendance framework, fonctions pures |
 | **Règles de jeu** | Définition déclarative JSON + moteurs impératifs nommés pour les jeux à calcul non trivial |
 | **Identité** | Tokens uniques bi-plateformes, contrastes WCAG AA vérifiés par calcul |
 | **Typographie** | SF Pro / Roboto système ; police display réservée au logo, vectorisée |
 | **Android** | Ré-implémentation 100 % native, pilotée par `spec/` et validée par les mêmes golden files |
 | **Tests** | Swift Testing, golden files rejoués sur les deux plateformes, XCUITest sur le parcours critique |
-| **Dépendances** | Zéro côté Apple. Une seule côté Android (Vico, graphiques) |
+| **Dépendances** | Une côté Apple (`supabase-swift`, exception documentée à ADR-0012 — voir `Package.swift`). Une côté Android (Vico, graphiques) |
 | **CI** | Xcode Cloud |
 
 ---
@@ -47,6 +47,8 @@ exactement les mêmes scores.
 | 11 | [Portage Android](docs/11-portage-android.md) | Équivalences, charte côté Material 3, discipline Swift, plan en 7 étapes |
 | 12 | [Roadmap](docs/12-roadmap.md) | 10 phases, 3 jalons, estimations, risques |
 | 13 | [Décisions (ADR)](docs/13-decisions-adr.md) | 15 décisions, alternatives écartées et pourquoi |
+| 14 | [Profils partagés](docs/14-profils-partages.md) | Lier deux fiches par QR, une partie apparaît chez l'ami |
+| 15 | [Plan qualité de code](docs/15-plan-qualite-code.md) | Audit et plan priorisé — écarts entre ce que le projet documente et ce qu'il fait |
 
 **Règle de cohérence** : le doc 07 définit toute valeur ; les docs 08 et 11 décrivent seulement
 comment elle s'implémente sur chaque plateforme. Aucune valeur n'est définie deux fois.
@@ -103,9 +105,9 @@ Ne peuvent pas être faites en CLI — à traiter quand tu as la main :
 | Action | Pourquoi | Bloque |
 |---|---|---|
 | ~~Team ID Apple Developer + capability iCloud/CloudKit~~ **fait** (Team ID `U79ZYL8WF3`, container `iCloud.com.cacompte.app`) | Signing réel sur appareil, container CloudKit | — |
-| **Remote git** (GitHub ou autre) | Xcode Cloud a besoin d'un repo distant lié à App Store Connect | Xcode Cloud |
+| ~~**Remote git**~~ **fait** — `origin` = `github.com/ErwanDecoster/CaCompte.git` | Xcode Cloud a besoin d'un repo distant lié à App Store Connect | — |
 | **Configurer le workflow Xcode Cloud** (Product → Xcode Cloud dans Xcode) | Pas d'API/CLI publique pour ça, uniquement l'UI Xcode/App Store Connect | CI automatique sur push |
-| **Premier commit git** | En attente de ta validation avant de committer | — |
+| ~~**Premier commit git**~~ **fait** — 39 commits au dernier audit ([15](docs/15-plan-qualite-code.md)) | — | — |
 | **Valeurs *High Contrast* des tokens couleur** | La charte §14 ne donne que Clair/Sombre ; aucune valeur « contraste augmenté » n'est spécifiée | Rendu en mode contraste augmenté (dégrade proprement sur Any/Dark en attendant) |
 | **Symboles de courbe joueurs #6 et #9** | `BasicChartSymbolShape` (Swift Charts) n'a que 8 formes natives, la charte en demande 10 (étoile, hexagone) — substitués par astérisque et carré dans `PlayerPalette.swift` | Distinction visuelle au-delà de 6 joueurs simultanés sur la courbe (Phase 5) |
 | ~~**Liste curatée d'emoji**~~ **fait** — 60 emoji dans `Avatar.curatedEmoji` (dérivation déterministe du pseudo), la cible ~60 de la charte (§10) est atteinte ; 6 ajoutés sur retour explicite (🤖 🧙 🥷 👾 🏎️ 🌸), écartés parmi les 36 proposés : redondants avec l'existant (🦝🐲 déjà couverts par 🐻🐼🐨🦄, 👻🎃🍄 saisonniers/moins « sûrs », ⚡ proche de 🔥, 🏄 proche de 🏎️/⚽/🏀, 🌷 proche de 🌸) et les 4 cœurs (♥️💚💙🩷), redondants entre eux | — |
@@ -135,6 +137,13 @@ Vérifiés sur cette machine le 29/07/2026 :
 Aucune dépendance tierce n'est prévue côté Apple.
 
 ## Étape suivante
+
+> **Note (audit qualité, [doc 15](docs/15-plan-qualite-code.md))** — le récit ci-dessous décrit
+> les phases dans l'ordre où elles ont été livrées, y compris la Phase 8 « Wi-Fi/BLE » qui
+> retrace une mécanique **remplacée depuis** par Supabase Realtime (voir le commentaire en tête
+> de `Package.swift`, l'historique Git, et la table « Sync » ci-dessus pour l'état courant). Le
+> journal est laissé tel quel pour l'historique plutôt que réécrit rétroactivement ; ne pas le
+> lire comme une description de l'architecture actuelle au-delà de ce point.
 
 **Phase 0 terminée** : `git init`, package `CaCompteKit` (cibles Domain/Catalog/Store/Sync/
 DesignSystem + tests), `App/CaCompte.xcodeproj`, script de synchronisation `spec/` ↔
