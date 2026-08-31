@@ -439,6 +439,13 @@ public struct GameDefinition: Identifiable, Sendable, Codable, Equatable {
         variants = try container.decodeIfPresent([Variant].self, forKey: .variants) ?? []
         statsProfiles = try container.decodeIfPresent([String].self, forKey: .statsProfiles) ?? ["standard"]
     }
+
+    /// Doc utilisateur — un seul endroit pour ce prédicat (Skyjo : qui a fermé la manche), repris
+    /// à l'identique par `LiveMatchModel` et `SharedMatchModel` plutôt que dupliqué à chaque écran
+    /// qui affiche la sélection.
+    public var requiresCloserSelection: Bool {
+        scoring.modifiers.contains { $0.kind == .exclusiveFlag && $0.required }
+    }
 }
 
 public typealias Direction = GameDefinition.Direction

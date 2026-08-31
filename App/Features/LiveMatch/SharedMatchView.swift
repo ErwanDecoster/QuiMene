@@ -3,9 +3,9 @@ import Domain
 import SwiftUI
 
 /// Doc 09 — l'écran d'un pair non-hôte. Observateur : lecture seule, le tableau se met à jour
-/// tout seul à mesure que l'hôte diffuse. Contributeur : les mêmes champs que `LiveMatchView`,
-/// mais « Envoyer » propose la manche à l'hôte au lieu de l'écrire directement — elle n'apparaît
-/// aux autres qu'une fois acceptée.
+/// tout seul à mesure que l'hôte diffuse. Contributeur : le même tableau que `LiveMatchView`
+/// (`ScoreBoardView`, partagé entre les deux écrans), mais « Envoyer » propose la manche à l'hôte
+/// au lieu de l'écrire directement — elle n'apparaît aux autres qu'une fois acceptée.
 struct SharedMatchView: View {
     let model: SharedMatchModel
     /// Doc utilisateur P9 — `MatchConnectionCoordinator` retente déjà seul, toutes les quelques
@@ -20,7 +20,12 @@ struct SharedMatchView: View {
     @State private var closedParticipantID: Participant.ID?
     @FocusState private var focusedParticipantID: Participant.ID?
     @State private var isPresentingRoundHistory = false
-    @State private var keyboardObserver = KeyboardObserver()
+    /// Doc utilisateur — remontée : rien ne validait localement avant d'envoyer une proposition à
+    /// l'hôte. Une manche invalide (Skyjo : aucun joueur désigné comme ayant fermé) était acceptée
+    /// *optimistiquement* en local, montrée un instant, puis rejetée et retirée par l'hôte — assez
+    /// vite pour donner l'impression que rien n'empêchait de l'ajouter. `ScoreBoardView.validationMessage`
+    /// combine ce contrôle local et un rejet distant tardif dans le même message.
+    @State private var validationErrorMessage: String?
 
     var body: some View {
         Group {
@@ -39,10 +44,6 @@ struct SharedMatchView: View {
         guard let definition = model.definition else { return "Partie partagée" }
         let roundNumber = (model.state?.rounds.count ?? 0) + 1
         return "\(definition.name.fr) · Manche \(roundNumber)"
-    }
-
-    private func requiresCloserSelection(_ definition: GameDefinition) -> Bool {
-        definition.scoring.modifiers.contains { $0.kind == .exclusiveFlag && $0.required }
     }
 
     private func liveView(definition: GameDefinition, state: MatchState) -> some View {
@@ -74,51 +75,25 @@ struct SharedMatchView: View {
                 }
             }
 
-            if model.canPropose, requiresCloserSelection(definition) {
-                Section {
-                    Text("A fermé la manche").font(.label).foregroundStyle(.textSecondary)
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: Space.sm) {
-                            ForEach(model.participants) { participant in
-                                Chip(LocalizedStringResource(stringLiteral: participant.displayName), isSelected: closedParticipantID == participant.id) {
-                                    closedParticipantID = participant.id
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            Section {
-                ForEach(model.participants) { participant in
-                    HStack(spacing: Space.md) {
-                        Text(participant.displayName)
-                            .font(.bodyText)
-                            .foregroundStyle(.textPrimary)
-                        Spacer()
-                        Text((model.totals[participant.id] ?? 0).formatted())
-                            .font(.scoreL)
-                            .foregroundStyle(.textSecondary)
-                        if model.canPropose {
-                            scoreField(for: participant)
-                        }
-                    }
-                    .padding(.vertical, Space.xs)
-                    .contentShape(Rectangle())
-                    .onTapGesture { focusedParticipantID = participant.id }
-                }
-            }
-
-            if let reason = model.latestRejectionReason {
-                Text(reason).font(.label).foregroundStyle(.semanticError)
-            }
-
-            if !model.canPropose {
-                Section {
-                    Text("Tu observes cette partie : la saisie se fait sur l'appareil de l'hôte ou d'un contributeur.")
-                        .font(.bodySmall)
-                        .foregroundStyle(.textTertiary)
-                }
+            ScoreBoardView(
+                participants: model.participants,
+                totals: model.totals,
+                ranks: Dictionary(uniqueKeysWithValues: model.currentStandings.map { ($0.participantID, $0.rank) }),
+                requiresCloserSelection: definition.requiresCloserSelection,
+                allowsNegative: definition.scoring.entry.allowsNegative,
+                canEdit: model.canPropose,
+                submitLabel: "Envoyer",
+                validationMessage: validationErrorMessage ?? model.latestRejectionReason,
+                readOnlyMessage: model.canPropose ? nil : "Tu observes cette partie : la saisie se fait sur l'appareil de l'hôte ou d'un contributeur.",
+                closedParticipantID: $closedParticipantID,
+                draftTexts: $draftTexts,
+                focusedParticipantID: $focusedParticipantID
+            ) { _, _ in
+                // Doc utilisateur — contrairement à l'hôte, un contributeur n'a pas de totaux
+                // « en direct » à mettre à jour pendant la saisie : `model.totals` ne reflète que
+                // les manches déjà acceptées par l'hôte, jamais un brouillon local.
+            } onSubmit: {
+                Task { await sendRound() }
             }
         }
         .listStyle(.plain)
@@ -130,41 +105,7 @@ struct SharedMatchView: View {
                     Label("Voir les manches", systemImage: "list.bullet")
                 }
             }
-            // Doc utilisateur — remontée : ce bouton manquait entièrement ici (un contributeur ne
-            // pouvait jamais saisir de score négatif) — même bouton que `LiveMatchView`, juste
-            // absent par oubli jusqu'ici.
-            if model.canPropose {
-                ToolbarItemGroup(placement: .keyboard) {
-                    if definition.scoring.entry.allowsNegative, let focusedParticipantID {
-                        Button {
-                            toggleSign(for: focusedParticipantID)
-                        } label: {
-                            Image(systemName: "plusminus")
-                        }
-                    }
-                    Spacer()
-                    Button("Envoyer") {
-                        Task { await sendRound() }
-                    }
-                }
-            }
         }
-        // Doc utilisateur — même bug que `LiveMatchView` : la barre d'accessoires du clavier
-        // disparaît avec lui, laissant l'écran sans moyen de valider la manche. Masqué quand le
-        // clavier est visible pour ne pas doublonner son propre bouton « Envoyer ».
-        .safeAreaInset(edge: .bottom) {
-            if model.canPropose, !keyboardObserver.isVisible {
-                Button("Envoyer") {
-                    Task { await sendRound() }
-                }
-                .buttonStyle(.primary(size: .medium))
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, Space.lg)
-                .padding(.vertical, Space.sm)
-                .background(.bar)
-            }
-        }
-        .animation(.default, value: keyboardObserver.isVisible)
         .sheet(isPresented: $isPresentingRoundHistory) {
             RoundHistoryView(state: state, definition: definition)
         }
@@ -180,43 +121,10 @@ struct SharedMatchView: View {
         .animation(.default, value: model.roundExplanationMessage)
     }
 
-    private func scoreField(for participant: Participant) -> some View {
-        TextField("0", text: textBinding(for: participant.id))
-            .keyboardType(.numberPad)
-            .multilineTextAlignment(.trailing)
-            .font(.scoreM)
-            .foregroundStyle(.textPrimary)
-            .padding(.horizontal, Space.md)
-            .frame(width: 88, height: ButtonHeight.medium)
-            .background(.neutralFill, in: .rect(cornerRadius: Radius.sm))
-            .overlay {
-                RoundedRectangle(cornerRadius: Radius.sm)
-                    .strokeBorder(.brandInk, lineWidth: focusedParticipantID == participant.id ? 2 : 0)
-            }
-            .focused($focusedParticipantID, equals: participant.id)
-    }
-
-    private func textBinding(for participantID: Participant.ID) -> Binding<String> {
-        Binding(
-            get: { draftTexts[participantID] ?? "" },
-            set: { newValue in
-                let sign = newValue.hasPrefix("-") ? "-" : ""
-                let digits = newValue.filter(\.isNumber)
-                draftTexts[participantID] = digits.isEmpty ? sign : sign + digits
-            }
-        )
-    }
-
-    private func toggleSign(for participantID: Participant.ID) {
-        var text = draftTexts[participantID] ?? ""
-        if text.hasPrefix("-") {
-            text.removeFirst()
-        } else {
-            text = "-" + text
-        }
-        draftTexts[participantID] = text
-    }
-
+    /// Doc utilisateur — remontée : valide localement *avant* d'envoyer, exactement comme
+    /// `LiveMatchModel.commitRound` côté hôte, plutôt que de compter uniquement sur le rejet
+    /// distant de l'hôte (`SharedMatchModel.validate`, mêmes règles de jeu des deux côtés). Une
+    /// manche invalide n'est ainsi plus jamais montrée comme acceptée, même un instant.
     private func sendRound() async {
         let inputs = model.participants.map { participant in
             ScoreInput(
@@ -225,6 +133,13 @@ struct SharedMatchView: View {
                 modifiers: participant.id == closedParticipantID ? [.closedRound] : []
             )
         }
+
+        if let result = model.validate(inputs), case .invalid(let errors) = result {
+            validationErrorMessage = errors.first?.message
+            return
+        }
+        validationErrorMessage = nil
+
         await model.propose(inputs)
         draftTexts = [:]
         closedParticipantID = nil

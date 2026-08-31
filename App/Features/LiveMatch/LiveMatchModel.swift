@@ -108,9 +108,7 @@ final class LiveMatchModel {
         return participants[activeSeatIndex]
     }
 
-    var requiresCloserSelection: Bool {
-        definition.scoring.modifiers.contains { $0.kind == .exclusiveFlag && $0.required }
-    }
+    var requiresCloserSelection: Bool { definition.requiresCloserSelection }
 
     /// Classement courant, recalculé à chaque manche validée (mêmes règles — y compris le
     /// départage — qu'au moment de conclure la partie). Sert aussi bien à `finalStandings` qu'à

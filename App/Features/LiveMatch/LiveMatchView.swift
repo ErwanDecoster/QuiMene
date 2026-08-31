@@ -15,7 +15,6 @@ struct LiveMatchView: View {
     @State private var isConfirmingShareSwitch = false
     @State private var isPresentingShareSession = false
     @State private var isPresentingRoundHistory = false
-    @State private var keyboardObserver = KeyboardObserver()
 
     init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
         _model = State(initialValue: try! LiveMatchModel(match: match, context: context, catalog: catalog))
@@ -40,50 +39,27 @@ struct LiveMatchView: View {
 
     private var liveView: some View {
         List {
-            if model.requiresCloserSelection {
-                Section {
-                    Text("A fermé la manche").font(.label).foregroundStyle(.textSecondary)
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: Space.sm) {
-                            ForEach(model.participants) { participant in
-                                Chip(LocalizedStringResource(stringLiteral: participant.displayName), isSelected: model.closedParticipantID == participant.id) {
-                                    model.closedParticipantID = participant.id
-                                }
-                            }
-                        }
-                    }
+            ScoreBoardView(
+                participants: model.participants,
+                totals: model.totals,
+                ranks: Dictionary(uniqueKeysWithValues: model.currentStandings.map { ($0.participantID, $0.rank) }),
+                requiresCloserSelection: model.requiresCloserSelection,
+                allowsNegative: model.definition.scoring.entry.allowsNegative,
+                canEdit: true,
+                submitLabel: "Terminé",
+                validationMessage: model.validationErrorMessage,
+                readOnlyMessage: nil,
+                closedParticipantID: $model.closedParticipantID,
+                draftTexts: $draftTexts,
+                focusedParticipantID: $focusedParticipantID
+            ) { participantID, value in
+                if let value {
+                    model.setScore(value, for: participantID)
+                } else {
+                    model.clearScore(for: participantID)
                 }
-            }
-
-            Section {
-                let rankByID = Dictionary(uniqueKeysWithValues: model.currentStandings.map { ($0.participantID, $0.rank) })
-                ForEach(rankedParticipants(rankByID: rankByID)) { participant in
-                    HStack(spacing: Space.md) {
-                        if let rank = rankByID[participant.id] {
-                            Text("\(rank)")
-                                .font(.label)
-                                .foregroundStyle(.textSecondary)
-                                .frame(minWidth: 18, alignment: .leading)
-                        }
-                        Text(participant.displayName)
-                            .font(participant.id == model.currentParticipant?.id ? .h6 : .bodyText)
-                            .foregroundStyle(.textPrimary)
-                        Spacer()
-                        Text((model.totals[participant.id] ?? 0).formatted())
-                            .font(.scoreL)
-                            .foregroundStyle(.textSecondary)
-                            .contentTransition(.numericText())
-                            .animation(.default, value: model.totals[participant.id])
-                        scoreField(for: participant)
-                    }
-                    .padding(.vertical, Space.xs)
-                    .contentShape(Rectangle())
-                    .onTapGesture { focusedParticipantID = participant.id }
-                }
-            }
-
-            if let message = model.validationErrorMessage {
-                Text(message).font(.label).foregroundStyle(.semanticError)
+            } onSubmit: {
+                finishRound()
             }
         }
         .listStyle(.plain)
@@ -123,38 +99,7 @@ struct LiveMatchView: View {
                     Image(systemName: "ellipsis.circle")
                 }
             }
-            ToolbarItemGroup(placement: .keyboard) {
-                if model.definition.scoring.entry.allowsNegative, let current = model.currentParticipant {
-                    Button {
-                        toggleSign(for: current.id)
-                    } label: {
-                        Image(systemName: "plusminus")
-                    }
-                }
-                Spacer()
-                Button("Terminé") {
-                    finishRound()
-                }
-            }
         }
-        // Doc utilisateur — la barre d'accessoires du clavier (juste au-dessus) disparaît avec
-        // lui : sur iPad notamment, le bouton natif de fermeture du clavier laissait l'écran sans
-        // aucun moyen de valider la manche en cours (bug remonté). Ce bouton prend le relais,
-        // mais uniquement quand le clavier est masqué — sinon il doublonne le « Terminé » déjà
-        // présent juste au-dessus (remontée utilisateur).
-        .safeAreaInset(edge: .bottom) {
-            if !keyboardObserver.isVisible {
-                Button("Terminé") {
-                    finishRound()
-                }
-                .buttonStyle(.primary(size: .medium))
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, Space.lg)
-                .padding(.vertical, Space.sm)
-                .background(.bar)
-            }
-        }
-        .animation(.default, value: keyboardObserver.isVisible)
         .onAppear {
             focusedParticipantID = model.currentParticipant?.id
             if model.needsShareSwitchConfirmation {
@@ -241,70 +186,6 @@ struct LiveMatchView: View {
         .animation(.default, value: model.roundExplanationMessage)
         .sensoryFeedback(.success, trigger: model.remoteActivityMessage) { oldValue, newValue in
             newValue != nil
-        }
-    }
-
-    /// Doc utilisateur — savoir d'un coup d'œil qui est premier, deuxième… pendant la saisie,
-    /// plutôt qu'attendre l'écran de résultats. Les sièges à égalité gardent le même rang (doc 03
-    /// `Standing.sharedWith`) ; l'ordre des sièges départage l'affichage entre eux (arbitraire mais
-    /// stable, pour ne pas faire sauter les lignes d'une manche à l'autre sans raison).
-    private func rankedParticipants(rankByID: [Participant.ID: Int]) -> [Participant] {
-        model.participants.sorted { lhs, rhs in
-            let l = rankByID[lhs.id] ?? .max
-            let r = rankByID[rhs.id] ?? .max
-            if l != r { return l < r }
-            return lhs.seatIndex < rhs.seatIndex
-        }
-    }
-
-    /// Charte §5.4 — jamais vide en apparence (placeholder `0`), bordure au focus uniquement.
-    /// Clavier système (`.numberPad`) : pas de touche « − », d'où le bouton de signe dans la
-    /// barre d'accessoires pour les jeux qui acceptent les valeurs négatives.
-    private func scoreField(for participant: Participant) -> some View {
-        TextField("0", text: textBinding(for: participant.id))
-            .keyboardType(.numberPad)
-            .multilineTextAlignment(.trailing)
-            .font(.scoreM)
-            .foregroundStyle(.textPrimary)
-            .padding(.horizontal, Space.md)
-            .frame(width: 88, height: ButtonHeight.medium)
-            .background(.neutralFill, in: .rect(cornerRadius: Radius.sm))
-            .overlay {
-                RoundedRectangle(cornerRadius: Radius.sm)
-                    .strokeBorder(.brandInk, lineWidth: focusedParticipantID == participant.id ? 2 : 0)
-            }
-            .focused($focusedParticipantID, equals: participant.id)
-    }
-
-    private func textBinding(for participantID: Participant.ID) -> Binding<String> {
-        Binding(
-            get: { draftTexts[participantID] ?? "" },
-            set: { newValue in
-                let sign = newValue.hasPrefix("-") ? "-" : ""
-                let digits = newValue.filter(\.isNumber)
-                let normalized = digits.isEmpty ? sign : sign + digits
-                draftTexts[participantID] = normalized
-                if let value = Int(normalized) {
-                    model.setScore(value, for: participantID)
-                } else {
-                    model.clearScore(for: participantID)
-                }
-            }
-        )
-    }
-
-    private func toggleSign(for participantID: Participant.ID) {
-        var text = draftTexts[participantID] ?? ""
-        if text.hasPrefix("-") {
-            text.removeFirst()
-        } else {
-            text = "-" + text
-        }
-        draftTexts[participantID] = text
-        if let value = Int(text) {
-            model.setScore(value, for: participantID)
-        } else {
-            model.clearScore(for: participantID)
         }
     }
 

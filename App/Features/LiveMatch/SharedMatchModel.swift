@@ -37,6 +37,26 @@ final class SharedMatchModel {
 
     var totals: [Participant.ID: Int] { state?.totals() ?? [:] }
 
+    /// Même calcul que `LiveMatchModel.currentStandings` — sert à trier/annoter la liste de
+    /// saisie ici aussi, pas seulement chez l'hôte.
+    var currentStandings: [Standing] {
+        guard let state, let rules, let definition else { return [] }
+        return rules.standings(state, definition: definition)
+    }
+
+    /// Doc utilisateur — remontée : rien ne validait localement une proposition avant de l'envoyer
+    /// à l'hôte, contrairement à `LiveMatchModel.commitRound` (qui valide avant même d'écrire).
+    /// Une manche invalide (Skyjo : aucun joueur désigné comme ayant fermé) semblait donc passer —
+    /// elle était en fait acceptée *optimistiquement* en local, puis rejetée et retirée par
+    /// l'hôte un instant plus tard, assez vite pour donner l'impression que rien ne s'était
+    /// produit. Valider ici, avant d'appeler `propose`, rend ce rejet impossible à manquer : le
+    /// message d'erreur s'affiche immédiatement, la manche n'est jamais montrée comme acceptée.
+    func validate(_ inputs: [ScoreInput]) -> ValidationResult? {
+        guard let state, let rules, let definition else { return nil }
+        let draft = RoundDraft(index: state.rounds.count, inputs: inputs)
+        return rules.validate(draft, in: state, definition: definition)
+    }
+
     /// Doc 09 — distingue « la partie est terminée » (fin normale attendue, l'hôte a arrêté le
     /// partage juste après) d'une vraie perte de connexion, pour ne pas afficher la même alarme
     /// dans les deux cas alors qu'un seul est un problème.
