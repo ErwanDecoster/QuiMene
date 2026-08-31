@@ -15,6 +15,7 @@ struct LiveMatchView: View {
     @State private var isConfirmingShareSwitch = false
     @State private var isPresentingShareSession = false
     @State private var isPresentingRoundHistory = false
+    @State private var keyboardObserver = KeyboardObserver()
 
     init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
         _model = State(initialValue: try! LiveMatchModel(match: match, context: context, catalog: catalog))
@@ -44,9 +45,7 @@ struct LiveMatchView: View {
                 totals: model.totals,
                 ranks: Dictionary(uniqueKeysWithValues: model.currentStandings.map { ($0.participantID, $0.rank) }),
                 requiresCloserSelection: model.requiresCloserSelection,
-                allowsNegative: model.definition.scoring.entry.allowsNegative,
                 canEdit: true,
-                submitLabel: "Terminé",
                 validationMessage: model.validationErrorMessage,
                 readOnlyMessage: nil,
                 closedParticipantID: $model.closedParticipantID,
@@ -58,8 +57,6 @@ struct LiveMatchView: View {
                 } else {
                     model.clearScore(for: participantID)
                 }
-            } onSubmit: {
-                finishRound()
             }
         }
         .listStyle(.plain)
@@ -99,7 +96,21 @@ struct LiveMatchView: View {
                     Image(systemName: "ellipsis.circle")
                 }
             }
+            ScoreBoardView.keyboardAccessory(
+                allowsNegative: model.definition.scoring.entry.allowsNegative,
+                currentParticipantID: focusedParticipantID,
+                submitLabel: "Terminé",
+                onToggleSign: toggleSign,
+                onSubmit: finishRound
+            )
         }
+        // Doc utilisateur — posé au niveau de l'écran, pas dans `ScoreBoardView` : un enfant de
+        // liste qui porte lui-même `.safeAreaInset` faisait dupliquer tout le rendu (voir la note
+        // en tête de `ScoreBoardView.swift`).
+        .safeAreaInset(edge: .bottom) {
+            ScoreBoardView.submitBar(isKeyboardVisible: keyboardObserver.isVisible, submitLabel: "Terminé", onSubmit: finishRound)
+        }
+        .animation(.default, value: keyboardObserver.isVisible)
         .onAppear {
             focusedParticipantID = model.currentParticipant?.id
             if model.needsShareSwitchConfirmation {
@@ -186,6 +197,21 @@ struct LiveMatchView: View {
         .animation(.default, value: model.roundExplanationMessage)
         .sensoryFeedback(.success, trigger: model.remoteActivityMessage) { oldValue, newValue in
             newValue != nil
+        }
+    }
+
+    private func toggleSign(for participantID: Participant.ID) {
+        var text = draftTexts[participantID] ?? ""
+        if text.hasPrefix("-") {
+            text.removeFirst()
+        } else {
+            text = "-" + text
+        }
+        draftTexts[participantID] = text
+        if let value = Int(text) {
+            model.setScore(value, for: participantID)
+        } else {
+            model.clearScore(for: participantID)
         }
     }
 

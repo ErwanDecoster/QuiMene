@@ -20,6 +20,7 @@ struct SharedMatchView: View {
     @State private var closedParticipantID: Participant.ID?
     @FocusState private var focusedParticipantID: Participant.ID?
     @State private var isPresentingRoundHistory = false
+    @State private var keyboardObserver = KeyboardObserver()
     /// Doc utilisateur — remontée : rien ne validait localement avant d'envoyer une proposition à
     /// l'hôte. Une manche invalide (Skyjo : aucun joueur désigné comme ayant fermé) était acceptée
     /// *optimistiquement* en local, montrée un instant, puis rejetée et retirée par l'hôte — assez
@@ -80,9 +81,7 @@ struct SharedMatchView: View {
                 totals: model.totals,
                 ranks: Dictionary(uniqueKeysWithValues: model.currentStandings.map { ($0.participantID, $0.rank) }),
                 requiresCloserSelection: definition.requiresCloserSelection,
-                allowsNegative: definition.scoring.entry.allowsNegative,
                 canEdit: model.canPropose,
-                submitLabel: "Envoyer",
                 validationMessage: validationErrorMessage ?? model.latestRejectionReason,
                 readOnlyMessage: model.canPropose ? nil : "Tu observes cette partie : la saisie se fait sur l'appareil de l'hôte ou d'un contributeur.",
                 closedParticipantID: $closedParticipantID,
@@ -92,8 +91,6 @@ struct SharedMatchView: View {
                 // Doc utilisateur — contrairement à l'hôte, un contributeur n'a pas de totaux
                 // « en direct » à mettre à jour pendant la saisie : `model.totals` ne reflète que
                 // les manches déjà acceptées par l'hôte, jamais un brouillon local.
-            } onSubmit: {
-                Task { await sendRound() }
             }
         }
         .listStyle(.plain)
@@ -105,7 +102,28 @@ struct SharedMatchView: View {
                     Label("Voir les manches", systemImage: "list.bullet")
                 }
             }
+            if model.canPropose {
+                ScoreBoardView.keyboardAccessory(
+                    allowsNegative: definition.scoring.entry.allowsNegative,
+                    currentParticipantID: focusedParticipantID,
+                    submitLabel: "Envoyer",
+                    onToggleSign: toggleSign
+                ) {
+                    Task { await sendRound() }
+                }
+            }
         }
+        // Doc utilisateur — posé au niveau de l'écran, pas dans `ScoreBoardView` : un enfant de
+        // liste qui porte lui-même `.safeAreaInset` faisait dupliquer tout le rendu (voir la note
+        // en tête de `ScoreBoardView.swift`).
+        .safeAreaInset(edge: .bottom) {
+            if model.canPropose {
+                ScoreBoardView.submitBar(isKeyboardVisible: keyboardObserver.isVisible, submitLabel: "Envoyer") {
+                    Task { await sendRound() }
+                }
+            }
+        }
+        .animation(.default, value: keyboardObserver.isVisible)
         .sheet(isPresented: $isPresentingRoundHistory) {
             RoundHistoryView(state: state, definition: definition)
         }
@@ -119,6 +137,16 @@ struct SharedMatchView: View {
             }
         }
         .animation(.default, value: model.roundExplanationMessage)
+    }
+
+    private func toggleSign(for participantID: Participant.ID) {
+        var text = draftTexts[participantID] ?? ""
+        if text.hasPrefix("-") {
+            text.removeFirst()
+        } else {
+            text = "-" + text
+        }
+        draftTexts[participantID] = text
     }
 
     /// Doc utilisateur — remontée : valide localement *avant* d'envoyer, exactement comme
