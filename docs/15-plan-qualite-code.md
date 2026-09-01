@@ -160,21 +160,49 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
 
 ## Reste au plan
 
-### Phase C — Combler le trou de tests côté App
+### Phase C — 🔶 Combler le trou de tests côté App, partiellement fait
 
-- Créer la cible `CaCompteUITests` (absente du `.xcodeproj`) avec les 3 parcours déjà spécifiés
-  par [10](10-tests-et-qualite.md) : créer un joueur, partie Skyjo complète jusqu'aux résultats,
-  relancer l'app et vérifier la reprise. C'est le parcours « soirée perdue », identifié comme
-  rédhibitoire dans la [vision produit](01-vision-produit.md).
-- Tests Swift Testing pour `LiveMatchModel`, `MatchSetupModel`, `PlayerEditorModel` — au minimum
-  `commitRound`/`undoLastRound`, rejet d'une validation invalide, transition d'état après fin de
-  partie. Ne dépend pas du simulateur (ce sont des objets `@Observable` purs, pas des vues).
-- Câbler les tests `CaCompteKit` dans le schéma `CaCompte` (action manuelle Xcode déjà listée au
-  README — 30 secondes en UI, non fiabilisable en pbxproj à la main) : sans ça, Xcode Cloud ne
-  fait tourner aucun test unitaire sur push.
+- ✅ **Cible `CaCompteUITests`** créée (absente du `.xcodeproj` au départ). Édition manuelle de
+  `project.pbxproj` — plus lourde que celle de la Phase G : un *target* entier (`PBXNativeTarget`,
+  `PBXContainerItemProxy`/`PBXTargetDependency` vers `CaCompte`, `XCBuildConfiguration` Debug/
+  Release avec `TEST_TARGET_NAME`, `TargetAttributes.TestTargetID`, entrée dans le `.xcscheme`
+  partagé) plutôt qu'un fichier ajouté à un target existant. Validée par étapes : `plutil -lint`
+  et `xmllint --noout` sur les fichiers édités, `xcodebuild -list` confirmant les 3 targets,
+  avant tout test réel.
+- ✅ **Parcours n°1 (créer un joueur)** et **n°3 (reprise après relance)** — le plus important
+  des trois, scénario « soirée perdue » de la [vision produit](01-vision-produit.md) — écrits et
+  stables sur deux exécutions consécutives de la suite complète.
+- ✅ **Magasin de test isolé** (`CaCompteApp.isUITesting`) — nécessaire dès l'écriture du premier
+  parcours : sans lui, les joueurs créés par un test s'accumulaient d'une exécution à l'autre
+  jusqu'à sortir de l'écran visible. `-uitesting-reset` (magasin sur disque dédié, effacé avant
+  ouverture) pour le premier lancement d'un test, `-uitesting` (même fichier, non effacé) pour
+  une relance au sein du même test — un magasin en mémoire pure aurait cassé le parcours n°3, qui
+  doit justement retrouver ses données après un `terminate()`.
+- 🔶 **Parcours n°2 (partie de Skyjo à 3 joueurs jusqu'aux résultats) — bloqué, pas écrit.** La
+  mise en place (créer 3 joueurs, ouvrir Skyjo, les sélectionner, démarrer) fonctionne de façon
+  fiable. La saisie des manches bute systématiquement sur la même ligne de `ScoreBoardView` (la
+  dernière visible à l'écran, juste au-dessus du clavier) : un tap synthétisé dessus n'y déplace
+  jamais le focus clavier, quel que soit le joueur qui s'y trouve après retri par rang — confirmé
+  par `app.debugDescription` à chaque tentative (le focus restait sur le champ précédent, sans
+  qu'aucune erreur ne remonte au moment du tap lui-même). Six stratégies essayées, toutes
+  identiquement bloquées sur cette même ligne : tap élément, double tap, tap par coordonnées,
+  ciblage dynamique du premier champ vide plutôt qu'un index fixe, tap sur le nom du joueur
+  (cible bien plus grande que le `TextField` de 64×22 pt) plutôt que sur le champ, fermeture du
+  clavier (`swipeDown()`) puis nouveau tap à écran plein. Hypothèse la plus probable, non
+  confirmée : une limite d'automatisation propre à `List` + `.focused()` + clavier `.numberPad`
+  sur cette ligne précise — pas nécessairement un bug de l'app (le parcours fonctionne à la main
+  sur simulateur et appareil réel, voir README). `testSkyjoMatchReachesResults` passe la mise en
+  place puis `throw XCTSkip(...)` avec ce diagnostic complet en commentaire — à reprendre avec
+  l'enregistreur de tests d'Xcode (accès UI direct, hors de portée en CLI).
+- Reste à faire : tests Swift Testing pour `LiveMatchModel`, `MatchSetupModel`,
+  `PlayerEditorModel` (`commitRound`/`undoLastRound`, rejet d'une validation invalide, transition
+  d'état après fin de partie — ne dépend pas du simulateur, ce sont des objets `@Observable`
+  purs) ; câbler les tests `CaCompteKit` dans le schéma `CaCompte` (action manuelle Xcode déjà
+  listée au README — 30 secondes en UI, non fiabilisable en pbxproj à la main, contrairement à
+  la création de cible ci-dessus qui l'a été).
 
 **Fini quand** : `App/Features` a une couverture de tests non nulle sur ses 3 flux `@Observable`,
-et les 3 parcours XCUITest passent en CI.
+et les 3 parcours XCUITest passent en CI (2 sur 3 le font désormais).
 
 ### Phase G — Catalogue de localisation — ✅ terminée (voir « Corrigé dans cet audit »)
 
