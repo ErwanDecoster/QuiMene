@@ -69,6 +69,7 @@
 		F5C748596F7079EDC19CB3DA /* YamsSheetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BADA2645FCD7DF45BDBEF1A4 /* YamsSheetModel.swift */; };
 		F90C9C1F96CB125785E4A63B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 166377630E42779B0C5793ED /* Foundation.framework */; };
 		FECF6A04A5074AE19E39062F /* MatchContinuation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6251C1B9A134F5DA88F87E3 /* MatchContinuation.swift */; };
+		FD8BC4C3AE2D4819B0583BCA /* CaCompteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF955D9B59F4DB880763DAD /* CaCompteUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +79,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = E2AFF0D5BDF162F6150E5E89;
 			remoteInfo = CaCompteWidgetExtension;
+		};
+		793A0DEA49A843B1AAC0ABAF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 194311EE5894E3937B117456 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A259F8DC917294226461FCC3;
+			remoteInfo = CaCompte;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -155,6 +163,8 @@
 		F22BB7F6F50FBAC4AD75FF39 /* MatchSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSetupView.swift; sourceTree = "<group>"; };
 		F6F181867B7C700F8A482072 /* CaCompteWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CaCompteWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEC066611F334B03347B64CF /* MatchSetupModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSetupModel.swift; sourceTree = "<group>"; };
+		B781475E221A4F2CA7D1908E /* CaCompteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaCompteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		8FF955D9B59F4DB880763DAD /* CaCompteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaCompteUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +191,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BFC7DC70155A42B09C2E56F2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -201,8 +218,17 @@
 			children = (
 				B027CF6BA8617B3C6DF58619 /* CaCompte.app */,
 				F6F181867B7C700F8A482072 /* CaCompteWidgetExtension.appex */,
+				B781475E221A4F2CA7D1908E /* CaCompteUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		32545BB46DA74D8AA5402E24 /* CaCompteUITests */ = {
+			isa = PBXGroup;
+			children = (
+				8FF955D9B59F4DB880763DAD /* CaCompteUITests.swift */,
+			);
+			path = CaCompteUITests;
 			sourceTree = "<group>";
 		};
 		391E62B92C7976A946FCEB9F /* Resources */ = {
@@ -343,6 +369,7 @@
 				AA1F1AA1301A3C0E002E85F9 /* CaCompte.entitlements */,
 				C15C1F1E2E5C224E80E4373A /* Info.plist */,
 				964DF914D15EE7BD800E0D40 /*  */,
+				32545BB46DA74D8AA5402E24 /* CaCompteUITests */,
 				209AD8EE9E38991B9AF90342 /* Products */,
 				63F385DFADA16903F3B48348 /* Frameworks */,
 			);
@@ -422,6 +449,24 @@
 			productReference = F6F181867B7C700F8A482072 /* CaCompteWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		1222518E81A941A88C341B68 /* CaCompteUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 62AD556A601945189BCA1A37 /* Build configuration list for PBXNativeTarget "CaCompteUITests" */;
+			buildPhases = (
+				E209B52BFD2645139C9BF0AB /* Sources */,
+				BFC7DC70155A42B09C2E56F2 /* Frameworks */,
+				BF16632F01244C28AD38599D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				2B183AB79EC24B678EC35541 /* PBXTargetDependency */,
+			);
+			name = CaCompteUITests;
+			productName = CaCompteUITests;
+			productReference = B781475E221A4F2CA7D1908E /* CaCompteUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -444,6 +489,11 @@
 						CreatedOnToolsVersion = 26.0;
 						ProvisioningStyle = Automatic;
 					};
+					1222518E81A941A88C341B68 = {
+						CreatedOnToolsVersion = 26.0;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A259F8DC917294226461FCC3;
+					};
 				};
 			};
 			buildConfigurationList = F2A25AC2F350A0DF67A70A44 /* Build configuration list for PBXProject "CaCompte" */;
@@ -465,6 +515,7 @@
 			targets = (
 				A259F8DC917294226461FCC3 /* CaCompte */,
 				E2AFF0D5BDF162F6150E5E89 /* CaCompteWidgetExtension */,
+				1222518E81A941A88C341B68 /* CaCompteUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -483,6 +534,13 @@
 			files = (
 				6389CCBC2E955F0259E97312 /* Assets.xcassets in Resources */,
 				5F633A43AE7C4EE4BACFCB7C /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF16632F01244C28AD38599D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,6 +611,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E209B52BFD2645139C9BF0AB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FD8BC4C3AE2D4819B0583BCA /* CaCompteUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -561,6 +627,11 @@
 			name = CaCompteWidgetExtension;
 			target = E2AFF0D5BDF162F6150E5E89 /* CaCompteWidgetExtension */;
 			targetProxy = 5CF327D7F748F95AF8101FEA /* PBXContainerItemProxy */;
+		};
+		2B183AB79EC24B678EC35541 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A259F8DC917294226461FCC3 /* CaCompte */;
+			targetProxy = 793A0DEA49A843B1AAC0ABAF /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -791,6 +862,52 @@
 			};
 			name = Release;
 		};
+		E87C724D9F7C44EF95B8F876 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U79ZYL8WF3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cacompte.app.CaCompteUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CaCompte;
+			};
+			name = Debug;
+		};
+		2FDAC4CA621544B7819490EB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U79ZYL8WF3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cacompte.app.CaCompteUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = CaCompte;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -817,6 +934,15 @@
 			buildConfigurations = (
 				5408C1DE55DC69D536EB3305 /* Debug */,
 				465038074C7B61637AE7450A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		62AD556A601945189BCA1A37 /* Build configuration list for PBXNativeTarget "CaCompteUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E87C724D9F7C44EF95B8F876 /* Debug */,
+				2FDAC4CA621544B7819490EB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

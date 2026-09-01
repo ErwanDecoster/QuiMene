@@ -144,9 +144,35 @@ struct CaCompteApp: App {
   /// disque plein). Le dernier repli n'a plus besoin de `try!` documenté comme un risque : un
   /// store en mémoire fraîchement créé, sans plan de migration à appliquer, ne peut pas échouer
   /// en pratique.
+  /// Doc utilisateur (audit qualité, 15, Phase C) — `CaCompteUITests` a besoin d'un magasin
+  /// propre à chaque *test*, mais qui survive un `terminate()`/relance *au sein* d'un même test
+  /// (parcours n°3, reprise après relance). Ni le magasin réel (s'accumule d'un lancement à
+  /// l'autre, jamais réinitialisé entre deux `xcodebuild test`, jusqu'à ce qu'une fiche
+  /// fraîchement créée sorte de l'écran visible) ni un magasin en mémoire pur (perdu au premier
+  /// `terminate()`, casserait justement le parcours qu'il s'agit de vérifier) ne conviennent
+  /// seuls. `-uitesting-reset` efface le fichier dédié avant de l'ouvrir (premier lancement d'un
+  /// test) ; `-uitesting` seul l'ouvre tel quel (relance dans le même test) — les deux passent
+  /// par le même fichier sur disque, jamais celui de l'utilisateur réel.
+  private nonisolated static var isUITesting: Bool {
+    ProcessInfo.processInfo.arguments.contains("-uitesting")
+      || ProcessInfo.processInfo.arguments.contains("-uitesting-reset")
+  }
+
+  private nonisolated static var uiTestingStoreURL: URL {
+    URL.applicationSupportDirectory.appending(path: "CaCompteUITesting.store")
+  }
+
   private static func loadContainer(iCloudSyncEnabled: Bool) async -> ModelContainer {
     await Task.detached(priority: .userInitiated) {
       let schema = Schema(CaCompteSchemaV1.models)
+      if isUITesting {
+        let url = uiTestingStoreURL
+        if ProcessInfo.processInfo.arguments.contains("-uitesting-reset") {
+          try? FileManager.default.removeItem(at: url)
+        }
+        return try! ModelContainer(
+          for: schema, configurations: [ModelConfiguration(schema: schema, url: url)])
+      }
       if iCloudSyncEnabled,
         let cloudContainer = try? ModelContainer(
           for: schema,
