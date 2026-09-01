@@ -72,7 +72,7 @@ struct BeloteRoundView: View {
           .frame(maxWidth: .infinity)
           .listRowBackground(Color.clear)
         }
-        .navigationTitle(model.definition.name.fr)
+        .navigationTitle(model.definition.name.localized)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItem(placement: .navigationBarLeading) {

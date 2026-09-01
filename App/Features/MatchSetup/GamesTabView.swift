@@ -43,11 +43,11 @@ struct GamesTabView: View {
   private var activePlayers: [PlayerRecord] { allPlayers.filter { !$0.isArchived } }
 
   private var games: [GameDefinition] {
-    let all = catalog.allGames.sorted { $0.name.fr < $1.name.fr }
+    let all = catalog.allGames.sorted { $0.name.localized < $1.name.localized }
     guard !searchText.isEmpty else { return all }
     return all.filter {
-      $0.name.fr.localizedCaseInsensitiveContains(searchText)
-        || ($0.shortDescription?.fr.localizedCaseInsensitiveContains(searchText) ?? false)
+      $0.name.localized.localizedCaseInsensitiveContains(searchText)
+        || ($0.shortDescription?.localized.localizedCaseInsensitiveContains(searchText) ?? false)
     }
   }
 
@@ -245,12 +245,12 @@ struct GamesTabView: View {
   }
 
   private func gameName(for match: MatchRecord) -> String {
-    (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.fr
+    (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.localized
       ?? match.gameID
   }
 
   private func gameName(forGameID gameID: String) -> String {
-    catalog.allGames.first { $0.id == gameID }?.name.fr ?? gameID
+    catalog.allGames.first { $0.id == gameID }?.name.localized ?? gameID
   }
 
   // Doc utilisateur — remontée : le bouton trophée à côté de chaque ligne rendait la liste
@@ -287,8 +287,8 @@ struct GamesTabView: View {
         .foregroundStyle(.brandInk)
         .frame(width: 32)
       VStack(alignment: .leading, spacing: Space.xxs) {
-        Text(definition.name.fr).font(.h6).foregroundStyle(.textPrimary)
-        if let description = definition.shortDescription?.fr {
+        Text(definition.name.localized).font(.h6).foregroundStyle(.textPrimary)
+        if let description = definition.shortDescription?.localized {
           Text(description).font(.bodySmall).foregroundStyle(.textSecondary)
         }
       }

@@ -83,7 +83,7 @@ struct ArchivedMatchesView: View {
   }
 
   private func gameName(for match: MatchRecord) -> String {
-    (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.fr
+    (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.localized
       ?? match.gameID
   }
 

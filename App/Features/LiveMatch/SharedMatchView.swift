@@ -44,7 +44,7 @@ struct SharedMatchView: View {
   private var navigationTitle: String {
     guard let definition = model.definition else { return "Partie partagée" }
     let roundNumber = (model.state?.rounds.count ?? 0) + 1
-    return "\(definition.name.fr) · Manche \(roundNumber)"
+    return "\(definition.name.localized) · Manche \(roundNumber)"
   }
 
   private func liveView(definition: GameDefinition, state: MatchState) -> some View {

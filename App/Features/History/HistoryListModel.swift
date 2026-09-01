@@ -55,7 +55,7 @@ final class HistoryListModel {
     return ids.compactMap { id in
       (try? catalog.definition(
         for: id, version: matches.first { $0.gameID == id }?.rulesVersion ?? 1))
-        .map { (id: id, name: $0.name.fr) } ?? (id: id, name: id)
+        .map { (id: id, name: $0.name.localized) } ?? (id: id, name: id)
     }.sorted { $0.name < $1.name }
   }
 
@@ -87,7 +87,7 @@ final class HistoryListModel {
   }
 
   func gameName(for match: MatchRecord) -> String {
-    (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.fr
+    (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.localized
       ?? match.gameID
   }
 

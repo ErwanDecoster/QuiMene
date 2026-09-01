@@ -35,7 +35,7 @@ struct MatchPlayView: View {
       }
     }
     .userActivity(MatchContinuation.activityType) { activity in
-      MatchContinuation.configure(activity, for: match, gameName: definition?.name.fr)
+      MatchContinuation.configure(activity, for: match, gameName: definition?.name.localized)
     }
   }
 

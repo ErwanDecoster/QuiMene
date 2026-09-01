@@ -77,7 +77,7 @@ struct MatchTimelineProvider: TimelineProvider {
       .map { (name: names[$0.participantID] ?? "", score: $0.score) }
 
     return MatchSnapshot(
-      gameName: definition.name.fr,
+      gameName: definition.name.localized,
       gameSymbol: definition.symbol,
       roundNumber: state.rounds.count + 1,
       standings: Array(standings)

@@ -69,7 +69,7 @@ struct MatchSetupView: View {
           }
         }
       }
-      .navigationTitle(model.definition.name.fr)
+      .navigationTitle(model.definition.name.localized)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("Annuler") { dismiss() }
@@ -110,10 +110,10 @@ struct MatchSetupView: View {
     VStack(alignment: .leading, spacing: Space.xxs) {
       switch variant.kind {
       case .bool:
-        Toggle(variant.label.fr, isOn: model.boolBinding(for: variant.id))
+        Toggle(variant.label.localized, isOn: model.boolBinding(for: variant.id))
           .tint(.brandInk)
       case .integerChoice:
-        Picker(variant.label.fr, selection: model.intBinding(for: variant.id)) {
+        Picker(variant.label.localized, selection: model.intBinding(for: variant.id)) {
           ForEach(Array(variant.values.enumerated()), id: \.offset) { _, value in
             if case .int(let intValue) = value {
               Text(intValue.formatted()).tag(intValue)
@@ -122,12 +122,12 @@ struct MatchSetupView: View {
         }
       case .integerRange:
         Stepper(
-          "\(variant.label.fr) : \(model.intBinding(for: variant.id).wrappedValue)",
+          "\(variant.label.localized) : \(model.intBinding(for: variant.id).wrappedValue)",
           value: model.intBinding(for: variant.id),
           in: (variant.min ?? 0)...(variant.max ?? 100)
         )
       case .option:
-        Picker(variant.label.fr, selection: model.stringBinding(for: variant.id)) {
+        Picker(variant.label.localized, selection: model.stringBinding(for: variant.id)) {
           ForEach(Array(variant.values.enumerated()), id: \.offset) { _, value in
             if case .string(let stringValue) = value {
               Text(stringValue).tag(stringValue)

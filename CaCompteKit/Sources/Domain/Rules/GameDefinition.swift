@@ -1,3 +1,5 @@
+import Foundation
+
 /// Définition déclarative d'un jeu — transposition mécanique de
 /// `spec/schema/game-definition.schema.json`. Couvre tout ce qui est exprimable en données ;
 /// le calcul non trivial est délégué au moteur impératif désigné par `engine`.
@@ -5,10 +7,35 @@ public struct GameDefinition: Identifiable, Sendable, Codable, Equatable {
   public struct LocalizedText: Sendable, Codable, Equatable {
     public let fr: String
     public let en: String?
+    public let es: String?
+    public let de: String?
+    public let it: String?
 
-    public init(fr: String, en: String? = nil) {
+    public init(
+      fr: String, en: String? = nil, es: String? = nil, de: String? = nil, it: String? = nil
+    ) {
       self.fr = fr
       self.en = en
+      self.es = es
+      self.de = de
+      self.it = it
+    }
+
+    /// Doc utilisateur — résolution de présentation, pas de calcul : ne porte sur aucune valeur
+    /// que rejoue un golden file (qui ne vérifie que les nombres du domaine), donc ne remet pas
+    /// en cause le déterminisme protégé par ADR-0002 malgré la lecture de `Bundle.main` ici.
+    /// `Bundle.main.preferredLocalizations` respecte à la fois les langues déclarées par l'app
+    /// (`knownRegions`) et le réglage de langue par app d'iOS (Réglages > Ça Compte > Langue),
+    /// contrairement à `Locale.current` qui ignore ce réglage par app. Repli sur le français —
+    /// la langue source, toujours renseignée — si la traduction demandée est absente.
+    public var localized: String {
+      switch Bundle.main.preferredLocalizations.first {
+      case "en": en ?? fr
+      case "es": es ?? fr
+      case "de": de ?? fr
+      case "it": it ?? fr
+      default: fr
+      }
     }
   }
 

@@ -35,8 +35,8 @@ struct GameEntityQuery: EntityStringQuery {
 
   private func allEntities() -> [GameEntity] {
     GameCatalog.embedded.allGames
-      .sorted { $0.name.fr < $1.name.fr }
-      .map { GameEntity(id: $0.id, name: $0.name.fr, symbol: $0.symbol) }
+      .sorted { $0.name.localized < $1.name.localized }
+      .map { GameEntity(id: $0.id, name: $0.name.localized, symbol: $0.symbol) }
   }
 }
 

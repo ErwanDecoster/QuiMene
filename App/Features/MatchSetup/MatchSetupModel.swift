@@ -83,7 +83,7 @@ final class MatchSetupModel {
 
   /// Texte d'aide de la variante, tel que déclaré dans le JSON du jeu.
   func help(forVariant id: String) -> String? {
-    definition.variants.first { $0.id == id }?.help?.fr
+    definition.variants.first { $0.id == id }?.help?.localized
   }
 
   func toggle(_ player: PlayerRecord) {

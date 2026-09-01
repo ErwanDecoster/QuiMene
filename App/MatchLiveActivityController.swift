@@ -70,7 +70,7 @@ enum MatchLiveActivityController {
     let matchID = state.matchID
     let content = MatchActivityAttributes.ContentState(
       matchID: matchID,
-      gameName: definition.name.fr,
+      gameName: definition.name.localized,
       gameSymbol: definition.symbol,
       roundNumber: state.rounds.count,
       standings: Array(standings)

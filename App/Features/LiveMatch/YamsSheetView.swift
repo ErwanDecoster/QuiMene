@@ -44,7 +44,7 @@ struct YamsSheetView: View {
         )
       } else {
         sheetGrid
-          .navigationTitle(model.definition.name.fr)
+          .navigationTitle(model.definition.name.localized)
           .navigationBarTitleDisplayMode(.inline)
           .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
@@ -144,7 +144,7 @@ struct YamsSheetView: View {
 
   private func categoryRow(_ category: GameDefinition.Category) -> some View {
     GridRow {
-      Text(category.label.fr)
+      Text(category.label.localized)
         .font(.bodySmall)
         .foregroundStyle(.textPrimary)
         .frame(width: 130, alignment: .leading)
@@ -197,7 +197,7 @@ private struct YamsCategoryEntrySheet: View {
       VStack(spacing: Space.xl) {
         VStack(spacing: Space.xxs) {
           Text(participant.displayName).font(.h4).foregroundStyle(.textPrimary)
-          Text(category.label.fr).font(.h6).foregroundStyle(.textSecondary)
+          Text(category.label.localized).font(.h6).foregroundStyle(.textSecondary)
         }
 
         switch category.scoring.kind {

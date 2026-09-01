@@ -65,7 +65,7 @@ public struct ProfileRepository {
       guard !gameID.isEmpty else { return nil }
       let rulesVersion = entries.first?.match?.rulesVersion ?? 1
       let definition = try? catalog.definition(for: gameID, version: rulesVersion)
-      let name = definition?.name.fr ?? gameID
+      let name = definition?.name.localized ?? gameID
       let direction = definition?.scoring.direction ?? .lowestWins
 
       let played = entries.count

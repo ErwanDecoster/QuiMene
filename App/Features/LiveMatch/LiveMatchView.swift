@@ -39,7 +39,9 @@ struct LiveMatchView: View {
         )
       } else {
         liveView
-          .navigationTitle("\(model.definition.name.fr) · Manche \(model.state.rounds.count + 1)")
+          .navigationTitle(
+            "\(model.definition.name.localized) · Manche \(model.state.rounds.count + 1)"
+          )
           .navigationBarTitleDisplayMode(.inline)
       }
     }

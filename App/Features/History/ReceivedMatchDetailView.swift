@@ -13,7 +13,7 @@ struct ReceivedMatchDetailView: View {
   let catalog: GameCatalog
 
   private var gameName: String {
-    (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.fr
+    (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.localized
       ?? match.gameID
   }
 

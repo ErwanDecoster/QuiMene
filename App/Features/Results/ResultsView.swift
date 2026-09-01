@@ -53,14 +53,14 @@ struct ResultsView: View {
         roundByRoundSection
         ShareLink(
           item: ResultsShareCard(
-            gameName: definition.name.fr,
+            gameName: definition.name.localized,
             standings: sortedStandings,
             recordByID: recordByID,
             badgeByParticipant: badgeByParticipant,
             roundCount: state.rounds.count,
             playedAt: playedAt ?? Date()
           ).renderedImage(),
-          preview: SharePreview("Résultats — \(definition.name.fr)")
+          preview: SharePreview("Résultats — \(definition.name.localized)")
         ) {
           HStack(spacing: Space.sm) {
             Image(systemName: "square.and.arrow.up")
@@ -80,7 +80,7 @@ struct ResultsView: View {
 
   private var podiumSection: some View {
     VStack(alignment: .leading, spacing: Space.md) {
-      Text(definition.name.fr).font(.h2).foregroundStyle(.textPrimary)
+      Text(definition.name.localized).font(.h2).foregroundStyle(.textPrimary)
       ForEach(sortedStandings, id: \.participantID) { standing in
         if let record = recordByID[standing.participantID] {
           HStack(spacing: Space.md) {

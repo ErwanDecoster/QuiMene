@@ -51,7 +51,7 @@ final class LiveShareCoordinator {
   /// Nom du jeu actuellement diffusé — pour le message de confirmation avant de le remplacer.
   var attachedGameName: String? {
     guard let match else { return nil }
-    return (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.fr
+    return (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.localized
       ?? match.gameID
   }
 
