@@ -5,7 +5,19 @@
     "%@": {},
     "%@ : %lld": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$lld"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$lld"
+          }
+        },
+        "es": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$@: %2$lld"
@@ -16,20 +28,44 @@
             "state": "new",
             "value": "%1$@ : %2$lld"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@: %2$lld"
+          }
         }
       }
     },
     "%@ · Manche %lld": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Runde %2$lld"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$@ · Round %2$lld"
           }
         },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ · Manga %2$lld"
+          }
+        },
         "fr": {
           "stringUnit": {
             "state": "new",
+            "value": "%1$@ · Manche %2$lld"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
             "value": "%1$@ · Manche %2$lld"
           }
         }
@@ -38,10 +74,22 @@
     "%lld": {},
     "%lld manche(s) · %@": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld Runde(n) · %2$@"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$lld round(s) · %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld manga(s) · %2$@"
           }
         },
         "fr": {
@@ -49,15 +97,33 @@
             "state": "new",
             "value": "%1$lld manche(s) · %2$@"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld manche · %2$@"
+          }
         }
       }
     },
     "%lld partie(s) ensemble · %@ de victoires": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld gemeinsame(s) Spiel(e) · %2$@ Siegquote"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$lld match(es) together · %2$@ win rate"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld partida(s) juntos · %2$@ de victorias"
           }
         },
         "fr": {
@@ -65,15 +131,33 @@
             "state": "new",
             "value": "%1$lld partie(s) ensemble · %2$@ de victoires"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld partita/e insieme · %2$@ di vittorie"
+          }
         }
       }
     },
     "%lld partie(s) · %lld victoire(s)": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld Spiel(e) · %2$lld Sieg(e)"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$lld match(es) · %2$lld win(s)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld partida(s) · %2$lld victoria(s)"
           }
         },
         "fr": {
@@ -81,15 +165,33 @@
             "state": "new",
             "value": "%1$lld partie(s) · %2$lld victoire(s)"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld partita/e · %2$lld vittoria/e"
+          }
         }
       }
     },
     "%lld partie(s) · %lld victoire(s) · %@": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld Spiel(e) · %2$lld Sieg(e) · %3$@"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$lld match(es) · %2$lld win(s) · %3$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld partida(s) · %2$lld victoria(s) · %3$@"
           }
         },
         "fr": {
@@ -97,25 +199,61 @@
             "state": "new",
             "value": "%1$lld partie(s) · %2$lld victoire(s) · %3$@"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$lld partita/e · %2$lld vittoria/e · %3$@"
+          }
         }
       }
     },
     "%lld points": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Punkte"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "%lld points"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld puntos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld punti"
           }
         }
       }
     },
     "%lld → %lld": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld → %lld"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "%1$lld → %2$lld"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld → %lld"
           }
         },
         "fr": {
@@ -123,15 +261,39 @@
             "state": "new",
             "value": "%1$lld → %2$lld"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld → %lld"
+          }
         }
       }
     },
     "+ %lld autre(s) joueur(s)": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ %lld weitere(r) Spieler"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "+ %lld more player(s)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ %lld jugador(es) más"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ %lld altro/i giocatore/i"
           }
         }
       }
@@ -139,260 +301,728 @@
     "0": {},
     "6 chiffres": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6 Ziffern"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "6 digits"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6 dígitos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "6 cifre"
           }
         }
       }
     },
     "A fermé la manche": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hat die Runde geschlossen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Closed the round"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerró la manga"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ha chiuso la manche"
           }
         }
       }
     },
     "Abandonner": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aufgeben"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Abandon"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abandonar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbandona"
           }
         }
       }
     },
     "Abandonner cette partie ?": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Partie aufgeben?"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Abandon this match?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Abandonar esta partida?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbandonare questa partita?"
           }
         }
       }
     },
     "Abandonner la partie": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie aufgeben"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Abandon the match"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abandonar la partida"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbandona la partita"
           }
         }
       }
     },
     "Activité": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktivität"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Activity"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actividad"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attività"
           }
         }
       }
     },
     "Adopter aussi son pseudo et son avatar": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auch dessen Spitznamen und Avatar übernehmen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Also adopt their nickname and avatar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adoptar también su apodo y su avatar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adotta anche il suo nickname e il suo avatar"
           }
         }
       }
     },
     "Ajouter un joueur": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spieler hinzufügen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Add a player"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Añadir un jugador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aggiungi un giocatore"
           }
         }
       }
     },
     "Annuler": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbrechen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Cancel"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancelar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annulla"
           }
         }
       }
     },
     "Annuler la dernière manche": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzte Runde rückgängig machen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Undo the last round"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deshacer la última manga"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Annulla l'ultima manche"
           }
         }
       }
     },
     "Appareils connectés": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbundene Geräte"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Connected devices"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dispositivos conectados"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dispositivi connessi"
           }
         }
       }
     },
     "Archiver": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivieren"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Archive"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivia"
           }
         }
       }
     },
     "Archiver (%lld)": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivieren (%lld)"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Archive (%lld)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivar (%lld)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivia (%lld)"
           }
         }
       }
     },
     "Archiver ce joueur": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen Spieler archivieren"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Archive this player"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivar este jugador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivia questo giocatore"
           }
         }
       }
     },
     "Arrêter le partage": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Freigabe beenden"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Stop sharing"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detener el uso compartido"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrompi la condivisione"
           }
         }
       }
     },
     "Aucun jeu ne correspond à ta recherche.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kein Spiel entspricht deiner Suche."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No game matches your search."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ningún juego coincide con tu búsqueda."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun gioco corrisponde alla tua ricerca."
           }
         }
       }
     },
     "Aucun joueur archivé.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine archivierten Spieler."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No archived players."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ningún jugador archivado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun giocatore archiviato."
           }
         }
       }
     },
     "Aucun joueur. Ajouter un joueur": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Spieler. Spieler hinzufügen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No players. Add a player"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ningún jugador. Añadir un jugador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun giocatore. Aggiungi un giocatore"
           }
         }
       }
     },
     "Aucune": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "None"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguna"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna"
           }
         }
       }
     },
     "Aucune manche jouée pour l'instant.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisher wurde noch keine Runde gespielt."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No rounds played yet."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todavía no se ha jugado ninguna manga."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna manche giocata per il momento."
           }
         }
       }
     },
     "Aucune partie archivée.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine archivierten Partien."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No archived matches."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguna partida archivada."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna partita archiviata."
           }
         }
       }
     },
     "Aucune partie de %@ terminée pour l'instant. Le classement se remplit après la première partie.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisher wurde noch keine Partie %@ beendet. Die Bestenliste füllt sich nach der ersten Partie."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No %@ matches finished yet. The leaderboard fills in after the first match."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todavía no se ha terminado ninguna partida de %@. La clasificación se completa después de la primera partida."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna partita di %@ terminata per il momento. La classifica si riempie dopo la prima partita."
           }
         }
       }
     },
     "Aucune partie ne correspond à ces filtres.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine Partie entspricht diesen Filtern."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No matches fit these filters."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguna partida coincide con estos filtros."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna partita corrisponde a questi filtri."
           }
         }
       }
     },
     "Aucune partie terminée pour l'instant. L'historique se remplit à la fin de la première partie.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisher wurde noch keine Partie beendet. Der Verlauf füllt sich nach der ersten Partie."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No matches finished yet. History fills in once the first match ends."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todavía no se ha terminado ninguna partida. El historial se completa al terminar la primera partida."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna partita terminata per il momento. La cronologia si riempie alla fine della prima partita."
           }
         }
       }
     },
     "Aucune partie terminée pour l'instant. La fiche se remplit après la première partie.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bisher wurde noch keine Partie beendet. Das Profil füllt sich nach der ersten Partie."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No matches finished yet. The profile fills in after the first match."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todavía no se ha terminado ninguna partida. La ficha se completa después de la primera partida."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna partita terminata per il momento. La scheda si riempie dopo la prima partita."
           }
         }
       }
     },
     "Aucune session partagée en cours.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine geteilte Sitzung aktiv."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "No shared session in progress."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguna sesión compartida en curso."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna sessione condivisa in corso."
           }
         }
       }
@@ -400,10 +1030,28 @@
     "Automatique": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisch"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Automatic"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automático"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatico"
           }
         }
       }
@@ -411,27 +1059,81 @@
     "Automatique : les joueurs les plus actifs (nombre de parties jouées) en premier. Manuel : réordonne-les toi-même dans l'onglet Joueurs.": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisch: die aktivsten Spieler (Anzahl gespielter Partien) zuerst. Manuell: ordne sie selbst im Tab „Spieler“ neu an."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Automatic: your most active players (by matches played) come first. Manual: reorder them yourself in the Players tab."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automático: los jugadores más activos (número de partidas jugadas) primero. Manual: reordénalos tú mismo en la pestaña Jugadores."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatico: prima i giocatori più attivi (numero di partite giocate). Manuale: riordinali tu stesso nella scheda Giocatori."
           }
         }
       }
     },
     "Autoriser les contributeurs": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitwirkende zulassen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Allow contributors"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir colaboradores"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consenti collaboratori"
           }
         }
       }
     },
     "Avatar": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avatar"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avatar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avatar"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Avatar"
@@ -441,7 +1143,25 @@
     },
     "Belote-rebelote": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belote-rebelote"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belote-rebelote"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belote-rebelote"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Belote-rebelote"
@@ -451,7 +1171,25 @@
     },
     "Bonus": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bonus"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bonus"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bonus"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Bonus"
@@ -461,7 +1199,25 @@
     },
     "Capot": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capot"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capot"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capot"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Capot"
@@ -471,30 +1227,78 @@
     },
     "Ce profil est déjà suivi par la fiche « %@ » sur cet appareil. Continuer le fera suivre aussi par celle-ci — à ne faire que si c'est la même personne (par exemple une fiche recréée).": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Profil wird auf diesem Gerät bereits von der Karte „%@“ verfolgt. Fortfahren lässt diese Karte es ebenfalls verfolgen — nur tun, wenn es dieselbe Person ist (z. B. eine neu erstellte Karte)."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "This profile is already followed by the “%@” profile card on this device. Continuing will make this card follow it too — only do this if it's the same person (for example, a recreated profile)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este perfil ya lo sigue la ficha «%@» en este dispositivo. Continuar hará que esta ficha también lo siga — hazlo solo si es la misma persona (por ejemplo, una ficha recreada)."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo profilo è già seguito dalla scheda «%@» su questo dispositivo. Continuare farà sì che anche questa lo segua — fallo solo se si tratta della stessa persona (ad esempio una scheda ricreata)."
           }
         }
       }
     },
     "Cette donne": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Hand"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "This Deal"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta mano"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa mano"
           }
         }
       }
     },
     "Cette fiche suit actuellement **%@**. Continuer la fera suivre **%@** à la place : %@ ne recevra plus les parties jouées avec cette fiche.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Karte folgt derzeit **%1$@**. Fortfahren lässt sie stattdessen **%2$@** folgen: %3$@ erhält die mit dieser Karte gespielten Partien nicht mehr."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "This profile currently follows **%1$@**. Continuing will make it follow **%2$@** instead: %3$@ will no longer receive matches played with this profile."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta ficha sigue actualmente a **%1$@**. Continuar hará que siga a **%2$@** en su lugar: %3$@ ya no recibirá las partidas jugadas con esta ficha."
           }
         },
         "fr": {
@@ -502,152 +1306,428 @@
             "state": "new",
             "value": "Cette fiche suit actuellement **%1$@**. Continuer la fera suivre **%2$@** à la place : %3$@ ne recevra plus les parties jouées avec cette fiche."
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa scheda segue attualmente **%1$@**. Continuare la farà seguire **%2$@** al suo posto: %3$@ non riceverà più le partite giocate con questa scheda."
+          }
         }
       }
     },
     "Cette partie n'est plus disponible — les règles de ce jeu ont changé depuis.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Partie ist nicht mehr verfügbar — die Regeln dieses Spiels haben sich seitdem geändert."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "This match is no longer available — this game's rules have changed since."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta partida ya no está disponible — las reglas de este juego han cambiado desde entonces."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa partita non è più disponibile — le regole di questo gioco sono cambiate da allora."
           }
         }
       }
     },
     "Chaque équipe doit compter exactement %lld joueurs.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jedes Team muss aus genau %lld Spielern bestehen."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Each team must have exactly %lld players."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cada equipo debe tener exactamente %lld jugadores."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ogni squadra deve contare esattamente %lld giocatori."
           }
         }
       }
     },
     "Choisir une photo": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto auswählen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Choose a photo"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elegir una foto"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli una foto"
           }
         }
       }
     },
     "Code QR d'appairage": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "QR-Kopplungscode"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Pairing QR code"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código QR de emparejamiento"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codice QR di associazione"
           }
         }
       }
     },
     "Code d'appairage": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopplungscode"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Pairing code"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código de emparejamiento"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codice di associazione"
           }
         }
       }
     },
     "Commencer": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starten"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Start"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empezar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia"
           }
         }
       }
     },
     "Commencer une partie": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Partie starten"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Start a match"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empezar una partida"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia una partita"
           }
         }
       }
     },
     "Commencer une partie de ${game}": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Partie ${game} starten"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Start a game of ${game}"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empezar una partida de ${game}"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inizia una partita di ${game}"
           }
         }
       }
     },
     "Connexion à l'hôte perdue. Le tableau affiché est le dernier reçu.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbindung zum Host verloren. Die angezeigte Tafel ist die zuletzt empfangene."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Connection to the host lost. The board shown is the last one received."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se perdió la conexión con el anfitrión. El tablero mostrado es el último recibido."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connessione all'host persa. Il tabellone mostrato è l'ultimo ricevuto."
           }
         }
       }
     },
     "Connexion à la partie…": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbindung zur Partie…"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Connecting to the match…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectando a la partida…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connessione alla partita…"
           }
         }
       }
     },
     "Connexion…": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbindung…"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Connecting…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectando…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connessione…"
           }
         }
       }
     },
     "Contributeur": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mitwirkender"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Contributor"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Colaborador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collaboratore"
           }
         }
       }
     },
     "Démarrage du partage…": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Freigabe wird gestartet…"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Starting sharing…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciando el uso compartido…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvio della condivisione…"
           }
         }
       }
     },
     "Dérivé automatiquement du pseudo — modifiable ci-dessous.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatisch vom Spitznamen abgeleitet — unten änderbar."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Automatically derived from the nickname — editable below."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derivado automáticamente del apodo — modificable a continuación."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Derivato automaticamente dal nickname — modificabile qui sotto."
           }
         }
       }
     },
     "Emoji": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emoji"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emoji"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emoji"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Emoji"
@@ -657,60 +1737,168 @@
     },
     "En attente d'un appareil qui rejoint…": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warten auf ein beitretendes Gerät…"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Waiting for a device to join…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando a que un dispositivo se una…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In attesa che un dispositivo si unisca…"
           }
         }
       }
     },
     "En bref": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf einen Blick"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "At a Glance"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En resumen"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In breve"
           }
         }
       }
     },
     "Enregistrer": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Speichern"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Save"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva"
           }
         }
       }
     },
     "Envoyer": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Senden"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Send"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enviar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invia"
           }
         }
       }
     },
     "Fais scanner ce code par l'ami avec qui tu veux partager ton historique, depuis sa propre fiche « Suivre un profil reçu ».": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lass diesen Code von dem Freund scannen, mit dem du deinen Verlauf teilen möchtest, über dessen eigene Karte „Empfangenes Profil folgen“."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Have the friend you want to share your history with scan this code, from their own “Follow a received profile” screen."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Haz que el amigo con quien quieres compartir tu historial escanee este código, desde su propia ficha «Seguir un perfil recibido»."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fai scansionare questo codice dall'amico con cui vuoi condividere la tua cronologia, dalla sua scheda «Segui un profilo ricevuto»."
           }
         }
       }
     },
     "Faits marquants": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Highlights"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Highlights"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Momentos destacados"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Momenti salienti"
           }
         }
       }
@@ -718,27 +1906,81 @@
     "Fermer": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schließen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Close"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiudi"
           }
         }
       }
     },
     "Historique": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verlauf"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "History"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Historial"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cronologia"
           }
         }
       }
     },
     "Hôte": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gastgeber"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Host"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anfitrión"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Host"
@@ -748,170 +1990,504 @@
     },
     "Impossible de démarrer le partage. Vérifie ta connexion Internet et réessaie.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Freigabe konnte nicht gestartet werden. Überprüfe deine Internetverbindung und versuche es erneut."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Couldn't start sharing. Check your internet connection and try again."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo iniciar el uso compartido. Comprueba tu conexión a Internet e inténtalo de nuevo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile avviare la condivisione. Controlla la tua connessione Internet e riprova."
           }
         }
       }
     },
     "Jeu": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiel"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Game"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Juego"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gioco"
           }
         }
       }
     },
     "Jeux": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiele"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Games"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Juegos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giochi"
           }
         }
       }
     },
     "Joueur": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spieler"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Player"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giocatore"
           }
         }
       }
     },
     "Joueurs": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spieler"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Players"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugadores"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giocatori"
           }
         }
       }
     },
     "Joueurs archivés": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivierte Spieler"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Archived Players"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugadores archivados"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giocatori archiviati"
           }
         }
       }
     },
     "Joueurs archivés (%lld)": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivierte Spieler (%lld)"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Archived Players (%lld)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugadores archivados (%lld)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giocatori archiviati (%lld)"
           }
         }
       }
     },
     "La fiche joueur sera définitivement supprimée. Les parties déjà jouées restent dans l'historique, mais ne pointeront plus vers ce joueur. Cette action ne peut pas être annulée.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Spielerkarte wird endgültig gelöscht. Bereits gespielte Partien bleiben im Verlauf, verweisen aber nicht mehr auf diesen Spieler. Diese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "The player profile will be permanently deleted. Matches already played stay in history, but will no longer point to this player. This action can't be undone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La ficha del jugador se eliminará definitivamente. Las partidas ya jugadas permanecen en el historial, pero ya no apuntarán a este jugador. Esta acción no se puede deshacer."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La scheda del giocatore verrà eliminata definitivamente. Le partite già giocate restano nella cronologia, ma non punteranno più a questo giocatore. Questa azione non può essere annullata."
           }
         }
       }
     },
     "La partie est terminée.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Partie ist beendet."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "The match has ended."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La partida ha terminado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La partita è terminata."
           }
         }
       }
     },
     "La partie et ses manches seront définitivement supprimées, y compris des statistiques des joueurs concernés. Cette action ne peut pas être annulée.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Partie und ihre Runden werden endgültig gelöscht, einschließlich der Statistiken der betroffenen Spieler. Diese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "The match and its rounds will be permanently deleted, including the statistics of the players involved. This action can't be undone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La partida y sus mangas se eliminarán definitivamente, incluidas las estadísticas de los jugadores implicados. Esta acción no se puede deshacer."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La partita e le sue manche verranno eliminate definitivamente, comprese le statistiche dei giocatori coinvolti. Questa azione non può essere annullata."
           }
         }
       }
     },
     "La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Partie wird im Verlauf als abgebrochen markiert, mit dem bis dahin erreichten Stand. Diese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "The match will be marked as abandoned in history, with the standings reached so far. This action can't be undone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La partida se clasificará como abandonada en el historial, con la clasificación alcanzada hasta ese momento. Esta acción no se puede deshacer."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La partita verrà classificata come abbandonata nella cronologia, con la classifica raggiunta fino a quel momento. Questa azione non può essere annullata."
+          }
+        }
+      }
+    },
+    "Langue": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sprache"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Idioma"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lingua"
           }
         }
       }
     },
     "Le classement final sera calculé à partir des manches jouées. Cette action ne peut pas être annulée.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Endwertung wird anhand der gespielten Runden berechnet. Diese Aktion kann nicht rückgängig gemacht werden."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "The final standings will be calculated from the rounds played. This action can't be undone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La clasificación final se calculará a partir de las mangas jugadas. Esta acción no se puede deshacer."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La classifica finale verrà calcolata in base alle manche giocate. Questa azione non può essere annullata."
           }
         }
       }
     },
     "Les personnes qui rejoignent ne peuvent qu'observer, quel que soit leur choix — ça ne change rien pour les contributeurs déjà connectés.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beitretende Personen können nur beobachten, unabhängig von ihrer Wahl — das ändert nichts für bereits verbundene Mitwirkende."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "People who join can only observe, whatever they choose — this changes nothing for contributors already connected."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las personas que se unan solo podrán observar, sea cual sea su elección — esto no cambia nada para los colaboradores ya conectados."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le persone che si uniscono possono solo osservare, qualunque sia la loro scelta — questo non cambia nulla per i collaboratori già connessi."
           }
         }
       }
     },
     "Les personnes qui rejoignent peuvent choisir d'observer ou de proposer des manches.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beitretende Personen können wählen, ob sie beobachten oder Runden vorschlagen möchten."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "People who join can choose to observe or to propose rounds."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Las personas que se unan pueden elegir observar o proponer mangas."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le persone che si uniscono possono scegliere di osservare o di proporre manche."
           }
         }
       }
     },
     "Manche": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Runde"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Round"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manga"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manche"
           }
         }
       }
     },
     "Manche par manche": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Runde für Runde"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Round by Round"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manga por manga"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manche per manche"
           }
         }
       }
     },
     "Manches précédentes": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorherige Runden"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Previous Rounds"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mangas anteriores"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manche precedenti"
           }
         }
       }
@@ -919,30 +2495,78 @@
     "Manuel": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manuell"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Manual"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manual"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manuale"
           }
         }
       }
     },
     "Meilleur joueur": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bester Spieler"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Best Player"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mejor jugador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miglior giocatore"
           }
         }
       }
     },
     "Meilleur score : %lld — %@": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beste Punktzahl: %1$lld — %2$@"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Best score: %1$lld — %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mejor puntuación: %1$lld — %2$@"
           }
         },
         "fr": {
@@ -950,92 +2574,260 @@
             "state": "new",
             "value": "Meilleur score : %1$lld — %2$@"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Miglior punteggio: %1$lld — %2$@"
+          }
         }
       }
     },
     "Meilleurs joueurs": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beste Spieler"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Best Players"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mejores jugadores"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Migliori giocatori"
           }
         }
       }
     },
     "Modifier": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bearbeiten"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Edit"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifica"
           }
         }
       }
     },
     "Modifier le joueur": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spieler bearbeiten"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Edit Player"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Editar el jugador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modifica il giocatore"
           }
         }
       }
     },
     "Mois": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monat"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Month"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mes"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mese"
           }
         }
       }
     },
     "Ne plus partager": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht mehr teilen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Stop Sharing"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dejar de compartir"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interrompi condivisione"
           }
         }
       }
     },
     "Ne plus suivre ce profil": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesem Profil nicht mehr folgen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Unfollow this profile"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dejar de seguir este perfil"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smetti di seguire questo profilo"
           }
         }
       }
     },
     "Nombre de dés : %lld": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anzahl Würfel: %lld"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Number of dice: %lld"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Número de dados: %lld"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Numero di dadi: %lld"
           }
         }
       }
     },
     "Némésis": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nemesis"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Nemesis"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Némesis"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nemesi"
           }
         }
       }
     },
     "OK": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "OK"
@@ -1045,160 +2837,470 @@
     },
     "Observateur": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beobachter"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Observer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Observador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Osservatore"
           }
         }
       }
     },
     "Obtenu (%lld)": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erzielt (%lld)"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Achieved (%lld)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conseguido (%lld)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ottenuto (%lld)"
+          }
+        }
+      }
+    },
+    "Ouvre les réglages système pour choisir la langue de l'app.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffnet die Systemeinstellungen, um die Sprache der App zu wählen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens system settings to choose the app's language."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre los ajustes del sistema para elegir el idioma de la app."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apre le impostazioni di sistema per scegliere la lingua dell'app."
           }
         }
       }
     },
     "Par jeu": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach Spiel"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "By Game"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Por juego"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Per gioco"
           }
         }
       }
     },
     "Partage ta fiche pour que tes amis puissent te suivre. Suis un ami pour retrouver vos parties jouées ensemble dans son historique.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teile deine Karte, damit deine Freunde dir folgen können. Folge einem Freund, um eure gemeinsam gespielten Partien in dessen Verlauf zu finden."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Share your profile so your friends can follow you. Follow a friend to find the matches you've played together in their history."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comparte tu ficha para que tus amigos puedan seguirte. Sigue a un amigo para encontrar las partidas jugadas juntos en su historial."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi la tua scheda in modo che i tuoi amici possano seguirti. Segui un amico per ritrovare le partite giocate insieme nella sua cronologia."
           }
         }
       }
     },
     "Partager ce profil (c'est moi)": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Profil teilen (das bin ich)"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Share this profile (it's me)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir este perfil (soy yo)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi questo profilo (sono io)"
           }
         }
       }
     },
     "Partager cette partie à la place": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stattdessen diese Partie teilen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Share this match instead"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir esta partida en su lugar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi questa partita al suo posto"
           }
         }
       }
     },
     "Partager en direct": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live teilen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Share Live"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir en directo"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi in diretta"
           }
         }
       }
     },
     "Partager la partie": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie teilen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Share the Match"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir la partida"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi la partita"
           }
         }
       }
     },
     "Partager le résumé": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zusammenfassung teilen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Share the Summary"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir el resumen"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi il riepilogo"
           }
         }
       }
     },
     "Partie reçue de l'appareil d'un ami : le détail manche par manche n'est pas disponible ici.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie vom Gerät eines Freundes empfangen: die Runde-für-Runde-Details sind hier nicht verfügbar."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Match received from a friend's device: round-by-round detail isn't available here."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partida recibida del dispositivo de un amigo: el detalle manga por manga no está disponible aquí."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partita ricevuta dal dispositivo di un amico: il dettaglio manche per manche non è disponibile qui."
           }
         }
       }
     },
     "Parties": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partien"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Matches"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partidas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partite"
           }
         }
       }
     },
     "Parties archivées": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivierte Partien"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Archived Matches"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partidas archivadas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partite archiviate"
           }
         }
       }
     },
     "Parties archivées (%lld)": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archivierte Partien (%lld)"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Archived Matches (%lld)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partidas archivadas (%lld)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partite archiviate (%lld)"
           }
         }
       }
     },
     "Parties ce mois-ci": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partien diesen Monat"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Matches This Month"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partidas este mes"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partite questo mese"
           }
         }
       }
     },
     "Photo": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Photo"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Foto"
           }
         }
       }
     },
     "Pire score : %lld — %@": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlechteste Punktzahl: %1$lld — %2$@"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Worst score: %1$lld — %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peor puntuación: %1$lld — %2$@"
           }
         },
         "fr": {
@@ -1206,32 +3308,92 @@
             "state": "new",
             "value": "Pire score : %1$lld — %2$@"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Peggior punteggio: %1$lld — %2$@"
+          }
         }
       }
     },
     "Points du preneur : %lld": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Punkte des Angreifers: %lld"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Taker's points: %lld"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puntos del atacante: %lld"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Punti dell'attaccante: %lld"
           }
         }
       }
     },
     "Profil partagé": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geteiltes Profil"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Shared Profile"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perfil compartido"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profilo condiviso"
           }
         }
       }
     },
     "Pseudo": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spitzname"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nickname"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apodo"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Nickname"
@@ -1241,57 +3403,165 @@
     },
     "Quitter": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verlassen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Leave"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salir"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esci"
           }
         }
       }
     },
     "Rang moyen": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Durchschnittlicher Rang"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Average Rank"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rango medio"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rango medio"
           }
         }
       }
     },
     "Raté (0)": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verfehlt (0)"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Missed (0)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fallado (0)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fallito (0)"
           }
         }
       }
     },
     "Rechercher un jeu": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spiel suchen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Search for a game"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buscar un juego"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerca un gioco"
           }
         }
       }
     },
     "Reconnexion…": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erneute Verbindung…"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Reconnecting…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reconectando…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riconnessione…"
           }
         }
       }
     },
     "Record": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rekord"
+          }
+        },
         "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Record"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Récord"
+          }
+        },
+        "it": {
           "stringUnit": {
             "state": "translated",
             "value": "Record"
@@ -1301,80 +3571,224 @@
     },
     "Rejoindre": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beitreten"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Join"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unirse"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unisciti"
           }
         }
       }
     },
     "Remplacer la partie partagée ?": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geteilte Partie ersetzen?"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Replace the shared match?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Reemplazar la partida compartida?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sostituire la partita condivisa?"
           }
         }
       }
     },
     "Reprendre la partie": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie fortsetzen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Resume the Match"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reanudar la partida"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprendi la partita"
           }
         }
       }
     },
     "Reprendre la partie en cours": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laufende Partie fortsetzen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Resume the Match in Progress"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reanudar la partida en curso"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprendi la partita in corso"
           }
         }
       }
     },
     "Reprise automatique en cours.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatische Fortsetzung läuft."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Automatic resume in progress."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reanudación automática en curso."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripresa automatica in corso."
           }
         }
       }
     },
     "Réactiver": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reaktivieren"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Reactivate"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reactivar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riattiva"
           }
         }
       }
     },
     "Réessayer": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erneut versuchen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Retry"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reintentar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprova"
           }
         }
       }
     },
     "Réessayer maintenant": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jetzt erneut versuchen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Retry Now"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reintentar ahora"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprova ora"
           }
         }
       }
@@ -1382,190 +3796,532 @@
     "Réglages": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Settings"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostazioni"
           }
         }
       }
     },
     "Réinitialiser l'avatar généré": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Generierten Avatar zurücksetzen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Reset the generated avatar"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restablecer el avatar generado"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ripristina l'avatar generato"
           }
         }
       }
     },
     "Résultats": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ergebnisse"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Results"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resultados"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risultati"
           }
         }
       }
     },
     "Résultats — %@": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ergebnisse — %@"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Results — %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resultados — %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Risultati — %@"
           }
         }
       }
     },
     "Saisie invalide": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ungültige Eingabe"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Invalid Entry"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrada no válida"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voce non valida"
           }
         }
       }
     },
     "Saisir un code": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code eingeben"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Enter a Code"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introducir un código"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci un codice"
           }
         }
       }
     },
     "Scores": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Punktestände"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Scores"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puntuaciones"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Punteggi"
           }
         }
       }
     },
     "Session partagée en cours": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geteilte Sitzung aktiv"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Shared Session in Progress"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sesión compartida en curso"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sessione condivisa in corso"
           }
         }
       }
     },
     "Seuil": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schwelle"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Threshold"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Umbral"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Soglia"
           }
         }
       }
     },
     "Somme : %lld": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Summe: %lld"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Sum: %lld"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suma: %lld"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Somma: %lld"
           }
         }
       }
     },
     "Son avatar est une photo : seul le pseudo peut être repris.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sein Avatar ist ein Foto: nur der Spitzname kann übernommen werden."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Their avatar is a photo: only the nickname can be adopted."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Su avatar es una foto: solo se puede reutilizar el apodo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il suo avatar è una foto: si può riprendere solo il nickname."
           }
         }
       }
     },
     "Source": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quelle"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Source"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fuente"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fonte"
           }
         }
       }
     },
     "Suivre ce profil ?": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesem Profil folgen?"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Follow this profile?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Seguir este perfil?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seguire questo profilo?"
           }
         }
       }
     },
     "Suivre quelqu'un d'autre (remplace %@)": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jemand anderem folgen (ersetzt %@)"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Follow someone else (replaces %@)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seguir a otra persona (reemplaza a %@)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Segui qualcun altro (sostituisce %@)"
           }
         }
       }
     },
     "Suivre un profil reçu": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empfangenem Profil folgen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Follow a Received Profile"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Seguir un perfil recibido"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Segui un profilo ricevuto"
           }
         }
       }
     },
     "Supprimer": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Löschen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Delete"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimina"
           }
         }
       }
     },
     "Supprimer ce joueur": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen Spieler löschen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Delete This Player"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminar este jugador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elimina questo giocatore"
           }
         }
       }
     },
     "Supprimer définitivement ce joueur ?": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen Spieler endgültig löschen?"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Permanently delete this player?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Eliminar definitivamente a este jugador?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminare definitivamente questo giocatore?"
           }
         }
       }
     },
     "Supprimer définitivement cette partie ?": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diese Partie endgültig löschen?"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Permanently delete this match?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Eliminar definitivamente esta partida?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminare definitivamente questa partita?"
           }
         }
       }
@@ -1573,10 +4329,28 @@
     "Synchronisation iCloud": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud-Synchronisierung"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "iCloud Sync"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronización de iCloud"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione iCloud"
           }
         }
       }
@@ -1584,110 +4358,308 @@
     "Synchronise les joueurs et les parties entre tes appareils via iCloud. Désactivée, l'app reste pleinement fonctionnelle en local. Le changement s'applique au prochain lancement de l'app.": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisiert Spieler und Partien über iCloud zwischen deinen Geräten. Deaktiviert bleibt die App lokal voll funktionsfähig. Die Änderung wird beim nächsten App-Start wirksam."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Syncs players and matches across your devices via iCloud. When off, the app stays fully functional locally. The change takes effect the next time you launch the app."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincroniza los jugadores y las partidas entre tus dispositivos mediante iCloud. Si está desactivada, la app sigue siendo totalmente funcional en local. El cambio se aplica en el próximo inicio de la app."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizza i giocatori e le partite tra i tuoi dispositivi tramite iCloud. Se disattivata, l'app resta pienamente funzionale in locale. La modifica si applica al prossimo avvio dell'app."
           }
         }
       }
     },
     "Série en cours": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktuelle Serie"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Current Streak"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Racha actual"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serie in corso"
           }
         }
       }
     },
     "Séries": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serien"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Streaks"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rachas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serie"
           }
         }
       }
     },
     "Taux de victoire": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siegquote"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Win Rate"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasa de victorias"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tasso di vittoria"
           }
         }
       }
     },
     "Terminer la partie": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie beenden"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "End the Match"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminar la partida"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Termina la partita"
           }
         }
       }
     },
     "Terminer la partie ?": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie beenden?"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "End the match?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Terminar la partida?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminare la partita?"
           }
         }
       }
     },
     "Terminé": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fertig"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Finished"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hecho"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fatto"
           }
         }
       }
     },
     "Total": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gesamt"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Total"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Total"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Totale"
           }
         }
       }
     },
     "Toujours pas de connexion — nouvelle tentative automatique en cours.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immer noch keine Verbindung — automatischer neuer Versuch läuft."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Still no connection — automatically retrying."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sigue sin haber conexión — nuevo intento automático en curso."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ancora nessuna connessione — nuovo tentativo automatico in corso."
           }
         }
       }
     },
     "Tous les jeux": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Spiele"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "All Games"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos los juegos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutti i giochi"
           }
         }
       }
     },
     "Tous les joueurs": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alle Spieler"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "All Players"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todos los jugadores"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutti i giocatori"
           }
         }
       }
@@ -1695,20 +4667,50 @@
     "Tri des joueurs": {
       "extractionState": "manual",
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spielersortierung"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Player Sorting"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Orden de los jugadores"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ordinamento giocatori"
           }
         }
       }
     },
     "Tu suis **%@**, depuis le %@": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Du folgst **%1$@** seit dem %2$@"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "You've followed **%1$@** since %2$@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sigues a **%1$@** desde el %2$@"
           }
         },
         "fr": {
@@ -1716,155 +4718,431 @@
             "state": "new",
             "value": "Tu suis **%1$@**, depuis le %2$@"
           }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Segui **%1$@** dal %2$@"
+          }
         }
       }
     },
     "Une session est en cours de partage sur %@. Continuer ici la remplacera : les personnes connectées verront cette partie à la place.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es läuft bereits eine geteilte Sitzung für %@. Hier fortzufahren ersetzt sie: verbundene Personen sehen stattdessen diese Partie."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "A session is currently being shared for %@. Continuing here will replace it: connected people will see this match instead."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hay una sesión en curso de compartición en %@. Continuar aquí la reemplazará: las personas conectadas verán esta partida en su lugar."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "È in corso una sessione di condivisione su %@. Continuare qui la sostituirà: le persone connesse vedranno questa partita al suo posto."
           }
         }
       }
     },
     "Valider": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bestätigen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Confirm"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Validar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conferma"
           }
         }
       }
     },
     "Valider la donne": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hand bestätigen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Confirm the Deal"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Validar la mano"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conferma la mano"
           }
         }
       }
     },
     "Variantes": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varianten"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Variants"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Variantes"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varianti"
           }
         }
       }
     },
     "Victoires": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Siege"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Wins"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Victorias"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vittorie"
           }
         }
       }
     },
     "Voir l'année": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jahr anzeigen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "View the Year"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver el año"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vedi l'anno"
           }
         }
       }
     },
     "Voir la session partagée": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geteilte Sitzung anzeigen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "View the Shared Session"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver la sesión compartida"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vedi la sessione condivisa"
           }
         }
       }
     },
     "Voir le mois": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Monat anzeigen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "View the Month"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver el mes"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vedi il mese"
           }
         }
       }
     },
     "Voir les manches": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Runden anzeigen"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "View the Rounds"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver las mangas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vedi le manche"
           }
         }
       }
     },
     "À scanner (bouton « Scanner un code » sur l'appareil qui rejoint) ou à saisir — aucune connexion Wi-Fi commune n'est nécessaire, juste une connexion Internet des deux côtés.": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zum Scannen (Schaltfläche „Code scannen“ auf dem beitretenden Gerät) oder zur Eingabe — es ist keine gemeinsame WLAN-Verbindung nötig, nur eine Internetverbindung auf beiden Seiten."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "To scan (“Scan a code” button on the joining device) or to type in — no shared Wi-Fi connection is needed, just an internet connection on both sides."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Para escanear (botón «Escanear un código» en el dispositivo que se une) o para introducir — no se necesita ninguna conexión Wi-Fi común, solo una conexión a Internet en ambos lados."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Da scansionare (pulsante «Scansiona un codice» sul dispositivo che si unisce) o da inserire — non è necessaria alcuna connessione Wi-Fi comune, solo una connessione Internet su entrambi i lati."
           }
         }
       }
     },
     "Équipe": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Team"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Team"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equipo"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squadra"
           }
         }
       }
     },
     "Équipe %@": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Team %@"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Team %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equipo %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squadra %@"
           }
         }
       }
     },
     "Équipe preneuse": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angreifendes Team"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Taking Team"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equipo atacante"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squadra attaccante"
           }
         }
       }
     },
     "Équipes": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teams"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Teams"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equipos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squadre"
           }
         }
       }
     },
     "Évolution": {
       "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entwicklung"
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Trend"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evolución"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Andamento"
           }
         }
       }
