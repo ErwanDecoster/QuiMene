@@ -30,6 +30,13 @@ public struct EmptyState: View {
         .font(.bodyText)
         .foregroundStyle(.textSecondary)
         .multilineTextAlignment(.center)
+        // Doc utilisateur (audit qualité, 15) — remontée en testant l'italien : sans ça, le
+        // `maxHeight: 160` ci-dessous propose une hauteur trop courte pour un message de deux
+        // lignes (traduction plus longue, ou français en Dynamic Type AX5) et le texte tronque
+        // en silence (« Aggiungi un g… ») plutôt que de passer à la ligne. `fixedSize` force ce
+        // texte précis à réclamer sa hauteur naturelle ; le VStack grandit au-delà de 160 si
+        // besoin plutôt que de couper le message.
+        .fixedSize(horizontal: false, vertical: true)
       if let actionTitle, let action {
         Button(actionTitle, action: action)
           .buttonStyle(.primary(size: .medium))
