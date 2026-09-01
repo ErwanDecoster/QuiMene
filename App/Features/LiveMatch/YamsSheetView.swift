@@ -156,11 +156,16 @@ struct YamsSheetView: View {
 
   private func cell(participant: Participant, category: GameDefinition.Category) -> some View {
     let filled = model.filledCategories(for: participant.id)
+    // Doc 08 « Accessibilité » — une grille n'a pas d'équivalent au regroupement de ligne
+    // (chaque cellule est déjà un arrêt VoiceOver séparé) : le correctif est un libellé par
+    // cellule identifiant participant + catégorie, plutôt qu'un chiffre ou une icône nus.
     return Group {
       if let entry = filled[category.id] {
         Text(entry.computedValue.formatted())
           .font(.bodyText)
           .foregroundStyle(.textPrimary)
+          .accessibilityLabel(
+            "\(participant.displayName), \(category.label.localized) : \(entry.computedValue)")
       } else {
         Button {
           pendingEntry = PendingEntry(participant: participant, category: category)
@@ -169,6 +174,8 @@ struct YamsSheetView: View {
             .font(.system(size: IconSize.md))
             .foregroundStyle(.brandTeal)
         }
+        .accessibilityLabel(
+          "\(participant.displayName), \(category.label.localized), non renseigné")
       }
     }
     .frame(width: 72)

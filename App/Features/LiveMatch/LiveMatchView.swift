@@ -122,7 +122,7 @@ struct LiveMatchView: View {
         isKeyboardVisible: keyboardObserver.isVisible, submitLabel: "Terminé", onSubmit: finishRound
       )
     }
-    .animation(.default, value: keyboardObserver.isVisible)
+    .accessibleAnimation(.default, value: keyboardObserver.isVisible)
     .onAppear {
       focusedParticipantID = model.currentParticipant?.id
       if model.needsShareSwitchConfirmation {
@@ -212,8 +212,16 @@ struct LiveMatchView: View {
       .frame(maxWidth: .infinity)
       .transition(.move(edge: .top).combined(with: .opacity))
     }
-    .animation(.default, value: model.remoteActivityMessage)
-    .animation(.default, value: model.roundExplanationMessage)
+    .accessibleAnimation(.default, value: model.remoteActivityMessage)
+    .accessibleAnimation(.default, value: model.roundExplanationMessage)
+    // Doc 08 « Accessibilité » — `Banner` est purement visuel par défaut ; sans annonce
+    // explicite, VoiceOver ne signale jamais son apparition.
+    .onChange(of: model.remoteActivityMessage) { _, newValue in
+      if let newValue { Banner.announce(LocalizedStringResource(stringLiteral: newValue)) }
+    }
+    .onChange(of: model.roundExplanationMessage) { _, newValue in
+      if let newValue { Banner.announce(LocalizedStringResource(stringLiteral: newValue)) }
+    }
     .sensoryFeedback(.success, trigger: model.remoteActivityMessage) { oldValue, newValue in
       newValue != nil
     }

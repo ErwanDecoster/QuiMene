@@ -1,0 +1,88 @@
+{
+  "id": "tarot",
+  "specVersion": 1,
+  "rulesVersion": 1,
+
+  "name": { "fr": "Tarot", "en": "French Tarot" },
+  "shortDescription": {
+    "fr": "3 à 5 joueurs. Un preneur contre les défenseurs ; à 5, le partenaire du roi appelé rejoint le preneur.",
+    "en": "3 to 5 players. One taker against the defenders; at 5 players, the called king's partner joins the taker."
+  },
+
+  "symbol": "suit.spade.fill",
+  "paletteID": "ink",
+
+  "players": { "min": 3, "max": 5, "recommended": [4, 5] },
+
+  "scoring": {
+    "direction": "highestWins",
+    "aggregation": "cumulative",
+    "roundLabel": { "fr": "Donne", "en": "Hand" },
+    "entry": {
+      "kind": "structured",
+      "min": 0,
+      "max": 91
+    },
+    "modifiers": [
+      {
+        "id": "isTaker",
+        "label": { "fr": "Preneur", "en": "Taker" },
+        "kind": "exclusiveFlag",
+        "required": false
+      },
+      {
+        "id": "isPartner",
+        "label": { "fr": "Partenaire (roi appelé)", "en": "Partner (called king)" },
+        "kind": "exclusiveFlag",
+        "required": false
+      },
+      {
+        "id": "passed",
+        "label": { "fr": "Donne passée", "en": "Passed hand" },
+        "kind": "flag"
+      },
+      {
+        "id": "petitAuBout",
+        "label": { "fr": "Petit au bout", "en": "Petit au bout" },
+        "kind": "flag"
+      },
+      {
+        "id": "chelemAnnounced",
+        "label": { "fr": "Chelem annoncé", "en": "Announced slam" },
+        "kind": "flag"
+      },
+      {
+        "id": "chelemAchieved",
+        "label": { "fr": "Chelem réussi", "en": "Achieved slam" },
+        "kind": "flag"
+      }
+    ]
+  },
+
+  "engine": "tarot.v1",
+
+  "end": {
+    "conditions": [
+      {
+        "type": "roundLimit",
+        "variantKey": "handsPerPlayer",
+        "comparison": ">=",
+        "completeRound": true
+      }
+    ]
+  },
+
+  "tieBreak": ["shared"],
+
+  "variants": [
+    {
+      "id": "handsPerPlayer",
+      "label": { "fr": "Nombre de donnes par joueur", "en": "Hands per player" },
+      "kind": "integerChoice",
+      "values": [1, 2, 3],
+      "default": 2
+    }
+  ],
+
+  "statsProfiles": ["standard"]
+}

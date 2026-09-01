@@ -1,0 +1,326 @@
+{
+  "goldenId": "tarot-03-cinq-joueurs-partenaire",
+  "description": "5 joueurs, roi appelé (5 donnes, handsPerPlayer=1) — vérifie la distribution avec partenaire (preneur 2S, partenaire S, chaque défenseur -S), y compris un chelem annoncé et raté, et le petit au bout.",
+  "gameId": "tarot",
+  "rulesVersion": 1,
+  "variants": {
+    "handsPerPlayer": 1
+  },
+  "participants": [
+    {
+      "id": "p1",
+      "name": "Alice",
+      "seatIndex": 0
+    },
+    {
+      "id": "p2",
+      "name": "Bob",
+      "seatIndex": 1
+    },
+    {
+      "id": "p3",
+      "name": "Chloé",
+      "seatIndex": 2
+    },
+    {
+      "id": "p4",
+      "name": "David",
+      "seatIndex": 3
+    },
+    {
+      "id": "p5",
+      "name": "Erwan",
+      "seatIndex": 4
+    }
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "2",
+            "contract": "0",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p1",
+          "rawValue": 50
+        },
+        {
+          "modifiers": [
+            "isPartner"
+          ],
+          "participant": "p4",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "1",
+            "contract": "1",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p2",
+          "rawValue": 45
+        },
+        {
+          "modifiers": [
+            "isPartner"
+          ],
+          "participant": "p5",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "3",
+            "contract": "3",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker",
+            "chelemAnnounced"
+          ],
+          "participant": "p3",
+          "rawValue": 85
+        },
+        {
+          "modifiers": [
+            "isPartner"
+          ],
+          "participant": "p1",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "0",
+            "contract": "0",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p4",
+          "rawValue": 50
+        },
+        {
+          "modifiers": [
+            "isPartner"
+          ],
+          "participant": "p2",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "2",
+            "contract": "1",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker",
+            "petitAuBout"
+          ],
+          "participant": "p5",
+          "rawValue": 70
+        },
+        {
+          "modifiers": [
+            "isPartner"
+          ],
+          "participant": "p3",
+          "rawValue": 0
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "final": {
+      "reason": "roundLimit",
+      "standings": [
+        {
+          "participant": "p3",
+          "rank": 1,
+          "score": 675,
+          "sharedWith": []
+        },
+        {
+          "participant": "p1",
+          "rank": 2,
+          "score": 277,
+          "sharedWith": []
+        },
+        {
+          "participant": "p5",
+          "rank": 3,
+          "score": -53,
+          "sharedWith": []
+        },
+        {
+          "participant": "p4",
+          "rank": 4,
+          "score": -338,
+          "sharedWith": []
+        },
+        {
+          "participant": "p2",
+          "rank": 5,
+          "score": -561,
+          "sharedWith": []
+        }
+      ],
+      "status": "ended"
+    },
+    "insights": [],
+    "roundResults": [
+      {
+        "computed": {
+          "p1": 68,
+          "p2": -34,
+          "p3": -34,
+          "p4": 34,
+          "p5": -34
+        },
+        "cumulative": {
+          "p1": 68,
+          "p2": -34,
+          "p3": -34,
+          "p4": 34,
+          "p5": -34
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5"
+        ],
+        "index": 0,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 62,
+          "p2": -124,
+          "p3": 62,
+          "p4": 62,
+          "p5": -62
+        },
+        "cumulative": {
+          "p1": 130,
+          "p2": -158,
+          "p3": 28,
+          "p4": 96,
+          "p5": -96
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5"
+        ],
+        "index": 1,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 244,
+          "p2": -244,
+          "p3": 488,
+          "p4": -244,
+          "p5": -244
+        },
+        "cumulative": {
+          "p1": 374,
+          "p2": -402,
+          "p3": 516,
+          "p4": -148,
+          "p5": -340
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5"
+        ],
+        "index": 2,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 31,
+          "p2": -31,
+          "p3": 31,
+          "p4": -62,
+          "p5": 31
+        },
+        "cumulative": {
+          "p1": 405,
+          "p2": -433,
+          "p3": 547,
+          "p4": -210,
+          "p5": -309
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5"
+        ],
+        "index": 3,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": -128,
+          "p2": -128,
+          "p3": 128,
+          "p4": -128,
+          "p5": 256
+        },
+        "cumulative": {
+          "p1": 277,
+          "p2": -561,
+          "p3": 675,
+          "p4": -338,
+          "p5": -53
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5"
+        ],
+        "index": 4,
+        "status": "ended"
+      }
+    ]
+  }
+}

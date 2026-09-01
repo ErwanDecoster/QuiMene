@@ -202,6 +202,15 @@ struct HistoryListView: View {
     .padding(.vertical, Space.xs)
     .frame(maxWidth: .infinity, alignment: .leading)
     .contentShape(Rectangle())
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel(
+      [
+        model.gameName(for: match), dateLabel(for: match),
+        model.winner(for: match)?.nicknameSnapshot,
+      ]
+      .compactMap { $0 }
+      .joined(separator: ", ")
+    )
   }
 
   /// Doc utilisateur — tous les participants, pas seulement le vainqueur : empilés avec un

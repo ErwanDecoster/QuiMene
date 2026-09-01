@@ -256,6 +256,10 @@ struct GamesTabView: View {
     .padding(.vertical, Space.xs)
     .frame(maxWidth: .infinity, alignment: .leading)
     .contentShape(Rectangle())
+    // Doc 08 « Accessibilité » — même principe que `ScoreBoardView`, forme composée ici (pas de
+    // score à afficher pour une ligne de reprise).
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel("Reprendre la partie en cours, \(gameName(for: match))")
   }
 
   private func gameName(for match: MatchRecord) -> String {
@@ -311,5 +315,11 @@ struct GamesTabView: View {
     .padding(.vertical, Space.xs)
     .frame(maxWidth: .infinity, alignment: .leading)
     .contentShape(Rectangle())
+    // Doc 08 « Accessibilité » — même principe que `ScoreBoardView`.
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel(
+      definition.shortDescription.map { "\(definition.name.localized), \($0.localized)" }
+        ?? definition.name.localized
+    )
   }
 }

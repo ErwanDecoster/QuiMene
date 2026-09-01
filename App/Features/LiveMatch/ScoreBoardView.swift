@@ -69,21 +69,30 @@ struct ScoreBoardView: View {
     Section {
       ForEach(rankedParticipants) { participant in
         HStack(spacing: Space.md) {
-          if let rank = ranks[participant.id] {
-            Text("\(rank)")
-              .font(.label)
+          // Doc 08 « Accessibilité » — un seul arrêt VoiceOver pour rang/nom/total : ce
+          // sous-groupe seul (jamais le `scoreField` ci-dessous) porte `.accessibilityElement
+          // (children: .combine)`, qui rendrait un enfant interactif (le `TextField`) impossible
+          // à cibler individuellement s'il y était inclus.
+          HStack(spacing: Space.md) {
+            if let rank = ranks[participant.id] {
+              Text("\(rank)")
+                .font(.label)
+                .foregroundStyle(.textSecondary)
+                .frame(minWidth: 18, alignment: .leading)
+            }
+            Text(participant.displayName)
+              .font(participant.id == focusedParticipantID.wrappedValue ? .h6 : .bodyText)
+              .foregroundStyle(.textPrimary)
+            Spacer()
+            Text((totals[participant.id] ?? 0).formatted())
+              .font(.scoreL)
               .foregroundStyle(.textSecondary)
-              .frame(minWidth: 18, alignment: .leading)
+              .contentTransition(.numericText())
+              .accessibleAnimation(.default, value: totals[participant.id])
           }
-          Text(participant.displayName)
-            .font(participant.id == focusedParticipantID.wrappedValue ? .h6 : .bodyText)
-            .foregroundStyle(.textPrimary)
-          Spacer()
-          Text((totals[participant.id] ?? 0).formatted())
-            .font(.scoreL)
-            .foregroundStyle(.textSecondary)
-            .contentTransition(.numericText())
-            .animation(.default, value: totals[participant.id])
+          .accessibleScoreRow(
+            name: participant.displayName, rank: ranks[participant.id],
+            score: totals[participant.id] ?? 0)
           if canEdit {
             scoreField(for: participant)
           }
@@ -121,6 +130,9 @@ struct ScoreBoardView: View {
       .padding(.horizontal, Space.md)
       .frame(width: 88, height: ButtonHeight.medium)
       .background(.neutralFill, in: .rect(cornerRadius: Radius.sm))
+      // Doc 08 « Accessibilité — Contrôle vocal » : un libellé lié au pseudo pour que VoiceOver
+      // annonce ce champ précis au focus, indépendamment du regroupement de ligne ci-dessus.
+      .accessibilityLabel(String(localized: "\(participant.displayName), score"))
       .overlay {
         RoundedRectangle(cornerRadius: Radius.sm)
           .strokeBorder(

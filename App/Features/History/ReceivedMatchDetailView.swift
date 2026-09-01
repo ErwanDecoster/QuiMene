@@ -50,6 +50,10 @@ struct ReceivedMatchDetailView: View {
               participant.finalRank == 1 ? Color.brandBrass.opacity(0.08) : Color.neutralSurface,
               in: .rect(cornerRadius: Radius.md)
             )
+            // Doc 08 « Accessibilité » — même regroupement de ligne que `ResultsView.podiumSection`.
+            .accessibleScoreRow(
+              name: participant.nicknameSnapshot, rank: participant.finalRank,
+              score: participant.finalScore ?? 0)
           }
         }
 

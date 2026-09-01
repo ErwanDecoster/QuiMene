@@ -233,6 +233,9 @@ struct PlayerEditorView: View {
             )
         }
         .buttonStyle(.plain)
+        // Doc 08 « Accessibilité » — le fond coloré qui marque la sélection n'est sinon jamais
+        // annoncé à VoiceOver.
+        .accessibilityAddTraits(emoji == model.emojiValue ? .isSelected : [])
       }
     }
   }

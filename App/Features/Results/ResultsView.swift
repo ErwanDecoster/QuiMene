@@ -105,6 +105,10 @@ struct ResultsView: View {
             standing.rank == 1 ? Color.brandBrass.opacity(0.08) : Color.neutralSurface,
             in: .rect(cornerRadius: Radius.md)
           )
+          // Doc 08 « Accessibilité » — même regroupement de ligne que `ScoreBoardView` ; le
+          // podium n'anime rien aujourd'hui, rien à gérer côté Reduce Motion pour l'instant.
+          .accessibleScoreRow(
+            name: record.nicknameSnapshot, rank: standing.rank, score: standing.score)
         }
       }
     }
@@ -171,7 +175,22 @@ struct ResultsView: View {
         }
       }
       .frame(height: 220)
+      // Doc 08 « Accessibilité » — Swift Charts ne donne aucun libellé VoiceOver aux `LineMark`
+      // par défaut. Plutôt qu'une description point par point (peu exploitable au doigt sur une
+      // dizaine de manches), un résumé composé du classement final, dans l'ordre du podium.
+      .accessibilityElement(children: .ignore)
+      .accessibilityLabel("Évolution des scores")
+      .accessibilityValue(chartAccessibilitySummary)
     }
+  }
+
+  private var chartAccessibilitySummary: String {
+    sortedStandings
+      .compactMap { standing -> String? in
+        guard let record = recordByID[standing.participantID] else { return nil }
+        return "\(record.nicknameSnapshot), \(standing.score.formatted()) points"
+      }
+      .joined(separator: " · ")
   }
 
   /// Doc 01 « détail manche par manche » — le journal d'événements est la source de vérité
@@ -202,12 +221,16 @@ struct ResultsView: View {
                     .foregroundStyle(.textTertiary)
                     .frame(width: 24, alignment: .leading)
                   ForEach(sortedStandings, id: \.participantID) { standing in
+                    let name = recordByID[standing.participantID]?.nicknameSnapshot ?? ""
                     if let entry = round.entries.first(where: {
                       $0.participantID == standing.participantID
                     }) {
                       roundEntryText(entry)
+                        .accessibilityLabel(
+                          "\(name), manche \(round.index + 1) : \(entry.computedValue)")
                     } else {
                       Text("—").font(.bodySmall).foregroundStyle(.textTertiary)
+                        .accessibilityLabel("\(name), manche \(round.index + 1), sans saisie")
                     }
                   }
                 }

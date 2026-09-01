@@ -132,7 +132,7 @@ struct SharedMatchView: View {
         }
       }
     }
-    .animation(.default, value: keyboardObserver.isVisible)
+    .accessibleAnimation(.default, value: keyboardObserver.isVisible)
     .sheet(isPresented: $isPresentingRoundHistory) {
       RoundHistoryView(state: state, definition: definition)
     }
@@ -145,7 +145,11 @@ struct SharedMatchView: View {
           .transition(.move(edge: .top).combined(with: .opacity))
       }
     }
-    .animation(.default, value: model.roundExplanationMessage)
+    .accessibleAnimation(.default, value: model.roundExplanationMessage)
+    // Doc 08 « Accessibilité » — voir la même remontée dans `LiveMatchView.swift`.
+    .onChange(of: model.roundExplanationMessage) { _, newValue in
+      if let newValue { Banner.announce(LocalizedStringResource(stringLiteral: newValue)) }
+    }
   }
 
   private func toggleSign(for participantID: Participant.ID) {

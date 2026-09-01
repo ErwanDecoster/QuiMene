@@ -66,5 +66,12 @@ struct GameLeaderboardView: View {
         .foregroundStyle(rank == 1 ? .brandBrass : .textPrimary)
     }
     .padding(.vertical, Space.xs)
+    // Doc 08 « Accessibilité » — même principe que `ScoreBoardView`, forme de ligne différente
+    // (taux de victoire, pas un score entier) donc composée ici plutôt que via
+    // `accessibleScoreRow`.
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel(
+      "\(entry.name), rang \(rank), \(entry.played) partie(s), \(entry.wins) victoire(s), \(entry.winRate.formatted(.percent.precision(.fractionLength(0)))) de victoires"
+    )
   }
 }

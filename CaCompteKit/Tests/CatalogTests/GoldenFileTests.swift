@@ -44,9 +44,22 @@ struct GoldenFileTests {
             participantID: idByToken[input.participant]!,
             rawValue: input.rawValue,
             detail: input.detail.flatMap { detail -> ScoreDetail? in
-              guard let categoryID = detail["categoryID"] else { return nil }
-              return ScoreDetail(
-                payload: try! JSONEncoder().encode(YamsCategoryDetail(categoryID: categoryID)))
+              if let categoryID = detail["categoryID"] {
+                return ScoreDetail(
+                  payload: try! JSONEncoder().encode(YamsCategoryDetail(categoryID: categoryID)))
+              }
+              if let bid = detail["bid"].flatMap(Int.init) {
+                return ScoreDetail(payload: try! JSONEncoder().encode(WizardBidDetail(bid: bid)))
+              }
+              if let contract = detail["contract"].flatMap(Int.init),
+                let bouts = detail["bouts"].flatMap(Int.init),
+                let poignee = detail["poignee"].flatMap(Int.init)
+              {
+                return ScoreDetail(
+                  payload: try! JSONEncoder().encode(
+                    TarotHandDetail(contract: contract, bouts: bouts, poignee: poignee)))
+              }
+              return nil
             },
             modifiers: Set(input.modifiers.map(ModifierID.init(rawValue:)))
           )

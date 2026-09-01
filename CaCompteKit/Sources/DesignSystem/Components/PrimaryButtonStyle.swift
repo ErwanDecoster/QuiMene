@@ -38,7 +38,7 @@ public struct PrimaryButtonStyle: ButtonStyle {
         .padding(.horizontal, size.horizontalPadding)
         .background(backgroundColor, in: .rect(cornerRadius: Radius.md))
         .scaleEffect(configuration.isPressed ? 0.97 : 1)
-        .animation(.linear(duration: 0.12), value: configuration.isPressed)
+        .accessibleAnimation(.linear(duration: 0.12), value: configuration.isPressed)
         .allowsHitTesting(!isLoading)
     }
 

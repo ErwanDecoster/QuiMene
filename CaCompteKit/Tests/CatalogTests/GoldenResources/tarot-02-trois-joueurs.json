@@ -1,0 +1,165 @@
+{
+  "goldenId": "tarot-02-trois-joueurs",
+  "description": "3 joueurs (3 donnes, handsPerPlayer=1) — vérifie la distribution à 3 (preneur 2S, chaque défenseur -S), y compris une chute et une poignée double.",
+  "gameId": "tarot",
+  "rulesVersion": 1,
+  "variants": {
+    "handsPerPlayer": 1
+  },
+  "participants": [
+    {
+      "id": "p1",
+      "name": "Alice",
+      "seatIndex": 0
+    },
+    {
+      "id": "p2",
+      "name": "Bob",
+      "seatIndex": 1
+    },
+    {
+      "id": "p3",
+      "name": "Chloé",
+      "seatIndex": 2
+    }
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "1",
+            "contract": "0",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p1",
+          "rawValue": 55
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "0",
+            "contract": "1",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p2",
+          "rawValue": 40
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "3",
+            "contract": "2",
+            "poignee": "2"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p3",
+          "rawValue": 80
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "final": {
+      "reason": "roundLimit",
+      "standings": [
+        {
+          "participant": "p3",
+          "rank": 1,
+          "score": 665,
+          "sharedWith": []
+        },
+        {
+          "participant": "p1",
+          "rank": 2,
+          "score": -166,
+          "sharedWith": []
+        },
+        {
+          "participant": "p2",
+          "rank": 3,
+          "score": -499,
+          "sharedWith": []
+        }
+      ],
+      "status": "ended"
+    },
+    "insights": [],
+    "roundResults": [
+      {
+        "computed": {
+          "p1": 58,
+          "p2": -29,
+          "p3": -29
+        },
+        "cumulative": {
+          "p1": 58,
+          "p2": -29,
+          "p3": -29
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3"
+        ],
+        "index": 0,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 82,
+          "p2": -164,
+          "p3": 82
+        },
+        "cumulative": {
+          "p1": 140,
+          "p2": -193,
+          "p3": 53
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3"
+        ],
+        "index": 1,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": -306,
+          "p2": -306,
+          "p3": 612
+        },
+        "cumulative": {
+          "p1": -166,
+          "p2": -499,
+          "p3": 665
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3"
+        ],
+        "index": 2,
+        "status": "ended"
+      }
+    ]
+  }
+}

@@ -50,8 +50,13 @@ struct RoundHistoryView: View {
                           $0.participantID == participant.id
                         }) {
                           roundEntryText(entry)
+                            .accessibilityLabel(
+                              "\(participant.displayName), manche \(round.index + 1) : \(entry.computedValue)"
+                            )
                         } else {
                           Text("—").font(.bodySmall).foregroundStyle(.textTertiary)
+                            .accessibilityLabel(
+                              "\(participant.displayName), manche \(round.index + 1), sans saisie")
                         }
                       }
                     }

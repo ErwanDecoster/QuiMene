@@ -1,0 +1,373 @@
+{
+  "goldenId": "tarot-01-partie-nominale-4-joueurs",
+  "description": "Partie nominale à 4 joueurs (8 donnes, handsPerPlayer=2). Couvre un succès simple, une chute, le petit au bout, la poignée, un chelem annoncé et réussi, et une donne passée (tout le monde marque 0).",
+  "gameId": "tarot",
+  "rulesVersion": 1,
+  "variants": {
+    "handsPerPlayer": 2
+  },
+  "participants": [
+    {
+      "id": "p1",
+      "name": "Alice",
+      "seatIndex": 0
+    },
+    {
+      "id": "p2",
+      "name": "Bob",
+      "seatIndex": 1
+    },
+    {
+      "id": "p3",
+      "name": "Chloé",
+      "seatIndex": 2
+    },
+    {
+      "id": "p4",
+      "name": "David",
+      "seatIndex": 3
+    }
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "1",
+            "contract": "0",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p1",
+          "rawValue": 60
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "0",
+            "contract": "1",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p2",
+          "rawValue": 50
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "2",
+            "contract": "2",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker",
+            "petitAuBout"
+          ],
+          "participant": "p3",
+          "rawValue": 55
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "3",
+            "contract": "3",
+            "poignee": "1"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p4",
+          "rawValue": 40
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "0",
+            "contract": "0",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p1",
+          "rawValue": 56
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "1",
+            "contract": "1",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker",
+            "chelemAnnounced",
+            "chelemAchieved"
+          ],
+          "participant": "p2",
+          "rawValue": 90
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "inputs": [
+        {
+          "detail": {
+            "bouts": "0",
+            "contract": "0",
+            "poignee": "0"
+          },
+          "modifiers": [
+            "isTaker"
+          ],
+          "participant": "p3",
+          "rawValue": 30
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "inputs": [
+        {
+          "modifiers": [
+            "passed"
+          ],
+          "participant": "p4",
+          "rawValue": 0
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "final": {
+      "reason": "roundLimit",
+      "standings": [
+        {
+          "participant": "p2",
+          "rank": 1,
+          "score": 1000,
+          "sharedWith": []
+        },
+        {
+          "participant": "p4",
+          "rank": 2,
+          "score": -88,
+          "sharedWith": []
+        },
+        {
+          "participant": "p3",
+          "rank": 3,
+          "score": -284,
+          "sharedWith": []
+        },
+        {
+          "participant": "p1",
+          "rank": 4,
+          "score": -628,
+          "sharedWith": []
+        }
+      ],
+      "status": "ended"
+    },
+    "insights": [],
+    "roundResults": [
+      {
+        "computed": {
+          "p1": 102,
+          "p2": -34,
+          "p3": -34,
+          "p4": -34
+        },
+        "cumulative": {
+          "p1": 102,
+          "p2": -34,
+          "p3": -34,
+          "p4": -34
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 0,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 62,
+          "p2": -186,
+          "p3": 62,
+          "p4": 62
+        },
+        "cumulative": {
+          "p1": 164,
+          "p2": -220,
+          "p3": 28,
+          "p4": 28
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 1,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": -196,
+          "p2": -196,
+          "p3": 588,
+          "p4": -196
+        },
+        "cumulative": {
+          "p1": -32,
+          "p2": -416,
+          "p3": 616,
+          "p4": -168
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 2,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": -194,
+          "p2": -194,
+          "p3": -194,
+          "p4": 582
+        },
+        "cumulative": {
+          "p1": -226,
+          "p2": -610,
+          "p3": 422,
+          "p4": 414
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 3,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 75,
+          "p2": -25,
+          "p3": -25,
+          "p4": -25
+        },
+        "cumulative": {
+          "p1": -151,
+          "p2": -635,
+          "p3": 397,
+          "p4": 389
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 4,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": -528,
+          "p2": 1584,
+          "p3": -528,
+          "p4": -528
+        },
+        "cumulative": {
+          "p1": -679,
+          "p2": 949,
+          "p3": -131,
+          "p4": -139
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 5,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 51,
+          "p2": 51,
+          "p3": -153,
+          "p4": 51
+        },
+        "cumulative": {
+          "p1": -628,
+          "p2": 1000,
+          "p3": -284,
+          "p4": -88
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 6,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 0,
+          "p2": 0,
+          "p3": 0,
+          "p4": 0
+        },
+        "cumulative": {
+          "p1": -628,
+          "p2": 1000,
+          "p3": -284,
+          "p4": -88
+        },
+        "doubled": [],
+        "index": 7,
+        "status": "ended"
+      }
+    ]
+  }
+}

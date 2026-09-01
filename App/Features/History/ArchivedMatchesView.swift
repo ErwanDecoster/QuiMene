@@ -80,6 +80,9 @@ struct ArchivedMatchesView: View {
     .padding(.vertical, Space.xs)
     .frame(maxWidth: .infinity, alignment: .leading)
     .contentShape(Rectangle())
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel(
+      "\(gameName(for: match)), \(match.startedAt.formatted(date: .abbreviated, time: .omitted))")
   }
 
   private func gameName(for match: MatchRecord) -> String {

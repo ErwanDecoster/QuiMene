@@ -1,0 +1,955 @@
+{
+  "goldenId": "wizard-01-partie-nominale-4-joueurs",
+  "description": "Partie nominale à 4 joueurs, 15 manches (60/4). Alterne annonces justes et fausses de façon déterministe pour exercer les deux branches du calcul (+20+10×annonce, -10×écart).",
+  "gameId": "wizard",
+  "rulesVersion": 1,
+  "variants": {},
+  "participants": [
+    {
+      "id": "p1",
+      "name": "Alice",
+      "seatIndex": 0
+    },
+    {
+      "id": "p2",
+      "name": "Bob",
+      "seatIndex": 1
+    },
+    {
+      "id": "p3",
+      "name": "Chloé",
+      "seatIndex": 2
+    },
+    {
+      "id": "p4",
+      "name": "David",
+      "seatIndex": 3
+    }
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 2
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 2
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 2
+        }
+      ]
+    },
+    {
+      "index": 10,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 2
+        }
+      ]
+    },
+    {
+      "index": 11,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 3
+        }
+      ]
+    },
+    {
+      "index": 12,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "4"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 4
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 3
+        }
+      ]
+    },
+    {
+      "index": 13,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "4"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 4
+        },
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 4
+        },
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 3
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 3
+        }
+      ]
+    },
+    {
+      "index": 14,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "4"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 4
+        },
+        {
+          "detail": {
+            "bid": "3"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 4
+        },
+        {
+          "detail": {
+            "bid": "4"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 4
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 3
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "final": {
+      "reason": "roundLimit",
+      "standings": [
+        {
+          "participant": "p1",
+          "rank": 1,
+          "score": 660,
+          "sharedWith": []
+        },
+        {
+          "participant": "p3",
+          "rank": 2,
+          "score": 580,
+          "sharedWith": []
+        },
+        {
+          "participant": "p2",
+          "rank": 3,
+          "score": -150,
+          "sharedWith": [
+            "p4"
+          ]
+        },
+        {
+          "participant": "p4",
+          "rank": 3,
+          "score": -150,
+          "sharedWith": [
+            "p2"
+          ]
+        }
+      ],
+      "status": "ended"
+    },
+    "insights": [],
+    "roundResults": [
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 20,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 20,
+          "p4": -10
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 0,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 20,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 60,
+          "p2": -20,
+          "p3": 40,
+          "p4": -20
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 1,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 90,
+          "p2": -30,
+          "p3": 70,
+          "p4": -30
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 2,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 120,
+          "p2": -40,
+          "p3": 100,
+          "p4": -40
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 3,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 40,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 160,
+          "p2": -50,
+          "p3": 130,
+          "p4": -50
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 4,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 40,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 200,
+          "p2": -60,
+          "p3": 160,
+          "p4": -60
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 5,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 40,
+          "p2": -10,
+          "p3": 40,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 240,
+          "p2": -70,
+          "p3": 200,
+          "p4": -70
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 6,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 40,
+          "p2": -10,
+          "p3": 40,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 280,
+          "p2": -80,
+          "p3": 240,
+          "p4": -80
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 7,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 50,
+          "p2": -10,
+          "p3": 40,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 330,
+          "p2": -90,
+          "p3": 280,
+          "p4": -90
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 8,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 50,
+          "p2": -10,
+          "p3": 40,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 380,
+          "p2": -100,
+          "p3": 320,
+          "p4": -100
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 9,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 50,
+          "p2": -10,
+          "p3": 50,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 430,
+          "p2": -110,
+          "p3": 370,
+          "p4": -110
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 10,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 50,
+          "p2": -10,
+          "p3": 50,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 480,
+          "p2": -120,
+          "p3": 420,
+          "p4": -120
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 11,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 60,
+          "p2": -10,
+          "p3": 50,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 540,
+          "p2": -130,
+          "p3": 470,
+          "p4": -130
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 12,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 60,
+          "p2": -10,
+          "p3": 50,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 600,
+          "p2": -140,
+          "p3": 520,
+          "p4": -140
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 13,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 60,
+          "p2": -10,
+          "p3": 60,
+          "p4": -10
+        },
+        "cumulative": {
+          "p1": 660,
+          "p2": -150,
+          "p3": 580,
+          "p4": -150
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4"
+        ],
+        "index": 14,
+        "status": "ended"
+      }
+    ]
+  }
+}

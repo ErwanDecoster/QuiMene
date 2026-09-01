@@ -120,7 +120,7 @@ raison de regarder l'écran de résultats en entier.
 | 🎢 **Les montagnes russes** | plus fort écart-type, et > 160 % de la moyenne |
 | 🚀 **La remontada** | gain ≥ 3 places depuis le pire rang atteint |
 | 💥 **Le kamikaze** | détient le plus gros tour dans un jeu où le plus bas gagne |
-| 🎯 **Chirurgien** | Wizard : ≥ 75 % d'annonces exactes ; Mölkky : aucun dépassement — **non codé** (Wizard n'est pas encore au catalogue, voir [05](05-catalogue-jeux.md)) |
+| 🎯 **Chirurgien** | Wizard : ≥ 75 % d'annonces exactes ; Mölkky : aucun dépassement — **non codé**, absent de `Badge.Kind` |
 | 🧊 **Imperturbable** | leader pendant ≥ 80 % des manches |
 | 🍀 **Photo finish** | vainqueur avec moins de 3 points d'écart |
 | 🏹 **Le Sniper** | détient le meilleur tour du match, dans le sens favorable au jeu — symétrique du Kamikaze, non attribué dans les jeux à cible exacte (Mölkky…) |

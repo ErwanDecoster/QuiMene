@@ -40,6 +40,10 @@ struct BeloteRoundView: View {
                   .font(.scoreL)
                   .foregroundStyle(.textPrimary)
               }
+              // Doc 08 « Accessibilité » — même regroupement de ligne que `ScoreBoardView`.
+              .accessibleScoreRow(
+                name: teamLabel(team),
+                score: model.state.total(for: team.members.first?.id ?? UUID()))
             }
           }
 

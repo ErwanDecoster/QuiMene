@@ -166,9 +166,10 @@ Apple, recette manuelle réussie sur appareil réel ; Android reste à faire.** 
   complet + lancement simulateur seulement ; leur rendu réel reste à valider sur appareil
   physique — voir doc [09](09-partie-partagee.md) pour le même principe appliqué au transport
   Supabase
-- ⏳ Passe d'accessibilité complète : VoiceOver, AX5, Reduce Motion, contraste augmenté — quasiment
-  pas commencée (2 fichiers sur 38 dans `App/Features` touchent l'accessibilité, aucun usage de
-  `accessibilityReduceMotion`/`colorSchemeContrast`), voir [15](15-plan-qualite-code.md)
+- 🔶 Passe d'accessibilité : infrastructure (Reduce Motion, regroupement de lignes VoiceOver,
+  contraste augmenté) et rattrapage sur les 8 zones de l'app faits — 20 fichiers sur 42 dans
+  `App/Features` touchent maintenant l'accessibilité (2 au départ). Reste la traversée manuelle
+  VoiceOver complète sur appareil réel, voir Phase H de [15](15-plan-qualite-code.md)
 - ✅ Localisation terminée — fr/en/es/de/it, interface et contenu des jeux (Phase G,
   [15](15-plan-qualite-code.md))
 - ⏳ Fiche App Store, captures, confidentialité (« aucune donnée collectée »)

@@ -24,6 +24,8 @@ extension GameCatalog {
         YamsRulesV1.engineID: { YamsRulesV1() },
         BeloteRulesV1.engineID: { BeloteRulesV1() },
         MolkkyRulesV1.engineID: { MolkkyRulesV1() },
+        TarotRulesV1.engineID: { TarotRulesV1() },
+        WizardRulesV1.engineID: { WizardRulesV1() },
       ]
     )
   }()

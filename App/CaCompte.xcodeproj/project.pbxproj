@@ -57,6 +57,10 @@
 		BE1477E7D8965E3F525C95B7 /* ArchivedPlayersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACECD00F003F1196DA804A2D /* ArchivedPlayersView.swift */; };
 		BE6BC237E6BEA852D7D6CC60 /* Catalog in Frameworks */ = {isa = PBXBuildFile; productRef = 033073A7339C70DDE2FEF711 /* Catalog */; };
 		C01898AD075E727F39FB5C3F /* BeloteRoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAAD36FF72BABA0EA7DA7CC /* BeloteRoundView.swift */; };
+		619A306B28F84BC1B13796B9 /* TarotRoundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 491F86BC6CB843A08C8BFAC8 /* TarotRoundModel.swift */; };
+		61520B89D0584AE79C324B92 /* TarotRoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6CCE5E938E2481F96A2BE45 /* TarotRoundView.swift */; };
+		7133C10A6CB5431699C7EE61 /* WizardRoundModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5006B6B55B04D4B989A22DC /* WizardRoundModel.swift */; };
+		810333B2DED241AE91824EE1 /* WizardRoundView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62E9F18BC8AC427EB63550A4 /* WizardRoundView.swift */; };
 		C227FDDBD1C6825CFF496CBA /* AvatarPhotoProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 052D480A99B3CEFE2DC01CC6 /* AvatarPhotoProcessor.swift */; };
 		C3AA6E864D68EC394369D686 /* JoinLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BD054369BC077C799BBFF57 /* JoinLink.swift */; };
 		EB18547401CE403AA928257E /* ProfileShareLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECAC647297540EA84E48BF6 /* ProfileShareLink.swift */; };
@@ -176,6 +180,10 @@
 		E6251C1B9A134F5DA88F87E3 /* MatchContinuation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MatchContinuation.swift; sourceTree = "<group>"; };
 		ED88C4CDA8CFDA746AC9588D /* SharedMatchModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedMatchModel.swift; sourceTree = "<group>"; };
 		EFAAD36FF72BABA0EA7DA7CC /* BeloteRoundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeloteRoundView.swift; sourceTree = "<group>"; };
+		491F86BC6CB843A08C8BFAC8 /* TarotRoundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TarotRoundModel.swift; sourceTree = "<group>"; };
+		D6CCE5E938E2481F96A2BE45 /* TarotRoundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TarotRoundView.swift; sourceTree = "<group>"; };
+		D5006B6B55B04D4B989A22DC /* WizardRoundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WizardRoundModel.swift; sourceTree = "<group>"; };
+		62E9F18BC8AC427EB63550A4 /* WizardRoundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WizardRoundView.swift; sourceTree = "<group>"; };
 		F22BB7F6F50FBAC4AD75FF39 /* MatchSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSetupView.swift; sourceTree = "<group>"; };
 		F6F181867B7C700F8A482072 /* CaCompteWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CaCompteWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		FEC066611F334B03347B64CF /* MatchSetupModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSetupModel.swift; sourceTree = "<group>"; };
@@ -395,6 +403,10 @@
 				105261167430649BF69A491B /* YamsSheetView.swift */,
 				E33D25510FA11118DE442CB2 /* BeloteRoundModel.swift */,
 				EFAAD36FF72BABA0EA7DA7CC /* BeloteRoundView.swift */,
+				491F86BC6CB843A08C8BFAC8 /* TarotRoundModel.swift */,
+				D6CCE5E938E2481F96A2BE45 /* TarotRoundView.swift */,
+				D5006B6B55B04D4B989A22DC /* WizardRoundModel.swift */,
+				62E9F18BC8AC427EB63550A4 /* WizardRoundView.swift */,
 				7A4AA12BF22916E17C286D79 /* ShareSessionView.swift */,
 				ED88C4CDA8CFDA746AC9588D /* SharedMatchModel.swift */,
 				4A9F5EDAC041F9E23EED5B5D /* SharedMatchView.swift */,
@@ -664,6 +676,10 @@
 				227E4860995218D9A9105300 /* GamesTabView.swift in Sources */,
 				B46B3AADB48EFF455E74A65C /* BeloteRoundModel.swift in Sources */,
 				C01898AD075E727F39FB5C3F /* BeloteRoundView.swift in Sources */,
+				619A306B28F84BC1B13796B9 /* TarotRoundModel.swift in Sources */,
+				61520B89D0584AE79C324B92 /* TarotRoundView.swift in Sources */,
+				7133C10A6CB5431699C7EE61 /* WizardRoundModel.swift in Sources */,
+				810333B2DED241AE91824EE1 /* WizardRoundView.swift in Sources */,
 				84D74211B8E5780DC8B5E153 /* ShareSessionView.swift in Sources */,
 				DDF0CF323C42A6717A2F2536 /* SharedMatchModel.swift in Sources */,
 				399BEAEE80010D1CAE1085DA /* SharedMatchView.swift in Sources */,

@@ -1,0 +1,907 @@
+{
+  "goldenId": "wizard-02-cas-limite-six-joueurs",
+  "description": "6 joueurs, 10 manches (60/6) — le nombre de manches le plus court de la plage supportée. Vérifie le passage exact à .ended à la toute dernière manche.",
+  "gameId": "wizard",
+  "rulesVersion": 1,
+  "variants": {},
+  "participants": [
+    {
+      "id": "p1",
+      "name": "Alice",
+      "seatIndex": 0
+    },
+    {
+      "id": "p2",
+      "name": "Bob",
+      "seatIndex": 1
+    },
+    {
+      "id": "p3",
+      "name": "Chloé",
+      "seatIndex": 2
+    },
+    {
+      "id": "p4",
+      "name": "David",
+      "seatIndex": 3
+    },
+    {
+      "id": "p5",
+      "name": "Erwan",
+      "seatIndex": 4
+    },
+    {
+      "id": "p6",
+      "name": "Fatou",
+      "seatIndex": 5
+    }
+  ],
+  "rounds": [
+    {
+      "index": 0,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 1,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 2,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 0
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 4,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 0
+        }
+      ]
+    },
+    {
+      "index": 5,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 1
+        }
+      ]
+    },
+    {
+      "index": 6,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 1
+        }
+      ]
+    },
+    {
+      "index": 7,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 1
+        }
+      ]
+    },
+    {
+      "index": 8,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 1
+        }
+      ]
+    },
+    {
+      "index": 9,
+      "inputs": [
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p1",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p2",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "2"
+          },
+          "modifiers": [],
+          "participant": "p3",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p4",
+          "rawValue": 2
+        },
+        {
+          "detail": {
+            "bid": "1"
+          },
+          "modifiers": [],
+          "participant": "p5",
+          "rawValue": 1
+        },
+        {
+          "detail": {
+            "bid": "0"
+          },
+          "modifiers": [],
+          "participant": "p6",
+          "rawValue": 1
+        }
+      ]
+    }
+  ],
+  "expected": {
+    "final": {
+      "reason": "roundLimit",
+      "standings": [
+        {
+          "participant": "p1",
+          "rank": 1,
+          "score": 340,
+          "sharedWith": []
+        },
+        {
+          "participant": "p3",
+          "rank": 2,
+          "score": 300,
+          "sharedWith": []
+        },
+        {
+          "participant": "p5",
+          "rank": 3,
+          "score": 260,
+          "sharedWith": []
+        },
+        {
+          "participant": "p2",
+          "rank": 4,
+          "score": -100,
+          "sharedWith": [
+            "p4",
+            "p6"
+          ]
+        },
+        {
+          "participant": "p4",
+          "rank": 4,
+          "score": -100,
+          "sharedWith": [
+            "p2",
+            "p6"
+          ]
+        },
+        {
+          "participant": "p6",
+          "rank": 4,
+          "score": -100,
+          "sharedWith": [
+            "p2",
+            "p4"
+          ]
+        }
+      ],
+      "status": "ended"
+    },
+    "insights": [],
+    "roundResults": [
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 20,
+          "p4": -10,
+          "p5": 20,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 20,
+          "p4": -10,
+          "p5": 20,
+          "p6": -10
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 0,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 20,
+          "p4": -10,
+          "p5": 20,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 60,
+          "p2": -20,
+          "p3": 40,
+          "p4": -20,
+          "p5": 40,
+          "p6": -20
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 1,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10,
+          "p5": 20,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 90,
+          "p2": -30,
+          "p3": 70,
+          "p4": -30,
+          "p5": 60,
+          "p6": -30
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 2,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10,
+          "p5": 20,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 120,
+          "p2": -40,
+          "p3": 100,
+          "p4": -40,
+          "p5": 80,
+          "p6": -40
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 3,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10,
+          "p5": 30,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 150,
+          "p2": -50,
+          "p3": 130,
+          "p4": -50,
+          "p5": 110,
+          "p6": -50
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 4,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 30,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10,
+          "p5": 30,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 180,
+          "p2": -60,
+          "p3": 160,
+          "p4": -60,
+          "p5": 140,
+          "p6": -60
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 5,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 40,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10,
+          "p5": 30,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 220,
+          "p2": -70,
+          "p3": 190,
+          "p4": -70,
+          "p5": 170,
+          "p6": -70
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 6,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 40,
+          "p2": -10,
+          "p3": 30,
+          "p4": -10,
+          "p5": 30,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 260,
+          "p2": -80,
+          "p3": 220,
+          "p4": -80,
+          "p5": 200,
+          "p6": -80
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 7,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 40,
+          "p2": -10,
+          "p3": 40,
+          "p4": -10,
+          "p5": 30,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 300,
+          "p2": -90,
+          "p3": 260,
+          "p4": -90,
+          "p5": 230,
+          "p6": -90
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 8,
+        "status": "inProgress"
+      },
+      {
+        "computed": {
+          "p1": 40,
+          "p2": -10,
+          "p3": 40,
+          "p4": -10,
+          "p5": 30,
+          "p6": -10
+        },
+        "cumulative": {
+          "p1": 340,
+          "p2": -100,
+          "p3": 300,
+          "p4": -100,
+          "p5": 260,
+          "p6": -100
+        },
+        "doubled": [
+          "p1",
+          "p2",
+          "p3",
+          "p4",
+          "p5",
+          "p6"
+        ],
+        "index": 9,
+        "status": "ended"
+      }
+    ]
+  }
+}

@@ -319,6 +319,88 @@ plateforme — `MatchActivityAttributes` n'aurait de toute façon jamais été p
 que soit l'endroit où il vit côté Apple. N'affecte aucun autre invariant de `Domain` (toujours
 zéro I/O, toujours `Sendable`).
 
+### Phase H — Accessibilité — ✅ terminée (infrastructure et rattrapage), traversée VoiceOver réelle à faire par l'utilisateur
+
+**Constat de départ** : 2 fichiers sur 38 dans `App/Features` touchaient l'accessibilité avant ce
+chantier, zéro usage de `accessibilityReduceMotion` ou de variante haut-contraste dans les assets
+de couleur joueur, malgré la prescription explicite de [07](07-design-system.md)/
+[08](08-accessibilite.md) depuis le début du projet.
+
+- ✅ **Infrastructure partagée** (construite en premier, puis utilisée dès l'écriture des écrans
+  Tarot/Wizard — pas de rattrapage a posteriori sur ces deux-là) :
+  - `Motion+Accessible.swift` (`DesignSystem/Tokens`) — `accessibleAnimation(_:value:)`, animation
+    remplacée par `.linear(duration: Motion.fast.seconds)` quand `accessibilityReduceMotion` est
+    actif. Appliqué aux 8 sites d'animation existants (`ScoreBoardView`, `SharedMatchView`,
+    `LiveMatchView`, `PrimaryButtonStyle`) — `grep -rn "\.animation(\.default" App
+    CaCompteKit/Sources` ne trouve plus rien hors de ce helper.
+  - `AccessibleScoreRow.swift` (`DesignSystem/Components`) — `accessibleScoreRow(name:rank:score:
+    delta:)`, un seul arrêt VoiceOver par ligne de tableau de scores (« Alice, deuxième, 44
+    points ») plutôt que plusieurs `Text` séparés. Appliqué à 7 écrans : `ScoreBoardView`,
+    `BeloteRoundView`, `TarotRoundView`, `ResultsView` (podium), `ReceivedMatchDetailView`,
+    `GameLeaderboardView`, `GamesTabView`.
+  - `Chip.swift` — zone tactile `Touch.minimum` (le commentaire de `Tokens/Sizes.swift` le
+    promettait déjà sans jamais le câbler) + `.accessibilityAddTraits(.isSelected)`.
+  - `Banner.announce(_:)` — annonce VoiceOver explicite (`UIAccessibility.post`) à l'apparition
+    d'un bandeau, appelée depuis `LiveMatchView`/`SharedMatchView`.
+  - Contraste augmenté des 10 couleurs `player/N` (`Assets.xcassets`) — entrées d'apparition
+    `"contrast": "high"` ajoutées (valeurs renforcées côté clair, calculées pour un ratio WCAG
+    ≥ 4.5, vérifiées côté sombre déjà suffisant sauf `player/5`). Aucun code Swift à écrire :
+    `Color.player(n)` fait déjà une résolution de catalogue simple, la bascule est gratuite dès que
+    la variante existe dans l'asset. `ContrastTests` étendu avec `UITraitCollection(
+    accessibilityContrast: .high)` — 20 nouveaux cas, tous verts.
+- ✅ **Tarot et Wizard construits accessibles dès leur premier commit** — `TarotRoundView`/
+  `WizardRoundView` utilisent `accessibleScoreRow` et des `accessibilityLabel`/`accessibilityValue`
+  explicites sur chaque `Stepper` (annonce, réalisé) sans étape de rattrapage séparée.
+- ✅ **Rattrapage sur les grilles manche-par-manche** (chaque cellule est déjà un arrêt VoiceOver
+  séparé par construction — pas de regroupement de ligne pertinent ici, seulement un label par
+  cellule identifiant participant + manche) — `YamsSheetView`, `RoundHistoryView`,
+  `ResultsView.roundByRoundSection`.
+- ✅ **Rattrapage sur les 8 zones du plan**, par priorité :
+  - **LiveMatch** — `ScoreBoardView` (regroupement de ligne + `accessibilityLabel` propre sur le
+    `TextField` éditable, qui doit s'annoncer lui-même au focus plutôt que dépendre du
+    regroupement) ; `HistoryListView` déjà couvert par le même motif.
+  - **Results** — podium regroupé, `Chart` d'évolution sans équivalent VoiceOver natif pour
+    `LineMark` : résumé composé (`accessibilityElement(children: .ignore)` +
+    `accessibilityValue` du classement final) plutôt qu'une description point par point,
+    inexploitable au doigt sur une dizaine de manches.
+  - **Players** — `PlayerEditorView.emojiGrid` (trait `.isSelected`, `paletteRow` l'avait déjà) ;
+    `PlayersListView`/`ArchivedPlayersView` (regroupement de ligne).
+  - **MatchSetup** — `GamesTabView` (regroupement de ligne) ; `MatchSetupView` (trait
+    `.isSelected` sur la ligne de sélection de joueur, même motif que `emojiGrid` — la coche
+    n'était sinon jamais annoncée) ; `JoinTabView`/`QRScannerView` audités, aucun correctif
+    nécessaire (contrôles système standards déjà accessibles, et le scan caméra a toujours un
+    repli clavier accessible via « Saisir un code »).
+  - **History** — `HistoryListView`, `ArchivedMatchesView` (regroupement de ligne) ;
+    `HistoryDetailView` hérite des correctifs `ResultsView`/`ReceivedMatchDetailView` sans rien à
+    faire en propre (pur routage).
+  - **Leaderboard** — `GameLeaderboardView` (regroupement de ligne).
+  - **Profile** — `ProfileView`, `BarMark` d'activité : même défaut et même correctif que le
+    `Chart` de `ResultsView`.
+  - **Settings** — audité, aucun correctif nécessaire : uniquement des `Toggle`/`Picker`/`Button`
+    de `Form` système, déjà accessibles par défaut.
+- ✅ **`ResultsShareCard`** — délibérément hors périmètre : image statique rendue une fois pour
+  `ShareLink`, pas un écran interactif.
+
+**Résultat chiffré** : 20 fichiers sur 42 dans `App/Features` touchent maintenant
+l'accessibilité (2 au départ), contre un dénominateur qui a grandi de 4 (les écrans Tarot/Wizard).
+
+Vérification : `xcodebuild test` (scheme `CaCompteKit-Package`) — 52 tests dans 5 suites, y
+compris les 20 nouveaux cas `ContrastTests` haut-contraste ; `xcodebuild test` (scheme `CaCompte`,
+`CaCompteTests`) — 12/12 ; `xcodebuild` (scheme `CaCompte`) réussit à 0 avertissement ;
+`Scripts/lint.sh` et `Scripts/check-spec-sync.sh` verts ; `grep -rn "\.animation(\.default" App
+CaCompteKit/Sources` ne trouve plus rien hors `accessibleAnimation`.
+
+**Ce qui reste, volontairement hors de portée ici** : la traversée manuelle VoiceOver complète
+(créer une partie, saisir plusieurs manches, consulter les résultats, sans regarder l'écran) sur
+les 8 zones et sur le parcours Tarot/Wizard — critère de la définition de « terminé »
+([10](10-tests-et-qualite.md)), qui suppose un appareil réel et un jugement humain sur ce qui
+« sonne bien » à l'oreille. Revient à l'utilisateur, comme le reste des vérifications sur
+appareil physique déjà menées sur ce projet (partie partagée Supabase, Dynamic Island).
+
+**Fini quand** : la traversée VoiceOver ci-dessus est faite sur appareil réel sans régression
+signalée — à ce moment seulement, faire passer la ligne accessibilité de
+[12-roadmap.md](12-roadmap.md) (P9) de ⏳ à ✅.
+
 ## Recommandation de pratique — README factuel plutôt que journal
 
 La dérive constatée sur le README (huit semaines sans mise à jour malgré un changement

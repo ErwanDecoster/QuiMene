@@ -217,6 +217,14 @@ struct ProfileView: View {
             .foregroundStyle(.brandInk)
           }
           .frame(height: 140)
+          // Doc 08 « Accessibilité » — même limite que le graphique de `ResultsView` : Swift
+          // Charts ne donne aucun libellé VoiceOver aux `BarMark` par défaut.
+          .accessibilityElement(children: .ignore)
+          .accessibilityLabel("Activité par mois")
+          .accessibilityValue(
+            stats.activity.map { "\(monthLabel($0.monthKey)) : \($0.count) partie(s)" }
+              .joined(separator: " · ")
+          )
         } else {
           HStack {
             statBlock(value: "\(currentMonthActivity)", label: "Parties ce mois-ci")

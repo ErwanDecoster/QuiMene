@@ -15,6 +15,12 @@ import SwiftUI
 /// qui plantait alors sur son propre `try!` en reconstruisant le même lookup. Le switch est
 /// maintenant exhaustif sur `EntryKind` : le cas `nil` a sa propre branche, qui n'ouvre aucun
 /// écran de saisie plutôt que de crasher.
+///
+/// Doc utilisateur — Tarot utilise aussi `structured` (la forme la plus proche de sa saisie),
+/// ce qui entrerait en collision avec Belote dans le switch ci-dessous : un pré-contrôle par
+/// `engine`, seulement pour Tarot, route avant le switch, qui reste exhaustif sur `EntryKind`
+/// pour tout le reste. Ne pas généraliser à un aiguillage par `engine` pour tous les jeux —
+/// casserait l'intention documentée ci-dessus.
 struct MatchPlayView: View {
   let match: MatchRecord
   let context: ModelContext
@@ -23,15 +29,21 @@ struct MatchPlayView: View {
   var body: some View {
     let definition = try? catalog.definition(for: match.gameID, version: match.rulesVersion)
     Group {
-      switch definition?.scoring.entry.kind {
-      case .categorySheet:
-        YamsSheetView(match: match, context: context, catalog: catalog)
-      case .structured:
-        BeloteRoundView(match: match, context: context, catalog: catalog)
-      case .integer, .rank, .predictionAndResult:
-        LiveMatchView(match: match, context: context, catalog: catalog)
-      case nil:
-        unavailable
+      if definition?.engine == TarotRulesV1.engineID {
+        TarotRoundView(match: match, context: context, catalog: catalog)
+      } else {
+        switch definition?.scoring.entry.kind {
+        case .categorySheet:
+          YamsSheetView(match: match, context: context, catalog: catalog)
+        case .structured:
+          BeloteRoundView(match: match, context: context, catalog: catalog)
+        case .predictionAndResult:
+          WizardRoundView(match: match, context: context, catalog: catalog)
+        case .integer, .rank:
+          LiveMatchView(match: match, context: context, catalog: catalog)
+        case nil:
+          unavailable
+        }
       }
     }
     .userActivity(MatchContinuation.activityType) { activity in

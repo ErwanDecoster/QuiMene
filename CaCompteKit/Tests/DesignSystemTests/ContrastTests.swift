@@ -15,8 +15,13 @@ struct ContrastTests {
     case token(String)
     case white
 
-    func resolve(style: UIUserInterfaceStyle) -> UIColor {
-      let trait = UITraitCollection(userInterfaceStyle: style)
+    func resolve(style: UIUserInterfaceStyle, contrast: UIAccessibilityContrast = .unspecified)
+      -> UIColor
+    {
+      let trait = UITraitCollection(traitsFrom: [
+        UITraitCollection(userInterfaceStyle: style),
+        UITraitCollection(accessibilityContrast: contrast),
+      ])
       switch self {
       case .white:
         return UIColor.white.resolvedColor(with: trait)
@@ -38,6 +43,7 @@ struct ContrastTests {
     let style: UIUserInterfaceStyle
     let expectedRatio: Double
     let minimumRequired: Double
+    var contrast: UIAccessibilityContrast = .unspecified
 
     var description: String { label }
   }
@@ -202,10 +208,132 @@ struct ContrastTests {
       expectedRatio: 9.18, minimumRequired: 4.5),
   ]
 
+  /// Doc 08 « Accessibilité » : « Contraste augmenté : les couleurs de joueur basculent sur
+  /// leurs variantes renforcées. » Vérifie les 10 variantes `"contrast": "high"` ajoutées aux
+  /// `.colorset` — un `UITraitCollection` combinant luminosité et `accessibilityContrast: .high`
+  /// résout ces couleurs sans code Swift supplémentaire (`Color.player(n)` reste une simple
+  /// résolution de catalogue). Seuil relevé à 4.5 (AA texte normal) plutôt que le 3.0 minimum du
+  /// mode normal — c'est tout l'intérêt de la variante renforcée.
+  static let highContrastCases: [Case] = [
+    Case(
+      label: "player/1 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/1"),
+      background: .token("neutral/surface"), style: .light, expectedRatio: 4.83,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/2 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/2"),
+      background: .token("neutral/surface"), style: .light, expectedRatio: 4.53,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/3 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/3"),
+      background: .token("neutral/surface"), style: .light, expectedRatio: 4.68,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/4 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/4"),
+      background: .token("neutral/surface"), style: .light, expectedRatio: 5.15,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/5 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/5"),
+      background: .token("neutral/surface"), style: .light, expectedRatio: 7.70,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/6 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/6"),
+      background: .token("neutral/surface"), style: .light, expectedRatio: 4.68,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/7 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/7"),
+      background: .token("neutral/surface"), style: .light, expectedRatio: 4.67,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/8 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/8"),
+      background: .token("neutral/surface"), style: .light, expectedRatio: 6.24,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/9 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/9"),
+      background: .token("neutral/surface"), style: .light, expectedRatio: 4.72,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/10 / neutral/surface — contraste augmenté (clair)",
+      foreground: .token("player/10"), background: .token("neutral/surface"), style: .light,
+      expectedRatio: 4.50, minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/1 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/1"),
+      background: .token("neutral/surface"), style: .dark, expectedRatio: 6.48,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/2 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/2"),
+      background: .token("neutral/surface"), style: .dark, expectedRatio: 9.16,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/3 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/3"),
+      background: .token("neutral/surface"), style: .dark, expectedRatio: 13.23,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/4 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/4"),
+      background: .token("neutral/surface"), style: .dark, expectedRatio: 6.33,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/5 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/5"),
+      background: .token("neutral/surface"), style: .dark, expectedRatio: 6.71,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/6 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/6"),
+      background: .token("neutral/surface"), style: .dark, expectedRatio: 11.88,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/7 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/7"),
+      background: .token("neutral/surface"), style: .dark, expectedRatio: 6.93,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/8 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/8"),
+      background: .token("neutral/surface"), style: .dark, expectedRatio: 6.83,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/9 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/9"),
+      background: .token("neutral/surface"), style: .dark, expectedRatio: 15.37,
+      minimumRequired: 4.5, contrast: .high),
+    Case(
+      label: "player/10 / neutral/surface — contraste augmenté (sombre)",
+      foreground: .token("player/10"), background: .token("neutral/surface"), style: .dark,
+      expectedRatio: 7.33, minimumRequired: 4.5, contrast: .high),
+  ]
+
   @Test("Paire respecte le ratio documenté dans la charte §1", arguments: cases)
   func pairMatchesDocumentedRatio(_ testCase: Case) {
     let foreground = testCase.foreground.resolve(style: testCase.style)
     let background = testCase.background.resolve(style: testCase.style)
+    let ratio = contrastRatio(foreground, background)
+
+    #expect(
+      ratio >= testCase.minimumRequired,
+      "\(testCase.label) : \(ratio) sous le seuil WCAG \(testCase.minimumRequired)")
+    #expect(
+      abs(ratio - testCase.expectedRatio) < 0.05,
+      "\(testCase.label) : \(ratio) ≠ \(testCase.expectedRatio) documenté — couleur modifiée sans mise à jour de la charte"
+    )
+  }
+
+  @Test("Variante contraste augmenté des couleurs de joueur", arguments: highContrastCases)
+  func highContrastPairMatchesRatio(_ testCase: Case) {
+    let foreground = testCase.foreground.resolve(style: testCase.style, contrast: testCase.contrast)
+    let background = testCase.background.resolve(style: testCase.style, contrast: testCase.contrast)
     let ratio = contrastRatio(foreground, background)
 
     #expect(

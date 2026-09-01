@@ -1,0 +1,45 @@
+{
+  "id": "wizard",
+  "specVersion": 1,
+  "rulesVersion": 1,
+
+  "name": { "fr": "Wizard", "en": "Wizard" },
+  "shortDescription": {
+    "fr": "3 à 6 joueurs. Chacun annonce le nombre de plis qu'il va réaliser ; l'annonce exacte rapporte le plus.",
+    "en": "3 to 6 players. Everyone bids how many tricks they'll take; an exact bid scores the most."
+  },
+
+  "symbol": "wand.and.stars",
+  "paletteID": "brass",
+
+  "players": { "min": 3, "max": 6, "recommended": [4, 5] },
+
+  "scoring": {
+    "direction": "highestWins",
+    "aggregation": "cumulative",
+    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "entry": {
+      "kind": "predictionAndResult",
+      "min": 0,
+      "max": 20
+    },
+    "modifiers": []
+  },
+
+  "engine": "wizard.v1",
+
+  "end": {
+    "conditions": [
+      {
+        "type": "roundLimit",
+        "valueExpression": "60 / playerCount",
+        "comparison": ">=",
+        "completeRound": true
+      }
+    ]
+  },
+
+  "tieBreak": ["shared"],
+
+  "statsProfiles": ["standard"]
+}

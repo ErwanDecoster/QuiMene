@@ -41,6 +41,9 @@ struct MatchSetupView: View {
               .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
+            // Doc 08 « Accessibilité » — même motif que `PlayerEditorView.emojiGrid` : la coche
+            // qui marque la sélection n'est sinon jamais annoncée à VoiceOver.
+            .accessibilityAddTraits(model.isSelected(player) ? .isSelected : [])
           }
         }
 

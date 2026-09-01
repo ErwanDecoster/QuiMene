@@ -32,5 +32,10 @@ public struct Chip: View {
         }
     }
     .buttonStyle(.plain)
+    // Charte §6 — zone tactile découplée du visuel : le dessin reste à 32 pt, la cible
+    // s'étend à `Touch.minimum` (44 pt) sans changer l'apparence.
+    .frame(minHeight: Touch.minimum)
+    .contentShape(.rect)
+    .accessibilityAddTraits(isSelected ? .isSelected : [])
   }
 }

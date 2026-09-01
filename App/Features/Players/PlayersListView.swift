@@ -143,6 +143,8 @@ struct PlayersListView: View {
     .padding(.vertical, Space.xs)
     .frame(maxWidth: .infinity, alignment: .leading)
     .contentShape(Rectangle())
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel(player.nickname)
   }
 
   private func matchesPlayedCount(for player: PlayerRecord) -> Int {
