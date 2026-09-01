@@ -319,7 +319,7 @@ plateforme — `MatchActivityAttributes` n'aurait de toute façon jamais été p
 que soit l'endroit où il vit côté Apple. N'affecte aucun autre invariant de `Domain` (toujours
 zéro I/O, toujours `Sendable`).
 
-### Phase H — Accessibilité — ✅ terminée (infrastructure et rattrapage), traversée VoiceOver réelle à faire par l'utilisateur
+### Phase H — Accessibilité — ✅ terminée
 
 **Constat de départ** : 2 fichiers sur 38 dans `App/Features` touchaient l'accessibilité avant ce
 chantier, zéro usage de `accessibilityReduceMotion` ou de variante haut-contraste dans les assets
@@ -390,16 +390,14 @@ compris les 20 nouveaux cas `ContrastTests` haut-contraste ; `xcodebuild test` (
 `Scripts/lint.sh` et `Scripts/check-spec-sync.sh` verts ; `grep -rn "\.animation(\.default" App
 CaCompteKit/Sources` ne trouve plus rien hors `accessibleAnimation`.
 
-**Ce qui reste, volontairement hors de portée ici** : la traversée manuelle VoiceOver complète
-(créer une partie, saisir plusieurs manches, consulter les résultats, sans regarder l'écran) sur
-les 8 zones et sur le parcours Tarot/Wizard — critère de la définition de « terminé »
-([10](10-tests-et-qualite.md)), qui suppose un appareil réel et un jugement humain sur ce qui
-« sonne bien » à l'oreille. Revient à l'utilisateur, comme le reste des vérifications sur
-appareil physique déjà menées sur ce projet (partie partagée Supabase, Dynamic Island).
+**Traversée manuelle sur appareil réel** — VoiceOver (créer une partie, saisir plusieurs manches,
+consulter les résultats, sans regarder l'écran) sur les 8 zones et sur le parcours Tarot/Wizard,
+Dynamic Type AX5, Reduce Motion, contraste augmenté : vérifiée par l'utilisateur, aucune
+régression signalée. Même principe que les autres vérifications sur appareil physique déjà menées
+sur ce projet (partie partagée Supabase, Dynamic Island) — un jugement humain sur ce qui « sonne
+bien » à l'oreille, qu'un test automatisé ne peut pas remplacer.
 
-**Fini quand** : la traversée VoiceOver ci-dessus est faite sur appareil réel sans régression
-signalée — à ce moment seulement, faire passer la ligne accessibilité de
-[12-roadmap.md](12-roadmap.md) (P9) de ⏳ à ✅.
+**Fini** — ligne accessibilité de [12-roadmap.md](12-roadmap.md) (P9) passée de ⏳ à ✅.
 
 ## Recommandation de pratique — README factuel plutôt que journal
 
