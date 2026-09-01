@@ -219,6 +219,58 @@ actuel (app monolingue française).
 **Fini quand** : `grep -rn 'Text("' App/Features` ne trouve plus de littéral français —
 uniquement des clés résolues par le catalogue.
 
+### Extension de la Phase G (2026-09-01) — es/de/it, contenu des jeux, raccourci de langue
+
+La Phase G ci-dessus ne couvrait que les 184 chaînes d'interface (fr/en) — le contenu des jeux
+(noms, descriptions, libellés de règles dans `spec/games/*.json`) restait figé en français quel
+que soit `Bundle.main.preferredLocalizations`, malgré des champs `en` déjà présents dans le
+schéma. Demande explicite : traduire l'intégralité (interface **et** contenu des jeux), ajouter
+« les langues les plus intéressantes », et un raccourci vers le réglage de langue dans les
+réglages de l'app. Espagnol, allemand, italien retenus (audience iOS App Store après fr/en/de/es
+selon les parts de marché habituelles des 4 marchés européens les plus importants).
+
+- ✅ **`GameDefinition.LocalizedText`** — champs `es`/`de`/`it` optionnels ajoutés, plus une
+  propriété calculée `localized` qui résout via `Bundle.main.preferredLocalizations` (respecte le
+  réglage de langue *par app* d'iOS, contrairement à `Locale.current` qui ne reflète que la
+  langue système) avec repli sur le français. Placée dans `Domain` avec justification explicite
+  en commentaire : résolution de présentation, jamais rejouée par un golden file (qui ne vérifie
+  que les valeurs numériques du domaine), donc ADR-0002 tient toujours malgré la lecture de
+  `Bundle.main`. Les 30 sites qui lisaient `.fr` en dur (`App` + `Store`) basculés sur
+  `.localized` (`perl -pi -e 's/\.fr\b/.localized/g'` — `sed` BSD ne supporte pas `\b`).
+- ✅ **Contenu des 18 jeux** — clés `es`/`de`/`it` ajoutées aux 82 objets `LocalizedText` de
+  `spec/games/*.json`, par substitution texte ciblée (pas de reparse + `json.dump`, qui aurait
+  détruit le formatage aligné à la main — colonnes des catégories Yams notamment). Copies
+  synchronisées vers `CaCompteKit/Sources/Catalog/GameDefinitions/`, vérifiées par
+  `Scripts/check-spec-sync.sh`.
+- ✅ **`Localizable.xcstrings`** — les 179 chaînes traduisibles (sur 186 clés, 7 étant des
+  symboles système) étendues à es/de/it, plus 2 nouvelles clés pour le raccourci de langue.
+- ✅ **`knownRegions`** — `(fr, en, Base)` → `(fr, en, es, de, it, Base)`, condition pour qu'iOS
+  propose ces langues dans son sélecteur par app (Réglages > Ça Compte > Langue).
+- ✅ **Raccourci de langue** (`SettingsView.swift`) — iOS ne permet pas à une app tierce de
+  changer sa propre langue en direct : seul levier, le sélecteur système par app. Une section
+  « Langue » ouvre directement cette page (`UIApplication.openSettingsURLString`) plutôt que de
+  laisser deviner où chercher dans l'app Réglages système.
+- ✅ **Vérification visuelle par capture d'écran** (pas seulement une vérification d'existence) —
+  `xcrun simctl launch ... -AppleLanguages` ne force pas la langue de façon fiable ; seul le
+  lancement via `XCUIApplication.launch()` (déjà éprouvé plus tôt dans le projet pour forcer le
+  français) applique `-AppleLanguages`/`-AppleLocale` de façon fiable. Captures prises en
+  allemand, espagnol et italien via un test XCUITest jetable, extraites par `xcrun xcresulttool
+  export attachments`, inspectées visuellement, puis le test et ses entrées `project.pbxproj`
+  supprimés une fois la vérification faite.
+- ✅ **Bug trouvé et corrigé : troncature de `EmptyState`** (`DesignSystem/Components/
+  EmptyState.swift`) — remonté par la capture italienne (« Aggiungi un g… » tronqué au lieu de
+  passer à la ligne). Cause : `.frame(maxHeight: 160)` sur le `VStack` parent contraint la
+  hauteur proposée au `Text`, qui tronque plutôt que d'envelopper un message de deux lignes
+  quand rien ne force sa hauteur naturelle. Corrigé par `.fixedSize(horizontal: false, vertical:
+  true)` sur le `Text`. Bug latent préexistant (aurait pu toucher le français en Dynamic Type
+  AX5), simplement plus visible avec une traduction italienne plus longue — illustre la valeur
+  d'une vérification visuelle réelle par-dessus les tests d'existence automatisés.
+
+Vérification finale : `xcodebuild test` (scheme `CaCompteKit-Package`, simulateur iOS — 34 tests
+dans 5 suites, y compris `ContrastTests` qui nécessite `UIKit`) au vert ; `xcodebuild` (scheme
+`CaCompte`) réussit ; `xcodebuild test` (même scheme, `CaCompteUITests`) 3 tests dont 1 skip
+attendu (parcours n°2, voir Phase C) ; `Scripts/lint.sh` et `Scripts/check-spec-sync.sh` au vert.
+
 ### Écart mineur non traité — `ActivityKit` dans `Domain`
 
 `Domain/LiveActivity/MatchActivityAttributes.swift` importe `ActivityKit`, en désaccord avec
