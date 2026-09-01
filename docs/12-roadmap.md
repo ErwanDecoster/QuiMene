@@ -18,7 +18,7 @@ ajouter 30 à 40 % en phase d'apprentissage.
   ├─ P8  Partie partagée ................. 3 sem   ██████
   └─ P9  Finitions & TestFlight .......... 2,5 sem █████        ◆ v1.0
 
-  Android v1 ............................ ~12,5 sem █████████████████████████
+  Android v1 ............................ ~10,5 sem █████████████████████
 ```
 
 Le **chemin critique** est P3 → P4 → P5 : le moteur, la saisie, les résultats. Tout le reste
@@ -126,32 +126,28 @@ Pour chacun : JSON, golden files, moteur si nécessaire, écran de saisie adapt�
 
 ## P8 — Partie partagée · 3 semaines
 
-- ✅ Protocole `Transport` + `WifiTransport` (`NetService`/`NetServiceBrowser` pour la
-  découverte, `NWListener`/`NWConnection` pour le socket tramé), protocole `WireMessage`, rôles
-  hôte / contributeur / observateur
+- ✅ Protocole `Transport` + `SupabaseTransport` (canal Realtime par session, presence pour la
+  connexion/déconnexion, broadcast pour `WireMessage` chiffré, `cacompte_open_games` pour la
+  découverte par code — voir [ADR-0016](13-decisions-adr.md)), rôles hôte / contributeur /
+  observateur
 - ✅ Appairage par code (dérivation HKDF, chiffrement AES-GCM des deux côtés), avec délai
-  explicite (`SessionError.noResponseFromHost`) si l'hôte ne répond jamais — code erroné ou hôte
-  injoignable, distingué de `WifiTransportError.hostNotFound`
+  explicite (`SessionError.noResponseFromHost`) si l'hôte ne répond jamais
 - ✅ Interface d'invitation (`ShareSessionView`, hôte) et de découverte/appariement
   (`JoinMatchView`, pair), branchées dans `LiveMatchView`/`GamesTabView`
 - ✅ Départ propre des deux côtés (`LiveSession.leave()`/`stopHosting()` ferment réellement la
-  connexion, pas seulement la référence locale — un bug de pair fantôme trouvé et corrigé en
-  recette sur appareils réels)
-- ✅ Recette manuelle iPhone + iPad concluante (hôte, observateur, contributeur)
-- ✅ Deux bugs supplémentaires trouvés en recette et corrigés : rejet d'une manche non répercuté
-  visuellement (`SharedMatchModel` gardait l'événement optimiste), partage jamais arrêté à la fin
-  de partie (l'hôte restait annoncé et rejoignable une fois la partie terminée)
-- 🔶 `BLETransport` (secours GATT) — **écrit, pas encore vérifié ni branché dans l'app**. Ne se
-  prête pas à l'auto-test comme le Wi-Fi (essayé : la self-communication BLE sur une seule
-  machine n'aboutit jamais, autorisation système pourtant accordée des deux côtés) ; la
-  vérification se fera sur deux appareils physiques. L'orchestration Wi-Fi-puis-BLE dans
-  `ShareSessionView`/`JoinMatchView` reste à écrire une fois validé.
-- ⏳ Portage Android, recette Apple + Android mélangés, golden du protocole (`spec/wire/`)
+  session, pas seulement la référence locale)
+- ✅ Deux bugs trouvés en usage réel et corrigés sur `SupabaseTransport` : perte de présence après
+  une reconnexion sous-jacente en arrière-plan (ré-enregistrement à chaque `.subscribed`), course
+  entre présence et premier message d'un pair (session créée au premier des deux événements) —
+  voir [09](09-partie-partagee.md)
+- ⏳ Recette manuelle formelle du transport Supabase (iPhone + iPad, observateur et contributeur)
+  — celle qui existait pour l'ancien transport Wi-Fi ne couvre plus l'architecture actuelle
+- ⏳ Portage Android, recette croisée Apple + Android, golden du protocole (`spec/wire/`)
 
-**Fini quand** : un iPhone, un iPad et un Android suivent la même partie — sur Wi-Fi puis sur
-Bluetooth seul — et l'un d'eux se met en veille et revient sans perdre l'état. **Wi-Fi
-iPhone ↔ iPad atteint ; BLE écrit mais pas vérifié ni branché ; Android reste à faire.** Voir
-[09 — Partie partagée](09-partie-partagee.md) et [ADR-0014](13-decisions-adr.md).
+**Fini quand** : un iPhone et un Android suivent la même partie via Supabase Realtime, et l'un
+d'eux perd puis retrouve sa connexion sans perdre l'état. **Supabase Realtime en production côté
+Apple ; recette formelle et Android restent à faire.** Voir
+[09 — Partie partagée](09-partie-partagee.md) et [ADR-0016](13-decisions-adr.md).
 
 ## P9 — Finitions & TestFlight · 2,5 semaines
 
@@ -167,7 +163,7 @@ iPhone ↔ iPad atteint ; BLE écrit mais pas vérifié ni branché ; Android re
 - 🔶 Les quatre ci-dessus sont vérifiés par build complet + lancement simulateur ; le rendu réel
   (Widget sur l'écran d'accueil, Dynamic Island, Handoff entre deux appareils, Siri) reste à
   valider par l'auteur sur appareil physique — voir doc [09](09-partie-partagee.md) pour le même
-  principe appliqué au Wi-Fi/BLE
+  principe appliqué au transport Supabase
 - ⏳ Passe d'accessibilité complète : VoiceOver, AX5, Reduce Motion, contraste augmenté
 - ⏳ Localisation anglaise complète et relecture
 - ⏳ Fiche App Store, captures, confidentialité (« aucune donnée collectée »)
@@ -176,7 +172,7 @@ iPhone ↔ iPad atteint ; BLE écrit mais pas vérifié ni branché ; Android re
 **Fini quand** : la check-list « définition de terminé » de [10](10-tests-et-qualite.md) passe
 sur tous les écrans.
 
-## Android · ~11 semaines
+## Android · ~10,5 semaines
 
 Détail en [11 — Portage Android](11-portage-android.md). À démarrer **après** la v1.0 Apple :
 `spec/` doit être stabilisé, sinon le portage suit une cible mouvante.
@@ -208,4 +204,4 @@ Par valeur décroissante, sans engagement de calendrier :
 | **Dérive du catalogue** | P7 déborde | Le « jeu libre » est livré en P7 : même si un jeu manque, l'app reste utilisable |
 | **`spec/` diverge du code** | Le portage Android casse | Vérification d'égalité au build dès P0 ; `spec/` est la seule source |
 | **Sur-ingénierie du moteur** | Retard sur P3 | Deux couches seulement (déclaratif + impératif). Toute troisième abstraction passe par un ADR. |
-| **Rôle périphérique BLE inégal sur Android** | Le secours Bluetooth du partage cross-plateforme ne marche pas sur certains appareils | Validé tôt à l'étape F du portage (doc 11), avant d'y engager les 3 semaines complètes ; le Wi-Fi reste le chemin principal, le BLE n'est qu'un secours |
+| **`supabase-kt` moins mature que `supabase-swift`** | L'étape F du portage (doc 11) dérape si l'API Realtime Kotlin n'a pas la même couverture (canal, presence, broadcast) que côté Swift | Timebox court en tête d'étape F pour vérifier la parité avant de s'engager sur l'estimation |

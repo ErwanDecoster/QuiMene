@@ -29,7 +29,7 @@ la compilation : `Domain` ne *peut pas* importer SwiftUI, le compilateur le refu
              ▼               ▼        ▼               ▼
       ┌────────────┐  ┌───────────┐ ┌──────┐  ┌──────────────┐
       │   Store    │  │  Catalog  │ │ Sync │  │ DesignSystem │
-      │ SwiftData  │  │  6 jeux   │ │Wi/BLE│  │   SwiftUI    │
+      │ SwiftData  │  │  18 jeux  │ │Realtm│  │   SwiftUI    │
       └──────┬─────┘  └─────┬─────┘ └──┬───┘  └──────────────┘
              └──────────────┼──────────┘
                             ▼
@@ -41,12 +41,20 @@ la compilation : `Domain` ne *peut pas* importer SwiftUI, le compilateur le refu
 
 | Cible | Dépend de | Contient | Ne contient jamais |
 |---|---|---|---|
-| **Domain** | `Foundation` | Types du domaine, protocole `GameRules`, `MatchEngine`, `StatsEngine`, chargement des définitions JSON | Aucune I/O, aucun `Date()` implicite, aucun singleton |
+| **Domain** | `Foundation`¹ | Types du domaine, protocole `GameRules`, `MatchEngine`, `StatsEngine`, chargement des définitions JSON | Aucune I/O, aucun `Date()` implicite, aucun singleton |
 | **Catalog** | Domain | Une implémentation `GameRules` par jeu + les JSON embarqués en ressource | Persistance, UI |
 | **Store** | Domain | Modèles `@Model`, `ModelContainer`, repositories, mapping domaine ↔ persistance | Règles de jeu |
-| **Sync** | Domain | `LiveSession`, protocole `Transport` (implémentations `WifiTransport`/`BLETransport`), `WireMessage`, horloge de Lamport | UI, persistance |
+| **Sync** | Domain | `LiveSession`, protocole `Transport` (implémentation `SupabaseTransport`, [ADR-0016](13-decisions-adr.md)), `WireMessage`, horloge de Lamport | UI, persistance |
 | **DesignSystem** | `SwiftUI` | Tokens, composants réutilisables, avatars, pavé de saisie | Domain (délibérément — composants agnostiques) |
 | **CaCompte.app** | tout | Écrans, navigation, `@Observable` de flux, composition des dépendances | Logique de calcul |
+
+¹ **Exception actée** (audit qualité, [15](15-plan-qualite-code.md)) : `Domain/LiveActivity/MatchActivityAttributes.swift`
+importe aussi `ActivityKit`. Nécessaire — le protocole `ActivityAttributes` doit être visible à la
+fois par `Domain` (qui définit le type) et par le widget (qui l'affiche) — et sans conséquence
+pour le portage Android ([11](11-portage-android.md)) : ActivityKit n'a aucun équivalent Android,
+`MatchActivityAttributes` n'aurait de toute façon jamais été porté tel quel, quel que soit
+l'endroit où il vit côté Apple. N'affecte aucun autre invariant de `Domain` (toujours zéro I/O,
+toujours `Sendable`).
 
 `DesignSystem` ne dépend pas de `Domain` volontairement : ses composants prennent des valeurs
 brutes en entrée. Cela évite qu'un bouton finisse par embarquer une règle de jeu, et rend les
@@ -156,7 +164,7 @@ reste la source, jamais l'inverse.
      │
      ├──▶ MatchStore.persist(event, state)      SwiftData, immédiat
      │
-     └──▶ LiveSession.propose(event)            transport actif (Wi-Fi ou BLE), si partagée —
+     └──▶ LiveSession.propose(event)            transport actif (Supabase Realtime), si partagée —
                                                  diffusion immédiate si hôte, sinon proposition
                                                  à l'hôte (doc 09)
 ```

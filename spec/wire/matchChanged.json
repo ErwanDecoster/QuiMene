@@ -1,0 +1,32 @@
+{
+  "kind" : {
+    "matchChanged" : {
+      "log" : [
+        {
+          "deviceID" : "peer-device",
+          "event" : {
+            "roundCommitted" : {
+              "_0" : {
+                "index" : 0,
+                "inputs" : [
+                  {
+                    "modifiers" : [
+
+                    ],
+                    "participantID" : "33333333-3333-3333-3333-333333333333",
+                    "rawValue" : 12
+                  }
+                ]
+              }
+            }
+          },
+          "id" : "44444444-4444-4444-4444-444444444444",
+          "lamport" : 3,
+          "occurredAt" : 0
+        }
+      ]
+    }
+  },
+  "protocolVersion" : 1,
+  "sessionID" : "11111111-1111-1111-1111-111111111111"
+}

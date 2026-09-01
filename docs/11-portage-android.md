@@ -48,8 +48,7 @@ impossible à ignorer — elle fait échouer la suite de tests Android.
 | `struct` / valeur | `data class` (immuable) | Le domaine reste sans mutation |
 | SwiftData | Room + KSP | Voir « Persistance » |
 | CloudKit privé | *(aucun équivalent)* | Voir « Synchronisation » |
-| `NWListener` / `NWBrowser` (Wi-Fi) | `NsdManager` + `Socket`/`ServerSocket` | Transport **partagé et interopérable**, voir [09](09-partie-partagee.md) |
-| `CBPeripheralManager` / `CBCentralManager` (BLE, secours) | `BluetoothGattServer` / `BluetoothGatt` | Idem — même `WireMessage`, même protocole |
+| `supabase-swift` (`RealtimeChannelV2`, Presence, Broadcast) | `supabase-kt` (module Realtime) | Même dépendance des deux côtés, pas une paire d'équivalents natifs — voir [09](09-partie-partagee.md) et [ADR-0016](13-decisions-adr.md). Découverte par `cacompte_open_games` (Postgrest, REST) : rien de spécifique à une plateforme, aucune API de découverte réseau à porter. |
 | Swift Testing | JUnit 5 + Kotest | Tests paramétrés des deux côtés |
 | Swift Charts | Vico | Bibliothèque tierce assumée — Compose n'a pas de graphiques natifs |
 | SF Symbols | Material Symbols Rounded | Voir charte §4 |
@@ -60,9 +59,11 @@ impossible à ignorer — elle fait échouer la suite de tests Android.
 | Xcode Cloud | GitHub Actions | |
 | `Localizable.xcstrings` | `strings.xml` + `plurals` | |
 
-**Une seule dépendance tierce sur Android** (Vico, pour les graphiques), contre zéro côté
-Apple. C'est l'écart d'écosystème le plus concret du projet, et il est accepté explicitement :
-réécrire un moteur de rendu de courbes coûterait bien plus que d'assumer cette dépendance.
+**Deux dépendances tierces, de nature différente** (ADR-0012, [ADR-0016](13-decisions-adr.md)).
+Vico est **propre à Android** : Compose n'a pas d'équivalent natif à Swift Charts, c'est l'écart
+d'écosystème le plus concret du projet. Supabase (`supabase-swift`/`supabase-kt`) est en
+revanche **symétrique** : voulue des deux côtés dès le départ pour le transport de la partie
+partagée, pas un choix propre à une plateforme avec un équivalent à inventer sur l'autre.
 
 ## Persistance
 
@@ -80,14 +81,15 @@ mapping vers le domaine. Le domaine Kotlin est identique au domaine Swift, au vo
 
 ## Synchronisation
 
-La partie partagée en direct **n'est plus un point de divergence** ([ADR-0014](13-decisions-adr.md)) : Apple et Android parlent le même protocole (`WireMessage`) sur les mêmes standards de
-transport (mDNS/DNS-SD + socket TCP, puis BLE en secours). Un iPhone et un Android rejoignent
-la même partie. Le seul vrai point de divergence fonctionnel reste la synchronisation entre les
-appareils **du même propriétaire**, hors partie en direct :
+La partie partagée en direct **n'est pas un point de divergence** ([ADR-0016](13-decisions-adr.md)) : Apple et Android parlent le même protocole (`WireMessage`) sur le même transport, Supabase
+Realtime (canal par session, presence + broadcast) — pas deux implémentations qui s'interopèrent,
+la même dépendance des deux côtés. Un iPhone et un Android rejoignent la même partie. Le seul vrai
+point de divergence fonctionnel reste la synchronisation entre les appareils **du même
+propriétaire**, hors partie en direct :
 
 | Fonction | Apple | Android |
 |---|---|---|
-| **Partie partagée en direct** | Wi-Fi (mDNS+socket) puis BLE — protocole commun | idem, interopérable avec Apple |
+| **Partie partagée en direct** | Supabase Realtime — protocole et transport communs | idem, `supabase-kt` |
 | **Sync entre appareils du propriétaire** | CloudKit privé, transparent | **Absent en v1** |
 | **Sauvegarde** | iCloud | Android Auto Backup (quota 25 Mo, suffisant) |
 | **Export / import** | fichier `.cacompte` | fichier `.cacompte` |
@@ -152,21 +154,22 @@ maintenant. Elles ne coûtent rien à l'écriture et évitent une réécriture p
 | **C** | **Golden files verts** — tous les jeux du catalogue | 1 sem |
 | **D** | Room, repositories, mapping | 1 sem |
 | **E** | Écrans : joueurs, configuration, partie, résultats, historique | 3 sem |
-| **F** | Transport partagé — `NsdManager`+`Socket`, `BluetoothGatt*`, appairage/chiffrement, export/import | 3 sem |
+| **F** | Transport partagé — client `supabase-kt` (canal/presence/broadcast), appairage/chiffrement (`javax.crypto`), export/import | 1,5 sem |
 | **G** | Accessibilité (TalkBack, échelle de police), localisation, recette | 1 sem |
-| | **Total** | **~12,5 semaines** |
+| | **Total** | **~10,5 semaines** |
 
 L'étape C est le jalon de vérité : à partir du moment où les golden files passent en Kotlin,
 les deux applications calculent **prouvablement** la même chose, et le reste du portage ne
 touche plus au métier.
 
-L'étape F est plus coûteuse que le reste ne le laisserait supposer pour un simple portage
-d'écrans : contrairement à Nearby Connections (une seule API haut niveau), le transport partagé
-demande de construire deux mécanismes (Wi-Fi et BLE), leur appairage et leur chiffrement, sur le
-modèle exact du doc [09](09-partie-partagee.md) — c'est le prix de l'interopérabilité réelle
-avec Apple plutôt que deux silots qui ne se parlent pas. Le support du rôle périphérique
-GATT (`BluetoothGattServer`) est à valider tôt sur le parc d'appareils cible : son comportement
-varie selon les fabricants, davantage que côté Apple.
+L'étape F reste sur son estimation d'origine (1,5 sem) : c'est un client `supabase-kt` qui
+reprend le même modèle canal/presence/broadcast que `SupabaseTransport.swift` côté Apple (voir
+[09](09-partie-partagee.md) et [ADR-0016](13-decisions-adr.md)), plus `SessionCrypto`
+(HKDF + AES-GCM) réimplémenté avec `javax.crypto` — un portage assez mécanique d'un client SDK
+déjà écrit une fois, pas la construction de deux transports bas niveau (mDNS/socket, GATT) que
+l'ancienne architecture Wi-Fi/BLE exigeait. Prévoir un timebox court en tête d'étape pour vérifier
+la parité de `supabase-kt` avec `supabase-swift` sur ce qui compte ici (canal, presence,
+broadcast) avant de s'engager sur le reste de l'estimation.
 
 ## Ce qui n'est pas partagé, et c'est voulu
 

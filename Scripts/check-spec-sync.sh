@@ -1,8 +1,8 @@
 #!/bin/sh
 # spec/ est la seule source de vérité (voir spec/README.md). Ce script échoue si une copie
-# embarquée diverge de spec/ : games/ -> Catalog/GameDefinitions (l'app), golden/ -> CatalogTests
-# (les tests ne peuvent pas référencer spec/ directement, SwiftPM exige des ressources locales
-# à la cible).
+# embarquée diverge de spec/ : games/ -> Catalog/GameDefinitions (l'app), golden/ -> CatalogTests,
+# wire/ -> SyncTests (les tests ne peuvent pas référencer spec/ directement, SwiftPM exige des
+# ressources locales à la cible).
 set -eu
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -40,6 +40,7 @@ check_pair() {
 
 check_pair "Catalog/GameDefinitions" "$ROOT/spec/games" "$ROOT/CaCompteKit/Sources/Catalog/GameDefinitions"
 check_pair "Tests/CatalogTests/GoldenResources" "$ROOT/spec/golden" "$ROOT/CaCompteKit/Tests/CatalogTests/GoldenResources"
+check_pair "Tests/SyncTests/WireResources" "$ROOT/spec/wire" "$ROOT/CaCompteKit/Tests/SyncTests/WireResources"
 
 if [ "$status" -eq 0 ]; then
     echo "spec/ et ses copies embarquées sont synchronisés."

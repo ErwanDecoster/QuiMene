@@ -269,9 +269,13 @@ graphiques) — chacune ajoute une surface de mise à jour à chaque version d'i
 quelque chose que le système fournit déjà.
 
 **Conséquences.** Compilation rapide, mises à jour d'OS sans risque de rupture, aucune
-vérification de licence. Une exception est actée d'avance côté Android : **Vico**, pour les
-graphiques, Compose n'ayant pas d'équivalent natif à Swift Charts. C'est l'écart d'écosystème
-le plus concret entre les deux versions.
+vérification de licence. Deux exceptions actées, de nature différente. **Vico**, côté Android
+seulement : Compose n'a pas d'équivalent natif à Swift Charts, c'est un écart d'écosystème propre
+à cette plateforme. **Supabase** ([ADR-0016](#adr-0016--remplacer-le-transport-wi-fi-et-bluetooth-le-par-supabase-realtime)),
+côté Apple **et** Android symétriquement (`supabase-swift`/`supabase-kt`) : le transport de la
+partie partagée en direct s'appuie sur le même service géré des deux côtés plutôt que sur du
+code réseau natif propre à chaque plateforme — ce n'est pas un écart entre les deux versions,
+c'est une dépendance partagée, acceptée pour la même raison des deux côtés.
 
 ---
 
@@ -308,7 +312,7 @@ le pavé numérique.
 
 ## ADR-0014 — Transport hybride Wi-Fi + Bluetooth LE plutôt que MultipeerConnectivity/Nearby Connections
 
-**Statut** : Acceptée · **Date** : 2026-07-30
+**Statut** : Remplacée par [ADR-0016](#adr-0016--remplacer-le-transport-wi-fi-et-bluetooth-le-par-supabase-realtime) · **Date** : 2026-07-30
 
 **Contexte.** La Phase 8 (partie partagée) était conçue autour de MultipeerConnectivity côté
 Apple et de Nearby Connections en équivalent Android (doc [11](11-portage-android.md)). Ce sont
@@ -410,3 +414,62 @@ tierce ajoutée : `if #available` est un mécanisme du langage, pas une biblioth
 système et l'icône adaptative (claire/sombre/teintée, iOS 18+) n'ont besoin d'aucun repli — elles
 sont déjà couvertes par le nouveau plancher. Vérifié par build et lancement réels sur simulateur
 iOS 18.6 (iPhone 16) en plus d'iOS 26, sans avertissement de disponibilité.
+
+---
+
+## ADR-0016 — Remplacer le transport Wi-Fi et Bluetooth LE par Supabase Realtime
+
+**Statut** : Acceptée · **Date** : 2026-07-31
+
+**Contexte.** ADR-0014 actait un transport hybride Wi-Fi (mDNS/DNS-SD + socket TCP) puis
+Bluetooth LE en secours, construit sur des frameworks système des deux plateformes. Le Wi-Fi a
+été vérifié de bout en bout sur appareils réels (iPhone + iPad). Le BLE, en revanche, a reçu cinq
+correctifs distincts, tous réels et vérifiés individuellement (rôle périphérique, cadrage des
+trames, autorisations système…), sans qu'une connexion ne s'établisse jamais entre deux appareils
+physiques — la self-communication sur une seule machine réussissait (autorisations accordées des
+deux côtés), pas la connexion entre deux appareils distincts, signe d'une limite du framework
+plutôt que d'un bug de code à corriger. Cinq correctifs réels sans connexion établie est le signal
+d'un rapport coût/bénéfice mauvais, pas d'un dernier bug à trouver.
+
+**Décision.** Remplacer `WifiTransport` et `BLETransport` par `SupabaseTransport`
+(`CaCompteKit/Sources/Sync/SupabaseTransport.swift`), une seule implémentation du protocole
+`Transport` (doc [09](09-partie-partagee.md)) reposant sur Supabase Realtime :
+
+- un canal par session de partage (`session:<sessionID>`, indépendant de la partie courante en
+  cours, doc 09 « Fin de partie ») ;
+- **Presence** pour la connexion/déconnexion — l'hôte s'annonce sous une clé constante `"host"`,
+  chaque pair sous son `deviceID` — qui remplace toute la détection de déconnexion Wi-Fi/BLE ;
+- **Broadcast** pour transporter chaque `WireMessage`, toujours chiffré par `SessionCrypto`
+  (HKDF + AES-GCM) — cette couche ne dépendait déjà pas du transport, elle est inchangée ;
+- une table Postgres, `cacompte_open_games` (migration
+  `supabase/migrations/20260731123300_create_cacompte_open_games.sql`), qui résout un code
+  d'appairage à 6 chiffres vers un `sessionID` — remplace la découverte mDNS/BLE, qui n'a plus
+  lieu d'être : Supabase ne demande aucune proximité physique entre les appareils.
+
+**Alternatives.**
+- *Continuer à déboguer le BLE* — écartée : cinq correctifs réels sans connexion jamais établie
+  entre deux appareils physiques est le signal d'un rapport coût/bénéfice mauvais, pas d'un
+  dernier bug à trouver.
+- *Un relais/serveur de signalisation maison* — écartée : réintroduit exactement la contrainte
+  « pas de serveur à opérer soi-même » que le projet voulait éviter, pour un bénéfice moindre
+  qu'un service managé déjà mature.
+- *Garder le Wi-Fi seul, sans secours* — écartée : le Wi-Fi seul dépend d'un réseau commun entre
+  les appareils (box ou partage de connexion). Supabase Realtime couvre nativement le cas
+  « aucun réseau local commun », sans exiger de reconstruire un mécanisme de secours séparé.
+
+**Conséquences.** Amende ADR-0012 (« aucune dépendance tierce côté Apple ») : `supabase-swift`
+est désormais une exception explicite — mais, contrairement à Vico (Android seulement), une
+exception **symétrique** : la même famille de dépendance (`supabase-swift`/`supabase-kt`) est
+voulue des deux côtés dès le départ, pas seulement côté Apple aujourd'hui avec un équivalent
+Android à inventer plus tard. Aucune divergence de transport n'est acceptée entre les deux
+plateformes : Android reprendra exactement le même modèle canal/presence/broadcast, jamais un
+mécanisme natif Android alternatif. La fiabilité de connexion/reconnexion est déléguée à un SDK
+websocket mature plutôt qu'à du code réseau/Bluetooth maison, qui s'est montré structurellement
+peu fiable en conditions réelles. La partie partagée nécessite désormais une connexion Internet
+sur chaque appareil, là où ADR-0014 ne l'exigeait pas (Wi-Fi local ou BLE suffisaient) —
+changement de comportement produit assumé, pas seulement technique (doc
+[09](09-partie-partagee.md)). Côté portage Android ([11](11-portage-android.md)), l'étape
+transport se simplifie : un client `supabase-kt` plutôt que deux mécanismes bas niveau
+(`NsdManager` + `BluetoothGatt*`) à construire et vérifier sur le parc d'appareils cible.
+ADR-0008 (hôte autoritaire) n'est pas remis en cause, comme pour ADR-0014 : cette décision porte
+uniquement sur le transport, pas sur le modèle de synchronisation.

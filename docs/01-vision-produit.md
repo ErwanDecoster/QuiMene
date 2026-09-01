@@ -86,7 +86,7 @@ Accueil
 - Historique des parties, filtrable par jeu et par joueur
 - Fiche de profil par joueur : parties jouées, victoires, records
 - Synchronisation iCloud entre les appareils du propriétaire
-- Partie partagée en direct autour de la table, entre iPhone et Android (Wi-Fi local, secours Bluetooth)
+- Partie partagée en direct autour de la table, entre iPhone et Android (Supabase Realtime)
 - Français et anglais, Dynamic Type, VoiceOver, mode sombre
 
 **Explicitement hors périmètre v1**

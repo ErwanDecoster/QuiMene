@@ -194,12 +194,48 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
   sur simulateur et appareil réel, voir README). `testSkyjoMatchReachesResults` passe la mise en
   place puis `throw XCTSkip(...)` avec ce diagnostic complet en commentaire — à reprendre avec
   l'enregistreur de tests d'Xcode (accès UI direct, hors de portée en CLI).
-- Reste à faire : tests Swift Testing pour `LiveMatchModel`, `MatchSetupModel`,
-  `PlayerEditorModel` (`commitRound`/`undoLastRound`, rejet d'une validation invalide, transition
-  d'état après fin de partie — ne dépend pas du simulateur, ce sont des objets `@Observable`
-  purs) ; câbler les tests `CaCompteKit` dans le schéma `CaCompte` (action manuelle Xcode déjà
-  listée au README — 30 secondes en UI, non fiabilisable en pbxproj à la main, contrairement à
-  la création de cible ci-dessus qui l'a été).
+- ✅ **Cible `CaCompteTests`** créée (aucune cible de tests unitaires hébergée n'existait —
+  `CaCompteUITests` est de l'UI-automation, pas un hôte `@testable import`). Même méthode que
+  `CaCompteUITests` ci-dessus (édition manuelle de `project.pbxproj` : `PBXNativeTarget`,
+  `PBXContainerItemProxy`/`PBXTargetDependency`, `XCBuildConfiguration` Debug/Release, entrée
+  `.xcscheme`), avec en plus `TEST_HOST`/`BUNDLE_LOADER` (cible hébergée, pour `@testable import
+  CaCompte`) et ses propres `packageProductDependencies` (Domain/Catalog/Store/DesignSystem —
+  liés séparément de la cible `CaCompte`, un module ne rend pas ses propres dépendances
+  visibles à un module qui l'importe en `@testable`). Validée par étapes : `plutil -lint`/
+  `xmllint --noout`, `xcodebuild -list` confirmant les 4 cibles, avant tout test réel.
+- ✅ **`LiveMatchModel`/`MatchSetupModel`/`PlayerEditorModel`, 12 tests** (`App/CaCompteTests/`) :
+  `commitRound`/`undoLastRound`/rejet d'une validation invalide/transition à `.ended` pour
+  `LiveMatchModel` ; bornes d'effectif, plafond de `toggle()`, complétude des équipes, `start()`
+  pour `MatchSetupModel` ; validation du pseudo, régénération d'avatar jusqu'au premier choix
+  manuel, `save()`/`archive()`/`delete()` pour `PlayerEditorModel`. Même patron `ModelContainer`
+  en mémoire que `CaCompteKit/Tests/StoreTests`.
+- ✅ **Deux bugs de test réels trouvés et corrigés en écrivant cette cible**, tous deux propres à
+  l'hébergement dans le vrai process `CaCompte.app` (`TEST_HOST`) — invisibles dans
+  `CaCompteKit/Tests`, qui tourne dans un exécutable non entitlé :
+  - `CaCompteApp.loadContainer` tentait un vrai container CloudKit au lancement, indisponible en
+    simulateur sans compte iCloud — plantait en cascade et détruisait des `ModelContainer` de
+    test sans rapport (état SwiftData partagé au niveau du process). Corrigé par
+    `CaCompteApp.isUnitTestHost` (détecte `XCTestConfigurationFilePath`, posé par XCTest sur
+    tout process hôte d'un bundle injecté) qui bascule sur un container local en mémoire.
+  - Même symptôme persistant après ce premier correctif : `ModelConfiguration(isStoredInMemoryOnly:
+    true)` sans `cloudKitDatabase` explicite retombe sur `.automatic`, qui tente quand même
+    CloudKit dans un process qui porte l'entitlement iCloud réel — absent d'un exécutable non
+    hébergé comme `StoreTests`, où `.automatic` ne tente jamais rien. Corrigé par
+    `cloudKitDatabase: .none` explicite, à la fois dans `CaCompteApp` et dans les trois fichiers
+    de test.
+  - Un troisième symptôme, sans rapport avec CloudKit celui-là (`SwiftData/BackingData.swift:835:
+    Fatal error: This model instance was destroyed by calling ModelContext.reset`), venait d'un
+    bug ordinaire du code de test : une fonction utilitaire renvoyait seulement
+    `container.mainContext`, jamais le `ModelContainer` lui-même — désalloué dès le retour de la
+    fonction, invalidant le contexte pour le corps du test qui suit. Corrigé en renvoyant (et en
+    gardant vivant via `withExtendedLifetime`) le conteneur, même convention que `StoreTests` où
+    il reste une variable du corps du test.
+- Reste à faire : câbler les tests `CaCompteKit` dans le schéma `CaCompte` (action manuelle Xcode
+  déjà listée au README — 30 secondes en UI, non fiabilisable en pbxproj à la main, contrairement
+  à la création des deux cibles ci-dessus qui l'a été).
+
+Vérification : `xcodebuild test` (scheme `CaCompte`) réussit — 12/12 sur `CaCompteTests`, 3 tests
+(1 skip attendu, parcours n°2 ci-dessus) sur `CaCompteUITests` — et `Scripts/lint.sh` reste vert.
 
 **Fini quand** : `App/Features` a une couverture de tests non nulle sur ses 3 flux `@Observable`,
 et les 3 parcours XCUITest passent en CI (2 sur 3 le font désormais).
@@ -271,16 +307,17 @@ dans 5 suites, y compris `ContrastTests` qui nécessite `UIKit`) au vert ; `xcod
 `CaCompte`) réussit ; `xcodebuild test` (même scheme, `CaCompteUITests`) 3 tests dont 1 skip
 attendu (parcours n°2, voir Phase C) ; `Scripts/lint.sh` et `Scripts/check-spec-sync.sh` au vert.
 
-### Écart mineur non traité — `ActivityKit` dans `Domain`
+### Écart mineur — `ActivityKit` dans `Domain` — ✅ documenté
 
 `Domain/LiveActivity/MatchActivityAttributes.swift` importe `ActivityKit`, en désaccord avec
-ADR-0002 (« `Domain` n'importe que `Foundation` »). Vraisemblablement nécessaire — le protocole
-`ActivityAttributes` doit être visible à la fois par `Domain` (qui définit le type) et par le
-widget (qui l'affiche) — mais jamais acté comme exception. À trancher dans une passe dédiée :
-soit documenter l'exception dans [02](02-architecture.md) (même esprit que l'amendement Supabase
-à ADR-0012), soit déplacer le type hors de `Domain` si un découpage plus propre existe. Non
-prioritaire : n'affecte aucun autre invariant de `Domain` (toujours zéro I/O, toujours
-`Sendable`).
+ADR-0002 (« `Domain` n'importe que `Foundation` »). Nécessaire — le protocole `ActivityAttributes`
+doit être visible à la fois par `Domain` (qui définit le type) et par le widget (qui l'affiche).
+Documenté comme exception explicite dans [02](02-architecture.md) (note ¹ sur la ligne `Domain`
+du tableau des cibles), plutôt que déplacé hors de `Domain` : sans bénéfice pour le portage
+Android (doc [11](11-portage-android.md)), ActivityKit n'ayant aucun équivalent sur cette
+plateforme — `MatchActivityAttributes` n'aurait de toute façon jamais été porté tel quel, quel
+que soit l'endroit où il vit côté Apple. N'affecte aucun autre invariant de `Domain` (toujours
+zéro I/O, toujours `Sendable`).
 
 ## Recommandation de pratique — README factuel plutôt que journal
 

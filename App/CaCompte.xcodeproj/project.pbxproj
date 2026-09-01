@@ -71,6 +71,13 @@
 		F90C9C1F96CB125785E4A63B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 166377630E42779B0C5793ED /* Foundation.framework */; };
 		FECF6A04A5074AE19E39062F /* MatchContinuation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6251C1B9A134F5DA88F87E3 /* MatchContinuation.swift */; };
 		FD8BC4C3AE2D4819B0583BCA /* CaCompteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF955D9B59F4DB880763DAD /* CaCompteUITests.swift */; };
+		7640F44AE3EC6B71C8FB21C1 /* LiveMatchModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAC33FCCCB34E3C6302345F6 /* LiveMatchModelTests.swift */; };
+		3D8ED29B740891E0A83141FC /* MatchSetupModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C242A8CBE4B3A54DF07033F /* MatchSetupModelTests.swift */; };
+		B6449644E869D1BE27A094BF /* PlayerEditorModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2B32522E3C3BECDBE1FBB2B /* PlayerEditorModelTests.swift */; };
+		033FC47E3D81ABFB62F0C352 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 62ED812F1D8049CBAE6F6278 /* Domain */; };
+		248B7282A9A5A9680B608D46 /* Catalog in Frameworks */ = {isa = PBXBuildFile; productRef = 0451D4F7B3D2724DB732295B /* Catalog */; };
+		6F75B1B9F9DDD45985444DD6 /* Store in Frameworks */ = {isa = PBXBuildFile; productRef = E0D5A21FB1240814A77C1ECF /* Store */; };
+		12BA3242BD0820C1F303E6D0 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = F1447FC049859DEDCC4CDB4A /* DesignSystem */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +89,13 @@
 			remoteInfo = CaCompteWidgetExtension;
 		};
 		793A0DEA49A843B1AAC0ABAF /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 194311EE5894E3937B117456 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A259F8DC917294226461FCC3;
+			remoteInfo = CaCompte;
+		};
+		9B4F4128897172553FA091C0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 194311EE5894E3937B117456 /* Project object */;
 			proxyType = 1;
@@ -167,6 +181,10 @@
 		FEC066611F334B03347B64CF /* MatchSetupModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSetupModel.swift; sourceTree = "<group>"; };
 		B781475E221A4F2CA7D1908E /* CaCompteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaCompteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8FF955D9B59F4DB880763DAD /* CaCompteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CaCompteUITests.swift; sourceTree = "<group>"; };
+		FFA2D0561A3E0F80667540A2 /* CaCompteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CaCompteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAC33FCCCB34E3C6302345F6 /* LiveMatchModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveMatchModelTests.swift; sourceTree = "<group>"; };
+		8C242A8CBE4B3A54DF07033F /* MatchSetupModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSetupModelTests.swift; sourceTree = "<group>"; };
+		E2B32522E3C3BECDBE1FBB2B /* PlayerEditorModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerEditorModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +218,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9D94DE9D7B58497B024E8AC9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				033FC47E3D81ABFB62F0C352 /* Domain in Frameworks */,
+				248B7282A9A5A9680B608D46 /* Catalog in Frameworks */,
+				6F75B1B9F9DDD45985444DD6 /* Store in Frameworks */,
+				12BA3242BD0820C1F303E6D0 /* DesignSystem in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -221,8 +250,19 @@
 				B027CF6BA8617B3C6DF58619 /* CaCompte.app */,
 				F6F181867B7C700F8A482072 /* CaCompteWidgetExtension.appex */,
 				B781475E221A4F2CA7D1908E /* CaCompteUITests.xctest */,
+				FFA2D0561A3E0F80667540A2 /* CaCompteTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		26769D15205A4915759DC99F /* CaCompteTests */ = {
+			isa = PBXGroup;
+			children = (
+				AAC33FCCCB34E3C6302345F6 /* LiveMatchModelTests.swift */,
+				8C242A8CBE4B3A54DF07033F /* MatchSetupModelTests.swift */,
+				E2B32522E3C3BECDBE1FBB2B /* PlayerEditorModelTests.swift */,
+			);
+			path = CaCompteTests;
 			sourceTree = "<group>";
 		};
 		32545BB46DA74D8AA5402E24 /* CaCompteUITests */ = {
@@ -373,6 +413,7 @@
 				C15C1F1E2E5C224E80E4373A /* Info.plist */,
 				964DF914D15EE7BD800E0D40 /*  */,
 				32545BB46DA74D8AA5402E24 /* CaCompteUITests */,
+				26769D15205A4915759DC99F /* CaCompteTests */,
 				209AD8EE9E38991B9AF90342 /* Products */,
 				63F385DFADA16903F3B48348 /* Frameworks */,
 			);
@@ -470,6 +511,30 @@
 			productReference = B781475E221A4F2CA7D1908E /* CaCompteUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		2A898A3753ABD779002A7245 /* CaCompteTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AADE2AB3AAAF95ABEB1ABC0B /* Build configuration list for PBXNativeTarget "CaCompteTests" */;
+			buildPhases = (
+				1DF18C0AD914C5E7E5BD8622 /* Sources */,
+				9D94DE9D7B58497B024E8AC9 /* Frameworks */,
+				06429C15DA6A6B8784DD89D4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DBF3D6204E6DCA67EC7F97E8 /* PBXTargetDependency */,
+			);
+			name = CaCompteTests;
+			packageProductDependencies = (
+				62ED812F1D8049CBAE6F6278 /* Domain */,
+				0451D4F7B3D2724DB732295B /* Catalog */,
+				E0D5A21FB1240814A77C1ECF /* Store */,
+				F1447FC049859DEDCC4CDB4A /* DesignSystem */,
+			);
+			productName = CaCompteTests;
+			productReference = FFA2D0561A3E0F80667540A2 /* CaCompteTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -493,6 +558,11 @@
 						ProvisioningStyle = Automatic;
 					};
 					1222518E81A941A88C341B68 = {
+						CreatedOnToolsVersion = 26.0;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A259F8DC917294226461FCC3;
+					};
+					2A898A3753ABD779002A7245 = {
 						CreatedOnToolsVersion = 26.0;
 						ProvisioningStyle = Automatic;
 						TestTargetID = A259F8DC917294226461FCC3;
@@ -522,6 +592,7 @@
 				A259F8DC917294226461FCC3 /* CaCompte */,
 				E2AFF0D5BDF162F6150E5E89 /* CaCompteWidgetExtension */,
 				1222518E81A941A88C341B68 /* CaCompteUITests */,
+				2A898A3753ABD779002A7245 /* CaCompteTests */,
 			);
 		};
 /* End PBXProject section */
@@ -544,6 +615,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		BF16632F01244C28AD38599D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		06429C15DA6A6B8784DD89D4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -626,6 +704,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		1DF18C0AD914C5E7E5BD8622 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7640F44AE3EC6B71C8FB21C1 /* LiveMatchModelTests.swift in Sources */,
+				3D8ED29B740891E0A83141FC /* MatchSetupModelTests.swift in Sources */,
+				B6449644E869D1BE27A094BF /* PlayerEditorModelTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -639,6 +727,11 @@
 			isa = PBXTargetDependency;
 			target = A259F8DC917294226461FCC3 /* CaCompte */;
 			targetProxy = 793A0DEA49A843B1AAC0ABAF /* PBXContainerItemProxy */;
+		};
+		DBF3D6204E6DCA67EC7F97E8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A259F8DC917294226461FCC3 /* CaCompte */;
+			targetProxy = 9B4F4128897172553FA091C0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -915,6 +1008,56 @@
 			};
 			name = Release;
 		};
+		F24E5FE4764B0B02C7B1BF74 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U79ZYL8WF3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cacompte.app.CaCompteTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CaCompte.app/CaCompte";
+				TEST_TARGET_NAME = CaCompte;
+			};
+			name = Debug;
+		};
+		7329BD3F583F55EC52AB69B2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = U79ZYL8WF3;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.cacompte.app.CaCompteTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_TREAT_WARNINGS_AS_ERRORS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CaCompte.app/CaCompte";
+				TEST_TARGET_NAME = CaCompte;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -950,6 +1093,15 @@
 			buildConfigurations = (
 				E87C724D9F7C44EF95B8F876 /* Debug */,
 				2FDAC4CA621544B7819490EB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AADE2AB3AAAF95ABEB1ABC0B /* Build configuration list for PBXNativeTarget "CaCompteTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F24E5FE4764B0B02C7B1BF74 /* Debug */,
+				7329BD3F583F55EC52AB69B2 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -1003,6 +1155,26 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 3EDE9CB3A150C8C1BAE90A21 /* XCLocalSwiftPackageReference "CaCompteKit" */;
 			productName = Sync;
+		};
+		62ED812F1D8049CBAE6F6278 /* Domain */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3EDE9CB3A150C8C1BAE90A21 /* XCLocalSwiftPackageReference "CaCompteKit" */;
+			productName = Domain;
+		};
+		0451D4F7B3D2724DB732295B /* Catalog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3EDE9CB3A150C8C1BAE90A21 /* XCLocalSwiftPackageReference "CaCompteKit" */;
+			productName = Catalog;
+		};
+		E0D5A21FB1240814A77C1ECF /* Store */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3EDE9CB3A150C8C1BAE90A21 /* XCLocalSwiftPackageReference "CaCompteKit" */;
+			productName = Store;
+		};
+		F1447FC049859DEDCC4CDB4A /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 3EDE9CB3A150C8C1BAE90A21 /* XCLocalSwiftPackageReference "CaCompteKit" */;
+			productName = DesignSystem;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

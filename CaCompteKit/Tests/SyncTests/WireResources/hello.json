@@ -1,0 +1,13 @@
+{
+  "kind" : {
+    "hello" : {
+      "appVersion" : "1.0",
+      "deviceID" : "peer-device",
+      "deviceName" : "iPhone de Théo",
+      "platform" : "apple",
+      "role" : "contributor"
+    }
+  },
+  "protocolVersion" : 1,
+  "sessionID" : "11111111-1111-1111-1111-111111111111"
+}

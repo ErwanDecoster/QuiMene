@@ -1,0 +1,9 @@
+{
+  "kind" : {
+    "heartbeat" : {
+      "lamport" : 7
+    }
+  },
+  "protocolVersion" : 1,
+  "sessionID" : "11111111-1111-1111-1111-111111111111"
+}

@@ -34,6 +34,20 @@
                ReferencedContainer = "container:CaCompte.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2A898A3753ABD779002A7245"
+               BuildableName = "CaCompteTests.xctest"
+               BlueprintName = "CaCompteTests"
+               ReferencedContainer = "container:CaCompte.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -49,6 +63,16 @@
                BlueprintIdentifier = "1222518E81A941A88C341B68"
                BuildableName = "CaCompteUITests.xctest"
                BlueprintName = "CaCompteUITests"
+               ReferencedContainer = "container:CaCompte.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "2A898A3753ABD779002A7245"
+               BuildableName = "CaCompteTests.xctest"
+               BlueprintName = "CaCompteTests"
                ReferencedContainer = "container:CaCompte.xcodeproj">
             </BuildableReference>
          </TestableReference>

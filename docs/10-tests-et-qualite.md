@@ -97,7 +97,7 @@ comportement d'une fiche joueur supprimée alors qu'elle apparaît dans l'histor
 **Migrations** — un magasin de test figé par version publiée, ouvert par la version courante.
 Ajouté dès qu'une V2 du schéma existe ; le test échoue si une migration perd une donnée.
 
-**Sync** — deux `LiveSession` reliées par un `Transport` en mémoire, sans Wi-Fi ni Bluetooth réels.
+**Sync** — deux `LiveSession` reliées par un `Transport` en mémoire, sans réseau réel.
 Convergence, reconnexion, rejet d'une proposition invalide, ordre d'arrivée inversé.
 
 ## Tests d'interface
@@ -120,8 +120,8 @@ Assumé explicitement, pour ne pas dépenser l'effort au mauvais endroit :
   clair/sombre, en AX5 **et dans les deux rendus iOS 18-25 / iOS 26+** pour tout composant
   concerné par l'amélioration progressive Liquid Glass ([ADR-0015](13-decisions-adr.md)), jouent
   ce rôle en revue.
-- Transport Wi-Fi et BLE sur appareils réels, y compris entre iPhone et Android — check-list de
-  recette manuelle, Phase 7.
+- Transport Supabase Realtime sur appareils réels, y compris entre iPhone et Android — check-list
+  de recette manuelle, Phase 7.
 - La sync CloudKit — nécessite deux appareils et un compte réel ; check-list manuelle,
   Phase 5.
 

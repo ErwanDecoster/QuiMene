@@ -11,7 +11,9 @@ calculé sur un Pixel, sans partager une ligne de code.
 spec/
 ├── schema/game-definition.schema.json   contrat de format (JSON Schema 2020-12)
 ├── games/*.json                         définitions déclaratives des jeux
-└── golden/*.json                        parties complètes + résultats attendus
+├── golden/*.json                        parties complètes + résultats attendus
+└── wire/*.json                          un WireMessage par Kind (doc 09), format d'échange
+                                          de la partie partagée en direct
 ```
 
 ## Règle d'or
@@ -95,3 +97,19 @@ de calcul qui se compense entre deux manches passerait sinon inaperçue.
 Les `insights` attendus sont un **sous-ensemble** : le test vérifie que ceux listés sont
 présents et exacts, sans exiger l'exhaustivité. Les statistiques évoluent plus vite que les
 règles, et un golden ne doit pas casser parce qu'un nouvel indicateur a été ajouté.
+
+## Format d'une fixture `wire/`
+
+Un fichier par cas de `WireMessage.Kind` (doc [09](../docs/09-partie-partagee.md)), en clair,
+jamais chiffré — `SessionCrypto` produit un nonce aléatoire à chaque appel, donc une identité
+d'octets chiffrés entre Swift et Kotlin n'est ni atteignable ni pertinente comme test. Généré une
+fois depuis les vrais types Swift (`WireMessage`/`JSONEncoder()`) plutôt qu'écrit à la main, pour
+refléter fidèlement le format que le compilateur synthétise pour un enum à valeurs associées
+(`{"nomDuCas": {"étiquette": valeur, …}}`, `{"_0": …}` pour un paramètre sans étiquette, `{}` pour
+un cas sans valeur associée).
+
+Le test sur chaque fixture n'exige **pas** une identité d'octets entre les deux plateformes :
+décoder une fixture doit produire une valeur `WireMessage` égale, et la ré-encoder doit redonner
+la même valeur au décodage — un round-trip de schéma, pas une identité d'octets (deux
+sérialiseurs JSON différents ne produisent pas la même mise en forme pour une donnée
+sémantiquement identique).

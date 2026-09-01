@@ -18,14 +18,14 @@ exactement les mêmes scores.
 | **Plateformes v1** | iPhone + iPad, une cible SwiftUI adaptative, iOS 18 minimum |
 | **UI** | SwiftUI, pattern MV avec `@Observable`, Liquid Glass en amélioration progressive iOS 26+ (repli Material iOS 18-25), HIG natives |
 | **Persistance** | SwiftData, modèle compatible CloudKit dès le départ |
-| **Sync** | CloudKit privé (entre les appareils du propriétaire) + Supabase Realtime pour la partie partagée autour de la table (un canal par session, presence + broadcast, découverte par code via `cacompte_open_games`) — remplace le transport Wi-Fi/BLE fait maison d'origine, voir [15](docs/15-plan-qualite-code.md) et `Package.swift` |
+| **Sync** | CloudKit privé (entre les appareils du propriétaire) + Supabase Realtime pour la partie partagée autour de la table (un canal par session, presence + broadcast, découverte par code via `cacompte_open_games`) — remplace le transport Wi-Fi/BLE fait maison d'origine, voir [ADR-0016](docs/13-decisions-adr.md) |
 | **Cœur métier** | Swift pur, `Sendable`, zéro dépendance framework, fonctions pures |
 | **Règles de jeu** | Définition déclarative JSON + moteurs impératifs nommés pour les jeux à calcul non trivial |
 | **Identité** | Tokens uniques bi-plateformes, contrastes WCAG AA vérifiés par calcul |
 | **Typographie** | SF Pro / Roboto système ; police display réservée au logo, vectorisée |
 | **Android** | Ré-implémentation 100 % native, pilotée par `spec/` et validée par les mêmes golden files |
 | **Tests** | Swift Testing, golden files rejoués sur les deux plateformes, XCUITest sur le parcours critique |
-| **Dépendances** | Une côté Apple (`supabase-swift`, exception documentée à ADR-0012 — voir `Package.swift`). Une côté Android (Vico, graphiques) |
+| **Dépendances** | `supabase-swift`/`supabase-kt`, exception symétrique documentée à ADR-0012/[ADR-0016](docs/13-decisions-adr.md) — voulue des deux côtés, pas propre à une plateforme. Vico (graphiques), Android seulement |
 | **CI** | Xcode Cloud |
 
 ---
@@ -42,11 +42,11 @@ exactement les mêmes scores.
 | 06 | [Statistiques](docs/06-statistiques.md) | Indicateurs, score d'intérêt, badges, profils joueur |
 | 07 | **[Charte graphique](docs/07-charte-graphique.md)** | **Source unique des tokens** — couleurs, typo, grille, icônes, composants, mouvement, logo, microcopy |
 | 08 | [Design system Apple](docs/08-design-system.md) | Implémentation SwiftUI des tokens, Liquid Glass, écran de saisie, accessibilité |
-| 09 | [Partie partagée](docs/09-partie-partagee.md) | Transport hybride Wi-Fi/BLE interopérable Apple/Android, hôte autoritaire, protocole, horloge de Lamport |
+| 09 | [Partie partagée](docs/09-partie-partagee.md) | Transport Supabase Realtime interopérable Apple/Android, hôte autoritaire, protocole, horloge de Lamport |
 | 10 | [Tests & qualité](docs/10-tests-et-qualite.md) | Pyramide, golden files, invariants, CI, définition de « terminé » |
 | 11 | [Portage Android](docs/11-portage-android.md) | Équivalences, charte côté Material 3, discipline Swift, plan en 7 étapes |
 | 12 | [Roadmap](docs/12-roadmap.md) | 10 phases, 3 jalons, estimations, risques |
-| 13 | [Décisions (ADR)](docs/13-decisions-adr.md) | 15 décisions, alternatives écartées et pourquoi |
+| 13 | [Décisions (ADR)](docs/13-decisions-adr.md) | 16 décisions, alternatives écartées et pourquoi |
 | 14 | [Profils partagés](docs/14-profils-partages.md) | Lier deux fiches par QR, une partie apparaît chez l'ami |
 | 15 | [Plan qualité de code](docs/15-plan-qualite-code.md) | Audit et plan priorisé — écarts entre ce que le projet documente et ce qu'il fait |
 

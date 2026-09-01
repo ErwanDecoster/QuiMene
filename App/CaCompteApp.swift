@@ -158,6 +158,19 @@ struct CaCompteApp: App {
       || ProcessInfo.processInfo.arguments.contains("-uitesting-reset")
   }
 
+  /// Doc utilisateur — Phase C (`CaCompteTests`) : une cible de tests unitaires *hébergée*
+  /// (`TEST_HOST`) injecte le bundle XCTest dans le vrai process de l'app, qui démarre donc
+  /// normalement — y compris sa tentative de container CloudKit réel, indisponible en
+  /// CI/simulateur sans compte iCloud connecté. L'échec en cascade qui en résultait faisait
+  /// planter des `ModelContainer` de test sans rapport (état SwiftData partagé au niveau du
+  /// process). `XCTestConfigurationFilePath` est posé par XCTest sur tout process hôte d'un
+  /// bundle de test injecté — contrairement à `CaCompteUITests`, qui lance `CaCompte.app` comme
+  /// une app normale via `XCUIApplication` (jamais injectée), donc jamais concernée par cet
+  /// indicateur ni par cette branche.
+  private nonisolated static var isUnitTestHost: Bool {
+    ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+  }
+
   private nonisolated static var uiTestingStoreURL: URL {
     URL.applicationSupportDirectory.appending(path: "CaCompteUITesting.store")
   }
@@ -172,6 +185,18 @@ struct CaCompteApp: App {
         }
         return try! ModelContainer(
           for: schema, configurations: [ModelConfiguration(schema: schema, url: url)])
+      }
+      if isUnitTestHost {
+        // Doc utilisateur — `cloudKitDatabase` explicite à `.none` : sans lui, le réglage par
+        // défaut (`.automatic`) tente quand même CloudKit dans ce process précis, puisque
+        // l'entitlement iCloud du host (`CaCompte.app`) est bien réel, contrairement à un
+        // magasin en mémoire construit dans un exécutable de test non hébergé (`StoreTests`),
+        // sans entitlement, où `.automatic` ne tente jamais rien.
+        return try! ModelContainer(
+          for: schema,
+          configurations: [
+            ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+          ])
       }
       if iCloudSyncEnabled,
         let cloudContainer = try? ModelContainer(
