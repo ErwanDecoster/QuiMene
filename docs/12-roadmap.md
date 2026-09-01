@@ -140,13 +140,14 @@ Pour chacun : JSON, golden files, moteur si nécessaire, écran de saisie adapt�
   une reconnexion sous-jacente en arrière-plan (ré-enregistrement à chaque `.subscribed`), course
   entre présence et premier message d'un pair (session créée au premier des deux événements) —
   voir [09](09-partie-partagee.md)
-- ⏳ Recette manuelle formelle du transport Supabase (iPhone + iPad, observateur et contributeur)
-  — celle qui existait pour l'ancien transport Wi-Fi ne couvre plus l'architecture actuelle
-- ⏳ Portage Android, recette croisée Apple + Android, golden du protocole (`spec/wire/`)
+- ✅ Recette manuelle du transport Supabase sur appareils réels par l'auteur du projet — partie
+  partagée créée et suivie avec succès, en plus d'un usage général de l'app hors simulateur
+- ✅ Golden du protocole (`spec/wire/`), côté Swift (`WireGoldenTests`)
+- ⏳ Portage Android, recette croisée Apple + Android, golden du protocole côté Kotlin
 
 **Fini quand** : un iPhone et un Android suivent la même partie via Supabase Realtime, et l'un
 d'eux perd puis retrouve sa connexion sans perdre l'état. **Supabase Realtime en production côté
-Apple ; recette formelle et Android restent à faire.** Voir
+Apple, recette manuelle réussie sur appareil réel ; Android reste à faire.** Voir
 [09 — Partie partagée](09-partie-partagee.md) et [ADR-0016](13-decisions-adr.md).
 
 ## P9 — Finitions & TestFlight · 2,5 semaines
@@ -160,12 +161,16 @@ Apple ; recette formelle et Android restent à faire.** Voir
   arrière-plan plutôt que sur un minuteur
 - ✅ Live Activity (`MatchActivityAttributes` dans `Domain`, `MatchLiveActivityController`) — écran
   verrouillé et Dynamic Island, mis à jour à chaque manche depuis les trois écrans de saisie
-- 🔶 Les quatre ci-dessus sont vérifiés par build complet + lancement simulateur ; le rendu réel
-  (Widget sur l'écran d'accueil, Dynamic Island, Handoff entre deux appareils, Siri) reste à
-  valider par l'auteur sur appareil physique — voir doc [09](09-partie-partagee.md) pour le même
-  principe appliqué au transport Supabase
-- ⏳ Passe d'accessibilité complète : VoiceOver, AX5, Reduce Motion, contraste augmenté
-- ⏳ Localisation anglaise complète et relecture
+- ✅ Dynamic Island vérifiée par l'auteur sur appareil physique — rendu réel conforme
+- 🔶 Widget sur l'écran d'accueil, Handoff entre deux appareils et Siri restent vérifiés par build
+  complet + lancement simulateur seulement ; leur rendu réel reste à valider sur appareil
+  physique — voir doc [09](09-partie-partagee.md) pour le même principe appliqué au transport
+  Supabase
+- ⏳ Passe d'accessibilité complète : VoiceOver, AX5, Reduce Motion, contraste augmenté — quasiment
+  pas commencée (2 fichiers sur 38 dans `App/Features` touchent l'accessibilité, aucun usage de
+  `accessibilityReduceMotion`/`colorSchemeContrast`), voir [15](15-plan-qualite-code.md)
+- ✅ Localisation terminée — fr/en/es/de/it, interface et contenu des jeux (Phase G,
+  [15](15-plan-qualite-code.md))
 - ⏳ Fiche App Store, captures, confidentialité (« aucune donnée collectée »)
 - ⏳ TestFlight interne, puis externe, correction des retours
 

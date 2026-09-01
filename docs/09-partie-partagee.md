@@ -366,11 +366,13 @@ graphe de dépendances du package : `Store` n'importe pas `Sync`.
   ré-enregistrement à chaque `.subscribed`), et une course entre l'événement de présence et le
   premier message d'un pair pouvait perdre son `hello` (corrigé en créant la session au premier
   des deux événements, quel que soit l'ordre). Ces deux correctifs sont documentés en commentaire
-  dans `SupabaseTransport.swift`. Il n'existe pas, à ce jour, de check-list de recette formelle
-  équivalente à celle qui avait validé l'ancien transport Wi-Fi (observateur/contributeur sur
-  iPhone + iPad) — à refaire pour Supabase avant de s'y appuyer pour la recette croisée
-  Apple/Android.
-- **Golden du protocole** (`spec/wire/`) : pas encore fait. Resterait à écrire pour garantir
-  qu'un même `WireMessage`, décodé sur les deux plateformes, produit une valeur équivalente — pas
-  une identité d'octets, hors de portée entre deux sérialiseurs JSON différents — sur le modèle
-  des golden files de jeu. Pertinent surtout une fois le portage Android entamé.
+  dans `SupabaseTransport.swift`.
+- **Sur appareil réel** : partie partagée créée et suivie avec succès par l'auteur du projet.
+  Reste à faire : une check-list détaillée par rôle (observateur/contributeur), comme celle qui
+  avait validé l'ancien transport Wi-Fi, et la recette croisée Apple/Android une fois le portage
+  entamé.
+- **Golden du protocole** (`spec/wire/`) : ✅ fait — un fichier par cas de `WireMessage.Kind`,
+  vérifié côté Swift (`WireGoldenTests`, `CaCompteKit/Tests/SyncTests`). Le critère n'est pas une
+  identité d'octets, hors de portée entre deux sérialiseurs JSON différents, mais un round-trip de
+  schéma : décoder une fixture sur les deux plateformes doit produire une valeur équivalente. Le
+  test Kotlin symétrique reste à écrire une fois le portage Android entamé.
