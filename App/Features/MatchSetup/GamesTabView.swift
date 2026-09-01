@@ -26,6 +26,7 @@ struct GamesTabView: View {
   /// précédente ; toutes doivent apparaître ici, pas seulement la première trouvée.
   @State private var inProgressMatches: [MatchRecord] = []
   @State private var matchPendingAbandon: MatchRecord?
+  @State private var showsNoMailClientAlert = false
   /// Doc 09 « Fin de partie » — une session de partage démarrée depuis une partie survit à sa
   /// fin (`LiveShareCoordinator`) : ce bouton laisse l'hôte la retrouver (code, pairs connectés,
   /// « Arrêter le partage ») même en revenant ici entre deux parties, sans avoir à en rouvrir
@@ -46,8 +47,7 @@ struct GamesTabView: View {
     let all = catalog.allGames.sorted { $0.name.localized < $1.name.localized }
     guard !searchText.isEmpty else { return all }
     return all.filter {
-      $0.name.localized.localizedCaseInsensitiveContains(searchText)
-        || ($0.shortDescription?.localized.localizedCaseInsensitiveContains(searchText) ?? false)
+      $0.name.matches(searchText) || ($0.shortDescription?.matches(searchText) ?? false)
     }
   }
 
@@ -65,8 +65,10 @@ struct GamesTabView: View {
     List {
       // Doc 01 : reprendre une partie en cours reste possible, mais en simple
       // suggestion — un onglet qu'on revisite pour parcourir le catalogue ne doit pas
-      // y être redirigé de force à chaque fois.
-      if !inProgressMatches.isEmpty {
+      // y être redirigé de force à chaque fois. Masquée pendant une recherche active
+      // (remontée : elle restait sinon affichée quel que soit le terme cherché, et
+      // masquait même le message « aucun résultat » ci-dessous).
+      if !inProgressMatches.isEmpty, searchText.isEmpty {
         Section {
           ForEach(inProgressMatches, id: \.id) { match in
             Button {
@@ -90,9 +92,14 @@ struct GamesTabView: View {
             gameRow(for: definition)
           }
         }
-      } else if inProgressMatches.isEmpty {
-        EmptyState(icon: "magnifyingglass", message: "Aucun jeu ne correspond à ta recherche.")
-          .listRowSeparator(.hidden)
+      } else {
+        EmptyState(
+          icon: "magnifyingglass",
+          message: "Aucun jeu ne correspond à ta recherche.",
+          actionTitle: "Demander ce jeu",
+          action: requestGame
+        )
+        .listRowSeparator(.hidden)
       }
     }
     .navigationTitle("Jeux")
@@ -145,6 +152,13 @@ struct GamesTabView: View {
     }
     .sheet(isPresented: $isPresentingActiveShare) {
       ShareSessionView(startAction: nil)
+    }
+    .gameRequestMailFallback(isPresented: $showsNoMailClientAlert)
+  }
+
+  private func requestGame() {
+    if !GameRequestMail.open(searchTerm: searchText) {
+      showsNoMailClientAlert = true
     }
   }
 

@@ -37,6 +37,26 @@ public struct GameDefinition: Identifiable, Sendable, Codable, Equatable {
       default: fr
       }
     }
+
+    /// Doc utilisateur — remontée : la recherche de jeux ne doit pas dépendre de la langue
+    /// affichée par l'app. Contrairement à `localized` (une seule traduction, celle à
+    /// afficher), ceci compare `term` à *toutes* les traductions déclarées (fr toujours
+    /// présente, les autres si fournies) — un jeu reste trouvable même si son nom cherché
+    /// correspond à une langue différente de celle actuellement affichée.
+    ///
+    /// Doc utilisateur — remontée : les espaces (y compris internes, pas seulement en début/fin)
+    /// ne doivent pas compter — « petit bac », « petitbac » et « petit  bac » doivent tous
+    /// trouver le même jeu. Les deux côtés de la comparaison sont donc dépouillés de leurs
+    /// espaces avant le `contains`.
+    public func matches(_ term: String) -> Bool {
+      let strippedTerm = term.filter { !$0.isWhitespace }
+      for candidate in [fr, en, es, de, it].compactMap({ $0 }) {
+        if candidate.filter({ !$0.isWhitespace }).localizedCaseInsensitiveContains(strippedTerm) {
+          return true
+        }
+      }
+      return false
+    }
   }
 
   public enum PaletteToken: String, Sendable, Codable, Equatable {

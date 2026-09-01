@@ -859,6 +859,34 @@
         }
       }
     },
+    "Aucune messagerie configurée": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine E-Mail-App eingerichtet"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No mail app configured"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No hay ninguna app de correo configurada"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuna app di posta configurata"
+          }
+        }
+      }
+    },
     "Aucune partie archivée.": {
       "localizations": {
         "de": {
@@ -1651,6 +1679,118 @@
         }
       }
     },
+    "Copier l'adresse": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adresse kopieren"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy the address"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar la dirección"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia l'indirizzo"
+          }
+        }
+      }
+    },
+    "Demande d'ajout d'un jeu — Ça Compte": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anfrage: Spiel hinzufügen — Ça Compte"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request to add a game — Ça Compte"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitud para añadir un juego — Ça Compte"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiesta di aggiunta di un gioco — Ça Compte"
+          }
+        }
+      }
+    },
+    "Demander ce jeu": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Spiel anfragen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request this game"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitar este juego"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiedi questo gioco"
+          }
+        }
+      }
+    },
+    "Demander l'ajout d'un jeu": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ein Spiel anfragen"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Request a game"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solicitar un juego"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Richiedi un gioco"
+          }
+        }
+      }
+    },
     "Démarrage du partage…": {
       "localizations": {
         "de": {
@@ -1815,6 +1955,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Salva"
+          }
+        }
+      }
+    },
+    "Envoie ta demande à %@ depuis l'application de ton choix.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sende deine Anfrage von einer beliebigen App an %@."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send your request to %@ from the app of your choice."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Envía tu solicitud a %@ desde la app que prefieras."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invia la tua richiesta a %@ dall'app che preferisci."
           }
         }
       }
@@ -2348,6 +2516,62 @@
           "stringUnit": {
             "state": "translated",
             "value": "La classifica finale verrà calcolata in base alle manche giocate. Questa azione non può essere annullata."
+          }
+        }
+      }
+    },
+    "Le jeu que je cherche : %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Spiel, das ich gesucht habe: %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The game I searched for: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El juego que buscaba: %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il gioco che stavo cercando: %@"
+          }
+        }
+      }
+    },
+    "Le jeu que je souhaite voir ajouté :": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Spiel, das ich mir wünsche:"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The game I'd like to see added:"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El juego que me gustaría que añadierais:"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il gioco che vorrei vedere aggiunto:"
           }
         }
       }
@@ -3709,6 +3933,34 @@
         }
       }
     },
+    "Règles ou lien vers les règles (facultatif) :": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regeln oder ein Link zu den Regeln (optional):"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rules or a link to the rules (optional):"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reglas o un enlace a las reglas (opcional):"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Regole o un link alle regole (facoltativo):"
+          }
+        }
+      }
+    },
     "Réactiver": {
       "localizations": {
         "de": {
@@ -4126,6 +4378,34 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fonte"
+          }
+        }
+      }
+    },
+    "Suggère un jeu à ajouter à l'app par e-mail.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schlage per E-Mail ein Spiel vor, das der App hinzugefügt werden soll."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suggest a game to add to the app by email."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sugiere por correo un juego para añadir a la app."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Suggerisci via e-mail un gioco da aggiungere all'app."
           }
         }
       }

@@ -9,6 +9,7 @@ import UIKit
 struct SettingsView: View {
   @Environment(AppSettings.self) private var settings
   @Environment(\.dismiss) private var dismiss
+  @State private var showsNoMailClientAlert = false
 
   var body: some View {
     NavigationStack {
@@ -56,6 +57,22 @@ struct SettingsView: View {
         } footer: {
           Text("Ouvre les réglages système pour choisir la langue de l'app.")
         }
+
+        Section {
+          Button {
+            requestGame()
+          } label: {
+            HStack {
+              Text("Demander l'ajout d'un jeu")
+                .foregroundStyle(.textPrimary)
+              Spacer()
+              Image(systemName: "envelope")
+                .foregroundStyle(.textSecondary)
+            }
+          }
+        } footer: {
+          Text("Suggère un jeu à ajouter à l'app par e-mail.")
+        }
       }
       .navigationTitle("Réglages")
       .navigationBarTitleDisplayMode(.inline)
@@ -64,6 +81,13 @@ struct SettingsView: View {
           Button("Fermer") { dismiss() }
         }
       }
+      .gameRequestMailFallback(isPresented: $showsNoMailClientAlert)
+    }
+  }
+
+  private func requestGame() {
+    if !GameRequestMail.open() {
+      showsNoMailClientAlert = true
     }
   }
 
