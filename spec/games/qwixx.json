@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Qwixx", "en": "Qwixx" },
+  "name": { "fr": "Qwixx", "en": "Qwixx", "es": "Qwixx", "de": "Qwixx", "it": "Qwixx" },
   "shortDescription": {
     "fr": "Une seule feuille par joueur, remplie au fil de la partie. Entrez le score final lu sur votre grille (barème triangulaire imprimé dessus) ; le plus haut gagne.",
-    "en": "One sheet per player, filled in over the course of the game. Enter the final score read off your sheet (the triangular table is printed on it); highest wins."
+    "en": "One sheet per player, filled in over the course of the game. Enter the final score read off your sheet (the triangular table is printed on it); highest wins.", "es": "Una hoja por jugador, que se rellena a lo largo de la partida. Introduce la puntuación final que leas en tu hoja (la tabla triangular está impresa en ella); gana la más alta.", "de": "Ein Blatt pro Spieler, das im Laufe des Spiels ausgefüllt wird. Gib die Endpunktzahl ein, die du auf deinem Blatt abliest (die Dreieckstabelle ist darauf aufgedruckt); die höchste gewinnt.", "it": "Un foglio per giocatore, compilato nel corso della partita. Inserisci il punteggio finale letto sul tuo foglio (la tabella triangolare è stampata sopra); vince il più alto."
   },
 
   "symbol": "number.square.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Partie", "en": "Game" },
+    "roundLabel": { "fr": "Partie", "en": "Game", "es": "Partida", "de": "Spiel", "it": "Partita" },
     "entry": {
       "kind": "integer",
       "min": 0,

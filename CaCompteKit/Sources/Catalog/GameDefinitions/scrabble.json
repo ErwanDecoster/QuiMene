@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Scrabble", "en": "Scrabble" },
+  "name": { "fr": "Scrabble", "en": "Scrabble", "es": "Scrabble", "de": "Scrabble", "it": "Scarabeo" },
   "shortDescription": {
     "fr": "Le score le plus haut gagne ; c'est vous qui décidez quand la partie se termine.",
-    "en": "Highest score wins; you decide when the game ends."
+    "en": "Highest score wins; you decide when the game ends.", "es": "Gana la puntuación más alta; tú decides cuándo termina la partida.", "de": "Die höchste Punktzahl gewinnt; du entscheidest, wann das Spiel endet.", "it": "Vince il punteggio più alto; decidi tu quando finisce la partita."
   },
 
   "symbol": "textformat.abc",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Tour", "en": "Turn" },
+    "roundLabel": { "fr": "Tour", "en": "Turn", "es": "Turno", "de": "Zug", "it": "Turno" },
     "entry": {
       "kind": "integer",
       "min": 0,

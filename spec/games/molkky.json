@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Mölkky", "en": "Mölkky" },
+  "name": { "fr": "Mölkky", "en": "Mölkky", "es": "Mölkky", "de": "Mölkky", "it": "Mölkky" },
   "shortDescription": {
     "fr": "Chaque quille tombée compte pour sa valeur (0 à 12). Dépasser 50 ramène le score à 25. Trois lancers ratés d'affilée éliminent. Premier joueur à exactement 50 gagne.",
-    "en": "Each fallen skittle counts for its value (0 to 12). Going over 50 resets the score to 25. Three consecutive misses eliminate a player. First to exactly 50 wins."
+    "en": "Each fallen skittle counts for its value (0 to 12). Going over 50 resets the score to 25. Three consecutive misses eliminate a player. First to exactly 50 wins.", "es": "Cada bolo caído cuenta por su valor (de 0 a 12). Superar 50 hace que la puntuación vuelva a 25. Tres fallos seguidos eliminan a un jugador. Gana quien llegue primero exactamente a 50.", "de": "Jeder umgefallene Kegel zählt seinen Wert (0 bis 12). Wer über 50 kommt, fällt auf 25 zurück. Drei Fehlwürfe in Folge scheiden einen Spieler aus. Wer zuerst genau 50 erreicht, gewinnt.", "it": "Ogni birillo caduto vale il suo punteggio (da 0 a 12). Superare 50 riporta il punteggio a 25. Tre lanci falliti di fila eliminano un giocatore. Vince chi raggiunge per primo esattamente 50."
   },
 
   "symbol": "target",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "targetExact",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Lancer", "en": "Throw" },
+    "roundLabel": { "fr": "Lancer", "en": "Throw", "es": "Lanzamiento", "de": "Wurf", "it": "Lancio" },
     "entry": {
       "kind": "integer",
       "min": 0,

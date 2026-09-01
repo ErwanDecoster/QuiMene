@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Time's Up !", "en": "Time's Up!" },
+  "name": { "fr": "Time's Up !", "en": "Time's Up!", "es": "Time's Up!", "de": "Time's Up!", "it": "Time's Up!" },
   "shortDescription": {
     "fr": "Trois manches avec les mêmes cartes (description libre, un mot, mime). Le total de cartes devinées sur les trois manches l'emporte.",
-    "en": "Three rounds with the same cards (free description, one word, charades). The highest total of guessed cards over the three rounds wins."
+    "en": "Three rounds with the same cards (free description, one word, charades). The highest total of guessed cards over the three rounds wins.", "es": "Tres mangas con las mismas cartas (descripción libre, una palabra, mímica). Gana el total más alto de cartas adivinadas en las tres mangas.", "de": "Drei Runden mit denselben Karten (freie Beschreibung, ein Wort, Pantomime). Die höchste Gesamtzahl erratener Karten über die drei Runden gewinnt.", "it": "Tre manche con le stesse carte (descrizione libera, una parola, mimo). Vince il totale più alto di carte indovinate nelle tre manche."
   },
 
   "symbol": "hourglass",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "roundLabel": { "fr": "Manche", "en": "Round", "es": "Manga", "de": "Runde", "it": "Manche" },
     "entry": {
       "kind": "integer",
       "min": 0,

@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Rummikub", "en": "Rummikub" },
+  "name": { "fr": "Rummikub", "en": "Rummikub", "es": "Rummikub", "de": "Rummikub", "it": "Rummikub" },
   "shortDescription": {
     "fr": "Le premier à poser toutes ses tuiles marque la valeur des tuiles restantes des autres ; chacun des autres perd la valeur de ses propres tuiles. Le plus haut score cumulé gagne.",
-    "en": "Whoever plays all their tiles first scores the value of everyone else's remaining tiles; everyone else loses the value of their own. Highest cumulative score wins."
+    "en": "Whoever plays all their tiles first scores the value of everyone else's remaining tiles; everyone else loses the value of their own. Highest cumulative score wins.", "es": "Quien coloca todas sus fichas primero anota el valor de las fichas restantes de los demás; los demás pierden el valor de las suyas propias. Gana la puntuación acumulada más alta.", "de": "Wer zuerst alle Steine ablegt, erhält den Wert der verbleibenden Steine aller anderen; alle anderen verlieren den Wert ihrer eigenen. Die höchste Gesamtpunktzahl gewinnt.", "it": "Chi posa per primo tutte le proprie tessere segna il valore delle tessere rimaste agli altri; tutti gli altri perdono il valore delle proprie. Vince il punteggio cumulativo più alto."
   },
 
   "symbol": "square.stack.3d.up.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "roundLabel": { "fr": "Manche", "en": "Round", "es": "Manga", "de": "Runde", "it": "Manche" },
     "entry": {
       "kind": "integer",
       "allowsNegative": true

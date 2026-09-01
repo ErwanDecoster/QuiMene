@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Yams", "en": "Yahtzee" },
+  "name": { "fr": "Yams", "en": "Yahtzee", "es": "Yahtzee", "de": "Kniffel", "it": "Yahtzee" },
   "shortDescription": {
     "fr": "Treize catégories à remplir. Bonus de 35 points si la section haute atteint 63.",
-    "en": "Thirteen categories to fill. 35-point bonus if the upper section reaches 63."
+    "en": "Thirteen categories to fill. 35-point bonus if the upper section reaches 63.", "es": "Trece categorías por rellenar. Bonus de 35 puntos si la sección superior alcanza 63.", "de": "Dreizehn Kategorien zum Ausfüllen. 35-Punkte-Bonus, wenn der obere Block 63 erreicht.", "it": "Tredici categorie da riempire. Bonus di 35 punti se la sezione superiore raggiunge 63."
   },
 
   "symbol": "dice.fill",
@@ -17,26 +17,26 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Tour", "en": "Turn" },
+    "roundLabel": { "fr": "Tour", "en": "Turn", "es": "Turno", "de": "Zug", "it": "Turno" },
     "entry": {
       "kind": "categorySheet",
       "min": 0,
       "max": 50,
       "categories": [
-        { "id": "ones",   "label": { "fr": "As",    "en": "Ones" },   "section": "upper", "scoring": { "kind": "multipleOf", "value": 1, "max": 5 } },
-        { "id": "twos",   "label": { "fr": "Deux",  "en": "Twos" },   "section": "upper", "scoring": { "kind": "multipleOf", "value": 2, "max": 10 } },
-        { "id": "threes", "label": { "fr": "Trois", "en": "Threes" }, "section": "upper", "scoring": { "kind": "multipleOf", "value": 3, "max": 15 } },
-        { "id": "fours",  "label": { "fr": "Quatre","en": "Fours" },  "section": "upper", "scoring": { "kind": "multipleOf", "value": 4, "max": 20 } },
-        { "id": "fives",  "label": { "fr": "Cinq",  "en": "Fives" },  "section": "upper", "scoring": { "kind": "multipleOf", "value": 5, "max": 25 } },
-        { "id": "sixes",  "label": { "fr": "Six",   "en": "Sixes" },  "section": "upper", "scoring": { "kind": "multipleOf", "value": 6, "max": 30 } },
+        { "id": "ones",   "label": { "fr": "As",    "en": "Ones", "es": "Unos", "de": "Einser", "it": "Assi" },   "section": "upper", "scoring": { "kind": "multipleOf", "value": 1, "max": 5 } },
+        { "id": "twos",   "label": { "fr": "Deux",  "en": "Twos", "es": "Doses", "de": "Zweier", "it": "Due" },   "section": "upper", "scoring": { "kind": "multipleOf", "value": 2, "max": 10 } },
+        { "id": "threes", "label": { "fr": "Trois", "en": "Threes", "es": "Treses", "de": "Dreier", "it": "Tre" }, "section": "upper", "scoring": { "kind": "multipleOf", "value": 3, "max": 15 } },
+        { "id": "fours",  "label": { "fr": "Quatre","en": "Fours", "es": "Cuatros", "de": "Vierer", "it": "Quattro" },  "section": "upper", "scoring": { "kind": "multipleOf", "value": 4, "max": 20 } },
+        { "id": "fives",  "label": { "fr": "Cinq",  "en": "Fives", "es": "Cincos", "de": "Fünfer", "it": "Cinque" },  "section": "upper", "scoring": { "kind": "multipleOf", "value": 5, "max": 25 } },
+        { "id": "sixes",  "label": { "fr": "Six",   "en": "Sixes", "es": "Seises", "de": "Sechser", "it": "Sei" },  "section": "upper", "scoring": { "kind": "multipleOf", "value": 6, "max": 30 } },
 
-        { "id": "threeOfAKind", "label": { "fr": "Brelan",        "en": "Three of a kind" }, "section": "lower", "scoring": { "kind": "sumOfDice", "max": 30 } },
-        { "id": "fourOfAKind",  "label": { "fr": "Carré",         "en": "Four of a kind" },  "section": "lower", "scoring": { "kind": "sumOfDice", "max": 30 } },
-        { "id": "fullHouse",    "label": { "fr": "Full",          "en": "Full house" },      "section": "lower", "scoring": { "kind": "fixed", "value": 25 } },
-        { "id": "smallStraight","label": { "fr": "Petite suite",  "en": "Small straight" },  "section": "lower", "scoring": { "kind": "fixed", "value": 30 } },
-        { "id": "largeStraight","label": { "fr": "Grande suite",  "en": "Large straight" },  "section": "lower", "scoring": { "kind": "fixed", "value": 40 } },
-        { "id": "yams",         "label": { "fr": "Yams",          "en": "Yahtzee" },         "section": "lower", "scoring": { "kind": "fixed", "value": 50 } },
-        { "id": "chance",       "label": { "fr": "Chance",        "en": "Chance" },          "section": "lower", "scoring": { "kind": "sumOfDice", "max": 30 } }
+        { "id": "threeOfAKind", "label": { "fr": "Brelan",        "en": "Three of a kind", "es": "Trío", "de": "Dreierpasch", "it": "Tris" }, "section": "lower", "scoring": { "kind": "sumOfDice", "max": 30 } },
+        { "id": "fourOfAKind",  "label": { "fr": "Carré",         "en": "Four of a kind", "es": "Póker", "de": "Viererpasch", "it": "Poker" },  "section": "lower", "scoring": { "kind": "sumOfDice", "max": 30 } },
+        { "id": "fullHouse",    "label": { "fr": "Full",          "en": "Full house", "es": "Full", "de": "Full House", "it": "Full" },      "section": "lower", "scoring": { "kind": "fixed", "value": 25 } },
+        { "id": "smallStraight","label": { "fr": "Petite suite",  "en": "Small straight", "es": "Escalera pequeña", "de": "Kleine Straße", "it": "Scala piccola" },  "section": "lower", "scoring": { "kind": "fixed", "value": 30 } },
+        { "id": "largeStraight","label": { "fr": "Grande suite",  "en": "Large straight", "es": "Escalera grande", "de": "Große Straße", "it": "Scala grande" },  "section": "lower", "scoring": { "kind": "fixed", "value": 40 } },
+        { "id": "yams",         "label": { "fr": "Yams",          "en": "Yahtzee", "es": "Yahtzee", "de": "Kniffel", "it": "Yahtzee" },         "section": "lower", "scoring": { "kind": "fixed", "value": 50 } },
+        { "id": "chance",       "label": { "fr": "Chance",        "en": "Chance", "es": "Chance", "de": "Chance", "it": "Chance" },          "section": "lower", "scoring": { "kind": "sumOfDice", "max": 30 } }
       ]
     },
     "modifiers": []
@@ -59,10 +59,10 @@
   "variants": [
     {
       "id": "upperBonusThreshold",
-      "label": { "fr": "Seuil du bonus", "en": "Bonus threshold" },
+      "label": { "fr": "Seuil du bonus", "en": "Bonus threshold", "es": "Umbral del bonus", "de": "Bonusschwelle", "it": "Soglia del bonus" },
       "help": {
         "fr": "Points nécessaires en section haute pour déclencher le bonus de 35.",
-        "en": "Upper-section points required to trigger the 35-point bonus."
+        "en": "Upper-section points required to trigger the 35-point bonus.", "es": "Puntos necesarios en la sección superior para activar el bonus de 35.", "de": "Punkte im oberen Block, die nötig sind, um den 35-Punkte-Bonus auszulösen.", "it": "Punti necessari nella sezione superiore per attivare il bonus di 35."
       },
       "kind": "integerChoice",
       "values": [63, 60],

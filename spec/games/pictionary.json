@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Pictionary", "en": "Pictionary" },
+  "name": { "fr": "Pictionary", "en": "Pictionary", "es": "Pictionary", "de": "Pictionary", "it": "Pictionary" },
   "shortDescription": {
     "fr": "Joueurs ou équipes marquent des points en devinant les dessins. La partie s'arrête dès qu'un score atteint le seuil choisi.",
-    "en": "Players or teams score points by guessing drawings. The game ends once a score reaches the chosen threshold."
+    "en": "Players or teams score points by guessing drawings. The game ends once a score reaches the chosen threshold.", "es": "Jugadores o equipos ganan puntos adivinando dibujos. La partida termina en cuanto una puntuación alcanza el umbral elegido.", "de": "Spieler oder Teams sammeln Punkte, indem sie Zeichnungen erraten. Das Spiel endet, sobald eine Punktzahl die gewählte Schwelle erreicht.", "it": "Giocatori o squadre segnano punti indovinando i disegni. La partita termina non appena un punteggio raggiunge la soglia scelta."
   },
 
   "symbol": "paintbrush.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "roundLabel": { "fr": "Manche", "en": "Round", "es": "Manga", "de": "Runde", "it": "Manche" },
     "entry": {
       "kind": "integer",
       "min": 0,
@@ -46,7 +46,7 @@
   "variants": [
     {
       "id": "threshold",
-      "label": { "fr": "Fin de partie à", "en": "Game ends at" },
+      "label": { "fr": "Fin de partie à", "en": "Game ends at", "es": "Fin de partida a", "de": "Spielende bei", "it": "Fine partita a" },
       "kind": "integerChoice",
       "values": [15, 20, 25],
       "default": 20

@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Jeu libre", "en": "Free scoring" },
+  "name": { "fr": "Jeu libre", "en": "Free scoring", "es": "Puntuación libre", "de": "Freie Zählung", "it": "Punteggio libero" },
   "shortDescription": {
     "fr": "Un tableau de scores pour n'importe quel jeu. Le score le plus haut gagne ; c'est toi qui décides quand la partie se termine.",
-    "en": "A scoreboard for any game. Highest score wins; you decide when the game ends."
+    "en": "A scoreboard for any game. Highest score wins; you decide when the game ends.", "es": "Un marcador para cualquier juego. Gana la puntuación más alta; tú decides cuándo termina la partida.", "de": "Eine Punktetafel für jedes Spiel. Die höchste Punktzahl gewinnt; du entscheidest, wann das Spiel endet.", "it": "Un tabellone punti per qualsiasi gioco. Vince il punteggio più alto; decidi tu quando finisce la partita."
   },
 
   "symbol": "square.and.pencil",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "roundLabel": { "fr": "Manche", "en": "Round", "es": "Manga", "de": "Runde", "it": "Manche" },
     "entry": {
       "kind": "integer",
       "allowsNegative": true

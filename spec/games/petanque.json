@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Pétanque", "en": "Pétanque" },
+  "name": { "fr": "Pétanque", "en": "Pétanque", "es": "Petanca", "de": "Pétanque", "it": "Petanca" },
   "shortDescription": {
     "fr": "Seule l'équipe qui remporte la mène marque, de 1 à 6 points ; l'autre entre 0. La partie s'arrête dès qu'une équipe atteint 13.",
-    "en": "Only the team that wins the end scores, 1 to 6 points; the other enters 0. The game ends once a team reaches 13."
+    "en": "Only the team that wins the end scores, 1 to 6 points; the other enters 0. The game ends once a team reaches 13.", "es": "Solo el equipo que gana la ronda puntúa, de 1 a 6 puntos; el otro anota 0. La partida termina en cuanto un equipo alcanza 13.", "de": "Nur das Team, das die Aufnahme gewinnt, punktet, 1 bis 6 Punkte; das andere trägt 0 ein. Das Spiel endet, sobald ein Team 13 erreicht.", "it": "Solo la squadra che vince il turno segna, da 1 a 6 punti; l'altra inserisce 0. La partita termina non appena una squadra raggiunge 13."
   },
 
   "symbol": "smallcircle.circle.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Mène", "en": "End" },
+    "roundLabel": { "fr": "Mène", "en": "End", "es": "Ronda", "de": "Runde", "it": "Turno" },
     "entry": {
       "kind": "integer",
       "min": 0,

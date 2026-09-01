@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Skyjo", "en": "Skyjo" },
+  "name": { "fr": "Skyjo", "en": "Skyjo", "es": "Skyjo", "de": "Skyjo", "it": "Skyjo" },
   "shortDescription": {
     "fr": "Le score le plus bas gagne. La partie s'arrête dès qu'un joueur atteint 100.",
-    "en": "Lowest score wins. The game ends once a player reaches 100."
+    "en": "Lowest score wins. The game ends once a player reaches 100.", "es": "Gana la puntuación más baja. La partida termina en cuanto un jugador alcanza 100.", "de": "Die niedrigste Punktzahl gewinnt. Das Spiel endet, sobald ein Spieler 100 erreicht.", "it": "Vince il punteggio più basso. La partita termina non appena un giocatore raggiunge 100."
   },
 
   "symbol": "square.grid.3x3.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "lowestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "roundLabel": { "fr": "Manche", "en": "Round", "es": "Manga", "de": "Runde", "it": "Manche" },
     "entry": {
       "kind": "integer",
       "min": -24,
@@ -29,7 +29,7 @@
     "modifiers": [
       {
         "id": "closedRound",
-        "label": { "fr": "A fermé la manche", "en": "Closed the round" },
+        "label": { "fr": "A fermé la manche", "en": "Closed the round", "es": "Cerró la manga", "de": "Hat die Runde geschlossen", "it": "Ha chiuso la manche" },
         "kind": "exclusiveFlag",
         "required": true
       }
@@ -56,17 +56,17 @@
   "variants": [
     {
       "id": "threshold",
-      "label": { "fr": "Fin de partie à", "en": "Game ends at" },
+      "label": { "fr": "Fin de partie à", "en": "Game ends at", "es": "Fin de partida a", "de": "Spielende bei", "it": "Fine partita a" },
       "kind": "integerChoice",
       "values": [50, 100, 150, 200],
       "default": 100
     },
     {
       "id": "doublePenalty",
-      "label": { "fr": "Doublement du score", "en": "Score doubling" },
+      "label": { "fr": "Doublement du score", "en": "Score doubling", "es": "Duplicación de puntuación", "de": "Punkteverdopplung", "it": "Raddoppio del punteggio" },
       "help": {
         "fr": "Le joueur qui ferme la manche voit son score doublé s'il n'a pas le score strictement le plus bas.",
-        "en": "The player who closes the round has their score doubled unless it is strictly the lowest."
+        "en": "The player who closes the round has their score doubled unless it is strictly the lowest.", "es": "El jugador que cierra la manga ve su puntuación duplicada si no tiene la puntuación estrictamente más baja.", "de": "Der Spieler, der die Runde schließt, bekommt seine Punktzahl verdoppelt, wenn sie nicht eindeutig die niedrigste ist.", "it": "Il giocatore che chiude la manche vede il proprio punteggio raddoppiato se non ha il punteggio strettamente più basso."
       },
       "kind": "bool",
       "default": true

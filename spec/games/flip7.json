@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Flip 7", "en": "Flip 7" },
+  "name": { "fr": "Flip 7", "en": "Flip 7", "es": "Flip 7", "de": "Flip 7", "it": "Flip 7" },
   "shortDescription": {
     "fr": "Cumulez des cartes sans tirer de doublon. Une manche ratée vaut 0. La partie s'arrête dès qu'un joueur atteint 200.",
-    "en": "Collect cards without busting on a duplicate. A busted round scores 0. The game ends once a player reaches 200."
+    "en": "Collect cards without busting on a duplicate. A busted round scores 0. The game ends once a player reaches 200.", "es": "Acumula cartas sin sacar un duplicado. Una manga fallida vale 0. La partida termina en cuanto un jugador alcanza 200.", "de": "Sammle Karten, ohne ein Duplikat zu ziehen. Eine gescheiterte Runde zählt 0. Das Spiel endet, sobald ein Spieler 200 erreicht.", "it": "Accumula carte senza pescare un doppione. Una manche fallita vale 0. La partita termina non appena un giocatore raggiunge 200."
   },
 
   "symbol": "7.circle.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "roundLabel": { "fr": "Manche", "en": "Round", "es": "Manga", "de": "Runde", "it": "Manche" },
     "entry": {
       "kind": "integer",
       "min": 0,
@@ -46,7 +46,7 @@
   "variants": [
     {
       "id": "threshold",
-      "label": { "fr": "Fin de partie à", "en": "Game ends at" },
+      "label": { "fr": "Fin de partie à", "en": "Game ends at", "es": "Fin de partida a", "de": "Spielende bei", "it": "Fine partita a" },
       "kind": "integerChoice",
       "values": [150, 200, 250],
       "default": 200

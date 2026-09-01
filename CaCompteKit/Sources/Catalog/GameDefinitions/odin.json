@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Odin", "en": "Odin" },
+  "name": { "fr": "Odin", "en": "Odin", "es": "Odin", "de": "Odin", "it": "Odin" },
   "shortDescription": {
     "fr": "Défaussez-vous de votre main avant les autres. Chaque manche, vous marquez le nombre de cartes qu'il vous reste en main ; le score le plus bas gagne. La partie s'arrête dès qu'un joueur atteint 15.",
-    "en": "Be first to empty your hand. Each round you score the number of cards left in hand; lowest score wins. The game ends once a player reaches 15."
+    "en": "Be first to empty your hand. Each round you score the number of cards left in hand; lowest score wins. The game ends once a player reaches 15.", "es": "Sé el primero en quedarte sin cartas. Cada manga anotas el número de cartas que te quedan en la mano; gana la puntuación más baja. La partida termina en cuanto un jugador alcanza 15.", "de": "Sei als Erster deine Handkarten los. Jede Runde zählst du die Anzahl der Karten, die dir noch bleiben; die niedrigste Punktzahl gewinnt. Das Spiel endet, sobald ein Spieler 15 erreicht.", "it": "Sii il primo a restare senza carte in mano. Ogni manche segni il numero di carte che ti restano in mano; vince il punteggio più basso. La partita termina non appena un giocatore raggiunge 15."
   },
 
   "symbol": "shield.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "lowestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "roundLabel": { "fr": "Manche", "en": "Round", "es": "Manga", "de": "Runde", "it": "Manche" },
     "entry": {
       "kind": "integer",
       "min": 0,
@@ -47,7 +47,7 @@
   "variants": [
     {
       "id": "threshold",
-      "label": { "fr": "Fin de partie à", "en": "Game ends at" },
+      "label": { "fr": "Fin de partie à", "en": "Game ends at", "es": "Fin de partida a", "de": "Spielende bei", "it": "Fine partita a" },
       "kind": "integerChoice",
       "values": [10, 15, 20],
       "default": 15

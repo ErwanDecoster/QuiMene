@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Cornhole", "en": "Cornhole" },
+  "name": { "fr": "Cornhole", "en": "Cornhole", "es": "Cornhole", "de": "Cornhole", "it": "Cornhole" },
   "shortDescription": {
     "fr": "Score à l'américaine : seul le camp en tête marque la différence de la manche (sac dans le trou = 3, sur la planche = 1). La partie s'arrête dès qu'un score atteint 21.",
-    "en": "Cancellation scoring: only the leading side scores the round's difference (bag in hole = 3, on the board = 1). The game ends once a score reaches 21."
+    "en": "Cancellation scoring: only the leading side scores the round's difference (bag in hole = 3, on the board = 1). The game ends once a score reaches 21.", "es": "Puntuación por diferencia: solo el equipo que va en cabeza anota la diferencia de la manga (bolsa en el agujero = 3, en la tabla = 1). La partida termina en cuanto una puntuación alcanza 21.", "de": "Differenzwertung: Nur die führende Seite erhält die Punktedifferenz der Runde (Sack im Loch = 3, auf dem Brett = 1). Das Spiel endet, sobald eine Punktzahl 21 erreicht.", "it": "Punteggio a differenza: solo la squadra in testa segna la differenza della manche (sacchetto nel buco = 3, sulla tavola = 1). La partita termina non appena un punteggio raggiunge 21."
   },
 
   "symbol": "circle.grid.cross.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "roundLabel": { "fr": "Manche", "en": "Round", "es": "Manga", "de": "Runde", "it": "Manche" },
     "entry": {
       "kind": "integer",
       "min": 0,

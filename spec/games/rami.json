@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Rami", "en": "Rummy" },
+  "name": { "fr": "Rami", "en": "Rummy", "es": "Rummy", "de": "Rommé", "it": "Ramino" },
   "shortDescription": {
     "fr": "Le score le plus bas gagne. La partie s'arrête dès qu'un joueur atteint 251.",
-    "en": "Lowest score wins. The game ends once a player reaches 251."
+    "en": "Lowest score wins. The game ends once a player reaches 251.", "es": "Gana la puntuación más baja. La partida termina en cuanto un jugador alcanza 251.", "de": "Die niedrigste Punktzahl gewinnt. Das Spiel endet, sobald ein Spieler 251 erreicht.", "it": "Vince il punteggio più basso. La partita termina non appena un giocatore raggiunge 251."
   },
 
   "symbol": "rectangle.stack.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "lowestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Manche", "en": "Round" },
+    "roundLabel": { "fr": "Manche", "en": "Round", "es": "Manga", "de": "Runde", "it": "Manche" },
     "entry": {
       "kind": "integer",
       "min": 0,
@@ -47,7 +47,7 @@
   "variants": [
     {
       "id": "threshold",
-      "label": { "fr": "Fin de partie à", "en": "Game ends at" },
+      "label": { "fr": "Fin de partie à", "en": "Game ends at", "es": "Fin de partida a", "de": "Spielende bei", "it": "Fine partita a" },
       "kind": "integerChoice",
       "values": [100, 251, 500],
       "default": 251

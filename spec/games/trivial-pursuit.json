@@ -3,10 +3,10 @@
   "specVersion": 1,
   "rulesVersion": 1,
 
-  "name": { "fr": "Trivial Pursuit", "en": "Trivial Pursuit" },
+  "name": { "fr": "Trivial Pursuit", "en": "Trivial Pursuit", "es": "Trivial Pursuit", "de": "Trivial Pursuit", "it": "Trivial Pursuit" },
   "shortDescription": {
     "fr": "Suivez la progression en camemberts gagnés (0 à 6) plutôt qu'un score classique. Premier à 6 (et à répondre à la question finale) gagne.",
-    "en": "Track progress by wedges won (0 to 6) rather than a classic score. First to 6 (and to answer the final question) wins."
+    "en": "Track progress by wedges won (0 to 6) rather than a classic score. First to 6 (and to answer the final question) wins.", "es": "Sigue el progreso por quesitos ganados (de 0 a 6) en lugar de una puntuación clásica. Gana quien llegue primero a 6 (y responda la pregunta final).", "de": "Verfolge den Fortschritt anhand gewonnener Tortenstücke (0 bis 6) statt einer klassischen Punktzahl. Wer zuerst 6 erreicht (und die Schlussfrage beantwortet), gewinnt.", "it": "Segui i progressi tramite gli spicchi vinti (da 0 a 6) invece di un punteggio classico. Vince chi arriva per primo a 6 (e risponde alla domanda finale)."
   },
 
   "symbol": "questionmark.circle.fill",
@@ -17,7 +17,7 @@
   "scoring": {
     "direction": "highestWins",
     "aggregation": "cumulative",
-    "roundLabel": { "fr": "Tour", "en": "Turn" },
+    "roundLabel": { "fr": "Tour", "en": "Turn", "es": "Turno", "de": "Zug", "it": "Turno" },
     "entry": {
       "kind": "integer",
       "min": 0,
