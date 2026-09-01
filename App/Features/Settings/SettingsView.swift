@@ -1,6 +1,7 @@
 import DesignSystem
 import Store
 import SwiftUI
+import UIKit
 
 /// Doc 03 : « La sync est désactivable : un utilisateur qui refuse iCloud garde une app
 /// pleinement fonctionnelle. Le basculement recrée le `ModelContainer` ; ce n'est pas une
@@ -32,6 +33,29 @@ struct SettingsView: View {
             "Automatique : les joueurs les plus actifs (nombre de parties jouées) en premier. Manuel : réordonne-les toi-même dans l'onglet Joueurs."
           )
         }
+
+        // Doc utilisateur (audit qualité, 15) — iOS ne permet pas à une app tierce de changer sa
+        // propre langue en direct : le seul levier est le sélecteur système par app (Réglages >
+        // Ça Compte > Langue), qui n'existe que parce que le projet déclare plusieurs langues
+        // (`knownRegions`). Ce bouton ouvre directement cette page plutôt que de laisser deviner
+        // où chercher dans l'app Réglages.
+        Section {
+          Button {
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+              UIApplication.shared.open(url)
+            }
+          } label: {
+            HStack {
+              Text("Langue")
+                .foregroundStyle(.textPrimary)
+              Spacer()
+              Text(currentLanguageDisplayName)
+                .foregroundStyle(.textSecondary)
+            }
+          }
+        } footer: {
+          Text("Ouvre les réglages système pour choisir la langue de l'app.")
+        }
       }
       .navigationTitle("Réglages")
       .navigationBarTitleDisplayMode(.inline)
@@ -41,5 +65,15 @@ struct SettingsView: View {
         }
       }
     }
+  }
+
+  /// Doc utilisateur — `Bundle.main.preferredLocalizations` (même résolution que
+  /// `GameDefinition.LocalizedText.localized`) plutôt que `Locale.current`, pour refléter le
+  /// réglage par app plutôt que la langue système. `Locale.current.localizedString(forLanguageCode:)`
+  /// donne le nom dans la langue *actuellement affichée* — cohérent avec le reste de l'écran.
+  private var currentLanguageDisplayName: String {
+    let code = Bundle.main.preferredLocalizations.first ?? "fr"
+    return Locale.current.localizedString(forLanguageCode: code)?.capitalized(with: Locale.current)
+      ?? code
   }
 }

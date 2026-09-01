@@ -503,6 +503,9 @@
 			knownRegions = (
 				fr,
 				en,
+				es,
+				de,
+				it,
 				Base,
 			);
 			mainGroup = B9FCD9EC037C18578EE32853;
