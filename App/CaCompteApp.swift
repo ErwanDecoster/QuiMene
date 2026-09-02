@@ -3,7 +3,6 @@ import Domain
 import Store
 import SwiftData
 import SwiftUI
-import WidgetKit
 
 /// Doc utilisateur — onglets adressables par un deep link (`CaCompteApp.selectedTab`) : sans ça,
 /// un lien `cacompte://`/Handoff/App Intent qui arrive alors que l'onglet visé n'est pas actif
@@ -67,8 +66,8 @@ struct CaCompteApp: App {
       // `cacompte://`, doc 09) : `DeepLinkRouter` fait le pont jusqu'à `JoinTabView`,
       // potentiellement affichée sur un autre onglet au moment où le lien s'ouvre.
       .onOpenURL { url in
-        // Doc utilisateur — Widget (P9) : tap sur la carte de partie en cours
-        // (`cacompte://resume`, posé par `MatchWidgetEntryView.widgetURL`).
+        // Doc utilisateur — Live Activity (P9) : tap sur l'écran verrouillé ou la Dynamic
+        // Island (`cacompte://resume`, posé par `MatchLiveActivityWidget.widgetURL`).
         if url.host == "resume" {
           deepLinkRouter.wantsResume = true
           return
@@ -76,14 +75,7 @@ struct CaCompteApp: App {
         guard let payload = JoinLink.parse(url) else { return }
         deepLinkRouter.pendingJoin = payload
       }
-      // Doc utilisateur — Widget (P9) : un score ne change que sur action explicite d'un
-      // joueur (doc `MatchTimelineProvider`), donc pas de rafraîchissement périodique côté
-      // widget — c'est l'app qui republie sa timeline, au moment le plus probable où
-      // l'utilisateur va la consulter (elle vient de quitter l'app).
       .onChange(of: scenePhase) { _, newPhase in
-        if newPhase == .background {
-          WidgetCenter.shared.reloadAllTimelines()
-        }
         if newPhase == .active, let container {
           Task { await SharedProfileSyncCoordinator.shared.sync(context: container.mainContext) }
         }
@@ -123,11 +115,11 @@ struct CaCompteApp: App {
   /// indisponible, container mal provisionné, réseau absent), on retombe sur un stockage
   /// local : « un utilisateur qui refuse iCloud garde une app pleinement fonctionnelle »
   /// s'applique aussi si iCloud est coché mais indisponible.
-  /// Doc utilisateur — Widget (P9) : le store vit dans le conteneur App Group quand il est
-  /// disponible, pour que l'extension widget (bundle id séparé, doc `SharedStore`) puisse lire
-  /// les mêmes données sans dupliquer la synchronisation CloudKit. Retombe sur l'emplacement
-  /// par défaut si le groupe n'est pas provisionné — l'app reste utilisable, seul le widget
-  /// perd sa source.
+  /// Doc utilisateur — le store vit dans le conteneur App Group (`SharedStore`) quand il est
+  /// disponible, plutôt qu'à l'emplacement par défaut. Conservé tel quel après le retrait du
+  /// widget d'écran d'accueil (P9, plus rien ne lit ce store hors de l'app) pour ne pas migrer
+  /// l'emplacement des données des installations existantes — changer d'emplacement de store
+  /// sans migration ferait apparaître les parties et joueurs déjà enregistrés comme perdus.
   private nonisolated static func configuration(
     schema: Schema, cloudKitDatabase: ModelConfiguration.CloudKitDatabase
   ) -> ModelConfiguration {

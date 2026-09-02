@@ -281,7 +281,6 @@ l'écran, fait partie de la définition de « terminé » de chaque écran ([10]
 
 Prévues en Phase 8, une fois le cœur stable :
 
-- **Widget** (WidgetKit) — dernière partie et vainqueur, sur l'écran d'accueil.
 - **App Intents** — « Démarrer une partie de Skyjo » depuis Siri, Raccourcis et Spotlight.
 - **Live Activity** — score en cours sur l'écran verrouillé et dans l'île dynamique, très
   pertinent pour une partie longue.

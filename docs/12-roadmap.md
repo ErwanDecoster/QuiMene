@@ -153,19 +153,26 @@ Apple, recette manuelle réussie sur appareil réel ; Android reste à faire.** 
 ## P9 — Finitions & TestFlight · 2,5 semaines
 
 - ✅ Handoff (`MatchContinuation`, `NSUserActivity` sur `MatchPlayView`) — reprise d'une partie en
-  cours sur un autre appareil au même compte iCloud
-- ✅ App Intents / Siri (`MatchShortcuts`) — « Reprends ma partie », « Commence une partie de… »
-  (`GameEntity`/`GameEntityQuery`), exposées via `AppShortcutsProvider`
-- ✅ Widget (cible `CaCompteWidgetExtension`) — classement de la partie en cours sur l'écran
-  d'accueil, store partagé via App Group (`SharedStore`), republié quand l'app repasse en
-  arrière-plan plutôt que sur un minuteur
+  cours sur un autre appareil au même compte iCloud. Vérifié par l'auteur sur appareil physique :
+  fonctionne tel quel, jugé d'un intérêt limité au quotidien — aucun développement supplémentaire
+  prévu au-delà de ce qui existe
+- ⏳ **App Intents / Siri (`MatchShortcuts`) — non fonctionnel, mis en pause.** Testé par l'auteur
+  sur appareil physique, plusieurs allers-retours : la couverture insuffisante des phrases
+  déclarées (une seule formulation par intent à l'origine) et l'absence de la capacité Siri
+  (`com.apple.developer.siri`, ajoutée depuis) ont chacune été corrigées sans résoudre le
+  problème — Siri reste incapable de lancer ou reprendre une partie. Cause exacte non identifiée ;
+  mis en pause à la demande de l'utilisateur plutôt que d'insister sans piste supplémentaire, voir
+  [15](15-plan-qualite-code.md#vérification-p9-sur-appareil-réel--widget-retiré-siri-mis-en-pause)
 - ✅ Live Activity (`MatchActivityAttributes` dans `Domain`, `MatchLiveActivityController`) — écran
   verrouillé et Dynamic Island, mis à jour à chaque manche depuis les trois écrans de saisie
 - ✅ Dynamic Island vérifiée par l'auteur sur appareil physique — rendu réel conforme
-- 🔶 Widget sur l'écran d'accueil, Handoff entre deux appareils et Siri restent vérifiés par build
-  complet + lancement simulateur seulement ; leur rendu réel reste à valider sur appareil
-  physique — voir doc [09](09-partie-partagee.md) pour le même principe appliqué au transport
-  Supabase
+- ❌ **Widget d'écran d'accueil retiré** — construit puis testé sur appareil physique par
+  l'auteur, jugé sans intérêt réel à l'usage (classement figé jusqu'au retour en arrière-plan,
+  contrairement à la Live Activity qui se met à jour en direct). `MatchWidget.swift` supprimé,
+  `CaCompteWidgetBundle` ne déclare plus que `MatchLiveActivityWidget`. `SharedStore`/le
+  conteneur App Group restent (Live Activity n'en a pas besoin, mais migrer l'emplacement du
+  store ferait apparaître les données déjà enregistrées comme perdues sur les installations
+  existantes) — voir le commentaire de `CaCompteApp.loadContainer`
 - ✅ Passe d'accessibilité : infrastructure (Reduce Motion, regroupement de lignes VoiceOver,
   contraste augmenté) et rattrapage sur les 8 zones de l'app faits — 20 fichiers sur 42 dans
   `App/Features` touchent maintenant l'accessibilité (2 au départ). Traversée VoiceOver, Dynamic

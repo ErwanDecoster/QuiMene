@@ -21,7 +21,6 @@
 		3F3546CAAB8E926419CC8851 /* LiveMatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A7326A3B54C2A7022BFF31D /* LiveMatchView.swift */; };
 		21214466801143AA906B98BE /* ScoreBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCA772F16A8046CCB612620B /* ScoreBoardView.swift */; };
 		1C0AC5F7DB9C7CCDF5852C46 /* KeyboardObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4069F1BD7B30DB92C9BF1AB /* KeyboardObserver.swift */; };
-		44387B906D7D533A7BC3DE2C /* MatchWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5423929B035410EC56001A4 /* MatchWidget.swift */; };
 		449D14BD722EA2711E98EFEC /* PlayerRecord+Avatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995D8274A3CEAA3E755A72E6 /* PlayerRecord+Avatar.swift */; };
 		4A2C78824B135828FE2E5FC6 /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E465C66E83BEDE023DDBDBFB /* QRScannerView.swift */; };
 		4A56CC9B8C9F6878EB95DC28 /* HistoryListModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 849F62578BC9685EEC910AC8 /* HistoryListModel.swift */; };
@@ -176,7 +175,6 @@
 		D90C5383931C73460C54F4F3 /* QRCodeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QRCodeView.swift; sourceTree = "<group>"; };
 		E33D25510FA11118DE442CB2 /* BeloteRoundModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeloteRoundModel.swift; sourceTree = "<group>"; };
 		E465C66E83BEDE023DDBDBFB /* QRScannerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
-		E5423929B035410EC56001A4 /* MatchWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MatchWidget.swift; sourceTree = "<group>"; };
 		E6251C1B9A134F5DA88F87E3 /* MatchContinuation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MatchContinuation.swift; sourceTree = "<group>"; };
 		ED88C4CDA8CFDA746AC9588D /* SharedMatchModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedMatchModel.swift; sourceTree = "<group>"; };
 		EFAAD36FF72BABA0EA7DA7CC /* BeloteRoundView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeloteRoundView.swift; sourceTree = "<group>"; };
@@ -296,7 +294,6 @@
 				2E3085EAB19FA97E55DB0D70 /* Info.plist */,
 				768FEE4048903956BFB3FB2B /* CaCompteWidget.entitlements */,
 				3C2581102A3F3BC41B60D067 /* CaCompteWidgetBundle.swift */,
-				E5423929B035410EC56001A4 /* MatchWidget.swift */,
 				BCA00ECB7595F62002FC421C /* MatchLiveActivityWidget.swift */,
 			);
 			name = CaCompteWidget;
@@ -707,7 +704,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				188202D3EB10D2CD01A3BC5C /* CaCompteWidgetBundle.swift in Sources */,
-				44387B906D7D533A7BC3DE2C /* MatchWidget.swift in Sources */,
 				22A26A3D66FC3BDB4954FE9F /* MatchLiveActivityWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

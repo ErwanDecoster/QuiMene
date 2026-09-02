@@ -70,12 +70,19 @@ struct ResumeMatchIntent: AppIntent {
 }
 
 struct CaCompteShortcuts: AppShortcutsProvider {
+  /// Doc utilisateur (audit qualité, 15) — remontée : « lance une partie de Skyjo sur CaCompte »
+  /// (verbe et préposition absents des phrases déclarées, une seule variante par intent au
+  /// départ) tombait sur l'intent musique du système au lieu de `StartMatchIntent` — Siri ne
+  /// fait pas de correspondance sémantique libre, seulement un rapprochement des phrases
+  /// vraiment déclarées ici. Plusieurs verbes/prépositions courants couverts par intent plutôt
+  /// qu'une seule formulation.
   static var appShortcuts: [AppShortcut] {
     AppShortcut(
       intent: ResumeMatchIntent(),
       phrases: [
         "Reprends ma partie dans \(.applicationName)",
         "Reprends la partie en cours dans \(.applicationName)",
+        "Continue ma partie dans \(.applicationName)",
       ],
       shortTitle: "Reprendre la partie",
       systemImageName: "arrow.clockwise.circle"
@@ -83,7 +90,10 @@ struct CaCompteShortcuts: AppShortcutsProvider {
     AppShortcut(
       intent: StartMatchIntent(),
       phrases: [
-        "Commence une partie de \(\.$game) dans \(.applicationName)"
+        "Commence une partie de \(\.$game) dans \(.applicationName)",
+        "Lance une partie de \(\.$game) dans \(.applicationName)",
+        "Lance une partie de \(\.$game) sur \(.applicationName)",
+        "Démarre une partie de \(\.$game) dans \(.applicationName)",
       ],
       shortTitle: "Commencer une partie",
       systemImageName: "die.face.5"

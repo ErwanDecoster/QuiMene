@@ -399,6 +399,55 @@ bien » à l'oreille, qu'un test automatisé ne peut pas remplacer.
 
 **Fini** — ligne accessibilité de [12-roadmap.md](12-roadmap.md) (P9) passée de ⏳ à ✅.
 
+### Vérification P9 sur appareil réel — Widget retiré, Siri mis en pause
+
+En marge de la traversée accessibilité ci-dessus, l'utilisateur a aussi vérifié sur appareil
+physique les autres finitions P9 restées jusque-là au stade « build + simulateur seulement »
+(Widget, Handoff, Siri).
+
+- ❌ **Widget d'écran d'accueil retiré** — présent, mais jugé sans intérêt réel une fois vu en
+  usage (classement figé jusqu'au retour de l'app en arrière-plan, contrairement à la Live
+  Activity qui suit chaque manche en direct — les deux affichaient la même information, l'une
+  en retard sur l'autre). Supprimé plutôt que laissé en l'état : `MatchWidget.swift` retiré du
+  projet (fichier + 4 entrées `project.pbxproj`), `CaCompteWidgetBundle` ne déclare plus que
+  `MatchLiveActivityWidget`, `WidgetCenter.shared.reloadAllTimelines()` retiré de `CaCompteApp`
+  (n'avait plus de destinataire). `SharedStore`/le conteneur App Group ne sont **pas** retirés
+  malgré n'être plus lus par rien après ce changement — y toucher changerait l'emplacement du
+  store SwiftData des installations existantes, ce qui ferait apparaître les parties et joueurs
+  déjà enregistrés comme perdus. Coût accepté : quelques dizaines de lignes mortes plutôt qu'un
+  risque de perte de données perçue.
+- ✅ **Handoff** — fonctionne tel quel sur appareil réel, jugé d'un intérêt limité au quotidien.
+  Décision : garder l'existant, aucun développement supplémentaire prévu.
+- ⏳ **Siri (`StartMatchIntent`) — ne parvient pas à lancer une partie, mis en pause sans être
+  résolu.** Constaté sur appareil réel, en trois temps :
+  1. Premier symptôme : l'app ne s'ouvrait pas du tout — signe que `perform()` n'était jamais
+     appelé (le code en aval, identique au chemin déjà éprouvé des liens `cacompte://`/Handoff,
+     n'était donc pas en cause).
+  2. Deuxième essai, symptôme différent : « lance une partie de Skyjo sur CaCompte » déclenchait
+     un intent **musique** du système au lieu de l'app. Diagnostiqué : `CaCompteShortcuts` ne
+     déclarait qu'**une seule** formulation par intent (« Commence…dans… ») — Siri ne fait pas de
+     correspondance sémantique libre sur les App Shortcuts, un verbe (« lance ») ou une
+     préposition (« sur ») absents des phrases déclarées laissent le champ libre à un intent
+     système concurrent mieux couvert. Corrigé en couvrant les verbes/prépositions les plus
+     probables : 4 phrases pour `StartMatchIntent` (commence/lance/démarre, dans/sur), 3 pour
+     `ResumeMatchIntent` (reprends ×2/continue).
+  3. Après réinstallation, troisième symptôme : « Siri ne prend pas en charge cette
+     fonctionnalité sur Ça Compte », reproductible seulement de façon intermittente (~1 essai sur
+     10). La capacité **Siri** (`com.apple.developer.siri`), absente des entitlements, a été
+     ajoutée — signature vérifiée sur appareil réel avec le compte payant de l'utilisateur
+     (`xcodebuild build`, provisioning automatique, aucune erreur). N'a pas résolu le problème.
+
+  Cause exacte non identifiée après ces trois correctifs successifs (couverture de phrases,
+  capacité Siri) — chacun plausible, aucun suffisant. Le comportement intermittent pointe vers un
+  problème d'indexation Siri/App Intents côté système plutôt que vers le code de l'app, mais ça
+  reste une hypothèse non confirmée. **Mis en pause à la demande de l'utilisateur** plutôt que de
+  continuer à corriger à l'aveugle sans nouvelle piste : les trois correctifs restent en place
+  (ils ne peuvent pas nuire), mais Siri lui-même n'est pas considéré fonctionnel.
+
+Vérification : `xcodebuild` (scheme `CaCompte`) réussit à 0 avertissement après le retrait du
+widget et l'ajout de la capacité Siri ; `grep -rn "MatchWidget" App CaCompteKit` ne trouve plus
+rien hors de ce journal.
+
 ## Recommandation de pratique — README factuel plutôt que journal
 
 La dérive constatée sur le README (huit semaines sans mise à jour malgré un changement
