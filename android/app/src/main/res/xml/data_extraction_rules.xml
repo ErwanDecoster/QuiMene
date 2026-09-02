@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Doc 11 « Synchronisation » : pas d'équivalent Android à CloudKit (pas de stockage privé lié
+    au compte système, sans serveur) — la v1 Android n'a donc pas de sync multi-appareils. Android
+    Auto Backup (quota 25 Mo, largement suffisant pour la base Room) en tient lieu pour la
+    sauvegarde, au même titre qu'iCloud côté Apple. Format API 31+ ; voir full_backup_content.xml
+    pour le repli API 26-30 (minSdk du module).
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="database" path="cacompte.db" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="database" path="cacompte.db" />
+    </device-transfer>
+</data-extraction-rules>

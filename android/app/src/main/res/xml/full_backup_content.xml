@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Repli Android Auto Backup pour API 26-30 (minSdk du module) — voir data_extraction_rules.xml
+     pour le format API 31+, même contenu sauvegardé (la base Room). -->
+<full-backup-content>
+    <include domain="database" path="cacompte.db" />
+</full-backup-content>

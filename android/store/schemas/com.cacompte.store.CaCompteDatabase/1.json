@@ -1,0 +1,305 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "5a9be0c7d2c3f08474199c0d11d5a1ec",
+    "entities": [
+      {
+        "tableName": "players",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `nickname` TEXT NOT NULL, `avatarKind` TEXT NOT NULL, `avatarValue` TEXT NOT NULL, `avatarPhoto` BLOB, `paletteID` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `isArchived` INTEGER NOT NULL, `sortIndex` INTEGER NOT NULL, `sharedProfileID` TEXT, `sharedProfileIsMine` INTEGER NOT NULL, `sharedProfileLinkedName` TEXT, `sharedProfileLinkedAt` INTEGER, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nickname",
+            "columnName": "nickname",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatarKind",
+            "columnName": "avatarKind",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatarValue",
+            "columnName": "avatarValue",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatarPhoto",
+            "columnName": "avatarPhoto",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "paletteID",
+            "columnName": "paletteID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isArchived",
+            "columnName": "isArchived",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sortIndex",
+            "columnName": "sortIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sharedProfileID",
+            "columnName": "sharedProfileID",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sharedProfileIsMine",
+            "columnName": "sharedProfileIsMine",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sharedProfileLinkedName",
+            "columnName": "sharedProfileLinkedName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sharedProfileLinkedAt",
+            "columnName": "sharedProfileLinkedAt",
+            "affinity": "INTEGER"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "matches",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `gameID` TEXT NOT NULL, `rulesVersion` INTEGER NOT NULL, `variantsData` BLOB NOT NULL, `startedAt` INTEGER NOT NULL, `endedAt` INTEGER, `status` TEXT NOT NULL, `endReasonRaw` TEXT, `isArchived` INTEGER NOT NULL, `deviceOrigin` TEXT NOT NULL, `eventLogData` BLOB NOT NULL, `pendingSharedProfileSync` INTEGER NOT NULL, `isImportedSummary` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gameID",
+            "columnName": "gameID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rulesVersion",
+            "columnName": "rulesVersion",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "variantsData",
+            "columnName": "variantsData",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startedAt",
+            "columnName": "startedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endedAt",
+            "columnName": "endedAt",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endReasonRaw",
+            "columnName": "endReasonRaw",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isArchived",
+            "columnName": "isArchived",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceOrigin",
+            "columnName": "deviceOrigin",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventLogData",
+            "columnName": "eventLogData",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "pendingSharedProfileSync",
+            "columnName": "pendingSharedProfileSync",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isImportedSummary",
+            "columnName": "isImportedSummary",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "participants",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `playerId` TEXT, `nicknameSnapshot` TEXT NOT NULL, `avatarKindSnapshot` TEXT NOT NULL, `avatarValueSnapshot` TEXT NOT NULL, `paletteIDSnapshot` TEXT NOT NULL, `seatIndex` INTEGER NOT NULL, `teamID` TEXT, `finalRank` INTEGER, `finalScore` INTEGER, `matchId` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`playerId`) REFERENCES `players`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`matchId`) REFERENCES `matches`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "playerId",
+            "columnName": "playerId",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "nicknameSnapshot",
+            "columnName": "nicknameSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatarKindSnapshot",
+            "columnName": "avatarKindSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatarValueSnapshot",
+            "columnName": "avatarValueSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "paletteIDSnapshot",
+            "columnName": "paletteIDSnapshot",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seatIndex",
+            "columnName": "seatIndex",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "teamID",
+            "columnName": "teamID",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "finalRank",
+            "columnName": "finalRank",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "finalScore",
+            "columnName": "finalScore",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "matchId",
+            "columnName": "matchId",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_participants_playerId",
+            "unique": false,
+            "columnNames": [
+              "playerId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_participants_playerId` ON `${TABLE_NAME}` (`playerId`)"
+          },
+          {
+            "name": "index_participants_matchId",
+            "unique": false,
+            "columnNames": [
+              "matchId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_participants_matchId` ON `${TABLE_NAME}` (`matchId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "players",
+            "onDelete": "SET NULL",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "playerId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "matches",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "matchId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5a9be0c7d2c3f08474199c0d11d5a1ec')"
+    ]
+  }
+}
