@@ -41,8 +41,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.core)
 
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
+    // `api`, pas `implementation` : l'API publique de :store expose Room directement
+    // (`CaCompteDatabase` hérite de `RoomDatabase`, les DAOs sont un type Room) — :app en a
+    // besoin sur son propre classpath de compilation pour construire/utiliser la base.
+    api(libs.androidx.room.runtime)
+    api(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.datastore.preferences)

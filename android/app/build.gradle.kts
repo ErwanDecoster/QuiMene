@@ -3,6 +3,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -31,6 +32,10 @@ android {
             isMinifyEnabled = false
         }
     }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
 }
 
 kotlin {
@@ -50,12 +55,21 @@ dependencies {
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.serialization.json)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    testImplementation(libs.junit.jupiter)
-    testRuntimeOnly(libs.junit.platform.launcher)
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
+    // JUnit4 + Robolectric — pas JUnit5 (voir :store) : les ViewModels de cette étape touchent
+    // Android (Context via AppContainer/Application) et Robolectric exige son propre runner.
+    testImplementation(libs.junit4)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.junit)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

@@ -11,7 +11,6 @@ import com.cacompte.domain.rules.GameCatalog
 import com.cacompte.domain.rules.GameDefinition
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import java.io.File
 
 /**
  * Miroir de `GameCatalog+Embedded.swift` : charge toutes les définitions embarquées et construit
@@ -41,25 +40,33 @@ object GameCatalogEmbedded {
     /**
      * Ressource régénérée à chaque build par la tâche Gradle `copySpecResources`
      * (`android/catalog/build.gradle.kts`) à partir de `spec/games/` — jamais committée, ne peut
-     * donc pas diverger de la source de vérité. Listage par répertoire de fichiers plutôt que
-     * balayage générique de JAR : suffisant pour l'exécution des tests JVM de cette étape ; à
-     * revérifier quand `:app` embarque réellement `:catalog` dans un APK packagé (étape D/E) —
-     * l'accès en lecture à une ressource *individuelle* via `getResourceAsStream` fonctionne déjà
-     * de façon standard sur Android (JAR classpath ordinaire), mais le listage de répertoire par
-     * `File(url.toURI())` suppose des ressources non compressées sur le disque.
+     * donc pas diverger de la source de vérité. Lue via `getResourceAsStream` (index texte, puis
+     * chaque fichier), jamais via `File(url.toURI())` : ce dernier lève "URI is not hierarchical"
+     * dès que la ressource est vue à travers un JAR (rencontré en test Robolectric de `:app`,
+     * qui consomme `:catalog` packagé) et n'aurait de toute façon pas fonctionné une fois les
+     * ressources compressées dans un APK réel — `getResourceAsStream` fonctionne uniformément
+     * dans les trois cas (répertoire de classes, JAR, APK).
      */
     private fun loadDefinitions(): List<GameDefinition> {
-        val resourceUrl =
-            requireNotNull(javaClass.classLoader.getResource("GameDefinitions")) {
-                "Ressource GameDefinitions introuvable — copySpecResources a-t-il tourné ?"
-            }
-        val directory = File(resourceUrl.toURI())
-        val files =
-            directory.listFiles { file -> file.extension == "json" }
-                ?: error("GameDefinitions n'est pas un dossier lisible : $directory")
+        val index =
+            requireNotNull(javaClass.classLoader.getResourceAsStream("GameDefinitions/index.txt")) {
+                "Index GameDefinitions introuvable — copySpecResources a-t-il tourné ?"
+            }.bufferedReader().readText()
 
-        return files
-            .sortedBy { it.name }
-            .map { file -> json.decodeFromString<GameDefinition>(file.readText()) }
+        val names =
+            index
+                .lineSequence()
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .sorted()
+
+        return names
+            .map { name ->
+                val text =
+                    requireNotNull(javaClass.classLoader.getResourceAsStream("GameDefinitions/$name")) {
+                        "Ressource GameDefinitions/$name introuvable alors que listée dans l'index."
+                    }.bufferedReader().readText()
+                json.decodeFromString<GameDefinition>(text)
+            }.toList()
     }
 }

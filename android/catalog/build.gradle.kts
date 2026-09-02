@@ -36,6 +36,41 @@ val copySpecResources =
         include("*.json")
     }
 
+// Index committé nulle part, régénéré avec la copie : `GameCatalogEmbedded` le lit via
+// `getResourceAsStream` plutôt que de lister le répertoire par `File(url.toURI())`, qui échoue
+// dès que la ressource est vue à travers un JAR ("URI is not hierarchical" — rencontré en test
+// Robolectric de :app) et n'aurait de toute façon pas fonctionné une fois les ressources
+// compressées dans un APK packagé. Tâche dédiée à entrées/sorties typées (plutôt qu'un `doLast`
+// sur `copySpecResources`) : compatible avec le cache de configuration Gradle, qui refuse de
+// sérialiser une closure capturant des objets du script de build.
+abstract class WriteGameDefinitionsIndex : DefaultTask() {
+    @get:InputDirectory
+    abstract val sourceDir: DirectoryProperty
+
+    @get:OutputFile
+    abstract val indexFile: RegularFileProperty
+
+    @TaskAction
+    fun run() {
+        val names =
+            sourceDir
+                .get()
+                .asFile
+                .listFiles { file -> file.extension == "json" }
+                .orEmpty()
+                .map { it.name }
+                .sorted()
+        indexFile.get().asFile.writeText(names.joinToString("\n"))
+    }
+}
+
+val writeGameDefinitionsIndex =
+    tasks.register<WriteGameDefinitionsIndex>("writeGameDefinitionsIndex") {
+        dependsOn(copySpecResources)
+        sourceDir.set(generatedResourcesDir.map { it.dir("GameDefinitions") })
+        indexFile.set(generatedResourcesDir.map { it.dir("GameDefinitions").file("index.txt") })
+    }
+
 // Même principe que copySpecResources, côté golden files (spec/golden/) — miroir de
 // Tests/CatalogTests/GoldenResources côté Swift, régénéré à chaque build plutôt que committé.
 val specGoldenDir = rootProject.layout.projectDirectory.dir("../spec/golden")
@@ -58,7 +93,7 @@ sourceSets {
 }
 
 tasks.named("processResources") {
-    dependsOn(copySpecResources)
+    dependsOn(writeGameDefinitionsIndex)
 }
 
 tasks.named("processTestResources") {

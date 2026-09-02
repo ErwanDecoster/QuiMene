@@ -4,6 +4,7 @@
          premier plan, zone sûre 66/108 dp) demande un travail d'asset qui n'est pas fait dans
          cette étape ; icône système par défaut en attendant. -->
     <application
+        android:name=".CaCompteApplication"
         android:allowBackup="true"
         android:usesCleartextTraffic="false"
         android:label="Ça Compte"
