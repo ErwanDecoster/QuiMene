@@ -15,6 +15,15 @@ DerivedData/
 # Xcode Cloud / CI
 ci_scripts/*.log
 
+# Gradle / Android
+android/**/build/
+android/.gradle/
+android/local.properties
+android/**/.cxx/
+android/captures/
+android/**/*.iml
+android/.idea/
+
 # macOS
 .DS_Store
 

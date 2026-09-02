@@ -1,0 +1,9 @@
+root = true
+
+[*.{kt,kts}]
+indent_size = 4
+max_line_length = 120
+# Convention Compose officielle : une fonction @Composable qui émet de l'UI se nomme comme un
+# type (PascalCase), pas comme une fonction — ktlint doit le savoir explicitement, sinon
+# `function-naming` la traite comme n'importe quelle fonction en minuscule/camelCase.
+ktlint_function_naming_ignore_when_annotated_with = Composable
