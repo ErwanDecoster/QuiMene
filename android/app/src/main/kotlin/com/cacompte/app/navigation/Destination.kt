@@ -1,5 +1,11 @@
 package com.cacompte.app.navigation
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.History
+import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.serialization.Serializable
 
 /**
@@ -66,9 +72,10 @@ sealed interface Destination {
 enum class RootDestination(
     val destination: Destination,
     val label: String,
+    val icon: ImageVector,
 ) {
-    Play(Destination.GamesCatalog, "Jouer"),
-    History(Destination.History, "Historique"),
-    Leaderboard(Destination.Leaderboard, "Classements"),
-    Players(Destination.PlayersList, "Joueurs"),
+    Play(Destination.GamesCatalog, "Jouer", Icons.Filled.Casino),
+    History(Destination.History, "Historique", Icons.Filled.History),
+    Leaderboard(Destination.Leaderboard, "Classements", Icons.Filled.EmojiEvents),
+    Players(Destination.PlayersList, "Joueurs", Icons.Filled.Group),
 }

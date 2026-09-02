@@ -40,6 +40,12 @@ android {
 
 kotlin {
     jvmToolchain(17)
+    // Scaffold/TopAppBar/DropdownMenu (Material 3) restent marqués expérimentaux dans cette
+    // version de la bibliothèque bien qu'ils soient l'API recommandée — pratique standard des
+    // projets Compose Material 3, pas un contournement ponctuel d'un avertissement.
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
+    }
 }
 
 dependencies {
@@ -57,6 +63,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material.icons.core)
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)

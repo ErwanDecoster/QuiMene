@@ -162,6 +162,10 @@ class MatchRepository(
 
     suspend fun match(id: UUID): MatchEntity? = matchDao.get(id)
 
+    /** Snapshots d'avatar/pseudo des participants (`:app` en a besoin pour l'affichage — le
+     * [com.cacompte.domain.model.Participant] du domaine n'en porte pas, lui). */
+    suspend fun participants(matchID: UUID): List<ParticipantEntity> = participantDao.forMatch(matchID)
+
     suspend fun hasAnyMatch(): Boolean = matchDao.count() > 0
 
     suspend fun finishedMatches(): List<MatchEntity> =

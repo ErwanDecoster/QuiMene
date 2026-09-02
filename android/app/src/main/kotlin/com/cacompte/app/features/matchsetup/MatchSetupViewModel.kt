@@ -158,6 +158,8 @@ class MatchSetupViewModel(
         default: Boolean = false,
     ): Boolean = (variantValues[variantID] as? VariantValue.BoolValue)?.value ?: default
 
+    fun stringVariantOrNull(variantID: String): String? = (variantValues[variantID] as? VariantValue.StringValue)?.value
+
     fun start(onStarted: (MatchEntity) -> Unit) {
         viewModelScope.launch {
             val seeds =

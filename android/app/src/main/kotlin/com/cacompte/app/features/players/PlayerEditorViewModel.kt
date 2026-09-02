@@ -151,6 +151,14 @@ class PlayerEditorViewModel(
         }
     }
 
+    fun unarchive(onDone: () -> Unit) {
+        val player = (mode as? Mode.Edit)?.player ?: return
+        viewModelScope.launch {
+            repository.unarchive(player)
+            onDone()
+        }
+    }
+
     fun delete(onDone: () -> Unit) {
         val player = (mode as? Mode.Edit)?.player ?: return
         viewModelScope.launch {
