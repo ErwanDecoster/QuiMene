@@ -175,7 +175,7 @@ Apple, recette manuelle réussie sur appareil réel ; Android reste à faire.** 
   existantes) — voir le commentaire de `CaCompteApp.loadContainer`
 - ✅ Passe d'accessibilité : infrastructure (Reduce Motion, regroupement de lignes VoiceOver,
   contraste augmenté) et rattrapage sur les 8 zones de l'app faits — 20 fichiers sur 42 dans
-  `App/Features` touchent maintenant l'accessibilité (2 au départ). Traversée VoiceOver, Dynamic
+  `apple/App/Features` touchent maintenant l'accessibilité (2 au départ). Traversée VoiceOver, Dynamic
   Type AX5, Reduce Motion et contraste augmenté vérifiés par l'auteur sur appareil physique, voir
   Phase H de [15](15-plan-qualite-code.md)
 - ✅ Localisation terminée — fr/en/es/de/it, interface et contenu des jeux (Phase G,

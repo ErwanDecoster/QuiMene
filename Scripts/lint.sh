@@ -5,6 +5,6 @@ set -eu
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 xcrun swift-format lint --recursive --strict --configuration "$ROOT/.swift-format" \
-    "$ROOT/CaCompteKit/Sources" \
-    "$ROOT/CaCompteKit/Tests" \
-    "$ROOT/App"
+    "$ROOT/apple/CaCompteKit/Sources" \
+    "$ROOT/apple/CaCompteKit/Tests" \
+    "$ROOT/apple/App"

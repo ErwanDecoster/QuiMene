@@ -237,7 +237,7 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
 Vérification : `xcodebuild test` (scheme `CaCompte`) réussit — 12/12 sur `CaCompteTests`, 3 tests
 (1 skip attendu, parcours n°2 ci-dessus) sur `CaCompteUITests` — et `Scripts/lint.sh` reste vert.
 
-**Fini quand** : `App/Features` a une couverture de tests non nulle sur ses 3 flux `@Observable`,
+**Fini quand** : `apple/App/Features` a une couverture de tests non nulle sur ses 3 flux `@Observable`,
 et les 3 parcours XCUITest passent en CI (2 sur 3 le font désormais).
 
 ### Phase G — Catalogue de localisation — ✅ terminée (voir « Corrigé dans cet audit »)
@@ -252,7 +252,7 @@ de format à la place d'un travail manuel par fichier, ce qui a ramené le chant
 traduction pure. Sans cet outil, l'étalement en plusieurs passages serait resté justifié.
 actuel (app monolingue française).
 
-**Fini quand** : `grep -rn 'Text("' App/Features` ne trouve plus de littéral français —
+**Fini quand** : `grep -rn 'Text("' apple/App/Features` ne trouve plus de littéral français —
 uniquement des clés résolues par le catalogue.
 
 ### Extension de la Phase G (2026-09-01) — es/de/it, contenu des jeux, raccourci de langue
@@ -321,7 +321,7 @@ zéro I/O, toujours `Sendable`).
 
 ### Phase H — Accessibilité — ✅ terminée
 
-**Constat de départ** : 2 fichiers sur 38 dans `App/Features` touchaient l'accessibilité avant ce
+**Constat de départ** : 2 fichiers sur 38 dans `apple/App/Features` touchaient l'accessibilité avant ce
 chantier, zéro usage de `accessibilityReduceMotion` ou de variante haut-contraste dans les assets
 de couleur joueur, malgré la prescription explicite de [07](07-design-system.md)/
 [08](08-accessibilite.md) depuis le début du projet.
@@ -381,7 +381,7 @@ de couleur joueur, malgré la prescription explicite de [07](07-design-system.md
 - ✅ **`ResultsShareCard`** — délibérément hors périmètre : image statique rendue une fois pour
   `ShareLink`, pas un écran interactif.
 
-**Résultat chiffré** : 20 fichiers sur 42 dans `App/Features` touchent maintenant
+**Résultat chiffré** : 20 fichiers sur 42 dans `apple/App/Features` touchent maintenant
 l'accessibilité (2 au départ), contre un dénominateur qui a grandi de 4 (les écrans Tarot/Wizard).
 
 Vérification : `xcodebuild test` (scheme `CaCompteKit-Package`) — 52 tests dans 5 suites, y
@@ -445,7 +445,7 @@ physique les autres finitions P9 restées jusque-là au stade « build + simulat
   (ils ne peuvent pas nuire), mais Siri lui-même n'est pas considéré fonctionnel.
 
 Vérification : `xcodebuild` (scheme `CaCompte`) réussit à 0 avertissement après le retrait du
-widget et l'ajout de la capacité Siri ; `grep -rn "MatchWidget" App CaCompteKit` ne trouve plus
+widget et l'ajout de la capacité Siri ; `grep -rn "MatchWidget" apple/App apple/CaCompteKit` ne trouve plus
 rien hors de ce journal.
 
 ## Recommandation de pratique — README factuel plutôt que journal

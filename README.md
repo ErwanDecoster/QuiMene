@@ -38,7 +38,7 @@ exactement les mêmes scores.
 | 02 | [Architecture](docs/02-architecture.md) | Modules, dépendances, concurrence Swift 6, flux de données |
 | 03 | [Modèle de données](docs/03-modele-de-donnees.md) | Entités SwiftData, contraintes CloudKit, conflits, migrations |
 | 04 | [Moteur de règles](docs/04-moteur-de-regles.md) | Le cœur : types du domaine, `GameRules`, event sourcing, cas Skyjo |
-| 05 | [Catalogue de jeux](docs/05-catalogue-jeux.md) | 16 jeux, conditions de fin, formules, priorisation en 3 vagues |
+| 05 | [Catalogue de jeux](docs/05-catalogue-jeux.md) | 20 jeux, conditions de fin, formules, priorisation en 3 vagues |
 | 06 | [Statistiques](docs/06-statistiques.md) | Indicateurs, score d'intérêt, badges, profils joueur |
 | 07 | **[Charte graphique](docs/07-charte-graphique.md)** | **Source unique des tokens** — couleurs, typo, grille, icônes, composants, mouvement, logo, microcopy |
 | 08 | [Design system Apple](docs/08-design-system.md) | Implémentation SwiftUI des tokens, Liquid Glass, écran de saisie, accessibilité |

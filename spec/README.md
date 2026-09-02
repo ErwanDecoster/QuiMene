@@ -51,7 +51,7 @@ continuent de tourner.
 
 Les définitions sont embarquées dans les applications, jamais téléchargées — l'app fonctionne
 hors ligne. Côté Apple, un script de build copie `games/` vers
-`CaCompteKit/Sources/Catalog/GameDefinitions/` et **échoue si les deux diffèrent**. `spec/` est
+`apple/CaCompteKit/Sources/Catalog/GameDefinitions/` et **échoue si les deux diffèrent**. `spec/` est
 la source ; la copie n'est jamais éditée à la main. (Le dossier ne s'appelle délibérément pas
 `Resources` : un dossier de ce nom copié tel quel dans un bundle fait planter `codesign` sur
 certaines versions de macOS/Xcode — voir README « Correctif post-Phase 6 ».)

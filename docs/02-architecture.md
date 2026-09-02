@@ -104,43 +104,56 @@ Le projet est en **mode langage Swift 6, concurrence stricte activée**, sans ex
 
 ## Arborescence cible
 
+Mono repo (doc 11) : `apple/` regroupe tout ce qui est propre à Apple, `android/` accueillera son
+équivalent Kotlin (à venir, doc 11) — le reste de la racine (`spec/`, `docs/`, `supabase/`,
+`Scripts/`, `ci_scripts/`) est partagé entre les deux plateformes ou transverse au dépôt.
+
 ```
 CaCompte/
 ├── docs/                      ce plan
 ├── spec/                      source de vérité inter-plateformes (JSON)
-├── CaCompteKit/               package Swift local
-│   ├── Package.swift
-│   ├── Sources/
-│   │   ├── Domain/
-│   │   │   ├── Model/         Player, Participant, MatchState, Round, ScoreEntry…
-│   │   │   ├── Rules/         GameDefinition, GameRules, EndCheck, Standing
-│   │   │   ├── Engine/        MatchEngine, EventLog, LamportClock
-│   │   │   └── Stats/         StatsEngine, Insight, Badge
-│   │   ├── Catalog/
-│   │   │   ├── Games/         SkyjoRules.swift, YamsRules.swift, TarotRules.swift…
-│   │   │   ├── GenericRules/  SumRules, TrickPredictionRules, FreeFormRules
-│   │   │   └── Resources/     copie synchronisée de spec/games/*.json
-│   │   ├── Store/
-│   │   ├── Sync/
-│   │   └── DesignSystem/
-│   └── Tests/
-│       ├── DomainTests/
-│       ├── CatalogTests/       ← rejoue spec/golden/*.json
-│       └── StoreTests/
-├── App/
-│   ├── CaCompte.xcodeproj
-│   ├── CaCompteApp.swift
-│   ├── Features/
-│   │   ├── Home/  Players/  MatchSetup/  LiveMatch/  Results/  History/  Profile/
-│   │   └── Settings/
-│   ├── Resources/             Assets, Localizable.xcstrings, Info.plist
-│   └── CaCompteUITests/
-└── .github/ ou ci_scripts/    Xcode Cloud
+├── supabase/                  migrations + edge functions, backend de la partie partagée (doc 09)
+├── Scripts/                   check-spec-sync.sh, lint.sh — connaissent apple/ (et android/ à venir)
+├── ci_scripts/                hook Xcode Cloud (post-clone)
+├── apple/
+│   ├── CaCompteKit/           package Swift local
+│   │   ├── Package.swift
+│   │   ├── Sources/
+│   │   │   ├── Domain/
+│   │   │   │   ├── Model/         Player, Participant, MatchState, Round, ScoreEntry…
+│   │   │   │   ├── Rules/         GameDefinition, GameRules, EndCheck, Standing
+│   │   │   │   ├── Engine/        MatchEngine, EventLog, LamportClock
+│   │   │   │   ├── Stats/         StatsEngine, Insight, Badge
+│   │   │   │   └── LiveActivity/  MatchActivityAttributes (exception ActivityKit, voir tableau ci-dessus)
+│   │   │   ├── Catalog/
+│   │   │   │   ├── Games/         SkyjoRulesV1.swift, YamsRulesV1.swift, TarotRulesV1.swift…
+│   │   │   │   ├── GenericRules/  GenericSumRules…
+│   │   │   │   └── GameDefinitions/  copie synchronisée de spec/games/*.json
+│   │   │   ├── Store/
+│   │   │   ├── Sync/
+│   │   │   └── DesignSystem/
+│   │   └── Tests/
+│   │       ├── DomainTests/
+│   │       ├── CatalogTests/       ← rejoue spec/golden/*.json
+│   │       ├── StoreTests/
+│   │       ├── SyncTests/          ← rejoue spec/wire/*.json
+│   │       └── DesignSystemTests/
+│   └── App/
+│       ├── CaCompte.xcodeproj
+│       ├── CaCompteApp.swift
+│       ├── Features/
+│       │   ├── Players/  MatchSetup/  LiveMatch/  Results/  History/  Leaderboard/  Profile/
+│       │   └── Settings/
+│       ├── Resources/             Assets, Localizable.xcstrings, Info.plist
+│       ├── CaCompteWidget/         Live Activity (widget d'écran d'accueil retiré, doc 15/P9)
+│       ├── CaCompteTests/          tests unitaires hébergés (@testable import CaCompte)
+│       └── CaCompteUITests/
+└── android/                    à venir — projet Gradle/Compose, plan détaillé en doc 11
 ```
 
-Les JSON de `Catalog/Resources/` sont une copie de `spec/games/`. Un script de build
-(Phase 0) copie et vérifie l'égalité : si les deux divergent, la compilation échoue. `spec/`
-reste la source, jamais l'inverse.
+Les JSON de `Catalog/GameDefinitions/` sont une copie de `spec/games/`. `Scripts/check-spec-sync.sh`
+(appelé par `ci_scripts/ci_post_clone.sh`) vérifie l'égalité : si les deux divergent, la
+compilation échoue en CI. `spec/` reste la source, jamais l'inverse.
 
 ## Flux de données d'une manche validée
 

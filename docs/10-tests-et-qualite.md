@@ -131,7 +131,7 @@ Assumé explicitement, pour ne pas dépenser l'effort au mauvais endroit :
   aucun `@unchecked Sendable`, aucun `@preconcurrency import`. Ces trois interdits sont
   vérifiés par une règle de revue, pas par un outil.
 
-  **Exception actée** (audit qualité, [15](15-plan-qualite-code.md)) : `App/Features/MatchSetup/QRScannerView.swift`
+  **Exception actée** (audit qualité, [15](15-plan-qualite-code.md)) : `apple/App/Features/MatchSetup/QRScannerView.swift`
   importe `AVFoundation` avec `@preconcurrency`. `AVCaptureMetadataOutputObjectsDelegate` est une
   API pré-Swift-concurrency non auditée `Sendable` par Apple — retirer l'import casse la
   compilation sans qu'aucun changement côté projet ne puisse le corriger ; c'est le fix-it que

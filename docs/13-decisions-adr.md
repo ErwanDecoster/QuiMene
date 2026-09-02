@@ -432,7 +432,7 @@ plutôt que d'un bug de code à corriger. Cinq correctifs réels sans connexion 
 d'un rapport coût/bénéfice mauvais, pas d'un dernier bug à trouver.
 
 **Décision.** Remplacer `WifiTransport` et `BLETransport` par `SupabaseTransport`
-(`CaCompteKit/Sources/Sync/SupabaseTransport.swift`), une seule implémentation du protocole
+(`apple/CaCompteKit/Sources/Sync/SupabaseTransport.swift`), une seule implémentation du protocole
 `Transport` (doc [09](09-partie-partagee.md)) reposant sur Supabase Realtime :
 
 - un canal par session de partage (`session:<sessionID>`, indépendant de la partie courante en

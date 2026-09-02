@@ -38,9 +38,9 @@ check_pair() {
     done
 }
 
-check_pair "Catalog/GameDefinitions" "$ROOT/spec/games" "$ROOT/CaCompteKit/Sources/Catalog/GameDefinitions"
-check_pair "Tests/CatalogTests/GoldenResources" "$ROOT/spec/golden" "$ROOT/CaCompteKit/Tests/CatalogTests/GoldenResources"
-check_pair "Tests/SyncTests/WireResources" "$ROOT/spec/wire" "$ROOT/CaCompteKit/Tests/SyncTests/WireResources"
+check_pair "Catalog/GameDefinitions" "$ROOT/spec/games" "$ROOT/apple/CaCompteKit/Sources/Catalog/GameDefinitions"
+check_pair "Tests/CatalogTests/GoldenResources" "$ROOT/spec/golden" "$ROOT/apple/CaCompteKit/Tests/CatalogTests/GoldenResources"
+check_pair "Tests/SyncTests/WireResources" "$ROOT/spec/wire" "$ROOT/apple/CaCompteKit/Tests/SyncTests/WireResources"
 
 if [ "$status" -eq 0 ]; then
     echo "spec/ et ses copies embarquées sont synchronisés."

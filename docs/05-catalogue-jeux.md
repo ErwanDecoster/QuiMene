@@ -1,6 +1,6 @@
 # 05 — Catalogue de jeux
 
-16 jeux planifiés, livrés en trois vagues. Chaque fiche précise ce dont le moteur a besoin :
+20 jeux dans le catalogue (`spec/games/`). Chaque fiche précise ce dont le moteur a besoin :
 sens du score, forme de la saisie, condition de fin, départage.
 
 ## Vue d'ensemble
@@ -14,18 +14,30 @@ sens du score, forme de la saisie, condition de fin, départage.
 | **Rami** | le plus bas gagne | entier (pénalités) | un joueur ≥ 251 | `generic.sum.v1` | v1 |
 | **6 qui prend** | le plus bas gagne | entier (têtes de bœuf) | un joueur ≥ 66 | `generic.sum.v1` | v1 |
 | **Tarot** | le plus haut gagne | contrat + bouts + points | nombre de donnes fixé | `tarot.v1` | v1.1 |
-| **Uno** | le plus haut gagne | entier | un joueur ≥ 500 | `generic.sum.v1` | v1.1 |
 | **Wizard** | le plus haut gagne | annonce + plis réalisés | 60 / nb joueurs manches | `wizard.v1` | v1.1 |
 | **Mölkky** | atteindre 50 exactement | entier 0–12 | un joueur = 50 | `molkky.v1` | v1.1 |
 | **Scrabble** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | v1.1 |
 | **Triominos** | le plus haut gagne | entier | un joueur ≥ 400 | `generic.sum.v1` | v1.2 |
-| **1000 Bornes** | le plus haut gagne | grille de primes | une équipe ≥ 5000 | `mille.v1` | v1.2 |
-| **Phase 10** | phases + départage points | phase franchie + entier | un joueur finit la phase 10 | `phase10.v1` | v1.2 |
-| **Qwirkle** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | v1.2 |
-| **Président** | le plus haut gagne | rang par joueur | nombre de manches fixé | `rank.v1` | v1.2 |
+| **Cornhole** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
+| **Flip 7** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
+| **Odin (Odin's Ravens)** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
+| **Pétanque** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
+| **Pictionary** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
+| **Qwixx** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
+| **Rummikub** | le plus bas gagne | entier (pénalités) | arrêt manuel | `generic.sum.v1` | hors plan initial |
+| **Time's Up** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
+| **Trivial Pursuit** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
 
-Six moteurs impératifs seulement (`skyjo`, `yams`, `belote`, `tarot`, `wizard`, `molkky`,
-`mille`, `phase10`, `rank`) pour 16 jeux : sept jeux se contentent de `generic.sum.v1`.
+Six moteurs impératifs (`skyjo`, `yams`, `belote`, `tarot`, `wizard`, `molkky`) plus le moteur
+générique déclaratif `generic.sum.v1` — sept au total — pour 20 jeux : 14 se contentent de
+`generic.sum.v1`, sans aucun code spécifique.
+
+**Écart avec le plan initial** : le catalogue n'a pas suivi les trois vagues prévues à la
+lettre. Cinq jeux planifiés n'ont finalement jamais été construits — **Uno**, **1000 Bornes**
+(`mille.v1`), **Phase 10** (`phase10.v1`), **Qwirkle**, **Président** (`rank.v1`) : ces trois
+moteurs n'existent nulle part dans `GameCatalog+Embedded.swift`, ils sont restés à l'état de
+plan. Neuf jeux hors plan initial ont été ajoutés à la place, tous sur `generic.sum.v1` (aucun
+n'a eu besoin d'un moteur dédié).
 
 ## Critère de priorisation
 
@@ -166,7 +178,10 @@ manche, et le meilleur garde-fou contre une erreur de formule.
   `EndCheck` renvoie `.ended` sans passer par `.finalRound` — le cas qui justifie que les deux
   soient distincts dans l'énumération.
 
-### 1000 Bornes — `mille.v1`
+### 1000 Bornes — `mille.v1` — non construit
+
+Ne figure pas dans `spec/games/` ni dans `GameCatalog+Embedded.swift` — resté à l'état de plan.
+Fiche conservée telle quelle pour une reprise éventuelle.
 
 Saisie par grille de primes plutôt que par nombre :
 
@@ -184,7 +199,10 @@ Saisie par grille de primes plutôt que par nombre :
 - Fin : première équipe à 5000.
 - Bon candidat à une saisie par steppers et interrupteurs plutôt que par pavé numérique.
 
-### Phase 10 — `phase10.v1`
+### Phase 10 — `phase10.v1` — non construit
+
+Ne figure pas dans `spec/games/` ni dans `GameCatalog+Embedded.swift` — resté à l'état de plan.
+Fiche conservée telle quelle pour une reprise éventuelle.
 
 Double critère : la progression en phases prime, les points départagent.
 
@@ -195,16 +213,23 @@ Double critère : la progression en phases prime, les points départagent.
   valide que `standings()` soit bien un point d'extension du protocole et pas une fonction
   générique.
 
-### Président — `rank.v1`
+### Président — `rank.v1` — non construit
+
+Ne figure pas dans `spec/games/` ni dans `GameCatalog+Embedded.swift` — resté à l'état de plan.
+Fiche conservée telle quelle pour une reprise éventuelle.
 
 - Saisie : un rang par joueur (Président, Vice-président, Neutre, Vice-trouduc, Trouduc).
 - Barème par défaut : 5 / 3 / 2 / 1 / 0, ajustable en variante.
 - Fin : nombre de manches fixé.
 - Validation : les rangs doivent former une permutation complète.
 
-### Uno, Scrabble, Triominos, Qwirkle, Jeu libre — `generic.sum.v1`
+### Les 14 jeux sur `generic.sum.v1`
 
-Aucun code. Uniquement un JSON déclaratif qui change le sens du score, le seuil et les libellés.
+Aucun code. Uniquement un JSON déclaratif qui change le sens du score, le seuil et les libellés
+(voir la table en tête de document pour la liste complète — Jeu libre, Rami, 6 qui prend,
+Scrabble, Triominos et neuf jeux ajoutés hors plan initial). Uno et Qwirkle, prévus sur ce même
+moteur, ne figurent pas dans `spec/games/` — jamais construits, comme 1000 Bornes/Phase 10/
+Président ci-dessus.
 
 ---
 

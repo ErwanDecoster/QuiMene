@@ -30,7 +30,7 @@ tierce côté Apple à la règle « zéro dépendance » (ADR-0012).
 | **Connexion / déconnexion** | **Presence** : l'hôte s'annonce sous une clé constante `"host"` (le pair n'a besoin de connaître aucun identifiant à l'avance) ; chaque pair s'annonce sous son `deviceID`. Une déconnexion, y compris abrupte (app tuée, réseau perdu), déclenche un événement de présence côté serveur. |
 | **Données** | **Broadcast** : chaque `WireMessage` transite chiffré (voir « Appairage et chiffrement » plus bas), adressé par un en-tête `from`/`to` applicatif — `SupabaseTransportSession` filtre ce flux partagé pour se comporter comme une session point-à-point ordinaire du point de vue de `LiveSession`. |
 
-`SupabaseTransport` (`CaCompteKit/Sources/Sync/SupabaseTransport.swift`) est la seule
+`SupabaseTransport` (`apple/CaCompteKit/Sources/Sync/SupabaseTransport.swift`) est la seule
 implémentation du protocole `Transport` (voir plus bas) — `supabase-swift` côté Apple,
 `supabase-kt` pour l'équivalent Android (doc [11](11-portage-android.md)), sur le même modèle
 canal/presence/broadcast des deux côtés.
@@ -319,7 +319,7 @@ scanne, identique sur Apple et Android.
 
 **Apple** — aucune entitlement réseau local ni Bluetooth : Supabase Realtime est un client
 HTTPS/WebSocket standard, qu'iOS ne soumet à aucune clé `Info.plist` particulière. Vérifié
-directement dans `App/Info.plist` : ni `NSLocalNetworkUsageDescription`, ni `NSBonjourServices`,
+directement dans `apple/App/Info.plist` : ni `NSLocalNetworkUsageDescription`, ni `NSBonjourServices`,
 ni `NSBluetoothAlwaysUsageDescription` n'y figurent plus. `NSCameraUsageDescription` reste
 présente, mais pour le scanner de QR (`QRScannerView`), sans rapport avec le transport.
 
@@ -354,7 +354,7 @@ graphe de dépendances du package : `Store` n'importe pas `Sync`.
 - **Sans réseau** : deux instances de `LiveSession` reliées par un transport en mémoire
   (`InMemoryTransport`, un troisième cas du protocole `Transport`, réservé aux tests). Couvre
   convergence, idempotence, ordre inversé, doublons — indépendant du transport réellement actif.
-  10 tests, `CaCompteKit/Tests/SyncTests`. `SupabaseTransport` lui-même n'est pas exercé
+  10 tests, `apple/CaCompteKit/Tests/SyncTests`. `SupabaseTransport` lui-même n'est pas exercé
   directement par cette suite (voir [15](15-plan-qualite-code.md)) — la vérification de sa
   logique de concurrence repose sur la compilation Swift 6 stricte, pas sur une exécution testée.
 - **Propriété testée** : pour tout journal `L` et toute permutation `σ`,
@@ -372,7 +372,7 @@ graphe de dépendances du package : `Store` n'importe pas `Sync`.
   avait validé l'ancien transport Wi-Fi, et la recette croisée Apple/Android une fois le portage
   entamé.
 - **Golden du protocole** (`spec/wire/`) : ✅ fait — un fichier par cas de `WireMessage.Kind`,
-  vérifié côté Swift (`WireGoldenTests`, `CaCompteKit/Tests/SyncTests`). Le critère n'est pas une
+  vérifié côté Swift (`WireGoldenTests`, `apple/CaCompteKit/Tests/SyncTests`). Le critère n'est pas une
   identité d'octets, hors de portée entre deux sérialiseurs JSON différents, mais un round-trip de
   schéma : décoder une fixture sur les deux plateformes doit produire une valeur équivalente. Le
   test Kotlin symétrique reste à écrire une fois le portage Android entamé.
