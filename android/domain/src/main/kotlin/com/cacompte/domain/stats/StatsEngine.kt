@@ -158,7 +158,15 @@ class StatsEngine {
         definition: GameDefinition,
     ): List<Insight> = select(candidates(state, definition))
 
-    internal fun candidates(
+    /**
+     * Miroir de `candidates(state:definition:)` — `internal` côté Swift (pas `public`), rendu
+     * accessible aux tests via `@testable import`. Kotlin n'a pas d'équivalent à
+     * `@testable import` : `internal` y est une visibilité de module, opaque à `:catalog` qui
+     * dépend de `:domain` sans y être compilé. D'où `public` ici — [insights] reste le point
+     * d'entrée destiné à l'app ; cette fonction est un point d'accroche pour les golden files
+     * (`:catalog`), pas une API applicative.
+     */
+    fun candidates(
         state: MatchState,
         definition: GameDefinition,
     ): List<Insight> {

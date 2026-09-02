@@ -36,12 +36,31 @@ val copySpecResources =
         include("*.json")
     }
 
+// Même principe que copySpecResources, côté golden files (spec/golden/) — miroir de
+// Tests/CatalogTests/GoldenResources côté Swift, régénéré à chaque build plutôt que committé.
+val specGoldenDir = rootProject.layout.projectDirectory.dir("../spec/golden")
+val generatedTestResourcesDir = layout.buildDirectory.dir("generated/resources/test")
+
+val copyGoldenResources =
+    tasks.register<Copy>("copyGoldenResources") {
+        from(specGoldenDir)
+        into(generatedTestResourcesDir.map { it.dir("GoldenResources") })
+        include("*.json")
+    }
+
 sourceSets {
     main {
         resources.srcDir(generatedResourcesDir)
+    }
+    test {
+        resources.srcDir(generatedTestResourcesDir)
     }
 }
 
 tasks.named("processResources") {
     dependsOn(copySpecResources)
+}
+
+tasks.named("processTestResources") {
+    dependsOn(copyGoldenResources)
 }

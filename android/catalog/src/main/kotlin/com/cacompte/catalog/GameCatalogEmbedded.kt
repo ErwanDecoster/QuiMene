@@ -15,11 +15,9 @@ import java.io.File
 
 /**
  * Miroir de `GameCatalog+Embedded.swift` : charge toutes les définitions embarquées et construit
- * un [GameCatalog] avec la table complète des 7 moteurs. **Aucune logique d'exclusion** — les 6
- * moteurs dédiés sont volontairement des réservations de place qui échouent à l'usage
- * (`TODO()`, voir [SkyjoRulesV1] et les classes sœurs), pas absentes de la table : la retirer
- * ferait échouer la construction même du catalogue (`GameCatalog` exige un moteur enregistré
- * pour chaque `engine` référencé par `spec/games (fichiers .json)`).
+ * un [GameCatalog] avec la table complète des 7 moteurs (le générique + les 6 dédiés — Skyjo,
+ * Yams, Belote, Mölkky, Tarot, Wizard — tous réellement implémentés depuis l'étape C, vérifiés
+ * par les 24 golden files de `spec/golden/`).
  */
 object GameCatalogEmbedded {
     private val json = Json { ignoreUnknownKeys = false }
