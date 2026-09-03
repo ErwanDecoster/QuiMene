@@ -20,8 +20,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.cacompte.app.features.history.HistoryDetailScreen
 import com.cacompte.app.features.history.HistoryListScreen
+import com.cacompte.app.features.join.JoinScreen
 import com.cacompte.app.features.leaderboard.GameLeaderboardScreen
-import com.cacompte.app.features.leaderboard.LeaderboardScreen
 import com.cacompte.app.features.livematch.LiveMatchScreen
 import com.cacompte.app.features.matchsetup.MatchSetupScreen
 import com.cacompte.app.features.play.GamesCatalogScreen
@@ -30,9 +30,9 @@ import com.cacompte.app.features.players.PlayersListScreen
 import com.cacompte.app.features.results.ResultsScreen
 import com.cacompte.app.features.settings.SettingsScreen
 
-/** Racine de l'UI — `Scaffold` avec barre de navigation basse à 4 onglets (doc 11 §E) +
- * `NavHost` typé sur [Destination]. Miroir de la `TabView` racine côté Swift, sans onglet
- * « Rejoindre » (dépend de `:sync`, voir [Destination]). */
+/** Racine de l'UI — `Scaffold` avec barre de navigation basse à 4 onglets (Joueurs, Jeux,
+ * Rejoindre, Historique — mêmes 4, même ordre que `CaCompteApp.swift`) + `NavHost` typé sur
+ * [Destination]. */
 @Composable
 fun CaCompteApp() {
     val navController = rememberNavController()
@@ -42,12 +42,13 @@ fun CaCompteApp() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Destination.GamesCatalog,
+            startDestination = Destination.PlayersList,
             modifier = Modifier.padding(innerPadding),
         ) {
             composable<Destination.GamesCatalog> {
                 GamesCatalogScreen(
                     onGameSelected = { gameId -> navController.navigate(Destination.MatchSetup(gameId)) },
+                    onOpenLeaderboard = { gameId -> navController.navigate(Destination.GameLeaderboard(gameId)) },
                 )
             }
             composable<Destination.MatchSetup> { backStackEntry ->
@@ -104,14 +105,12 @@ fun CaCompteApp() {
                 val route: Destination.HistoryDetail = backStackEntry.toRoute()
                 HistoryDetailScreen(matchId = route.matchId, onBack = { navController.popBackStack() })
             }
-            composable<Destination.Leaderboard> {
-                LeaderboardScreen(
-                    onOpenGame = { gameId -> navController.navigate(Destination.GameLeaderboard(gameId)) },
-                )
-            }
             composable<Destination.GameLeaderboard> { backStackEntry ->
                 val route: Destination.GameLeaderboard = backStackEntry.toRoute()
                 GameLeaderboardScreen(gameId = route.gameId, onBack = { navController.popBackStack() })
+            }
+            composable<Destination.Join> {
+                JoinScreen()
             }
             composable<Destination.Settings> {
                 SettingsScreen(onBack = { navController.popBackStack() })
@@ -130,10 +129,10 @@ private fun RootNavigationBar(navController: NavHostController) {
             val selected =
                 currentDestination?.hierarchy?.any {
                     when (root) {
-                        RootDestination.Play -> it.hasRoute<Destination.GamesCatalog>()
-                        RootDestination.History -> it.hasRoute<Destination.History>()
-                        RootDestination.Leaderboard -> it.hasRoute<Destination.Leaderboard>()
                         RootDestination.Players -> it.hasRoute<Destination.PlayersList>()
+                        RootDestination.Games -> it.hasRoute<Destination.GamesCatalog>()
+                        RootDestination.Join -> it.hasRoute<Destination.Join>()
+                        RootDestination.History -> it.hasRoute<Destination.History>()
                     }
                 } == true
 
