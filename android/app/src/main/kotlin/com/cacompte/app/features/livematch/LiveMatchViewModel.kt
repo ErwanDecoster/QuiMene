@@ -9,6 +9,7 @@ import com.cacompte.domain.model.MatchState
 import com.cacompte.domain.model.MatchStatus
 import com.cacompte.domain.model.ModifierID
 import com.cacompte.domain.model.Participant
+import com.cacompte.domain.model.Round
 import com.cacompte.domain.model.RoundDraft
 import com.cacompte.domain.model.ScoreDetail
 import com.cacompte.domain.model.ScoreInput
@@ -64,6 +65,12 @@ class LiveMatchViewModel(
     val currentParticipant: Participant? get() = participants.getOrNull(activeSeatIndex)
     val requiresCloserSelection: Boolean get() = definition.requiresCloserSelection
 
+    /** Manches déjà validées, dans l'ordre — brut, sans interprétation : chaque écran de saisie
+     * dédié (Tarot/Wizard/Yams) décode lui-même le `ScoreDetail` propre à son jeu (`:catalog`
+     * expose les types `*Detail` publiquement), ce ViewModel générique reste agnostique du jeu. */
+    val rounds: List<Round> get() = state.rounds
+    val currentRoundNumber: Int get() = state.rounds.size + 1
+
     /** Classement courant, recalculé à chaque manche validée — sert aussi bien à
      * [finalStandings] qu'à trier/annoter la liste de saisie en direct. */
     val currentStandings: List<Standing> get() = rules.standings(state, definition)
@@ -118,6 +125,24 @@ class LiveMatchViewModel(
                     modifiers = modifiers,
                 )
             }
+        commitCustomRound(inputs) {
+            pendingScores = emptyMap()
+            closedParticipantID = null
+            activeSeatIndex = 0
+        }
+    }
+
+    /** Même chemin que [commitRound], mais pour les écrans de saisie dédiés (Belote/Tarot/Wizard/
+     * Yams), dont les [ScoreInput] ne suivent pas le schéma générique « une entrée par
+     * participant, un seul modificateur possible » — ex. Belote/Tarot n'en soumettent qu'un ou
+     * deux (le moteur redistribue), avec plusieurs modificateurs par entrée (`isTaker`, `capot`,
+     * …). [onCommitted] laisse chaque appelant réinitialiser son propre état de saisie (brouillon
+     * de donne/manche) une fois la validation et l'écriture réussies — jamais avant, pour ne pas
+     * effacer une saisie que le moteur vient de rejeter. */
+    fun commitCustomRound(
+        inputs: List<ScoreInput>,
+        onCommitted: () -> Unit = {},
+    ) {
         val draft = RoundDraft(index = state.rounds.size, inputs = inputs)
 
         val validation = rules.validate(draft, state, definition)
@@ -138,10 +163,8 @@ class LiveMatchViewModel(
                 }
             match = requireNotNull(repository.match(match.id))
             stateFlow.value = newState
-            pendingScores = emptyMap()
-            closedParticipantID = null
-            activeSeatIndex = 0
             validationErrorMessage = null
+            onCommitted()
             newState.rounds
                 .lastOrNull()
                 ?.entries

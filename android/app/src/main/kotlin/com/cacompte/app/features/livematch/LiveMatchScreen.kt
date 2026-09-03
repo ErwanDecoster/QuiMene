@@ -1,6 +1,7 @@
 package com.cacompte.app.features.livematch
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -36,7 +38,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
+import com.cacompte.app.features.livematch.belote.BeloteRoundScreen
+import com.cacompte.app.features.livematch.tarot.TarotRoundScreen
+import com.cacompte.app.features.livematch.wizard.WizardRoundScreen
+import com.cacompte.app.features.livematch.yams.YamsRoundScreen
 import com.cacompte.app.ui.toAvatar
+import com.cacompte.catalog.games.BeloteRulesV1
+import com.cacompte.catalog.games.TarotRulesV1
+import com.cacompte.catalog.games.WizardRulesV1
+import com.cacompte.catalog.games.YamsRulesV1
 import com.cacompte.designsystem.components.AvatarSize
 import com.cacompte.designsystem.components.AvatarView
 import com.cacompte.designsystem.components.Banner
@@ -56,17 +66,16 @@ import com.cacompte.store.ParticipantEntity
 import java.util.UUID
 
 /**
- * Miroir de `LiveMatchView.swift` (doc 05) — saisie de manche générique, pour la famille "entier
- * simple" (`EntryKind.Integer` : Skyjo, Mölkky, et la plupart des jeux du catalogue générique).
- * **Saisie au clavier système** (`KeyboardType.Number`), pas de pavé numérique maison (ADR-0013 :
- * retiré côté Apple, revalidé — pas simplement reporté — pour cette étape).
- *
- * Belote/Tarot (`structured`), Wizard (`predictionAndResult`) et Yams (`categorySheet`) ont
- * chacun une saisie fondamentalement différente (drapeaux d'équipe/contrat, annonce puis
- * résultat, grille de catégories) qui ne peut pas être rendue correctement par ce formulaire
- * générique — les servir ici produirait un score enregistré incomplet, la seule faute grave du
- * projet (doc 10). Ils affichent donc un repli explicite ([RoundEntryPlaceholder]) plutôt qu'un
- * formulaire silencieusement faux, en attendant leurs 4 écrans dédiés.
+ * Point d'entrée de la partie en direct — choisit la bonne forme de saisie selon le moteur du
+ * jeu (miroir de `LiveMatchView.swift`, doc 05) : [GenericRoundEntry] pour la famille "entier
+ * simple" (`EntryKind.Integer` : Skyjo, Mölkky, et la plupart du catalogue générique, **au
+ * clavier système**, pas de pavé numérique maison — ADR-0013), et un écran dédié pour Belote/
+ * Tarot ([BeloteRoundScreen]/[TarotRoundScreen], `structured`), Wizard ([WizardRoundScreen],
+ * `predictionAndResult`) et Yams ([YamsRoundScreen], `categorySheet`) — chacun a une saisie
+ * fondamentalement différente (drapeaux d'équipe/contrat, annonce puis résultat, grille de
+ * catégories) que le formulaire générique ne pourrait pas rendre correctement. [RoundEntryPlaceholder]
+ * reste un repli défensif pour un moteur qu'aucun des cinq cas ne couvrirait (aucun dans le
+ * catalogue actuel) — jamais un formulaire silencieusement faux (doc 10).
  */
 @Composable
 fun LiveMatchScreen(
@@ -88,11 +97,6 @@ fun LiveMatchScreen(
         }
     val setup = loaded.value ?: return
 
-    if (setup.definition.scoring.entry.kind != EntryKind.Integer) {
-        RoundEntryPlaceholder(setup.definition.name.localized, onAbandoned)
-        return
-    }
-
     val viewModel =
         rememberViewModel {
             LiveMatchViewModel(
@@ -104,11 +108,46 @@ fun LiveMatchScreen(
                 setup.deviceID,
             )
         }
+    // `LiveMatchViewModel.init` charge le `MatchState` de façon asynchrone (Room dispatche
+    // réellement vers un thread d'arrière-plan hors test) — `participants`/`isConcluded`/etc.
+    // lèvent tant que ce chargement n'est pas terminé. Ne rien lire dessus avant.
+    if (viewModel.stateOrNull == null) {
+        LoadingScreen()
+        return
+    }
+
     LaunchedEffect(viewModel.isConcluded) {
         if (viewModel.isConcluded) onConcluded(matchId)
     }
 
-    LiveMatchContent(viewModel, setup.snapshotsByParticipant, onAbandoned)
+    // Belote/Tarot/Wizard n'ont pas la même forme de saisie qu'un jeu à `EntryKind.Integer` —
+    // dispatch sur `engine` (pas `entry.kind`, ambigu : Belote et Tarot partagent tous deux
+    // `structured`) plutôt que sur `entry.kind` seul.
+    when (setup.definition.engine) {
+        BeloteRulesV1.ENGINE_ID ->
+            LiveMatchScaffold(viewModel, onAbandoned) { BeloteRoundScreen(viewModel) }
+        TarotRulesV1.ENGINE_ID ->
+            LiveMatchScaffold(viewModel, onAbandoned) { TarotRoundScreen(viewModel) }
+        WizardRulesV1.ENGINE_ID ->
+            LiveMatchScaffold(viewModel, onAbandoned) { WizardRoundScreen(viewModel) }
+        YamsRulesV1.ENGINE_ID ->
+            LiveMatchScaffold(viewModel, onAbandoned) { YamsRoundScreen(viewModel) }
+        else ->
+            if (setup.definition.scoring.entry.kind == EntryKind.Integer) {
+                LiveMatchScaffold(viewModel, onAbandoned) {
+                    GenericRoundEntry(viewModel, setup.snapshotsByParticipant)
+                }
+            } else {
+                RoundEntryPlaceholder(setup.definition.name.localized, onAbandoned)
+            }
+    }
+}
+
+@Composable
+private fun LoadingScreen() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        CircularProgressIndicator()
+    }
 }
 
 private data class LiveMatchSetup(
@@ -138,11 +177,14 @@ private fun RoundEntryPlaceholder(
     }
 }
 
+/** Coquille commune aux 5 formes de saisie (générique + les 4 dédiées) : titre, menu
+ * Terminer/Annuler/Abandonner, bandeaux d'erreur/explication de manche — seul le contenu central
+ * change d'un jeu à l'autre. */
 @Composable
-private fun LiveMatchContent(
+private fun LiveMatchScaffold(
     viewModel: LiveMatchViewModel,
-    snapshotsByParticipant: Map<UUID, ParticipantEntity>,
     onAbandoned: () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
 
@@ -189,42 +231,51 @@ private fun LiveMatchContent(
             viewModel.validationErrorMessage?.let {
                 Banner(message = it, modifier = Modifier.padding(horizontal = Space.lg))
             }
-
-            LazyColumn(
-                modifier = Modifier.weight(1f).padding(horizontal = Space.lg),
-                verticalArrangement = Arrangement.spacedBy(CardGutter),
-            ) {
-                items(viewModel.participants, key = { it.id }) { participant ->
-                    ParticipantScoreRow(
-                        participant = participant,
-                        snapshot = snapshotsByParticipant[participant.id],
-                        total = viewModel.totals[participant.id] ?: 0,
-                        pendingValue = viewModel.pendingScores[participant.id],
-                        requiresCloserSelection = viewModel.requiresCloserSelection,
-                        isCloser = viewModel.closedParticipantID == participant.id,
-                        onScoreChange = { raw ->
-                            val value = raw.toIntOrNull()
-                            if (raw.isEmpty()) {
-                                viewModel.clearScore(participant.id)
-                            } else if (value != null) {
-                                viewModel.setScore(participant.id, value)
-                            }
-                        },
-                        onToggleCloser = {
-                            viewModel.closedParticipantID =
-                                if (viewModel.closedParticipantID == participant.id) null else participant.id
-                        },
-                        onFocus = { viewModel.focus(participant.id) },
-                    )
-                }
-            }
-
-            PrimaryButton(
-                text = "Valider la manche",
-                onClick = { viewModel.commitRound() },
-                modifier = Modifier.padding(Space.lg),
-            )
+            content()
         }
+    }
+}
+
+@Composable
+private fun GenericRoundEntry(
+    viewModel: LiveMatchViewModel,
+    snapshotsByParticipant: Map<UUID, ParticipantEntity>,
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.weight(1f).padding(horizontal = Space.lg),
+            verticalArrangement = Arrangement.spacedBy(CardGutter),
+        ) {
+            items(viewModel.participants, key = { it.id }) { participant ->
+                ParticipantScoreRow(
+                    participant = participant,
+                    snapshot = snapshotsByParticipant[participant.id],
+                    total = viewModel.totals[participant.id] ?: 0,
+                    pendingValue = viewModel.pendingScores[participant.id],
+                    requiresCloserSelection = viewModel.requiresCloserSelection,
+                    isCloser = viewModel.closedParticipantID == participant.id,
+                    onScoreChange = { raw ->
+                        val value = raw.toIntOrNull()
+                        if (raw.isEmpty()) {
+                            viewModel.clearScore(participant.id)
+                        } else if (value != null) {
+                            viewModel.setScore(participant.id, value)
+                        }
+                    },
+                    onToggleCloser = {
+                        viewModel.closedParticipantID =
+                            if (viewModel.closedParticipantID == participant.id) null else participant.id
+                    },
+                    onFocus = { viewModel.focus(participant.id) },
+                )
+            }
+        }
+
+        PrimaryButton(
+            text = "Valider la manche",
+            onClick = { viewModel.commitRound() },
+            modifier = Modifier.padding(Space.lg),
+        )
     }
 }
 

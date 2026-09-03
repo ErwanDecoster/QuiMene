@@ -34,7 +34,6 @@ import com.cacompte.designsystem.components.PrimaryButton
 import com.cacompte.designsystem.tokens.LocalAppColors
 import com.cacompte.designsystem.tokens.Space
 import com.cacompte.domain.model.VariantValue
-import com.cacompte.domain.rules.EntryKind
 import com.cacompte.domain.rules.Variant
 import com.cacompte.domain.rules.VariantKind
 import com.cacompte.store.PlayerEntity
@@ -122,18 +121,9 @@ private fun MatchSetupContent(
             }
         }
 
-        val entrySupported = viewModel.definition.scoring.entry.kind == EntryKind.Integer
-        if (!entrySupported) {
-            Text(
-                "La saisie de manche de ce jeu n'est pas encore construite dans cette version.",
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.textSecondary,
-                modifier = Modifier.padding(Space.lg),
-            )
-        }
         PrimaryButton(
             text = "Commencer",
-            enabled = viewModel.canStart && entrySupported,
+            enabled = viewModel.canStart,
             onClick = { viewModel.start { match -> onMatchStarted(match.id.toString()) } },
             modifier = Modifier.padding(Space.lg),
         )
