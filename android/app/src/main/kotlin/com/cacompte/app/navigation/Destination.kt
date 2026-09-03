@@ -49,13 +49,23 @@ sealed interface Destination {
         val playerId: String,
     ) : Destination
 
+    /** [gameId] non nul quand on arrive depuis le bouton « Historique » d'un classement
+     * ([GameLeaderboard]) — miroir de `deepLinkRouter.pendingHistoryGameID` côté Apple : la liste
+     * s'ouvre déjà filtrée sur ce jeu plutôt que de forcer l'utilisateur à refiltrer. */
     @Serializable
-    data object History : Destination
+    data class History(
+        val gameId: String? = null,
+    ) : Destination
 
     @Serializable
     data class HistoryDetail(
         val matchId: String,
     ) : Destination
+
+    /** Miroir de `ArchivedMatchesView.swift` — écran séparé plutôt qu'une section toujours
+     * visible dans [History] : les parties archivées sont un cas d'usage occasionnel. */
+    @Serializable
+    data object ArchivedMatches : Destination
 
     @Serializable
     data class GameLeaderboard(
@@ -81,5 +91,5 @@ enum class RootDestination(
     Players(Destination.PlayersList, "Joueurs", Icons.Filled.Group),
     Games(Destination.GamesCatalog, "Jeux", Icons.Filled.Games),
     Join(Destination.Join, "Rejoindre", Icons.Filled.QrCodeScanner),
-    History(Destination.History, "Historique", Icons.Filled.History),
+    History(Destination.History(), "Historique", Icons.Filled.History),
 }

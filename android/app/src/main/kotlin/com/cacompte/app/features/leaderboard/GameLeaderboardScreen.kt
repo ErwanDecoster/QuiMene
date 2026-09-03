@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +45,7 @@ import kotlin.math.roundToInt
 fun GameLeaderboardScreen(
     gameId: String,
     onBack: () -> Unit,
+    onOpenHistory: (String) -> Unit,
 ) {
     val container = LocalAppContainer.current
     val definitionName =
@@ -60,6 +62,11 @@ fun GameLeaderboardScreen(
                 title = { Text(definitionName) },
                 navigationIcon = {
                     IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Retour") }
+                },
+                actions = {
+                    IconButton(onClick = { onOpenHistory(gameId) }) {
+                        Icon(Icons.Filled.History, contentDescription = "Historique de $definitionName")
+                    }
                 },
             )
         },

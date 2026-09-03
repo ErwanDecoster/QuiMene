@@ -6,7 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -14,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -127,9 +131,15 @@ private fun RoundEntryPlaceholder(
     }
 }
 
-/** Coquille commune aux 5 formes de saisie (générique + les 4 dédiées) : titre, menu
- * Terminer/Annuler/Abandonner/Partager, bandeaux d'erreur/explication de manche — seul le
- * contenu central change d'un jeu à l'autre. */
+/** Coquille commune aux 5 formes de saisie (générique + les 4 dédiées) : titre, « Annuler la
+ * dernière manche » toujours visible (miroir de `LiveMatchView.swift` — Apple la sort du menu
+ * plutôt que de l'y enterrer), menu Partager/Voir les manches/Terminer/Abandonner, bandeaux
+ * d'erreur/explication de manche — seul le contenu central change d'un jeu à l'autre.
+ *
+ * Contrairement à Apple (5 barres d'outils différentes — les 4 écrans dédiés n'ont ni Terminer ni
+ * Partager), cette coquille unique s'applique aux 5 formes : plutôt que d'appauvrir Android pour
+ * copier l'incohérence d'Apple entre ses propres écrans, tous les jeux gagnent un accès uniforme
+ * ici (doc utilisateur — cohérence *au sein* d'Android, pas seulement avec Apple). */
 @Composable
 private fun LiveMatchScaffold(
     viewModel: LiveMatchViewModel,
@@ -138,12 +148,20 @@ private fun LiveMatchScaffold(
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     var isPresentingShareSession by remember { mutableStateOf(false) }
+    var isPresentingRoundHistory by remember { mutableStateOf(false) }
+    var isConfirmingEnd by remember { mutableStateOf(false) }
+    var isConfirmingAbandon by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(viewModel.definition.name.localized) },
                 actions = {
+                    if (viewModel.canEndManually) {
+                        IconButton(onClick = { viewModel.undoLastRound() }) {
+                            Icon(Icons.Filled.Undo, contentDescription = "Annuler la dernière manche")
+                        }
+                    }
                     IconButton(onClick = { menuExpanded = true }) {
                         Icon(Icons.Filled.MoreVert, contentDescription = "Plus d'actions")
                     }
@@ -160,27 +178,25 @@ private fun LiveMatchScaffold(
                             },
                         )
                         DropdownMenuItem(
+                            text = { Text("Voir les manches") },
+                            onClick = {
+                                menuExpanded = false
+                                isPresentingRoundHistory = true
+                            },
+                        )
+                        DropdownMenuItem(
                             text = { Text("Terminer la partie") },
                             enabled = viewModel.canEndManually,
                             onClick = {
                                 menuExpanded = false
-                                viewModel.endManually()
+                                isConfirmingEnd = true
                             },
                         )
                         DropdownMenuItem(
-                            text = { Text("Annuler la dernière manche") },
-                            enabled = viewModel.canEndManually,
+                            text = { Text("Abandonner la partie") },
                             onClick = {
                                 menuExpanded = false
-                                viewModel.undoLastRound()
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text("Abandonner") },
-                            onClick = {
-                                menuExpanded = false
-                                viewModel.abandon()
-                                onAbandoned()
+                                isConfirmingAbandon = true
                             },
                         )
                     }
@@ -198,7 +214,60 @@ private fun LiveMatchScaffold(
         }
     }
 
-    if (isPresentingShareSession) {
-        ShareSessionDialog(viewModel, onDismiss = { isPresentingShareSession = false })
+    val coordinator = viewModel.shareCoordinator
+    if (isPresentingShareSession && coordinator != null) {
+        val context = LocalContext.current
+        ShareSessionDialog(
+            coordinator = coordinator,
+            isAttached = viewModel.isSharing,
+            onDismiss = { isPresentingShareSession = false },
+            startAction = { viewModel.startSharing(DeviceIdentity.name(context), allowsContributors = true) },
+        )
+    }
+    if (isPresentingRoundHistory) {
+        RoundHistoryDialog(viewModel, onDismiss = { isPresentingRoundHistory = false })
+    }
+    if (isConfirmingEnd) {
+        AlertDialog(
+            onDismissRequest = { isConfirmingEnd = false },
+            title = { Text("Terminer la partie ?") },
+            text = {
+                Text(
+                    "Le classement final sera calculé à partir des manches jouées. " +
+                        "Cette action ne peut pas être annulée.",
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    isConfirmingEnd = false
+                    viewModel.endManually()
+                }) {
+                    Text("Terminer la partie")
+                }
+            },
+            dismissButton = { TextButton(onClick = { isConfirmingEnd = false }) { Text("Annuler") } },
+        )
+    }
+    if (isConfirmingAbandon) {
+        AlertDialog(
+            onDismissRequest = { isConfirmingAbandon = false },
+            title = { Text("Abandonner cette partie ?") },
+            text = {
+                Text(
+                    "La partie sera classée comme abandonnée dans l'historique, avec le classement " +
+                        "atteint jusque-là. Cette action ne peut pas être annulée.",
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        isConfirmingAbandon = false
+                        viewModel.abandon()
+                        onAbandoned()
+                    },
+                ) { Text("Abandonner") }
+            },
+            dismissButton = { TextButton(onClick = { isConfirmingAbandon = false }) { Text("Annuler") } },
+        )
     }
 }

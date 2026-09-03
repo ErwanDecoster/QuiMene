@@ -12,10 +12,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -41,7 +39,6 @@ import com.cacompte.store.PlayerEntity
 fun PlayersListScreen(
     onAddPlayer: () -> Unit,
     onEditPlayer: (String) -> Unit,
-    onOpenSettings: () -> Unit,
 ) {
     val container = LocalAppContainer.current
     val viewModel = rememberViewModel { PlayersListViewModel(container.playerRepository, container.appSettings) }
@@ -49,16 +46,7 @@ fun PlayersListScreen(
     val colors = LocalAppColors.current
 
     Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Joueurs") },
-                actions = {
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Réglages")
-                    }
-                },
-            )
-        },
+        topBar = { TopAppBar(title = { Text("Joueurs") }) },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddPlayer) {
                 Icon(Icons.Filled.Add, contentDescription = "Ajouter un joueur")

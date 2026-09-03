@@ -17,53 +17,64 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import com.cacompte.app.livesync.LiveShareCoordinator
 import com.cacompte.designsystem.components.Banner
 import com.cacompte.designsystem.components.SecondaryButton
 import com.cacompte.designsystem.tokens.LocalAppColors
 import com.cacompte.designsystem.tokens.Space
-import com.cacompte.store.DeviceIdentity
 import com.cacompte.sync.Role
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 /**
  * Feuille de partage d'une partie en direct — miroir de `ShareSessionView.swift` (sans le QR
  * code : la saisie manuelle du code à 6 chiffres suffit pour cette version, voir
  * [com.cacompte.app.features.join.JoinScreen]). Code de pairage bien visible, bascule « Autoriser
  * les contributeurs », liste des appareils connectés, bouton « Arrêter le partage ».
+ *
+ * Pilotée directement par [LiveShareCoordinator] (durée de vie applicative) plutôt que par un
+ * `LiveMatchViewModel` particulier — cette même feuille sert aussi bien depuis
+ * [com.cacompte.app.features.livematch.LiveMatchScreen] (partage/gestion d'*une* partie donnée,
+ * [isAttached] = « c'est bien la mienne ») que depuis
+ * [com.cacompte.app.features.play.GamesCatalogScreen] (simple observation d'une session déjà en
+ * cours, [startAction] `null` — miroir de `ShareSessionView(startAction: nil)`).
  */
 @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun ShareSessionDialog(
-    viewModel: LiveMatchViewModel,
+    coordinator: LiveShareCoordinator,
+    isAttached: Boolean,
     onDismiss: () -> Unit,
+    startAction: (suspend () -> Unit)? = null,
 ) {
-    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var isStarting by remember { mutableStateOf(false) }
     var startError by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(viewModel.isSharing) {
-        if (!viewModel.isSharing) {
+    LaunchedEffect(isAttached) {
+        if (!isAttached && startAction != null) {
             isStarting = true
             startError = null
-            viewModel.startSharing(
-                deviceName = DeviceIdentity.name(context),
-                allowsContributors = true,
-                onError = { error ->
-                    isStarting = false
-                    startError = error.message ?: "Le partage n'a pas pu démarrer."
-                },
-            )
+            try {
+                startAction()
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (error: Exception) {
+                isStarting = false
+                startError = error.message ?: "Le partage n'a pas pu démarrer."
+            }
         }
     }
-    LaunchedEffect(viewModel.pairingCode) {
-        if (viewModel.pairingCode != null) isStarting = false
+    LaunchedEffect(coordinator.pairingCode) {
+        if (coordinator.pairingCode != null) isStarting = false
     }
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
@@ -74,7 +85,7 @@ fun ShareSessionDialog(
             when {
                 startError != null ->
                     Banner(message = startError.orEmpty())
-                isStarting || viewModel.pairingCode == null ->
+                isStarting || coordinator.pairingCode == null ->
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(Space.xl),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -82,16 +93,24 @@ fun ShareSessionDialog(
                         CircularProgressIndicator()
                         Text("Démarrage du partage…", modifier = Modifier.padding(top = Space.md))
                     }
-                else -> SharingContent(viewModel)
+                else ->
+                    SharingContent(
+                        coordinator = coordinator,
+                        onStop = { scope.launch { coordinator.stopSharing() } },
+                    )
             }
         }
     }
 }
 
 @Composable
-private fun SharingContent(viewModel: LiveMatchViewModel) {
+private fun SharingContent(
+    coordinator: LiveShareCoordinator,
+    onStop: () -> Unit,
+) {
     val colors = LocalAppColors.current
-    val code = viewModel.pairingCode.orEmpty()
+    val scope = rememberCoroutineScope()
+    val code = coordinator.pairingCode.orEmpty()
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -123,25 +142,32 @@ private fun SharingContent(viewModel: LiveMatchViewModel) {
         Column(modifier = Modifier.weight(1f)) {
             Text("Autoriser les contributeurs", style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
             Text(
-                "Désactivé, les appareils qui rejoignent ne peuvent qu'observer la partie.",
+                if (coordinator.allowsContributors) {
+                    "Les appareils qui rejoignent peuvent proposer des manches, validées par toi."
+                } else {
+                    "Désactivé, les appareils qui rejoignent ne peuvent qu'observer la partie."
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.textSecondary,
             )
         }
-        Switch(checked = viewModel.allowsContributors, onCheckedChange = viewModel::setAllowsContributors)
+        Switch(
+            checked = coordinator.allowsContributors,
+            onCheckedChange = { allowed -> scope.launch { coordinator.setAllowsContributors(allowed) } },
+        )
     }
 
     HorizontalDivider()
 
     Text("Appareils connectés", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
-    if (viewModel.connectedPeers.isEmpty()) {
+    if (coordinator.connectedPeers.isEmpty()) {
         Text(
             "En attente d'un appareil qui rejoint…",
             style = MaterialTheme.typography.bodyMedium,
             color = colors.textTertiary,
         )
     } else {
-        for (peer in viewModel.connectedPeers) {
+        for (peer in coordinator.connectedPeers) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(peer.deviceName, color = colors.textPrimary)
                 Text(roleLabel(peer.role), style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
@@ -149,7 +175,7 @@ private fun SharingContent(viewModel: LiveMatchViewModel) {
         }
     }
 
-    SecondaryButton(text = "Arrêter le partage", onClick = viewModel::stopSharing, modifier = Modifier.fillMaxWidth())
+    SecondaryButton(text = "Arrêter le partage", onClick = onStop, modifier = Modifier.fillMaxWidth())
 }
 
 private fun roleLabel(role: Role): String =

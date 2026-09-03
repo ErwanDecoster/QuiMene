@@ -46,7 +46,7 @@ class LiveMatchViewModel(
     private val catalog: GameCatalog,
     private val repository: MatchRepository,
     private val deviceID: String,
-    private val shareCoordinator: LiveShareCoordinator? = null,
+    val shareCoordinator: LiveShareCoordinator? = null,
 ) : ViewModel(),
     LiveRoundEntryState {
     private val stateFlow = MutableStateFlow<MatchState?>(null)
@@ -101,32 +101,13 @@ class LiveMatchViewModel(
     }
 
     /** Démarre (ou continue) le partage en direct de cette partie — mirror de
-     * `LiveMatchModel.startSharing` + `LiveShareCoordinator.startSharing`. */
-    fun startSharing(
+     * `LiveMatchModel.startSharing`. Suspend plutôt que fire-and-forget : [ShareSessionDialog]
+     * attend l'issue pour afficher une erreur éventuelle sans avaler `CancellationException`. */
+    suspend fun startSharing(
         deviceName: String,
         allowsContributors: Boolean,
-        onError: (Throwable) -> Unit,
     ) {
-        val coordinator = shareCoordinator ?: return
-        viewModelScope.launch {
-            try {
-                coordinator.startSharing(match, participants.size, deviceName, allowsContributors)
-            } catch (cancellation: CancellationException) {
-                throw cancellation
-            } catch (error: Exception) {
-                onError(error)
-            }
-        }
-    }
-
-    fun setAllowsContributors(allowed: Boolean) {
-        val coordinator = shareCoordinator ?: return
-        viewModelScope.launch { coordinator.setAllowsContributors(allowed) }
-    }
-
-    fun stopSharing() {
-        val coordinator = shareCoordinator ?: return
-        viewModelScope.launch { coordinator.stopSharing() }
+        shareCoordinator?.startSharing(match, participants.size, deviceName, allowsContributors)
     }
 
     private val state: MatchState get() = requireNotNull(stateFlow.value) { "MatchState pas encore chargé" }

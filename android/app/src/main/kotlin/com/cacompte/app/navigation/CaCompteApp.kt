@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.cacompte.app.features.history.ArchivedMatchesScreen
 import com.cacompte.app.features.history.HistoryDetailScreen
 import com.cacompte.app.features.history.HistoryListScreen
 import com.cacompte.app.features.join.JoinScreen
@@ -49,6 +50,7 @@ fun CaCompteApp() {
                 GamesCatalogScreen(
                     onGameSelected = { gameId -> navController.navigate(Destination.MatchSetup(gameId)) },
                     onOpenLeaderboard = { gameId -> navController.navigate(Destination.GameLeaderboard(gameId)) },
+                    onResumeMatch = { matchId -> navController.navigate(Destination.LiveMatch(matchId)) },
                 )
             }
             composable<Destination.MatchSetup> { backStackEntry ->
@@ -86,7 +88,6 @@ fun CaCompteApp() {
                 PlayersListScreen(
                     onAddPlayer = { navController.navigate(Destination.PlayerEditor(null)) },
                     onEditPlayer = { playerId -> navController.navigate(Destination.PlayerEditor(playerId)) },
-                    onOpenSettings = { navController.navigate(Destination.Settings) },
                 )
             }
             composable<Destination.PlayerEditor> { backStackEntry ->
@@ -96,18 +97,33 @@ fun CaCompteApp() {
                     onDone = { navController.popBackStack() },
                 )
             }
-            composable<Destination.History> {
+            composable<Destination.History> { backStackEntry ->
+                val route: Destination.History = backStackEntry.toRoute()
                 HistoryListScreen(
+                    initialGameFilter = route.gameId,
                     onOpenMatch = { matchId -> navController.navigate(Destination.HistoryDetail(matchId)) },
+                    onOpenArchivedMatches = { navController.navigate(Destination.ArchivedMatches) },
+                    onOpenSettings = { navController.navigate(Destination.Settings) },
                 )
             }
             composable<Destination.HistoryDetail> { backStackEntry ->
                 val route: Destination.HistoryDetail = backStackEntry.toRoute()
                 HistoryDetailScreen(matchId = route.matchId, onBack = { navController.popBackStack() })
             }
+            composable<Destination.ArchivedMatches> {
+                ArchivedMatchesScreen(onBack = { navController.popBackStack() })
+            }
             composable<Destination.GameLeaderboard> { backStackEntry ->
                 val route: Destination.GameLeaderboard = backStackEntry.toRoute()
-                GameLeaderboardScreen(gameId = route.gameId, onBack = { navController.popBackStack() })
+                GameLeaderboardScreen(
+                    gameId = route.gameId,
+                    onBack = { navController.popBackStack() },
+                    onOpenHistory = { gameId ->
+                        navController.navigate(Destination.History(gameId)) {
+                            popUpTo(Destination.GamesCatalog)
+                        }
+                    },
+                )
             }
             composable<Destination.Join> {
                 JoinScreen()
