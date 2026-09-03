@@ -155,9 +155,9 @@ val LocalAppColors = staticCompositionLocalOf { LightAppColors }
 val LocalIsDarkTheme = staticCompositionLocalOf { false }
 
 /**
- * ColorScheme Material 3 dérivé des mêmes tokens, pour que tout composant M3 standard (pas
- * seulement nos composants maison) reste dans la palette de marque — pas de `dynamicColor`
- * (charte : « il écraserait la palette de marque et casserait les contrastes vérifiés »).
+ * ColorScheme Material 3 dérivé des mêmes tokens — repli utilisé quand la couleur dynamique
+ * (Material You, Android 12+) n'est pas disponible ou désactivée par le système ; voir
+ * [dynamicAppColors] et `CaCompteTheme` pour le cas dynamique, aujourd'hui le cas par défaut.
  *
  * Les rôles `surfaceContainer*` (élévation, charte §5.2) n'ont pas de hex distinct documenté par
  * la charte au-delà de `neutral/surface` — celle-ci ne donne que les ombres L1-L4. En attendant
@@ -225,3 +225,42 @@ fun appColorScheme(
             outlineVariant = colors.neutralBorder,
         )
     }
+
+/**
+ * [AppColors] dérivé du `ColorScheme` dynamique du téléphone (Material You, Android 12+,
+ * `dynamicLightColorScheme`/`dynamicDarkColorScheme`) — utilisé par `CaCompteTheme` quand le
+ * système le permet, à la place des tokens fixes de charte. Les couleurs sémantiques
+ * (succès/erreur/avertissement/info) et la palette des 10 joueurs restent **toujours** celles de
+ * [LightAppColors]/[DarkAppColors] : un statut ou l'identité visuelle d'un joueur (hash FNV-1a,
+ * doit rester stable et distinguable) n'a pas de raison de dériver du fond d'écran de la
+ * personne qui tient le téléphone.
+ */
+fun dynamicAppColors(
+    scheme: ColorScheme,
+    dark: Boolean,
+): AppColors {
+    val fixed = if (dark) DarkAppColors else LightAppColors
+    return AppColors(
+        brandInk = scheme.primary,
+        brandInkPressed = scheme.primaryContainer,
+        brandBrass = scheme.tertiary,
+        brandTeal = scheme.secondary,
+        neutralBg = scheme.background,
+        neutralSurface = scheme.surface,
+        neutralSunken = scheme.surfaceContainerLowest,
+        neutralFill = scheme.surfaceVariant,
+        neutralBorder = scheme.outlineVariant,
+        neutralBorderStrong = scheme.outline,
+        textPrimary = scheme.onBackground,
+        textSecondary = scheme.onSurfaceVariant,
+        textTertiary = scheme.onSurfaceVariant,
+        textDisabled = scheme.onSurface.copy(alpha = 0.38f),
+        semanticSuccess = fixed.semanticSuccess,
+        semanticError = fixed.semanticError,
+        semanticWarning = fixed.semanticWarning,
+        semanticInfo = fixed.semanticInfo,
+        onBrandInk = scheme.onPrimary,
+        players = List(10) { fixed.player(it + 1) },
+        playersHighContrast = List(10) { fixed.playerHighContrast(it + 1) },
+    )
+}
