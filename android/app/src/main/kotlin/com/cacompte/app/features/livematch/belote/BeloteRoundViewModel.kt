@@ -4,18 +4,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.cacompte.app.features.livematch.LiveMatchViewModel
+import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.domain.model.ModifierID
 import com.cacompte.domain.model.ScoreInput
 
 /**
  * Miroir de `BeloteRoundModel.swift` — une donne = une entrée par équipe (2 toujours), le moteur
- * (`BeloteRulesV1`) redistribue à chaque coéquipier. Enveloppe [LiveMatchViewModel] plutôt que de
- * recharger la partie soi-même : seul l'état de brouillon de la donne en cours est propre à ce
- * ViewModel.
+ * (`BeloteRulesV1`) redistribue à chaque coéquipier. Enveloppe [LiveRoundEntryState] (hôte ou
+ * contributeur, voir cette interface) plutôt que de recharger la partie soi-même : seul l'état
+ * de brouillon de la donne en cours est propre à ce ViewModel.
  */
 class BeloteRoundViewModel(
-    private val liveMatch: LiveMatchViewModel,
+    private val liveMatch: LiveRoundEntryState,
 ) : ViewModel() {
     /** Équipes du match, dans l'ordre des sièges — toujours 2 pour Belote (4 joueurs, doc 05). */
     val teams: List<String>

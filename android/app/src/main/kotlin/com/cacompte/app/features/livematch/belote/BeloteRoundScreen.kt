@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.cacompte.app.di.rememberViewModel
-import com.cacompte.app.features.livematch.LiveMatchViewModel
+import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.CardGutter
 import com.cacompte.designsystem.components.Chip
@@ -28,7 +28,7 @@ import com.cacompte.domain.model.Participant
  * belote-rebelote. Les défenseurs ne saisissent rien : leur score (162 − points du preneur) est
  * calculé par le moteur. */
 @Composable
-fun BeloteRoundScreen(liveMatch: LiveMatchViewModel) {
+fun BeloteRoundScreen(liveMatch: LiveRoundEntryState) {
     val viewModel = rememberViewModel { BeloteRoundViewModel(liveMatch) }
     val colors = LocalAppColors.current
 
@@ -166,7 +166,7 @@ private fun teamLabel(
  * total d'un seul membre de l'équipe suffit. */
 private fun teamTotal(
     teamID: String,
-    liveMatch: LiveMatchViewModel,
+    liveMatch: LiveRoundEntryState,
 ): Int {
     val representative = liveMatch.participants.firstOrNull { it.teamID == teamID } ?: return 0
     return liveMatch.totals[representative.id] ?: 0

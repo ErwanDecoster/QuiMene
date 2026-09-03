@@ -14,7 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.cacompte.app.di.rememberViewModel
-import com.cacompte.app.features.livematch.LiveMatchViewModel
+import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.CardGutter
 import com.cacompte.designsystem.components.Chip
@@ -27,7 +27,7 @@ import com.cacompte.domain.model.Participant
  * joueurs), contrat, points, bouts, poignée, petit au bout, chelem. Les défenseurs ne saisissent
  * rien : leur part est calculée par le moteur (`TarotRulesV1`). */
 @Composable
-fun TarotRoundScreen(liveMatch: LiveMatchViewModel) {
+fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
     val viewModel = rememberViewModel { TarotRoundViewModel(liveMatch) }
     val colors = LocalAppColors.current
 

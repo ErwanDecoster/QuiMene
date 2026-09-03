@@ -1,7 +1,7 @@
 package com.cacompte.app.features.livematch.yams
 
 import androidx.lifecycle.ViewModel
-import com.cacompte.app.features.livematch.LiveMatchViewModel
+import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.catalog.decodeDetail
 import com.cacompte.catalog.games.YamsCategoryDetail
 import com.cacompte.catalog.toScoreDetail
@@ -13,7 +13,7 @@ import java.util.UUID
  * participant ; le bonus de section haute est calculé par le moteur (`YamsRulesV1`), jamais
  * saisi. */
 class YamsRoundViewModel(
-    private val liveMatch: LiveMatchViewModel,
+    private val liveMatch: LiveRoundEntryState,
 ) : ViewModel() {
     /** Catégories déjà remplies par ce participant, par `categoryID`. */
     fun filledEntries(participantID: UUID): Map<String, ScoreEntry> {

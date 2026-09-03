@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cacompte.app.livesync.LiveShareCoordinator
 import com.cacompte.domain.model.MatchState
 import com.cacompte.domain.model.MatchStatus
 import com.cacompte.domain.model.ModifierID
@@ -20,6 +21,7 @@ import com.cacompte.domain.rules.GameRules
 import com.cacompte.domain.rules.Standing
 import com.cacompte.store.MatchEntity
 import com.cacompte.store.MatchRepository
+import com.cacompte.sync.LiveSession
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,48 +30,117 @@ import java.util.UUID
 
 /**
  * Miroir de `LiveMatchModel.swift` — porte l'état de la manche en cours, rien n'est écrit tant
- * qu'elle n'est pas validée. **La partie partagée en direct (doc 09 : partage, pairs connectés,
- * Live Activity) n'est pas portée** : `startSharing`/`stopSharing`/`refreshFromRemote` dépendent
- * de `:sync` (étape F). Ce ViewModel couvre uniquement le jeu solo/local, hôte de sa propre
- * partie.
+ * qu'elle n'est pas validée. **Hôte** de sa propre partie : écrit toujours directement en local
+ * ([MatchRepository]), jamais via `LiveSession.propose` (réservé aux contributeurs distants —
+ * voir `SharedMatchViewModel`). Implémente [LiveRoundEntryState] : les 4 écrans de saisie dédiés
+ * (Belote/Tarot/Wizard/Yams) et [GenericRoundEntry] ne le savent jamais distinctement d'un
+ * `SharedMatchViewModel` contributeur, exactement comme `ScoreBoardView.swift` côté Apple.
+ * Le partage en direct (pairage, pairs connectés) vit dans [LiveShareCoordinator], injecté
+ * plutôt que construit ici — un seul l'un `LiveSession`/`SupabaseTransport` par session, pas un
+ * par écran.
  */
 class LiveMatchViewModel(
     private var match: MatchEntity,
-    val definition: GameDefinition,
+    override val definition: GameDefinition,
     private val rules: GameRules,
     private val catalog: GameCatalog,
     private val repository: MatchRepository,
     private val deviceID: String,
-) : ViewModel() {
+    private val shareCoordinator: LiveShareCoordinator? = null,
+) : ViewModel(),
+    LiveRoundEntryState {
     private val stateFlow = MutableStateFlow<MatchState?>(null)
     val stateOrNull get() = stateFlow.value
 
-    var pendingScores by mutableStateOf<Map<UUID, Int>>(emptyMap())
+    override var pendingScores by mutableStateOf<Map<UUID, Int>>(emptyMap())
         private set
-    var closedParticipantID by mutableStateOf<UUID?>(null)
+    override var closedParticipantID by mutableStateOf<UUID?>(null)
     var activeSeatIndex by mutableStateOf(0)
         private set
-    var validationErrorMessage by mutableStateOf<String?>(null)
+    override var validationErrorMessage by mutableStateOf<String?>(null)
         private set
-    var roundExplanationMessage by mutableStateOf<String?>(null)
+    override var roundExplanationMessage by mutableStateOf<String?>(null)
         private set
+
+    var remoteActivityMessage by mutableStateOf<String?>(null)
+        private set
+
+    val isSharing: Boolean get() = shareCoordinator?.attachedMatchID == match.id
+    val pairingCode: String? get() = if (isSharing) shareCoordinator?.pairingCode else null
+    val allowsContributors: Boolean get() = shareCoordinator?.allowsContributors ?: true
+    val connectedPeers: List<LiveSession.ConnectedPeer> get() =
+        if (isSharing) {
+            shareCoordinator
+                ?.connectedPeers
+                .orEmpty()
+        } else {
+            emptyList()
+        }
 
     init {
         viewModelScope.launch { stateFlow.value = repository.loadState(match, catalog) }
+        shareCoordinator?.let { coordinator ->
+            viewModelScope.launch {
+                coordinator.remoteMatchUpdates.collect { update ->
+                    if (update.matchID != match.id) return@collect
+                    match = requireNotNull(repository.match(match.id))
+                    stateFlow.value = repository.loadState(match, catalog)
+                    update.deviceName?.let { name -> if (update.isRoundCommit) announceRemoteActivity(name) }
+                }
+            }
+        }
+    }
+
+    private fun announceRemoteActivity(deviceName: String) {
+        viewModelScope.launch {
+            val message = "$deviceName a ajouté une manche."
+            remoteActivityMessage = message
+            delay(4_000)
+            if (remoteActivityMessage == message) remoteActivityMessage = null
+        }
+    }
+
+    /** Démarre (ou continue) le partage en direct de cette partie — mirror de
+     * `LiveMatchModel.startSharing` + `LiveShareCoordinator.startSharing`. */
+    fun startSharing(
+        deviceName: String,
+        allowsContributors: Boolean,
+        onError: (Throwable) -> Unit,
+    ) {
+        val coordinator = shareCoordinator ?: return
+        viewModelScope.launch {
+            try {
+                coordinator.startSharing(match, participants.size, deviceName, allowsContributors)
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (error: Exception) {
+                onError(error)
+            }
+        }
+    }
+
+    fun setAllowsContributors(allowed: Boolean) {
+        val coordinator = shareCoordinator ?: return
+        viewModelScope.launch { coordinator.setAllowsContributors(allowed) }
+    }
+
+    fun stopSharing() {
+        val coordinator = shareCoordinator ?: return
+        viewModelScope.launch { coordinator.stopSharing() }
     }
 
     private val state: MatchState get() = requireNotNull(stateFlow.value) { "MatchState pas encore chargé" }
 
-    val participants: List<Participant> get() = state.participants.sortedBy { it.seatIndex }
-    val totals: Map<UUID, Int> get() = state.totals()
+    override val participants: List<Participant> get() = state.participants.sortedBy { it.seatIndex }
+    override val totals: Map<UUID, Int> get() = state.totals()
     val currentParticipant: Participant? get() = participants.getOrNull(activeSeatIndex)
-    val requiresCloserSelection: Boolean get() = definition.requiresCloserSelection
+    override val requiresCloserSelection: Boolean get() = definition.requiresCloserSelection
 
     /** Manches déjà validées, dans l'ordre — brut, sans interprétation : chaque écran de saisie
      * dédié (Tarot/Wizard/Yams) décode lui-même le `ScoreDetail` propre à son jeu (`:catalog`
      * expose les types `*Detail` publiquement), ce ViewModel générique reste agnostique du jeu. */
-    val rounds: List<Round> get() = state.rounds
-    val currentRoundNumber: Int get() = state.rounds.size + 1
+    override val rounds: List<Round> get() = state.rounds
+    override val currentRoundNumber: Int get() = state.rounds.size + 1
 
     /** Classement courant, recalculé à chaque manche validée — sert aussi bien à
      * [finalStandings] qu'à trier/annoter la liste de saisie en direct. */
@@ -89,7 +160,7 @@ class LiveMatchViewModel(
      * contrairement à une suppression qui ferait tout perdre. */
     fun abandon() = mutate { repository.abandonMatch(match, catalog, deviceID) }
 
-    fun setScore(
+    override fun setScore(
         participantID: UUID,
         value: Int,
     ) {
@@ -97,19 +168,19 @@ class LiveMatchViewModel(
         validationErrorMessage = null
     }
 
-    fun clearScore(participantID: UUID) {
+    override fun clearScore(participantID: UUID) {
         pendingScores = pendingScores - participantID
     }
 
     /** Doc utilisateur — les scores ne sont jamais annoncés dans l'ordre des sièges : chaque
      * champ se remplit par un tap direct. `activeSeatIndex` ne sert qu'à mettre en valeur le
      * champ actuellement focus. */
-    fun focus(participantID: UUID) {
+    override fun focus(participantID: UUID) {
         val index = participants.indexOfFirst { it.id == participantID }
         if (index >= 0) activeSeatIndex = index
     }
 
-    fun commitRound(detailByParticipant: Map<UUID, ScoreDetail> = emptyMap()) {
+    override fun commitRound(detailByParticipant: Map<UUID, ScoreDetail>) {
         val inputs =
             participants.map { participant ->
                 val modifiers =
@@ -139,9 +210,9 @@ class LiveMatchViewModel(
      * …). [onCommitted] laisse chaque appelant réinitialiser son propre état de saisie (brouillon
      * de donne/manche) une fois la validation et l'écriture réussies — jamais avant, pour ne pas
      * effacer une saisie que le moteur vient de rejeter. */
-    fun commitCustomRound(
+    override fun commitCustomRound(
         inputs: List<ScoreInput>,
-        onCommitted: () -> Unit = {},
+        onCommitted: () -> Unit,
     ) {
         val draft = RoundDraft(index = state.rounds.size, inputs = inputs)
 
@@ -170,6 +241,7 @@ class LiveMatchViewModel(
                 ?.entries
                 ?.firstNotNullOfOrNull { it.explanation }
                 ?.let(::showRoundExplanation)
+            syncSharedLogIfNeeded()
         }
     }
 
@@ -187,6 +259,15 @@ class LiveMatchViewModel(
         viewModelScope.launch {
             stateFlow.value = block()
             match = requireNotNull(repository.match(match.id))
+            syncSharedLogIfNeeded()
         }
+    }
+
+    /** Doc 09 « hôte autoritaire » — après chaque écriture locale, republie le journal complet
+     * vers les pairs déjà connectés (`LiveSession.syncHostLog`, qui ne diffuse que les nouveaux
+     * événements) si cette partie est celle actuellement partagée. Miroir de
+     * `LiveMatchModel.syncSharedLogIfNeeded`. */
+    private suspend fun syncSharedLogIfNeeded() {
+        if (isSharing) shareCoordinator?.syncLog(match.id)
     }
 }

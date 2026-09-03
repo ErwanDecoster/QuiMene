@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.cacompte.app.features.livematch.LiveMatchViewModel
+import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.catalog.games.TarotHandDetail
 import com.cacompte.catalog.toScoreDetail
 import com.cacompte.domain.model.ModifierID
@@ -13,9 +13,9 @@ import java.util.UUID
 
 /** Miroir de `TarotRoundModel.swift` — une donne = le preneur seul (3/4 joueurs), ou preneur +
  * partenaire « roi appelé » (5 joueurs) ; les défenseurs ne saisissent jamais rien
- * ([LiveMatchViewModel.commitCustomRound] laisse le moteur calculer et distribuer leur part). */
+ * ([LiveRoundEntryState.commitCustomRound] laisse le moteur calculer et distribuer leur part). */
 class TarotRoundViewModel(
-    private val liveMatch: LiveMatchViewModel,
+    private val liveMatch: LiveRoundEntryState,
 ) : ViewModel() {
     val needsPartner: Boolean get() = liveMatch.participants.size == 5
 

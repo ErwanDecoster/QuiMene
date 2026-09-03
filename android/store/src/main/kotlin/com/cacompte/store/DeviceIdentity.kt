@@ -1,6 +1,8 @@
 package com.cacompte.store
 
 import android.content.Context
+import android.os.Build
+import android.provider.Settings
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -34,4 +36,10 @@ object DeviceIdentity {
         context.deviceIdentityDataStore.edit { it[key] = generated }
         return generated
     }
+
+    /** Équivalent d'`UIDevice.current.name` (doc 09 — nom affiché aux autres appareils d'une
+     * session partagée) : `Settings.Global.DEVICE_NAME` n'existe qu'à partir d'Android 7.1 et
+     * peut rester vide sur certains constructeurs, d'où le repli sur [Build.MODEL]. */
+    fun name(context: Context): String =
+        Settings.Global.getString(context.contentResolver, "device_name") ?: Build.MODEL
 }

@@ -62,10 +62,8 @@ sealed interface Destination {
         val gameId: String,
     ) : Destination
 
-    /** Miroir de `JoinTabView.swift` — écran de repli tant que `:sync` (étape F, transport
-     * Supabase Realtime, ADR-0016) n'existe pas : l'onglet est présent dans la barre (même
-     * position qu'Apple) mais annonce honnêtement l'indisponibilité plutôt que d'imiter un
-     * flux de scan QR qui ne connecterait rien. */
+    /** Miroir de `JoinTabView.swift` — code de pairage à 6 chiffres (pas de scan caméra dans
+     * cette version, voir [com.cacompte.app.features.join.JoinScreen]). */
     @Serializable
     data object Join : Destination
 

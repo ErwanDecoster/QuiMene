@@ -12,7 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.cacompte.app.di.rememberViewModel
-import com.cacompte.app.features.livematch.LiveMatchViewModel
+import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.app.features.livematch.tarot.SteppedValue
 import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.CardGutter
@@ -25,7 +25,7 @@ import com.cacompte.domain.model.Participant
  * de flux en deux temps). Un bandeau compare le total des plis réalisés au numéro de la manche —
  * indication visuelle seulement, `WizardRulesV1.validate` reste le seul verrou réel. */
 @Composable
-fun WizardRoundScreen(liveMatch: LiveMatchViewModel) {
+fun WizardRoundScreen(liveMatch: LiveRoundEntryState) {
     val viewModel = rememberViewModel { WizardRoundViewModel(liveMatch) }
     val colors = LocalAppColors.current
 

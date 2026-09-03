@@ -30,7 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.cacompte.app.di.rememberViewModel
-import com.cacompte.app.features.livematch.LiveMatchViewModel
+import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.designsystem.components.Chip
 import com.cacompte.designsystem.components.PrimaryButton
 import com.cacompte.designsystem.tokens.LocalAppColors
@@ -47,7 +47,7 @@ private val ParticipantColumnWidth = 96.dp
  * / réussi-raté). Le bonus de section haute (+35) est affiché tel que calculé par le moteur,
  * jamais saisi. */
 @Composable
-fun YamsRoundScreen(liveMatch: LiveMatchViewModel) {
+fun YamsRoundScreen(liveMatch: LiveRoundEntryState) {
     val viewModel = rememberViewModel { YamsRoundViewModel(liveMatch) }
     val definition = liveMatch.definition
     val categories =
@@ -193,7 +193,7 @@ private fun BonusRow(
 @Composable
 private fun TotalRow(
     participants: List<Participant>,
-    liveMatch: LiveMatchViewModel,
+    liveMatch: LiveRoundEntryState,
 ) {
     val colors = LocalAppColors.current
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = Space.xxs)) {

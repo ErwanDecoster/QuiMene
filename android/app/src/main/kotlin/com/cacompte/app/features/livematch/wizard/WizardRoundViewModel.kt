@@ -4,7 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import com.cacompte.app.features.livematch.LiveMatchViewModel
+import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.catalog.games.WizardBidDetail
 import com.cacompte.catalog.toScoreDetail
 import com.cacompte.domain.model.ScoreInput
@@ -14,7 +14,7 @@ import java.util.UUID
  * résultat (plis réellement réalisés) par participant, soumis ensemble en une seule fois (le
  * moteur valide que la somme des résultats égale le numéro de la manche). */
 class WizardRoundViewModel(
-    private val liveMatch: LiveMatchViewModel,
+    private val liveMatch: LiveRoundEntryState,
 ) : ViewModel() {
     val roundNumber: Int get() = liveMatch.currentRoundNumber
 

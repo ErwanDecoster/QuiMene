@@ -1,10 +1,13 @@
 package com.cacompte.app.di
 
 import android.content.Context
+import com.cacompte.app.livesync.LiveShareCoordinator
+import com.cacompte.app.livesync.MatchConnectionCoordinator
 import com.cacompte.catalog.GameCatalogEmbedded
 import com.cacompte.domain.rules.GameCatalog
 import com.cacompte.store.AppSettings
 import com.cacompte.store.CaCompteDatabase
+import com.cacompte.store.DeviceIdentity
 import com.cacompte.store.LeaderboardRepository
 import com.cacompte.store.MatchRepository
 import com.cacompte.store.PlayerRepository
@@ -31,4 +34,21 @@ class AppContainer(
     val profileRepository = ProfileRepository(database.matchDao(), database.participantDao())
 
     val appSettings = AppSettings(context, applicationScope)
+
+    /** Doc 09 — un seul `LiveSession` hôte et un seul rejoint à la fois, tous deux de durée de
+     * vie applicative (pas liés à un écran) : voir [LiveShareCoordinator]/
+     * [MatchConnectionCoordinator]. */
+    val liveShareCoordinator =
+        LiveShareCoordinator(
+            catalog = catalog,
+            matchRepository = matchRepository,
+            resolveDeviceID = { DeviceIdentity.current(context) },
+            scope = applicationScope,
+        )
+    val matchConnectionCoordinator =
+        MatchConnectionCoordinator(
+            catalog = catalog,
+            resolveDeviceID = { DeviceIdentity.current(context) },
+            scope = applicationScope,
+        )
 }
