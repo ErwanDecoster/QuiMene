@@ -12,14 +12,13 @@ import java.util.UUID
 /**
  * Miroir de `MatchEvent.swift` — **7 cas**, pas 6 comme l'énumère par erreur le texte de
  * docs/11-portage-android.md (étape B) : le code Swift source fait foi. `Codable` côté Swift ;
- * marqué `@Serializable` ici pour la même fidélité structurelle, mais la forme JSON exacte de
- * kotlinx.serialization (polymorphisme à discriminant) n'a pas été vérifiée bit-à-bit contre
- * l'encodage Swift réel de `MatchRecord.eventLogData` — aucun golden file ni fichier `spec/` ne
- * sérialise `MatchEvent` (les golden files ont leur propre format ad hoc, décodé par le code de
- * test, pas par `MatchEvent.Codable`). À vérifier explicitement à l'étape où l'export/import
- * `.cacompte` ou la persistance de journal sont réellement implémentés (D/F), pas avant.
+ * sérialisé ici via [MatchEventSerializer], qui reproduit exactement la forme du `Codable`
+ * synthétisé par Swift (`{"<cas>": {…}}`, `_0` pour un paramètre non nommé) — vérifié bit-à-bit
+ * contre les golden files du protocole applicatif (dossier `spec/wire`, doc 09, étape F), pas le
+ * polymorphisme à discriminant par défaut de kotlinx.serialization (`{"type": "roundCommitted",
+ * ...}`) qu'aurait produit un simple `@Serializable` sur cette interface.
  */
-@Serializable
+@Serializable(with = MatchEventSerializer::class)
 sealed interface MatchEvent {
     @Serializable
     data class MatchCreated(
