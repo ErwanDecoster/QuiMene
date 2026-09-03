@@ -37,6 +37,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.core)
 
+    implementation(platform(libs.supabase.bom))
+    implementation(libs.supabase.realtime.kt)
+    implementation(libs.supabase.postgrest.kt)
+    implementation(libs.ktor.client.okhttp)
+
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform.launcher)
     testImplementation(libs.kotest.assertions.core)
