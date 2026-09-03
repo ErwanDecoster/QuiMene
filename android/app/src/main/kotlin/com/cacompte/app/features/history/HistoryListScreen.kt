@@ -79,13 +79,16 @@ fun HistoryListScreen(
             )
             return@Scaffold
         }
-        Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+        Column(modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding())) {
             if (viewModel.availableGames.isNotEmpty()) {
                 GameFilterBar(viewModel)
             }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = floatingNavBarContentPadding(),
+                contentPadding =
+                    floatingNavBarContentPadding(
+                        systemBottomInset = innerPadding.calculateBottomPadding(),
+                    ),
                 verticalArrangement = Arrangement.spacedBy(CardGutter),
             ) {
                 items(viewModel.filteredRows, key = { it.match.id }) { row ->

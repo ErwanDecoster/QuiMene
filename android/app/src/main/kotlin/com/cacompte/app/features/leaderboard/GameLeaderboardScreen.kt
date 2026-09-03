@@ -82,8 +82,8 @@ fun GameLeaderboardScreen(
             return@Scaffold
         }
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
-            contentPadding = floatingNavBarContentPadding(),
+            modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding()),
+            contentPadding = floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding()),
             verticalArrangement = Arrangement.spacedBy(CardGutter),
         ) {
             itemsIndexed(currentEntries) { index, entry ->

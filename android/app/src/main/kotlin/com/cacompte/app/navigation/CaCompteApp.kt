@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -42,8 +43,10 @@ import com.cacompte.app.features.leaderboard.GameLeaderboardScreen
 import com.cacompte.app.features.livematch.LiveMatchScreen
 import com.cacompte.app.features.matchsetup.MatchSetupScreen
 import com.cacompte.app.features.play.GamesCatalogScreen
+import com.cacompte.app.features.players.ArchivedPlayersScreen
 import com.cacompte.app.features.players.PlayerEditorScreen
 import com.cacompte.app.features.players.PlayersListScreen
+import com.cacompte.app.features.profile.ProfileScreen
 import com.cacompte.app.features.results.ResultsScreen
 import com.cacompte.app.features.settings.SettingsScreen
 import com.cacompte.designsystem.tokens.Space
@@ -62,7 +65,6 @@ val LocalFloatingNavBarHeight = compositionLocalOf { 0.dp }
 @Composable
 fun CaCompteApp() {
     val navController = rememberNavController()
-    val density = LocalDensity.current
     var navBarHeight by remember { mutableStateOf(0.dp) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -113,7 +115,8 @@ fun CaCompteApp() {
                 composable<Destination.PlayersList> {
                     PlayersListScreen(
                         onAddPlayer = { navController.navigate(Destination.PlayerEditor(null)) },
-                        onEditPlayer = { playerId -> navController.navigate(Destination.PlayerEditor(playerId)) },
+                        onOpenProfile = { playerId -> navController.navigate(Destination.PlayerProfile(playerId)) },
+                        onOpenArchivedPlayers = { navController.navigate(Destination.ArchivedPlayers) },
                     )
                 }
                 composable<Destination.PlayerEditor> { backStackEntry ->
@@ -121,6 +124,20 @@ fun CaCompteApp() {
                     PlayerEditorScreen(
                         playerId = route.playerId,
                         onDone = { navController.popBackStack() },
+                    )
+                }
+                composable<Destination.PlayerProfile> { backStackEntry ->
+                    val route: Destination.PlayerProfile = backStackEntry.toRoute()
+                    ProfileScreen(
+                        playerId = route.playerId,
+                        onBack = { navController.popBackStack() },
+                        onEdit = { playerId -> navController.navigate(Destination.PlayerEditor(playerId)) },
+                    )
+                }
+                composable<Destination.ArchivedPlayers> {
+                    ArchivedPlayersScreen(
+                        onOpenProfile = { playerId -> navController.navigate(Destination.PlayerProfile(playerId)) },
+                        onBack = { navController.popBackStack() },
                     )
                 }
                 composable<Destination.History> { backStackEntry ->
@@ -162,10 +179,8 @@ fun CaCompteApp() {
 
         RootNavigationBar(
             navController = navController,
-            modifier =
-                Modifier.align(Alignment.BottomCenter).onGloballyPositioned { coordinates ->
-                    navBarHeight = with(density) { coordinates.size.height.toDp() }
-                },
+            modifier = Modifier.align(Alignment.BottomCenter),
+            onIslandHeightMeasured = { height -> navBarHeight = height },
         )
     }
 }
@@ -174,22 +189,30 @@ fun CaCompteApp() {
  * plutôt qu'une barre pleine largeur collée en bas (doc utilisateur). Dessinée par-dessus le
  * `NavHost` (même `Box`, ajoutée en second) plutôt que dans un `Scaffold.bottomBar` : le contenu
  * défilant de chaque écran doit pouvoir passer *derrière* elle, pas s'arrêter au-dessus (voir
- * [LocalFloatingNavBarHeight]). L'inset système (barre de geste/navigation) est consommé une
- * seule fois ici, à la marge (`windowInsetsPadding`), pour que [NavigationBar] elle-même n'ait
- * pas besoin de son propre inset par défaut. */
+ * [LocalFloatingNavBarHeight]).
+ *
+ * [onIslandHeightMeasured] rapporte la hauteur de l'îlot **seul** (marge + contenu), mesurée
+ * *après* avoir consommé l'inset système (`windowInsetsPadding`, plus bas dans la chaîne de
+ * modificateurs) — sans quoi chaque écran qui l'ajoute à son propre `innerPadding` (qui compte
+ * déjà cet inset une fois, via son propre `Scaffold`) le compterait deux fois : la « Saisir un
+ * code » de [com.cacompte.app.features.join.JoinScreen] apparaissait ainsi trop haute. */
 @Composable
 private fun RootNavigationBar(
     navController: NavHostController,
     modifier: Modifier = Modifier,
+    onIslandHeightMeasured: (Dp) -> Unit = {},
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+    val density = LocalDensity.current
 
     Surface(
         modifier =
             modifier
                 .windowInsetsPadding(WindowInsets.navigationBars)
-                .padding(horizontal = Space.lg, vertical = Space.sm),
+                .onGloballyPositioned { coordinates ->
+                    onIslandHeightMeasured(with(density) { coordinates.size.height.toDp() })
+                }.padding(horizontal = Space.lg, vertical = Space.sm),
         shape = RoundedCornerShape(28.dp),
         tonalElevation = 3.dp,
         shadowElevation = 8.dp,

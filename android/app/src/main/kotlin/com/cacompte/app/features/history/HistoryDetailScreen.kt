@@ -55,8 +55,12 @@ fun HistoryDetailScreen(
         StandingsList(
             state.standings,
             state.participants,
-            modifier = Modifier.padding(innerPadding),
-            contentPadding = PaddingValues(top = Space.lg, bottom = Space.lg + LocalFloatingNavBarHeight.current),
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
+            contentPadding =
+                PaddingValues(
+                    top = Space.lg,
+                    bottom = Space.lg + innerPadding.calculateBottomPadding() + LocalFloatingNavBarHeight.current,
+                ),
         )
     }
 }

@@ -87,8 +87,8 @@ fun GamesCatalogScreen(
         },
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(innerPadding),
-            contentPadding = floatingNavBarContentPadding(),
+            modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding()),
+            contentPadding = floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding()),
             verticalArrangement = Arrangement.spacedBy(CardGutter),
         ) {
             items(viewModel.inProgressMatches, key = { "resume-${it.id}" }) { match ->

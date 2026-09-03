@@ -10,12 +10,12 @@ import kotlinx.serialization.Serializable
 
 /**
  * Routes de navigation typées (Navigation Compose 2.10+, objets `@Serializable` plutôt que des
- * chaînes construites à la main). **Pas de destination « Profil » séparée** au sens Swift (doc 14,
- * identité partagée de l'appareil) : la gestion des joueurs et leurs statistiques (doc 06) sont
- * fusionnées sous [PlayersList] faute de notion d'identité de l'appareil sans profil partagé.
- * **Pas de destination « Classements » de premier niveau** : comme côté Swift
- * (`CaCompteApp.swift`), un classement se rejoint toujours pour un jeu donné, jamais comme liste
- * de tous les jeux — voir [GameLeaderboard], atteint depuis une ligne de [GamesCatalog].
+ * chaînes construites à la main). [PlayerProfile] (statistiques) est distincte de [PlayerEditor]
+ * (édition) — miroir de `ProfileView.swift`/`PlayerEditorView.swift` : taper une ligne dans
+ * [PlayersList] ouvre le profil, jamais directement l'éditeur (atteint depuis le profil via son
+ * bouton « Modifier »). **Pas de destination « Classements » de premier niveau** : comme côté
+ * Swift (`CaCompteApp.swift`), un classement se rejoint toujours pour un jeu donné, jamais comme
+ * liste de tous les jeux — voir [GameLeaderboard], atteint depuis une ligne de [GamesCatalog].
  */
 sealed interface Destination {
     @Serializable
@@ -48,6 +48,11 @@ sealed interface Destination {
     data class PlayerProfile(
         val playerId: String,
     ) : Destination
+
+    /** Miroir de `ArchivedPlayersView.swift` — écran séparé plutôt qu'une section toujours
+     * visible dans [PlayersList], même logique que [ArchivedMatches]. */
+    @Serializable
+    data object ArchivedPlayers : Destination
 
     /** [gameId] non nul quand on arrive depuis le bouton « Historique » d'un classement
      * ([GameLeaderboard]) — miroir de `deepLinkRouter.pendingHistoryGameID` côté Apple : la liste

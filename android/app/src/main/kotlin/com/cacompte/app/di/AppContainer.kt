@@ -3,6 +3,7 @@ package com.cacompte.app.di
 import android.content.Context
 import com.cacompte.app.livesync.LiveShareCoordinator
 import com.cacompte.app.livesync.MatchConnectionCoordinator
+import com.cacompte.app.profilesharing.SharedProfileSyncCoordinator
 import com.cacompte.catalog.GameCatalogEmbedded
 import com.cacompte.domain.rules.GameCatalog
 import com.cacompte.store.AppSettings
@@ -51,4 +52,8 @@ class AppContainer(
             resolveDeviceID = { DeviceIdentity.current(context) },
             scope = applicationScope,
         )
+
+    /** Doc 14 — poussé au lancement et à chaque retour au premier plan (voir
+     * [com.cacompte.app.CaCompteApplication]), pas par un minuteur propre. */
+    val sharedProfileSyncCoordinator = SharedProfileSyncCoordinator(matchRepository, playerRepository)
 }
