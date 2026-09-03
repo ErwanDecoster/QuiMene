@@ -3,9 +3,11 @@ package com.cacompte.app.features.join
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -25,20 +27,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.cacompte.app.BuildConfig
 import com.cacompte.app.di.LocalAppContainer
+import com.cacompte.app.livesync.JoinLink
 import com.cacompte.designsystem.components.Banner
 import com.cacompte.designsystem.components.PrimaryButton
+import com.cacompte.designsystem.components.SecondaryButton
 import com.cacompte.designsystem.tokens.LocalAppColors
 import com.cacompte.designsystem.tokens.Space
 import com.cacompte.store.DeviceIdentity
 import com.cacompte.sync.LiveSession
 import com.cacompte.sync.SupabaseTransportError
+import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 /**
- * Miroir de `JoinTabView.swift` (doc 09) — saisie manuelle du code à 6 chiffres uniquement (pas
- * de scan caméra dans cette version : le code reste la voie de repli d'Apple elle-même, suffisant
- * pour une première parité fonctionnelle). Une fois connecté, remplacé par [SharedMatchScreen].
+ * Miroir de `JoinTabView.swift` (doc 09) — scan de QR en premier (comme Apple, mais lancé à la
+ * demande via le scanner système Google Play Services plutôt qu'un aperçu caméra intégré en
+ * permanence : `GmsBarcodeScanning` gère lui-même la caméra et la permission, aucune permission
+ * `CAMERA` à déclarer). Saisie manuelle du code à 6 chiffres en repli, toujours disponible en
+ * dessous. Une fois connecté, remplacé par [SharedMatchScreen].
  */
 @Composable
 fun JoinScreen() {
@@ -61,6 +68,45 @@ fun JoinScreen() {
     var isConnecting by remember { mutableStateOf(false) }
     var connectionError by remember { mutableStateOf<String?>(null) }
 
+    fun join(code: String) {
+        isConnecting = true
+        connectionError = null
+        scope.launch {
+            try {
+                coordinator.join(
+                    code = code,
+                    deviceName = DeviceIdentity.name(context),
+                    appVersion = BuildConfig.VERSION_NAME,
+                )
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (error: Exception) {
+                connectionError = describe(error)
+            } finally {
+                isConnecting = false
+            }
+        }
+    }
+
+    fun scan() {
+        connectionError = null
+        GmsBarcodeScanning
+            .getClient(context)
+            .startScan()
+            .addOnSuccessListener { barcode ->
+                val raw = barcode.rawValue ?: return@addOnSuccessListener
+                val code = JoinLink.parse(raw) ?: raw.filter(Char::isDigit).take(6)
+                if (code.length == 6) {
+                    pairingCode = code
+                    join(code)
+                } else {
+                    connectionError = "Ce code QR ne correspond pas à une partie Ça Compte."
+                }
+            }.addOnFailureListener { error ->
+                connectionError = error.message ?: "Le scan a échoué. Réessaie."
+            }
+    }
+
     Scaffold(topBar = { TopAppBar(title = { Text("Rejoindre") }) }) { innerPadding ->
         Column(
             modifier = Modifier.fillMaxSize().padding(innerPadding).padding(Space.xl),
@@ -68,11 +114,18 @@ fun JoinScreen() {
             verticalArrangement = Arrangement.spacedBy(Space.lg),
         ) {
             Text(
-                "Saisis le code à 6 chiffres affiché sur l'appareil qui partage la partie.",
+                "Scanne le code QR affiché sur l'appareil qui partage la partie, ou saisis son code à 6 chiffres.",
                 style = MaterialTheme.typography.bodyLarge,
                 color = LocalAppColors.current.textSecondary,
                 textAlign = TextAlign.Center,
             )
+            PrimaryButton(
+                text = "Scanner un code QR",
+                enabled = !isConnecting,
+                onClick = ::scan,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            HorizontalDivider()
             OutlinedTextField(
                 value = pairingCode,
                 onValueChange = { raw -> pairingCode = raw.filter(Char::isDigit).take(6) },
@@ -89,28 +142,10 @@ fun JoinScreen() {
             if (isConnecting) {
                 CircularProgressIndicator()
             } else {
-                PrimaryButton(
-                    text = "Rejoindre",
+                SecondaryButton(
+                    text = "Rejoindre avec ce code",
                     enabled = pairingCode.length == 6,
-                    onClick = {
-                        isConnecting = true
-                        connectionError = null
-                        scope.launch {
-                            try {
-                                coordinator.join(
-                                    code = pairingCode,
-                                    deviceName = DeviceIdentity.name(context),
-                                    appVersion = BuildConfig.VERSION_NAME,
-                                )
-                            } catch (cancellation: CancellationException) {
-                                throw cancellation
-                            } catch (error: Exception) {
-                                connectionError = describe(error)
-                            } finally {
-                                isConnecting = false
-                            }
-                        }
-                    },
+                    onClick = { join(pairingCode) },
                 )
             }
         }

@@ -1,14 +1,22 @@
 package com.cacompte.app.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -30,6 +38,7 @@ import com.cacompte.app.features.players.PlayerEditorScreen
 import com.cacompte.app.features.players.PlayersListScreen
 import com.cacompte.app.features.results.ResultsScreen
 import com.cacompte.app.features.settings.SettingsScreen
+import com.cacompte.designsystem.tokens.Space
 
 /** Racine de l'UI — `Scaffold` avec barre de navigation basse à 4 onglets (Joueurs, Jeux,
  * Rejoindre, Historique — mêmes 4, même ordre que `CaCompteApp.swift`) + `NavHost` typé sur
@@ -41,10 +50,14 @@ fun CaCompteApp() {
     Scaffold(
         bottomBar = { RootNavigationBar(navController) },
     ) { innerPadding ->
+        // Chaque écran a son propre `Scaffold` (barre de titre) qui, par défaut, réserve à
+        // nouveau l'espace des barres système (`contentWindowInsets`) — sans `consumeWindowInsets`
+        // ici, cet espace se cumule avec celui déjà réservé par CE `Scaffold` (barre de nav
+        // basse) : zone morte en bas, titre poussé trop bas sur chaque écran.
         NavHost(
             navController = navController,
             startDestination = Destination.PlayersList,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding),
         ) {
             composable<Destination.GamesCatalog> {
                 GamesCatalogScreen(
@@ -135,35 +148,52 @@ fun CaCompteApp() {
     }
 }
 
+/** Barre de navigation flottante — îlot arrondi, séparé des bords de l'écran et surélevé (ombre),
+ * plutôt qu'une barre pleine largeur collée en bas (doc utilisateur). L'inset système (barre de
+ * geste/navigation) est consommé une seule fois ici, à la marge (`windowInsetsPadding`), pour que
+ * [NavigationBar] elle-même n'ait pas besoin de son propre inset par défaut. */
 @Composable
 private fun RootNavigationBar(navController: NavHostController) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
-    NavigationBar {
-        for (root in RootDestination.entries) {
-            val selected =
-                currentDestination?.hierarchy?.any {
-                    when (root) {
-                        RootDestination.Players -> it.hasRoute<Destination.PlayersList>()
-                        RootDestination.Games -> it.hasRoute<Destination.GamesCatalog>()
-                        RootDestination.Join -> it.hasRoute<Destination.Join>()
-                        RootDestination.History -> it.hasRoute<Destination.History>()
-                    }
-                } == true
+    Surface(
+        modifier =
+            Modifier
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(horizontal = Space.lg, vertical = Space.sm),
+        shape = RoundedCornerShape(28.dp),
+        tonalElevation = 3.dp,
+        shadowElevation = 8.dp,
+    ) {
+        NavigationBar(
+            windowInsets = WindowInsets(0, 0, 0, 0),
+            containerColor = Color.Transparent,
+        ) {
+            for (root in RootDestination.entries) {
+                val selected =
+                    currentDestination?.hierarchy?.any {
+                        when (root) {
+                            RootDestination.Players -> it.hasRoute<Destination.PlayersList>()
+                            RootDestination.Games -> it.hasRoute<Destination.GamesCatalog>()
+                            RootDestination.Join -> it.hasRoute<Destination.Join>()
+                            RootDestination.History -> it.hasRoute<Destination.History>()
+                        }
+                    } == true
 
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    navController.navigate(root.destination) {
-                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                icon = { Icon(root.icon, contentDescription = null) },
-                label = { Text(root.label) },
-            )
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = {
+                        navController.navigate(root.destination) {
+                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    icon = { Icon(root.icon, contentDescription = null) },
+                    label = { Text(root.label) },
+                )
+            }
         }
     }
 }

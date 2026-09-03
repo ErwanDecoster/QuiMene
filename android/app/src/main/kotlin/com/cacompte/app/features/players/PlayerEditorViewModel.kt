@@ -74,8 +74,9 @@ class PlayerEditorViewModel(
     }
 
     fun updateNickname(value: String) {
-        if (nickname == value) return
-        nickname = value
+        val capitalized = capitalizeEachWord(value)
+        if (nickname == capitalized) return
+        nickname = capitalized
         if (!hasManualAvatarOverride) regenerateFromNickname()
     }
 
@@ -165,5 +166,18 @@ class PlayerEditorViewModel(
             repository.delete(player)
             onDone()
         }
+    }
+
+    /** Doc utilisateur — un pseudo commence toujours par une majuscule à chaque mot, imposé (pas
+     * juste suggéré par le clavier) : ne force que la première lettre de chaque mot, laisse le
+     * reste de la saisie intact (« McDonald » reste « McDonald », pas « Mcdonald »). */
+    private fun capitalizeEachWord(value: String): String {
+        val builder = StringBuilder(value.length)
+        var capitalizeNext = true
+        for (char in value) {
+            builder.append(if (capitalizeNext) char.uppercaseChar() else char)
+            capitalizeNext = char.isWhitespace()
+        }
+        return builder.toString()
     }
 }

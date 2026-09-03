@@ -34,6 +34,20 @@ class PlayerEditorViewModelTest {
     }
 
     @Test
+    fun `updateNickname capitalizes the first letter of each word without touching the rest`() {
+        val vm = viewModel()
+
+        vm.updateNickname("jean paul")
+        vm.nickname shouldBe "Jean Paul"
+
+        vm.updateNickname("mcDonald")
+        vm.nickname shouldBe "McDonald"
+
+        vm.updateNickname("  léa")
+        vm.nickname shouldBe "  Léa"
+    }
+
+    @Test
     fun `manually picking an emoji stops further automatic regeneration`() {
         val vm = viewModel()
         vm.updateNickname("Alice")

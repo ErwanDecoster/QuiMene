@@ -70,6 +70,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.play.services.code.scanner)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
     // JUnit4 + Robolectric — pas JUnit5 (voir :store) : les ViewModels de cette étape touchent
