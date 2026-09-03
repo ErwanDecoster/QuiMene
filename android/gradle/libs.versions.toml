@@ -4,7 +4,7 @@
 # été vérifiées comme les dernières stables publiées (Maven Central / Google Maven) au moment de
 # l'écriture, jamais devinées.
 kotlin = "2.4.10"
-agp = "9.4.0"
+agp = "9.2.1"
 ksp = "2.3.11" # Vérifié compatible avec Kotlin 2.4.10 à l'usage (étape D) — KSP2 a une
 # numérotation indépendante de Kotlin depuis peu, plus le préfixe "<kotlin>-<ksp>" historique.
 composeBom = "2026.08.00"
