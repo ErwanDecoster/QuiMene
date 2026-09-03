@@ -41,7 +41,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -115,6 +118,18 @@ private fun PlayerEditorContent(
     val viewModel = rememberViewModel { PlayerEditorViewModel(mode, container.playerRepository) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     val colors = LocalAppColors.current
+    val nicknameFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    // Doc utilisateur — remontée : à la création d'un joueur, le champ de saisie du pseudo
+    // doit déjà être prêt à recevoir la frappe, comme sur Apple. Pas au moment de modifier un
+    // joueur existant : ouvrirait le clavier sans y avoir été invité, pour une fiche déjà remplie.
+    LaunchedEffect(Unit) {
+        if (!viewModel.isEditing) {
+            nicknameFocusRequester.requestFocus()
+            keyboardController?.show()
+        }
+    }
 
     Column(
         modifier =
@@ -148,7 +163,7 @@ private fun PlayerEditorContent(
             label = { Text("Pseudo") },
             singleLine = true,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().focusRequester(nicknameFocusRequester),
         )
 
         Text("Emoji", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)

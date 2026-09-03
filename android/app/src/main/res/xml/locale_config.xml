@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Langues déjà déclarées côté contenu (spec/games/*.json, GameDefinition.LocalizedText — fr
+     source, en/es/de/it) : miroir des knownRegions Apple (Localizable.xcstrings). Nécessaire pour
+     que Settings.ACTION_APP_LOCALE_SETTINGS propose un choix de langue par app — sans ce fichier,
+     le système ne sait pas quelles langues l'app prétend supporter. Le chrome de l'interface
+     (boutons, titres) reste en dur en français quelle que soit la langue choisie ici tant que
+     l'étape G (doc 11, extraction de Localizable.xcstrings vers strings.xml) n'est pas faite ;
+     changer la langue ici n'affecte pour l'instant que le contenu des jeux (noms, descriptions). -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="fr" />
+    <locale android:name="en" />
+    <locale android:name="es" />
+    <locale android:name="de" />
+    <locale android:name="it" />
+</locale-config>

@@ -10,6 +10,7 @@ struct PlayerEditorView: View {
   @State private var photoPickerItem: PhotosPickerItem?
   @State private var isPresentingDeleteConfirmation = false
   @State private var isPresentingProfileScanner = false
+  @FocusState private var isNicknameFocused: Bool
 
   init(mode: PlayerEditorMode, context: ModelContext) {
     _model = State(initialValue: PlayerEditorModel(mode: mode, context: context))
@@ -20,6 +21,7 @@ struct PlayerEditorView: View {
       Form {
         Section("Pseudo") {
           TextField("Pseudo", text: $model.nickname)
+            .focused($isNicknameFocused)
         }
 
         Section("Avatar") {
@@ -118,6 +120,15 @@ struct PlayerEditorView: View {
         }
       }
       .navigationTitle(model.isEditing ? "Modifier le joueur" : "Ajouter un joueur")
+      .onAppear {
+        // Doc utilisateur — remontée : à la création d'un joueur, le champ de saisie du
+        // pseudo doit déjà être prêt à recevoir la frappe, pas seulement affiché. Pas au
+        // moment de modifier un joueur existant : ouvrirait le clavier sans y avoir été
+        // invité, pour une fiche déjà remplie.
+        if !model.isEditing {
+          isNicknameFocused = true
+        }
+      }
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
           Button("Annuler") { dismiss() }

@@ -5,23 +5,36 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cacompte.domain.model.MatchStatus
 import com.cacompte.domain.rules.GameCatalog
 import com.cacompte.domain.rules.GameDefinition
 import com.cacompte.store.MatchEntity
 import com.cacompte.store.MatchRepository
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /** Miroir de la logique de reprise de `GamesTabView.swift` — parties en cours, toutes plateformes
- * confondues (rien n'empêche d'en avoir plusieurs sans avoir terminé la précédente). Rafraîchi
- * manuellement (à l'ouverture de l'écran, après un abandon) plutôt qu'observé en continu — même
- * choix qu'Apple (`refreshInProgressMatches()`), pas besoin d'un flux réactif pour une liste qui
- * ne change qu'à la marge d'une session. */
+ * confondues (rien n'empêche d'en avoir plusieurs sans avoir terminé la précédente).
+ *
+ * Observe [MatchRepository.observeAll] plutôt qu'un chargement ponctuel rafraîchi à la main —
+ * même bug de fond que celui corrigé sur [com.cacompte.app.features.history.HistoryViewModel] :
+ * la `ViewModel` de cet onglet vit aussi longtemps que son entrée de pile de retour, donc un
+ * chargement figé à `init{}` ne verrait jamais une partie conclue depuis un autre onglet. */
 class GamesCatalogViewModel(
     private val matchRepository: MatchRepository,
     private val catalog: GameCatalog,
 ) : ViewModel() {
-    var inProgressMatches by mutableStateOf<List<MatchEntity>>(emptyList())
-        private set
+    val inProgressMatches: StateFlow<List<MatchEntity>> =
+        matchRepository
+            .observeAll()
+            .map { matches ->
+                matches
+                    .filter { it.status == MatchStatus.InProgress || it.status == MatchStatus.FinalRound }
+                    .sortedByDescending { it.startedAt }
+            }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** Miroir de `GamesTabView.searchText` — filtre en direct à chaque frappe, sur le nom et la
      * description courte, dans les 5 langues déclarées (voir [GameDefinition.LocalizedText
@@ -42,22 +55,11 @@ class GamesCatalogViewModel(
         searchText = value
     }
 
-    init {
-        refresh()
-    }
-
-    fun refresh() {
-        viewModelScope.launch { inProgressMatches = matchRepository.inProgressMatches() }
-    }
-
     fun abandon(
         match: MatchEntity,
         deviceID: String,
     ) {
-        viewModelScope.launch {
-            matchRepository.abandonMatch(match, catalog, deviceID)
-            refresh()
-        }
+        viewModelScope.launch { matchRepository.abandonMatch(match, catalog, deviceID) }
     }
 
     fun gameName(match: MatchEntity): String =

@@ -23,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +39,7 @@ import com.cacompte.designsystem.components.Chip
 import com.cacompte.designsystem.components.EmptyState
 import com.cacompte.designsystem.tokens.LocalAppColors
 import com.cacompte.designsystem.tokens.Space
+import com.cacompte.domain.rules.GameDefinition
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -56,7 +58,18 @@ fun HistoryListScreen(
     val container = LocalAppContainer.current
     val viewModel =
         rememberViewModel { HistoryViewModel(container.catalog, container.matchRepository, initialGameFilter) }
-    val rows = viewModel.rows
+    val state by viewModel.uiState.collectAsState()
+    val rows = state.rows
+    val availableGames =
+        rows
+            .orEmpty()
+            .map { it.match.gameID }
+            .distinct()
+            .mapNotNull { id -> container.catalog.allGames.firstOrNull { it.id == id } }
+            .sortedBy { it.name.localized }
+    val filteredRows =
+        viewModel.selectedGameID?.let { gameID -> rows.orEmpty().filter { it.match.gameID == gameID } }
+            ?: rows.orEmpty()
 
     Scaffold(
         topBar = {
@@ -80,8 +93,8 @@ fun HistoryListScreen(
             return@Scaffold
         }
         Column(modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding())) {
-            if (viewModel.availableGames.isNotEmpty()) {
-                GameFilterBar(viewModel)
+            if (availableGames.isNotEmpty()) {
+                GameFilterBar(viewModel, availableGames)
             }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -91,16 +104,16 @@ fun HistoryListScreen(
                     ),
                 verticalArrangement = Arrangement.spacedBy(CardGutter),
             ) {
-                items(viewModel.filteredRows, key = { it.match.id }) { row ->
+                items(filteredRows, key = { it.match.id }) { row ->
                     HistoryRow(
                         row,
                         onClick = { onOpenMatch(row.match.id.toString()) },
                         onArchive = { viewModel.archive(row.match) },
                     )
                 }
-                if (viewModel.archivedCount > 0) {
+                if (state.archivedCount > 0) {
                     item {
-                        ArchivedMatchesLink(count = viewModel.archivedCount, onClick = onOpenArchivedMatches)
+                        ArchivedMatchesLink(count = state.archivedCount, onClick = onOpenArchivedMatches)
                     }
                 }
             }
@@ -109,10 +122,13 @@ fun HistoryListScreen(
 }
 
 @Composable
-private fun GameFilterBar(viewModel: HistoryViewModel) {
+private fun GameFilterBar(
+    viewModel: HistoryViewModel,
+    availableGames: List<GameDefinition>,
+) {
     var menuExpanded by remember { mutableStateOf(false) }
     val label =
-        viewModel.availableGames
+        availableGames
             .firstOrNull { it.id == viewModel.selectedGameID }
             ?.name
             ?.localized
@@ -131,7 +147,7 @@ private fun GameFilterBar(viewModel: HistoryViewModel) {
                     viewModel.selectGame(null)
                 },
             )
-            for (game in viewModel.availableGames) {
+            for (game in availableGames) {
                 DropdownMenuItem(
                     text = { Text(game.name.localized) },
                     onClick = {

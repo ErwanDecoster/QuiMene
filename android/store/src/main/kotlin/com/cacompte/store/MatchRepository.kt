@@ -10,6 +10,7 @@ import com.cacompte.domain.model.RoundDraft
 import com.cacompte.domain.model.SharedMatchSummaryPayload
 import com.cacompte.domain.model.VariantSelection
 import com.cacompte.domain.rules.GameCatalog
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -153,6 +154,14 @@ class MatchRepository(
     suspend fun delete(match: MatchEntity) {
         matchDao.delete(match)
     }
+
+    /** Miroir réactif de [inProgressMatches]/[finishedMatches]/[archivedMatches] — indispensable
+     * pour un écran d'onglet (Historique, catalogue de jeux) : la `ViewModel` d'un onglet vit
+     * aussi longtemps que son entrée de pile de retour est conservée (`saveState`/`restoreState`
+     * du sélecteur d'onglets), donc `init{}` ne se relance pas à chaque retour sur l'onglet — un
+     * chargement ponctuel (`suspend fun`) y resterait figé sur l'instantané du premier passage,
+     * même après qu'une partie se soit conclue ailleurs dans l'app. */
+    fun observeAll(): Flow<List<MatchEntity>> = matchDao.observeAll()
 
     suspend fun inProgressMatches(): List<MatchEntity> =
         matchDao

@@ -235,10 +235,20 @@ private fun RootNavigationBar(
                 NavigationBarItem(
                     selected = selected,
                     onClick = {
-                        navController.navigate(root.destination) {
-                            popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
+                        // Doc utilisateur — retaper l'onglet courant (même en profondeur dans un
+                        // écran poussé depuis sa racine, ex. le profil d'un joueur) doit revenir à
+                        // la première page de cet onglet, sur les 4 onglets. `popBackStack` ne
+                        // pop que si la racine de l'onglet est déjà quelque part sur la pile
+                        // actuelle (donc seulement quand on est *dans* cet onglet) ; sinon (on
+                        // change réellement d'onglet), repli sur le patron standard qui préserve
+                        // l'état de chaque onglet entre deux sélections.
+                        val poppedToTabRoot = navController.popBackStack(root.destination, inclusive = false)
+                        if (!poppedToTabRoot) {
+                            navController.navigate(root.destination) {
+                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
                     },
                     icon = { Icon(root.icon, contentDescription = null) },

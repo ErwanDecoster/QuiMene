@@ -18,7 +18,8 @@
         android:label="Ça Compte"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/full_backup_content">
+        android:fullBackupContent="@xml/full_backup_content"
+        android:localeConfig="@xml/locale_config">
 
         <activity
             android:name=".MainActivity"

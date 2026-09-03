@@ -31,6 +31,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -79,6 +80,7 @@ fun GamesCatalogScreen(
     val scope = rememberCoroutineScope()
     val catalog = container.catalog
     val viewModel = rememberViewModel { GamesCatalogViewModel(container.matchRepository, catalog) }
+    val inProgressMatches by viewModel.inProgressMatches.collectAsState()
     var matchPendingAbandon by remember { mutableStateOf<MatchEntity?>(null) }
     var isPresentingActiveShare by remember { mutableStateOf(false) }
     var isSearching by remember { mutableStateOf(false) }
@@ -166,7 +168,7 @@ fun GamesCatalogScreen(
             verticalArrangement = Arrangement.spacedBy(CardGutter),
         ) {
             if (viewModel.searchText.isBlank()) {
-                items(viewModel.inProgressMatches, key = { "resume-${it.id}" }) { match ->
+                items(inProgressMatches, key = { "resume-${it.id}" }) { match ->
                     ResumeMatchRow(
                         gameName = viewModel.gameName(match),
                         onClick = { onResumeMatch(match.id.toString()) },
