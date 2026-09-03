@@ -163,6 +163,10 @@ class MatchRepository(
      * même après qu'une partie se soit conclue ailleurs dans l'app. */
     fun observeAll(): Flow<List<MatchEntity>> = matchDao.observeAll()
 
+    /** Miroir réactif de [participants] — nécessaire au filtre par joueur de l'historique
+     * (`HistoryViewModel`), qui doit croiser toutes les parties avec tous les participants. */
+    fun observeAllParticipants(): Flow<List<ParticipantEntity>> = participantDao.observeAll()
+
     suspend fun inProgressMatches(): List<MatchEntity> =
         matchDao
             .getAll()

@@ -2,6 +2,7 @@ package com.cacompte.app.features.history
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,9 +68,21 @@ fun HistoryListScreen(
             .distinct()
             .mapNotNull { id -> container.catalog.allGames.firstOrNull { it.id == id } }
             .sortedBy { it.name.localized }
+    val availablePlayers =
+        rows
+            .orEmpty()
+            .flatMap { it.participants }
+            .associate { HistoryViewModel.filterID(it) to it.nicknameSnapshot }
+            .toList()
+            .sortedBy { (_, name) -> name }
     val filteredRows =
-        viewModel.selectedGameID?.let { gameID -> rows.orEmpty().filter { it.match.gameID == gameID } }
-            ?: rows.orEmpty()
+        rows.orEmpty().filter { row ->
+            (viewModel.selectedGameID == null || row.match.gameID == viewModel.selectedGameID) &&
+                (
+                    viewModel.selectedPlayerID == null ||
+                        row.participants.any { HistoryViewModel.filterID(it) == viewModel.selectedPlayerID }
+                )
+        }
 
     Scaffold(
         topBar = {
@@ -93,8 +106,8 @@ fun HistoryListScreen(
             return@Scaffold
         }
         Column(modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding())) {
-            if (availableGames.isNotEmpty()) {
-                GameFilterBar(viewModel, availableGames)
+            if (availableGames.isNotEmpty() || availablePlayers.isNotEmpty()) {
+                FilterBar(viewModel, availableGames, availablePlayers)
             }
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -122,7 +135,26 @@ fun HistoryListScreen(
 }
 
 @Composable
-private fun GameFilterBar(
+private fun FilterBar(
+    viewModel: HistoryViewModel,
+    availableGames: List<GameDefinition>,
+    availablePlayers: List<Pair<HistoryViewModel.PlayerFilterID, String>>,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = Space.lg, vertical = Space.sm),
+        horizontalArrangement = Arrangement.spacedBy(Space.sm),
+    ) {
+        if (availableGames.isNotEmpty()) {
+            GameFilterChip(viewModel, availableGames)
+        }
+        if (availablePlayers.isNotEmpty()) {
+            PlayerFilterChip(viewModel, availablePlayers)
+        }
+    }
+}
+
+@Composable
+private fun GameFilterChip(
     viewModel: HistoryViewModel,
     availableGames: List<GameDefinition>,
 ) {
@@ -133,7 +165,7 @@ private fun GameFilterBar(
             ?.name
             ?.localized
 
-    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = Space.lg, vertical = Space.sm)) {
+    Box {
         Chip(
             title = label ?: "Tous les jeux",
             isSelected = label != null,
@@ -153,6 +185,41 @@ private fun GameFilterBar(
                     onClick = {
                         menuExpanded = false
                         viewModel.selectGame(game.id)
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PlayerFilterChip(
+    viewModel: HistoryViewModel,
+    availablePlayers: List<Pair<HistoryViewModel.PlayerFilterID, String>>,
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+    val label = availablePlayers.firstOrNull { (id, _) -> id == viewModel.selectedPlayerID }?.second
+
+    Box {
+        Chip(
+            title = label ?: "Tous les joueurs",
+            isSelected = label != null,
+            onClick = { menuExpanded = true },
+        )
+        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text("Tous les joueurs") },
+                onClick = {
+                    menuExpanded = false
+                    viewModel.selectPlayer(null)
+                },
+            )
+            for ((id, name) in availablePlayers) {
+                DropdownMenuItem(
+                    text = { Text(name) },
+                    onClick = {
+                        menuExpanded = false
+                        viewModel.selectPlayer(id)
                     },
                 )
             }

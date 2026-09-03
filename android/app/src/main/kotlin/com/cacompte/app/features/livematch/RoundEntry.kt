@@ -68,13 +68,21 @@ fun RoundEntryDispatch(
 @Composable
 fun GenericRoundEntry(source: LiveRoundEntryState) {
     val rankByParticipant = source.currentStandings.associate { it.participantID to it.rank }
+    // Miroir de `ScoreBoardView.rankedParticipants` — la liste elle-même est triée par
+    // classement (l'ordre des sièges ne sert qu'à départager une égalité), pas seulement le
+    // numéro affiché sur chaque ligne : remontée utilisateur, le numéro de rang affiché ne
+    // correspondait pas à la position dans la liste tant que celle-ci restait triée par siège.
+    val rankedParticipants =
+        source.participants.sortedWith(
+            compareBy({ rankByParticipant[it.id] ?: Int.MAX_VALUE }, { it.seatIndex }),
+        )
 
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.weight(1f).padding(horizontal = Space.lg),
             verticalArrangement = Arrangement.spacedBy(CardGutter),
         ) {
-            items(source.participants, key = { it.id }) { participant ->
+            items(rankedParticipants, key = { it.id }) { participant ->
                 ParticipantScoreRow(
                     participant = participant,
                     rank = rankByParticipant[participant.id],

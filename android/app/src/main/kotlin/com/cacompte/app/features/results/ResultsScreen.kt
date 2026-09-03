@@ -1,6 +1,7 @@
 package com.cacompte.app.features.results
 
 import android.graphics.Paint
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -22,6 +23,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -49,6 +51,7 @@ import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.PrimaryButton
 import com.cacompte.designsystem.tokens.IconSize
 import com.cacompte.designsystem.tokens.LocalAppColors
+import com.cacompte.designsystem.tokens.LocalIsDarkTheme
 import com.cacompte.designsystem.tokens.Radius
 import com.cacompte.designsystem.tokens.ScoreTypography
 import com.cacompte.designsystem.tokens.Space
@@ -147,34 +150,46 @@ private fun PodiumRow(
     badge: Badge?,
 ) {
     val colors = LocalAppColors.current
+    val isDark = LocalIsDarkTheme.current
     val isFirst = standing.rank == 1
     val accentColor = if (isFirst) colors.brandBrass else colors.textSecondary
     val background = if (isFirst) colors.brandBrass.copy(alpha = 0.08f) else colors.neutralSurface
 
-    Row(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(Radius.md))
-                .background(background)
-                .padding(Space.md),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Space.md),
+    // Miroir de `Card` (:designsystem) plutôt qu'un simple `Modifier.background()` — même
+    // remontée « les listes ne se détachent pas du fond » : tonal + ombre garantit une séparation
+    // visuelle même quand le fond est proche de `background` en couleur dynamique.
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(Radius.md),
+        color = background,
+        tonalElevation = 1.dp,
+        shadowElevation = 1.dp,
+        border = if (isDark) BorderStroke(1.dp, colors.neutralBorder) else null,
     ) {
-        Text(
-            text = "${standing.rank}",
-            style = MaterialTheme.typography.headlineSmall,
-            color = accentColor,
-            modifier = Modifier.width(32.dp),
-        )
-        AvatarView(participant.toAvatar(), size = AvatarSize.Medium)
-        Column(modifier = Modifier.weight(1f)) {
-            Text(participant.nicknameSnapshot, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
-            badge?.let {
-                Text(it.kind.label, style = MaterialTheme.typography.labelMedium, color = colors.brandBrass)
+        Row(
+            modifier = Modifier.padding(Space.md),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Space.md),
+        ) {
+            Text(
+                text = "${standing.rank}",
+                style = MaterialTheme.typography.headlineSmall,
+                color = accentColor,
+                modifier = Modifier.width(32.dp),
+            )
+            AvatarView(participant.toAvatar(), size = AvatarSize.Medium)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    participant.nicknameSnapshot,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colors.textPrimary,
+                )
+                badge?.let {
+                    Text(it.kind.label, style = MaterialTheme.typography.labelMedium, color = colors.brandBrass)
+                }
             }
+            Text(text = standing.score.toString(), style = ScoreTypography.scoreXL, color = accentColor)
         }
-        Text(text = standing.score.toString(), style = ScoreTypography.scoreXL, color = accentColor)
     }
 }
 
