@@ -2,7 +2,6 @@ package com.cacompte.app.features.history
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
+import com.cacompte.app.navigation.floatingNavBarContentPadding
 import com.cacompte.app.ui.gameIcon
 import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.CardGutter
@@ -74,7 +74,7 @@ fun ArchivedMatchesScreen(onBack: () -> Unit) {
         }
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-            contentPadding = PaddingValues(Space.lg),
+            contentPadding = floatingNavBarContentPadding(),
             verticalArrangement = Arrangement.spacedBy(CardGutter),
         ) {
             items(viewModel.matches, key = { it.id }) { match ->

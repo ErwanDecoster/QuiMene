@@ -23,6 +23,7 @@ import com.cacompte.app.features.livematch.belote.BeloteRoundScreen
 import com.cacompte.app.features.livematch.tarot.TarotRoundScreen
 import com.cacompte.app.features.livematch.wizard.WizardRoundScreen
 import com.cacompte.app.features.livematch.yams.YamsRoundScreen
+import com.cacompte.app.navigation.LocalFloatingNavBarHeight
 import com.cacompte.app.ui.toAvatar
 import com.cacompte.catalog.games.BeloteRulesV1
 import com.cacompte.catalog.games.TarotRulesV1
@@ -106,7 +107,7 @@ fun GenericRoundEntry(
         PrimaryButton(
             text = "Valider la manche",
             onClick = { source.commitRound() },
-            modifier = Modifier.padding(Space.lg),
+            modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
         )
     }
 }

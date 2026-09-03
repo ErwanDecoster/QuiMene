@@ -1,7 +1,8 @@
 package com.cacompte.app.navigation
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -9,13 +10,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -40,126 +48,146 @@ import com.cacompte.app.features.results.ResultsScreen
 import com.cacompte.app.features.settings.SettingsScreen
 import com.cacompte.designsystem.tokens.Space
 
-/** Racine de l'UI — `Scaffold` avec barre de navigation basse à 4 onglets (Joueurs, Jeux,
- * Rejoindre, Historique — mêmes 4, même ordre que `CaCompteApp.swift`) + `NavHost` typé sur
- * [Destination]. */
+/** Hauteur réellement occupée par l'îlot flottant de [RootNavigationBar] (mesurée à l'exécution,
+ * marge + barre de geste système incluses) — à ajouter au padding bas du contenu défilant de
+ * chaque écran pour qu'il puisse défiler *derrière* l'îlot (doc utilisateur) sans que son dernier
+ * élément reste durablement caché dessous. `0.dp` tant que la barre n'a pas encore été mesurée
+ * (première composition). */
+val LocalFloatingNavBarHeight = compositionLocalOf { 0.dp }
+
+/** Racine de l'UI — barre de navigation flottante à 4 onglets (Joueurs, Jeux, Rejoindre,
+ * Historique — mêmes 4, même ordre que `CaCompteApp.swift`) superposée au `NavHost`, qui occupe
+ * tout l'écran (le contenu défile derrière l'îlot plutôt que de s'arrêter au-dessus, doc
+ * utilisateur) + `NavHost` typé sur [Destination]. */
 @Composable
 fun CaCompteApp() {
     val navController = rememberNavController()
+    val density = LocalDensity.current
+    var navBarHeight by remember { mutableStateOf(0.dp) }
 
-    Scaffold(
-        bottomBar = { RootNavigationBar(navController) },
-    ) { innerPadding ->
-        // Chaque écran a son propre `Scaffold` (barre de titre) qui, par défaut, réserve à
-        // nouveau l'espace des barres système (`contentWindowInsets`) — sans `consumeWindowInsets`
-        // ici, cet espace se cumule avec celui déjà réservé par CE `Scaffold` (barre de nav
-        // basse) : zone morte en bas, titre poussé trop bas sur chaque écran.
-        NavHost(
-            navController = navController,
-            startDestination = Destination.PlayersList,
-            modifier = Modifier.padding(innerPadding).consumeWindowInsets(innerPadding),
-        ) {
-            composable<Destination.GamesCatalog> {
-                GamesCatalogScreen(
-                    onGameSelected = { gameId -> navController.navigate(Destination.MatchSetup(gameId)) },
-                    onOpenLeaderboard = { gameId -> navController.navigate(Destination.GameLeaderboard(gameId)) },
-                    onResumeMatch = { matchId -> navController.navigate(Destination.LiveMatch(matchId)) },
-                )
-            }
-            composable<Destination.MatchSetup> { backStackEntry ->
-                val route: Destination.MatchSetup = backStackEntry.toRoute()
-                MatchSetupScreen(
-                    gameId = route.gameId,
-                    onMatchStarted = { matchId ->
-                        navController.navigate(Destination.LiveMatch(matchId)) {
-                            popUpTo(Destination.GamesCatalog)
-                        }
-                    },
-                    onBack = { navController.popBackStack() },
-                )
-            }
-            composable<Destination.LiveMatch> { backStackEntry ->
-                val route: Destination.LiveMatch = backStackEntry.toRoute()
-                LiveMatchScreen(
-                    matchId = route.matchId,
-                    onConcluded = { matchId ->
-                        navController.navigate(Destination.Results(matchId)) {
-                            popUpTo(Destination.GamesCatalog)
-                        }
-                    },
-                    onAbandoned = { navController.popBackStack(Destination.GamesCatalog, inclusive = false) },
-                )
-            }
-            composable<Destination.Results> { backStackEntry ->
-                val route: Destination.Results = backStackEntry.toRoute()
-                ResultsScreen(
-                    matchId = route.matchId,
-                    onDone = { navController.popBackStack(Destination.GamesCatalog, inclusive = false) },
-                )
-            }
-            composable<Destination.PlayersList> {
-                PlayersListScreen(
-                    onAddPlayer = { navController.navigate(Destination.PlayerEditor(null)) },
-                    onEditPlayer = { playerId -> navController.navigate(Destination.PlayerEditor(playerId)) },
-                )
-            }
-            composable<Destination.PlayerEditor> { backStackEntry ->
-                val route: Destination.PlayerEditor = backStackEntry.toRoute()
-                PlayerEditorScreen(
-                    playerId = route.playerId,
-                    onDone = { navController.popBackStack() },
-                )
-            }
-            composable<Destination.History> { backStackEntry ->
-                val route: Destination.History = backStackEntry.toRoute()
-                HistoryListScreen(
-                    initialGameFilter = route.gameId,
-                    onOpenMatch = { matchId -> navController.navigate(Destination.HistoryDetail(matchId)) },
-                    onOpenArchivedMatches = { navController.navigate(Destination.ArchivedMatches) },
-                    onOpenSettings = { navController.navigate(Destination.Settings) },
-                )
-            }
-            composable<Destination.HistoryDetail> { backStackEntry ->
-                val route: Destination.HistoryDetail = backStackEntry.toRoute()
-                HistoryDetailScreen(matchId = route.matchId, onBack = { navController.popBackStack() })
-            }
-            composable<Destination.ArchivedMatches> {
-                ArchivedMatchesScreen(onBack = { navController.popBackStack() })
-            }
-            composable<Destination.GameLeaderboard> { backStackEntry ->
-                val route: Destination.GameLeaderboard = backStackEntry.toRoute()
-                GameLeaderboardScreen(
-                    gameId = route.gameId,
-                    onBack = { navController.popBackStack() },
-                    onOpenHistory = { gameId ->
-                        navController.navigate(Destination.History(gameId)) {
-                            popUpTo(Destination.GamesCatalog)
-                        }
-                    },
-                )
-            }
-            composable<Destination.Join> {
-                JoinScreen()
-            }
-            composable<Destination.Settings> {
-                SettingsScreen(onBack = { navController.popBackStack() })
+    Box(modifier = Modifier.fillMaxSize()) {
+        CompositionLocalProvider(LocalFloatingNavBarHeight provides navBarHeight) {
+            NavHost(
+                navController = navController,
+                startDestination = Destination.PlayersList,
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                composable<Destination.GamesCatalog> {
+                    GamesCatalogScreen(
+                        onGameSelected = { gameId -> navController.navigate(Destination.MatchSetup(gameId)) },
+                        onOpenLeaderboard = { gameId -> navController.navigate(Destination.GameLeaderboard(gameId)) },
+                        onResumeMatch = { matchId -> navController.navigate(Destination.LiveMatch(matchId)) },
+                    )
+                }
+                composable<Destination.MatchSetup> { backStackEntry ->
+                    val route: Destination.MatchSetup = backStackEntry.toRoute()
+                    MatchSetupScreen(
+                        gameId = route.gameId,
+                        onMatchStarted = { matchId ->
+                            navController.navigate(Destination.LiveMatch(matchId)) {
+                                popUpTo(Destination.GamesCatalog)
+                            }
+                        },
+                        onBack = { navController.popBackStack() },
+                    )
+                }
+                composable<Destination.LiveMatch> { backStackEntry ->
+                    val route: Destination.LiveMatch = backStackEntry.toRoute()
+                    LiveMatchScreen(
+                        matchId = route.matchId,
+                        onConcluded = { matchId ->
+                            navController.navigate(Destination.Results(matchId)) {
+                                popUpTo(Destination.GamesCatalog)
+                            }
+                        },
+                        onAbandoned = { navController.popBackStack(Destination.GamesCatalog, inclusive = false) },
+                    )
+                }
+                composable<Destination.Results> { backStackEntry ->
+                    val route: Destination.Results = backStackEntry.toRoute()
+                    ResultsScreen(
+                        matchId = route.matchId,
+                        onDone = { navController.popBackStack(Destination.GamesCatalog, inclusive = false) },
+                    )
+                }
+                composable<Destination.PlayersList> {
+                    PlayersListScreen(
+                        onAddPlayer = { navController.navigate(Destination.PlayerEditor(null)) },
+                        onEditPlayer = { playerId -> navController.navigate(Destination.PlayerEditor(playerId)) },
+                    )
+                }
+                composable<Destination.PlayerEditor> { backStackEntry ->
+                    val route: Destination.PlayerEditor = backStackEntry.toRoute()
+                    PlayerEditorScreen(
+                        playerId = route.playerId,
+                        onDone = { navController.popBackStack() },
+                    )
+                }
+                composable<Destination.History> { backStackEntry ->
+                    val route: Destination.History = backStackEntry.toRoute()
+                    HistoryListScreen(
+                        initialGameFilter = route.gameId,
+                        onOpenMatch = { matchId -> navController.navigate(Destination.HistoryDetail(matchId)) },
+                        onOpenArchivedMatches = { navController.navigate(Destination.ArchivedMatches) },
+                        onOpenSettings = { navController.navigate(Destination.Settings) },
+                    )
+                }
+                composable<Destination.HistoryDetail> { backStackEntry ->
+                    val route: Destination.HistoryDetail = backStackEntry.toRoute()
+                    HistoryDetailScreen(matchId = route.matchId, onBack = { navController.popBackStack() })
+                }
+                composable<Destination.ArchivedMatches> {
+                    ArchivedMatchesScreen(onBack = { navController.popBackStack() })
+                }
+                composable<Destination.GameLeaderboard> { backStackEntry ->
+                    val route: Destination.GameLeaderboard = backStackEntry.toRoute()
+                    GameLeaderboardScreen(
+                        gameId = route.gameId,
+                        onBack = { navController.popBackStack() },
+                        onOpenHistory = { gameId ->
+                            navController.navigate(Destination.History(gameId)) {
+                                popUpTo(Destination.GamesCatalog)
+                            }
+                        },
+                    )
+                }
+                composable<Destination.Join> {
+                    JoinScreen()
+                }
+                composable<Destination.Settings> {
+                    SettingsScreen(onBack = { navController.popBackStack() })
+                }
             }
         }
+
+        RootNavigationBar(
+            navController = navController,
+            modifier =
+                Modifier.align(Alignment.BottomCenter).onGloballyPositioned { coordinates ->
+                    navBarHeight = with(density) { coordinates.size.height.toDp() }
+                },
+        )
     }
 }
 
 /** Barre de navigation flottante — îlot arrondi, séparé des bords de l'écran et surélevé (ombre),
- * plutôt qu'une barre pleine largeur collée en bas (doc utilisateur). L'inset système (barre de
- * geste/navigation) est consommé une seule fois ici, à la marge (`windowInsetsPadding`), pour que
- * [NavigationBar] elle-même n'ait pas besoin de son propre inset par défaut. */
+ * plutôt qu'une barre pleine largeur collée en bas (doc utilisateur). Dessinée par-dessus le
+ * `NavHost` (même `Box`, ajoutée en second) plutôt que dans un `Scaffold.bottomBar` : le contenu
+ * défilant de chaque écran doit pouvoir passer *derrière* elle, pas s'arrêter au-dessus (voir
+ * [LocalFloatingNavBarHeight]). L'inset système (barre de geste/navigation) est consommé une
+ * seule fois ici, à la marge (`windowInsetsPadding`), pour que [NavigationBar] elle-même n'ait
+ * pas besoin de son propre inset par défaut. */
 @Composable
-private fun RootNavigationBar(navController: NavHostController) {
+private fun RootNavigationBar(
+    navController: NavHostController,
+    modifier: Modifier = Modifier,
+) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
 
     Surface(
         modifier =
-            Modifier
+            modifier
                 .windowInsetsPadding(WindowInsets.navigationBars)
                 .padding(horizontal = Space.lg, vertical = Space.sm),
         shape = RoundedCornerShape(28.dp),

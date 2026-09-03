@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.app.features.livematch.tarot.SteppedValue
+import com.cacompte.app.navigation.LocalFloatingNavBarHeight
 import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.CardGutter
 import com.cacompte.designsystem.components.PrimaryButton
@@ -59,7 +60,11 @@ fun WizardRoundScreen(liveMatch: LiveRoundEntryState) {
                 ParticipantBidRow(participant, viewModel)
             }
         }
-        PrimaryButton(text = "Valider la manche", onClick = viewModel::submit, modifier = Modifier.padding(Space.lg))
+        PrimaryButton(
+            text = "Valider la manche",
+            onClick = viewModel::submit,
+            modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
+        )
     }
 }
 

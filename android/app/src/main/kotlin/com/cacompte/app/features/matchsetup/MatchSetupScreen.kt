@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
+import com.cacompte.app.navigation.LocalFloatingNavBarHeight
 import com.cacompte.app.ui.toAvatar
 import com.cacompte.designsystem.components.AvatarSize
 import com.cacompte.designsystem.components.AvatarView
@@ -125,7 +126,7 @@ private fun MatchSetupContent(
             text = "Commencer",
             enabled = viewModel.canStart,
             onClick = { viewModel.start { match -> onMatchStarted(match.id.toString()) } },
-            modifier = Modifier.padding(Space.lg),
+            modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
         )
     }
 }

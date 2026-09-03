@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.livematch.LiveRoundEntryState
+import com.cacompte.app.navigation.LocalFloatingNavBarHeight
 import com.cacompte.designsystem.components.Chip
 import com.cacompte.designsystem.components.PrimaryButton
 import com.cacompte.designsystem.tokens.LocalAppColors
@@ -63,7 +64,8 @@ fun YamsRoundScreen(liveMatch: LiveRoundEntryState) {
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(Space.lg)
+                .padding(horizontal = Space.lg, vertical = Space.lg)
+                .padding(bottom = LocalFloatingNavBarHeight.current)
                 .horizontalScroll(rememberScrollState())
                 .verticalScroll(rememberScrollState()),
     ) {

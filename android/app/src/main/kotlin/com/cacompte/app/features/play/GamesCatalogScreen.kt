@@ -4,7 +4,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.livematch.ShareSessionDialog
+import com.cacompte.app.navigation.floatingNavBarContentPadding
 import com.cacompte.app.ui.gameIcon
 import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.CardGutter
@@ -88,7 +88,7 @@ fun GamesCatalogScreen(
     ) { innerPadding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-            contentPadding = PaddingValues(Space.lg),
+            contentPadding = floatingNavBarContentPadding(),
             verticalArrangement = Arrangement.spacedBy(CardGutter),
         ) {
             items(viewModel.inProgressMatches, key = { "resume-${it.id}" }) { match ->

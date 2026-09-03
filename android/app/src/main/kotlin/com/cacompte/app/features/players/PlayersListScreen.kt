@@ -3,7 +3,6 @@ package com.cacompte.app.features.players
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
+import com.cacompte.app.navigation.floatingNavBarContentPadding
 import com.cacompte.app.ui.toAvatar
 import com.cacompte.designsystem.components.AvatarSize
 import com.cacompte.designsystem.components.AvatarView
@@ -66,7 +66,7 @@ fun PlayersListScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(innerPadding),
-            contentPadding = PaddingValues(Space.lg),
+            contentPadding = floatingNavBarContentPadding(),
             verticalArrangement = Arrangement.spacedBy(Space.sm),
         ) {
             items(state.active, key = { it.id }) { player ->

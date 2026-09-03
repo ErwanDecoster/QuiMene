@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
@@ -38,6 +40,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
+import com.cacompte.app.navigation.LocalFloatingNavBarHeight
 import com.cacompte.designsystem.components.Avatar
 import com.cacompte.designsystem.components.AvatarKind
 import com.cacompte.designsystem.components.AvatarSize
@@ -98,7 +101,12 @@ private fun PlayerEditorContent(
     val colors = LocalAppColors.current
 
     Column(
-        modifier = modifier.fillMaxSize().padding(Space.lg),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(Space.lg)
+                .padding(bottom = LocalFloatingNavBarHeight.current)
+                .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(Space.xl),
     ) {
         val avatar =

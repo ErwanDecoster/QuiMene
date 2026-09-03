@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.livematch.LiveRoundEntryState
+import com.cacompte.app.navigation.LocalFloatingNavBarHeight
 import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.CardGutter
 import com.cacompte.designsystem.components.Chip
@@ -183,7 +184,11 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
                 }
             }
         }
-        PrimaryButton(text = "Valider la donne", onClick = viewModel::submit, modifier = Modifier.padding(Space.lg))
+        PrimaryButton(
+            text = "Valider la donne",
+            onClick = viewModel::submit,
+            modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
+        )
     }
 }
 

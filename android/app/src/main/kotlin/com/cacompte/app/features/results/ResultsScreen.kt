@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
+import com.cacompte.app.navigation.LocalFloatingNavBarHeight
 import com.cacompte.app.ui.toAvatar
 import com.cacompte.designsystem.components.AvatarSize
 import com.cacompte.designsystem.components.AvatarView
@@ -57,7 +58,11 @@ fun ResultsScreen(
         }
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             StandingsList(state.standings, state.participants, modifier = Modifier.weight(1f))
-            PrimaryButton(text = "Terminé", onClick = onDone, modifier = Modifier.padding(Space.lg))
+            PrimaryButton(
+                text = "Terminé",
+                onClick = onDone,
+                modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
+            )
         }
     }
 }
@@ -67,11 +72,12 @@ internal fun StandingsList(
     standings: List<Standing>,
     participants: Map<UUID, ParticipantEntity>,
     modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(vertical = Space.lg),
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize().padding(horizontal = Space.lg),
         verticalArrangement = Arrangement.spacedBy(CardGutter),
-        contentPadding = PaddingValues(vertical = Space.lg),
+        contentPadding = contentPadding,
     ) {
         items(standings, key = { it.participantID }) { standing ->
             StandingRow(standing, participants[standing.participantID])

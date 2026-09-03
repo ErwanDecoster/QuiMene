@@ -1,5 +1,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Aperçu caméra intégré à l'écran Rejoindre (scan de QR, doc 09) — la saisie manuelle du
+         code reste toujours disponible, donc pas d'appareil photo requis pour installer/utiliser
+         l'app (android:required="false"). -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <!-- Pas d'android:icon pour l'instant : l'icône adaptative (charte §11.5 — couche de fond +
          premier plan, zone sûre 66/108 dp) demande un travail d'asset qui n'est pas fait dans
          cette étape ; icône système par défaut en attendant. -->

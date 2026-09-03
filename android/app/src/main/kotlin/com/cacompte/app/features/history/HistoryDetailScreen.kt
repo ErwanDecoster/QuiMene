@@ -1,6 +1,7 @@
 package com.cacompte.app.features.history
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,6 +19,8 @@ import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.results.MatchSummaryViewModel
 import com.cacompte.app.features.results.StandingsList
+import com.cacompte.app.navigation.LocalFloatingNavBarHeight
+import com.cacompte.designsystem.tokens.Space
 import java.util.UUID
 
 /** Réouverture du classement final d'une partie déjà terminée — même rendu que
@@ -49,6 +52,11 @@ fun HistoryDetailScreen(
             }
             return@Scaffold
         }
-        StandingsList(state.standings, state.participants, modifier = Modifier.padding(innerPadding))
+        StandingsList(
+            state.standings,
+            state.participants,
+            modifier = Modifier.padding(innerPadding),
+            contentPadding = PaddingValues(top = Space.lg, bottom = Space.lg + LocalFloatingNavBarHeight.current),
+        )
     }
 }
