@@ -17,8 +17,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
+import com.cacompte.app.features.results.MatchSummaryContent
 import com.cacompte.app.features.results.MatchSummaryViewModel
-import com.cacompte.app.features.results.StandingsList
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
 import com.cacompte.designsystem.tokens.Space
 import java.util.UUID
@@ -52,9 +52,8 @@ fun HistoryDetailScreen(
             }
             return@Scaffold
         }
-        StandingsList(
-            state.standings,
-            state.participants,
+        MatchSummaryContent(
+            state,
             modifier = Modifier.padding(top = innerPadding.calculateTopPadding()),
             contentPadding =
                 PaddingValues(

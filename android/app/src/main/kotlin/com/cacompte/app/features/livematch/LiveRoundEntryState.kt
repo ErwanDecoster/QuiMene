@@ -5,6 +5,7 @@ import com.cacompte.domain.model.Round
 import com.cacompte.domain.model.ScoreDetail
 import com.cacompte.domain.model.ScoreInput
 import com.cacompte.domain.rules.GameDefinition
+import com.cacompte.domain.rules.Standing
 import java.util.UUID
 
 /**
@@ -22,6 +23,10 @@ interface LiveRoundEntryState {
     val rounds: List<Round>
     val currentRoundNumber: Int
     val requiresCloserSelection: Boolean
+
+    /** Classement courant, recalculé à chaque manche validée — sert à faire figurer un rang en
+     * tête de chaque ligne de saisie (doc utilisateur), pas seulement à l'écran de résultats. */
+    val currentStandings: List<Standing>
 
     val pendingScores: Map<UUID, Int>
     var closedParticipantID: UUID?

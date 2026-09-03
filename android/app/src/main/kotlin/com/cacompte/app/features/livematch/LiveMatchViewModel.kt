@@ -24,7 +24,6 @@ import com.cacompte.store.MatchRepository
 import com.cacompte.sync.LiveSession
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -49,8 +48,13 @@ class LiveMatchViewModel(
     val shareCoordinator: LiveShareCoordinator? = null,
 ) : ViewModel(),
     LiveRoundEntryState {
-    private val stateFlow = MutableStateFlow<MatchState?>(null)
-    val stateOrNull get() = stateFlow.value
+    // `mutableStateOf`, pas `MutableStateFlow` — un `Flow` lu directement par `.value` (jamais
+    // collecté) n'est observable par aucune composable : `LiveMatchScreen` ne recomposait pas de
+    // façon fiable quand une manche se validait ou qu'une partie se concluait (l'utilisateur
+    // restait sur l'écran de saisie jusqu'à un changement d'onglet forçant une recomposition
+    // fraîche). Même correctif déjà en place côté `SharedMatchViewModel.stateInternal`.
+    private var stateInternal by mutableStateOf<MatchState?>(null)
+    val stateOrNull get() = stateInternal
 
     override var pendingScores by mutableStateOf<Map<UUID, Int>>(emptyMap())
         private set
@@ -78,13 +82,13 @@ class LiveMatchViewModel(
         }
 
     init {
-        viewModelScope.launch { stateFlow.value = repository.loadState(match, catalog) }
+        viewModelScope.launch { stateInternal = repository.loadState(match, catalog) }
         shareCoordinator?.let { coordinator ->
             viewModelScope.launch {
                 coordinator.remoteMatchUpdates.collect { update ->
                     if (update.matchID != match.id) return@collect
                     match = requireNotNull(repository.match(match.id))
-                    stateFlow.value = repository.loadState(match, catalog)
+                    stateInternal = repository.loadState(match, catalog)
                     update.deviceName?.let { name -> if (update.isRoundCommit) announceRemoteActivity(name) }
                 }
             }
@@ -110,7 +114,7 @@ class LiveMatchViewModel(
         shareCoordinator?.startSharing(match, participants.size, deviceName, allowsContributors)
     }
 
-    private val state: MatchState get() = requireNotNull(stateFlow.value) { "MatchState pas encore chargé" }
+    private val state: MatchState get() = requireNotNull(stateInternal) { "MatchState pas encore chargé" }
 
     override val participants: List<Participant> get() = state.participants.sortedBy { it.seatIndex }
     override val totals: Map<UUID, Int> get() = state.totals()
@@ -125,7 +129,7 @@ class LiveMatchViewModel(
 
     /** Classement courant, recalculé à chaque manche validée — sert aussi bien à
      * [finalStandings] qu'à trier/annoter la liste de saisie en direct. */
-    val currentStandings: List<Standing> get() = rules.standings(state, definition)
+    override val currentStandings: List<Standing> get() = rules.standings(state, definition)
     val finalStandings: List<Standing> get() = currentStandings
 
     val isConcluded: Boolean get() = state.status == MatchStatus.Ended || state.status == MatchStatus.Abandoned
@@ -214,7 +218,7 @@ class LiveMatchViewModel(
                     return@launch
                 }
             match = requireNotNull(repository.match(match.id))
-            stateFlow.value = newState
+            stateInternal = newState
             validationErrorMessage = null
             onCommitted()
             newState.rounds
@@ -238,7 +242,7 @@ class LiveMatchViewModel(
 
     private fun mutate(block: suspend () -> MatchState) {
         viewModelScope.launch {
-            stateFlow.value = block()
+            stateInternal = block()
             match = requireNotNull(repository.match(match.id))
             syncSharedLogIfNeeded()
         }

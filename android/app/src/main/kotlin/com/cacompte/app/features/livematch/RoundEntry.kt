@@ -18,29 +18,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.cacompte.app.features.livematch.belote.BeloteRoundScreen
 import com.cacompte.app.features.livematch.tarot.TarotRoundScreen
 import com.cacompte.app.features.livematch.wizard.WizardRoundScreen
 import com.cacompte.app.features.livematch.yams.YamsRoundScreen
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
-import com.cacompte.app.ui.toAvatar
 import com.cacompte.catalog.games.BeloteRulesV1
 import com.cacompte.catalog.games.TarotRulesV1
 import com.cacompte.catalog.games.WizardRulesV1
 import com.cacompte.catalog.games.YamsRulesV1
-import com.cacompte.designsystem.components.AvatarSize
-import com.cacompte.designsystem.components.AvatarView
 import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.CardGutter
 import com.cacompte.designsystem.components.Chip
 import com.cacompte.designsystem.components.PrimaryButton
 import com.cacompte.designsystem.tokens.LocalAppColors
+import com.cacompte.designsystem.tokens.ScoreTypography
 import com.cacompte.designsystem.tokens.Space
 import com.cacompte.domain.model.Participant
 import com.cacompte.domain.rules.EntryKind
-import com.cacompte.store.ParticipantEntity
-import java.util.UUID
 
 /**
  * Dispatch sur la bonne forme de saisie de manche selon le moteur du jeu — miroir de
@@ -52,7 +49,6 @@ import java.util.UUID
 @Composable
 fun RoundEntryDispatch(
     source: LiveRoundEntryState,
-    snapshotsByParticipant: Map<UUID, ParticipantEntity> = emptyMap(),
     onUnsupported: @Composable (gameName: String) -> Unit,
 ) {
     when (source.definition.engine) {
@@ -62,7 +58,7 @@ fun RoundEntryDispatch(
         YamsRulesV1.ENGINE_ID -> YamsRoundScreen(source)
         else ->
             if (source.definition.scoring.entry.kind == EntryKind.Integer) {
-                GenericRoundEntry(source, snapshotsByParticipant)
+                GenericRoundEntry(source)
             } else {
                 onUnsupported(source.definition.name.localized)
             }
@@ -70,10 +66,9 @@ fun RoundEntryDispatch(
 }
 
 @Composable
-fun GenericRoundEntry(
-    source: LiveRoundEntryState,
-    snapshotsByParticipant: Map<UUID, ParticipantEntity> = emptyMap(),
-) {
+fun GenericRoundEntry(source: LiveRoundEntryState) {
+    val rankByParticipant = source.currentStandings.associate { it.participantID to it.rank }
+
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier.weight(1f).padding(horizontal = Space.lg),
@@ -82,7 +77,7 @@ fun GenericRoundEntry(
             items(source.participants, key = { it.id }) { participant ->
                 ParticipantScoreRow(
                     participant = participant,
-                    snapshot = snapshotsByParticipant[participant.id],
+                    rank = rankByParticipant[participant.id],
                     total = source.totals[participant.id] ?: 0,
                     pendingValue = source.pendingScores[participant.id],
                     requiresCloserSelection = source.requiresCloserSelection,
@@ -112,10 +107,14 @@ fun GenericRoundEntry(
     }
 }
 
+/** Miroir de `ScoreBoardView.swift` : rang, nom, total (grand format, sans étiquette « Total »),
+ * fermeture de manche selon le jeu, saisie — dans cet ordre, tout tenant sur une seule ligne
+ * (doc utilisateur). Pas d'avatar ici, comme côté Apple : la place gagnée est ce qui garantit que
+ * le pseudo reste lisible même à 6+ joueurs. */
 @Composable
 private fun ParticipantScoreRow(
     participant: Participant,
-    snapshot: ParticipantEntity?,
+    rank: Int?,
     total: Int,
     pendingValue: Int?,
     requiresCloserSelection: Boolean,
@@ -127,13 +126,21 @@ private fun ParticipantScoreRow(
     val colors = LocalAppColors.current
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.md)) {
-            if (snapshot != null) {
-                AvatarView(snapshot.toAvatar(), size = AvatarSize.Small)
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(participant.displayName, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
-                Text("Total : $total", style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
-            }
+            Text(
+                text = rank?.toString() ?: "",
+                style = MaterialTheme.typography.labelLarge,
+                color = colors.textSecondary,
+                modifier = Modifier.width(20.dp),
+            )
+            Text(
+                text = participant.displayName,
+                style = MaterialTheme.typography.bodyLarge,
+                color = colors.textPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+            )
+            Text(text = total.toString(), style = ScoreTypography.scoreL, color = colors.textSecondary)
             if (requiresCloserSelection) {
                 Chip(title = "Ferme", isSelected = isCloser, onClick = onToggleCloser)
             }
@@ -144,6 +151,7 @@ private fun ParticipantScoreRow(
                     Modifier.width(96.dp).onFocusChanged { focusState ->
                         if (focusState.isFocused) onFocus()
                     },
+                textStyle = ScoreTypography.scoreM,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             )

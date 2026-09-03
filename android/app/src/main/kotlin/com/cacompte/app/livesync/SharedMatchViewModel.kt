@@ -65,7 +65,7 @@ class SharedMatchViewModel(
     override val rounds: List<Round> get() = state.rounds
     override val currentRoundNumber: Int get() = state.rounds.size + 1
     override val requiresCloserSelection: Boolean get() = definition.requiresCloserSelection
-    val currentStandings: List<Standing> get() =
+    override val currentStandings: List<Standing> get() =
         catalog
             .rules(
                 state.gameID,

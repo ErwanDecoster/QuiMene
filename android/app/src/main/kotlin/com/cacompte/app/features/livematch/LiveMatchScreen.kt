@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.AlertDialog
@@ -38,7 +37,6 @@ import com.cacompte.domain.rules.GameDefinition
 import com.cacompte.domain.rules.GameRules
 import com.cacompte.store.DeviceIdentity
 import com.cacompte.store.MatchEntity
-import com.cacompte.store.ParticipantEntity
 import java.util.UUID
 
 /**
@@ -61,8 +59,7 @@ fun LiveMatchScreen(
             val definition = container.catalog.definition(match.gameID, match.rulesVersion)
             val rules = container.catalog.rules(match.gameID, match.rulesVersion)
             val deviceID = DeviceIdentity.current(context)
-            val participantSnapshots = container.matchRepository.participants(id)
-            value = LiveMatchSetup(match, definition, rules, deviceID, participantSnapshots)
+            value = LiveMatchSetup(match, definition, rules, deviceID)
         }
     val setup = loaded.value ?: return
 
@@ -91,7 +88,7 @@ fun LiveMatchScreen(
     }
 
     LiveMatchScaffold(viewModel, onAbandoned) {
-        RoundEntryDispatch(viewModel, setup.snapshotsByParticipant) { gameName ->
+        RoundEntryDispatch(viewModel) { gameName ->
             RoundEntryPlaceholder(gameName, onAbandoned)
         }
     }
@@ -109,10 +106,7 @@ private data class LiveMatchSetup(
     val definition: GameDefinition,
     val rules: GameRules,
     val deviceID: String,
-    val snapshots: List<ParticipantEntity>,
-) {
-    val snapshotsByParticipant: Map<UUID, ParticipantEntity> get() = snapshots.associateBy { it.id }
-}
+)
 
 @Composable
 private fun RoundEntryPlaceholder(
