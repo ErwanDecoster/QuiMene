@@ -2,12 +2,13 @@ package com.cacompte.app.features.players
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
@@ -34,8 +35,9 @@ import com.cacompte.app.navigation.floatingNavBarContentPadding
 import com.cacompte.app.ui.toAvatar
 import com.cacompte.designsystem.components.AvatarSize
 import com.cacompte.designsystem.components.AvatarView
-import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.EmptyState
+import com.cacompte.designsystem.components.ListContainer
+import com.cacompte.designsystem.components.ListRowDivider
 import com.cacompte.designsystem.tokens.LocalAppColors
 import com.cacompte.designsystem.tokens.Space
 import com.cacompte.store.PlayerEntity
@@ -113,29 +115,36 @@ fun PlayersListScreen(
             return@Scaffold
         }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding()),
-            contentPadding = floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding()),
-            verticalArrangement = Arrangement.spacedBy(Space.sm),
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(top = innerPadding.calculateTopPadding())
+                    .verticalScroll(rememberScrollState())
+                    .padding(floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding())),
+            verticalArrangement = Arrangement.spacedBy(Space.lg),
         ) {
-            items(state.active, key = { it.id }) { player ->
-                PlayerRow(
-                    player = player,
-                    isSelecting = viewModel.isSelecting,
-                    isSelected = player.id in viewModel.selectedPlayerIDs,
-                    onClick = {
-                        if (viewModel.isSelecting) {
-                            viewModel.toggleSelected(
-                                player.id,
-                            )
-                        } else {
-                            onOpenProfile(player.id.toString())
-                        }
-                    },
-                )
+            if (state.active.isNotEmpty()) {
+                ListContainer(modifier = Modifier.fillMaxWidth()) {
+                    state.active.forEachIndexed { index, player ->
+                        PlayerRow(
+                            player = player,
+                            isSelecting = viewModel.isSelecting,
+                            isSelected = player.id in viewModel.selectedPlayerIDs,
+                            onClick = {
+                                if (viewModel.isSelecting) {
+                                    viewModel.toggleSelected(player.id)
+                                } else {
+                                    onOpenProfile(player.id.toString())
+                                }
+                            },
+                        )
+                        if (index < state.active.lastIndex) ListRowDivider()
+                    }
+                }
             }
             if (state.archivedCount > 0 && !viewModel.isSelecting) {
-                item {
+                ListContainer(modifier = Modifier.fillMaxWidth()) {
                     ArchivedPlayersLink(count = state.archivedCount, onClick = onOpenArchivedPlayers)
                 }
             }
@@ -152,7 +161,11 @@ private fun PlayerRow(
 ) {
     val colors = LocalAppColors.current
     Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(vertical = Space.sm),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = Space.lg, vertical = Space.md),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(Space.md),
     ) {
@@ -170,10 +183,16 @@ private fun ArchivedPlayersLink(
     onClick: () -> Unit,
 ) {
     val colors = LocalAppColors.current
-    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Joueurs archivés ($count)", color = colors.textSecondary)
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = colors.textTertiary)
-        }
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = Space.lg, vertical = Space.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text("Joueurs archivés ($count)", color = colors.textSecondary)
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = colors.textTertiary)
     }
 }

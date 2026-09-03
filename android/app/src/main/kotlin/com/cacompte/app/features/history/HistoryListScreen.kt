@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Archive
@@ -34,10 +34,10 @@ import androidx.compose.ui.Modifier
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.floatingNavBarContentPadding
-import com.cacompte.designsystem.components.Card
-import com.cacompte.designsystem.components.CardGutter
 import com.cacompte.designsystem.components.Chip
 import com.cacompte.designsystem.components.EmptyState
+import com.cacompte.designsystem.components.ListContainer
+import com.cacompte.designsystem.components.ListRowDivider
 import com.cacompte.designsystem.tokens.LocalAppColors
 import com.cacompte.designsystem.tokens.Space
 import com.cacompte.domain.rules.GameDefinition
@@ -109,23 +109,30 @@ fun HistoryListScreen(
             if (availableGames.isNotEmpty() || availablePlayers.isNotEmpty()) {
                 FilterBar(viewModel, availableGames, availablePlayers)
             }
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding =
-                    floatingNavBarContentPadding(
-                        systemBottomInset = innerPadding.calculateBottomPadding(),
-                    ),
-                verticalArrangement = Arrangement.spacedBy(CardGutter),
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding()),
+                        ),
+                verticalArrangement = Arrangement.spacedBy(Space.lg),
             ) {
-                items(filteredRows, key = { it.match.id }) { row ->
-                    HistoryRow(
-                        row,
-                        onClick = { onOpenMatch(row.match.id.toString()) },
-                        onArchive = { viewModel.archive(row.match) },
-                    )
+                if (filteredRows.isNotEmpty()) {
+                    ListContainer(modifier = Modifier.fillMaxWidth()) {
+                        filteredRows.forEachIndexed { index, row ->
+                            HistoryRow(
+                                row,
+                                onClick = { onOpenMatch(row.match.id.toString()) },
+                                onArchive = { viewModel.archive(row.match) },
+                            )
+                            if (index < filteredRows.lastIndex) ListRowDivider()
+                        }
+                    }
                 }
                 if (state.archivedCount > 0) {
-                    item {
+                    ListContainer(modifier = Modifier.fillMaxWidth()) {
                         ArchivedMatchesLink(count = state.archivedCount, onClick = onOpenArchivedMatches)
                     }
                 }
@@ -237,19 +244,24 @@ private fun HistoryRow(
     onArchive: () -> Unit,
 ) {
     val colors = LocalAppColors.current
-    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(row.gameName, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
-                Text(
-                    text = dateFormatter.format(row.match.startedAt.atZone(ZoneId.systemDefault())),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = colors.textSecondary,
-                )
-            }
-            IconButton(onClick = onArchive) {
-                Icon(Icons.Filled.Archive, contentDescription = "Archiver cette partie")
-            }
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = Space.lg, vertical = Space.md),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(row.gameName, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
+            Text(
+                text = dateFormatter.format(row.match.startedAt.atZone(ZoneId.systemDefault())),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.textSecondary,
+            )
+        }
+        IconButton(onClick = onArchive) {
+            Icon(Icons.Filled.Archive, contentDescription = "Archiver cette partie")
         }
     }
 }
@@ -260,10 +272,16 @@ private fun ArchivedMatchesLink(
     onClick: () -> Unit,
 ) {
     val colors = LocalAppColors.current
-    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-            Text("Parties archivées ($count)", color = colors.textSecondary)
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = colors.textTertiary)
-        }
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = Space.lg, vertical = Space.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text("Parties archivées ($count)", color = colors.textSecondary)
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = colors.textTertiary)
     }
 }

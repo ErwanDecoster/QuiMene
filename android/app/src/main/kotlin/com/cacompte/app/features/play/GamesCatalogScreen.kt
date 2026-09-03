@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -52,9 +52,9 @@ import com.cacompte.app.features.livematch.ShareSessionDialog
 import com.cacompte.app.navigation.floatingNavBarContentPadding
 import com.cacompte.app.ui.GameRequestMail
 import com.cacompte.app.ui.gameIcon
-import com.cacompte.designsystem.components.Card
-import com.cacompte.designsystem.components.CardGutter
 import com.cacompte.designsystem.components.EmptyState
+import com.cacompte.designsystem.components.ListContainer
+import com.cacompte.designsystem.components.ListRowDivider
 import com.cacompte.designsystem.tokens.IconSize
 import com.cacompte.designsystem.tokens.LocalAppColors
 import com.cacompte.designsystem.tokens.Space
@@ -162,26 +162,38 @@ fun GamesCatalogScreen(
             return@Scaffold
         }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding()),
-            contentPadding = floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding()),
-            verticalArrangement = Arrangement.spacedBy(CardGutter),
+        Column(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(top = innerPadding.calculateTopPadding())
+                    .verticalScroll(rememberScrollState())
+                    .padding(floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding())),
+            verticalArrangement = Arrangement.spacedBy(Space.lg),
         ) {
-            if (viewModel.searchText.isBlank()) {
-                items(inProgressMatches, key = { "resume-${it.id}" }) { match ->
-                    ResumeMatchRow(
-                        gameName = viewModel.gameName(match),
-                        onClick = { onResumeMatch(match.id.toString()) },
-                        onAbandon = { matchPendingAbandon = match },
-                    )
+            if (viewModel.searchText.isBlank() && inProgressMatches.isNotEmpty()) {
+                ListContainer(modifier = Modifier.fillMaxWidth()) {
+                    inProgressMatches.forEachIndexed { index, match ->
+                        ResumeMatchRow(
+                            gameName = viewModel.gameName(match),
+                            onClick = { onResumeMatch(match.id.toString()) },
+                            onAbandon = { matchPendingAbandon = match },
+                        )
+                        if (index < inProgressMatches.lastIndex) ListRowDivider()
+                    }
                 }
             }
-            items(viewModel.games, key = { it.id }) { definition ->
-                GameRow(
-                    definition = definition,
-                    onClick = { onGameSelected(definition.id) },
-                    onOpenLeaderboard = { onOpenLeaderboard(definition.id) },
-                )
+            if (viewModel.games.isNotEmpty()) {
+                ListContainer(modifier = Modifier.fillMaxWidth()) {
+                    viewModel.games.forEachIndexed { index, definition ->
+                        GameRow(
+                            definition = definition,
+                            onClick = { onGameSelected(definition.id) },
+                            onOpenLeaderboard = { onOpenLeaderboard(definition.id) },
+                        )
+                        if (index < viewModel.games.lastIndex) ListRowDivider()
+                    }
+                }
             }
         }
     }
@@ -243,31 +255,33 @@ private fun ResumeMatchRow(
     onAbandon: () -> Unit,
 ) {
     val colors = LocalAppColors.current
-    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Space.md),
-        ) {
-            Box(modifier = Modifier.width(32.dp), contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = null,
-                    tint = colors.brandBrass,
-                    modifier = Modifier.size(IconSize.lg),
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Reprendre la partie en cours",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colors.textPrimary,
-                )
-                Text(text = gameName, style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
-            }
-            IconButton(onClick = onAbandon) {
-                Icon(Icons.Filled.Close, contentDescription = "Abandonner la partie en cours de $gameName")
-            }
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = Space.lg, vertical = Space.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Space.md),
+    ) {
+        Box(modifier = Modifier.width(32.dp), contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = Icons.Filled.Refresh,
+                contentDescription = null,
+                tint = colors.brandBrass,
+                modifier = Modifier.size(IconSize.lg),
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Reprendre la partie en cours",
+                style = MaterialTheme.typography.titleMedium,
+                color = colors.textPrimary,
+            )
+            Text(text = gameName, style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
+        }
+        IconButton(onClick = onAbandon) {
+            Icon(Icons.Filled.Close, contentDescription = "Abandonner la partie en cours de $gameName")
         }
     }
 }
@@ -279,37 +293,39 @@ private fun GameRow(
     onOpenLeaderboard: () -> Unit,
 ) {
     val colors = LocalAppColors.current
-    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(Space.md),
-        ) {
-            Box(modifier = Modifier.width(32.dp), contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = gameIcon(definition.id),
-                    contentDescription = null,
-                    tint = colors.brandInk,
-                    modifier = Modifier.size(IconSize.lg),
-                )
-            }
-            Column(modifier = Modifier.weight(1f)) {
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = Space.lg, vertical = Space.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Space.md),
+    ) {
+        Box(modifier = Modifier.width(32.dp), contentAlignment = Alignment.Center) {
+            Icon(
+                imageVector = gameIcon(definition.id),
+                contentDescription = null,
+                tint = colors.brandInk,
+                modifier = Modifier.size(IconSize.lg),
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = definition.name.localized,
+                style = MaterialTheme.typography.titleMedium,
+                color = colors.textPrimary,
+            )
+            definition.shortDescription?.localized?.let { description ->
                 Text(
-                    text = definition.name.localized,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colors.textPrimary,
+                    text = description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textSecondary,
                 )
-                definition.shortDescription?.localized?.let { description ->
-                    Text(
-                        text = description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = colors.textSecondary,
-                    )
-                }
             }
-            IconButton(onClick = onOpenLeaderboard) {
-                Icon(Icons.Filled.EmojiEvents, contentDescription = "Classement de ${definition.name.localized}")
-            }
+        }
+        IconButton(onClick = onOpenLeaderboard) {
+            Icon(Icons.Filled.EmojiEvents, contentDescription = "Classement de ${definition.name.localized}")
         }
     }
 }
