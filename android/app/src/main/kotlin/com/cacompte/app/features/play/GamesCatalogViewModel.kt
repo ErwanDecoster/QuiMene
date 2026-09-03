@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cacompte.domain.rules.GameCatalog
+import com.cacompte.domain.rules.GameDefinition
 import com.cacompte.store.MatchEntity
 import com.cacompte.store.MatchRepository
 import kotlinx.coroutines.launch
@@ -21,6 +22,25 @@ class GamesCatalogViewModel(
 ) : ViewModel() {
     var inProgressMatches by mutableStateOf<List<MatchEntity>>(emptyList())
         private set
+
+    /** Miroir de `GamesTabView.searchText` — filtre en direct à chaque frappe, sur le nom et la
+     * description courte, dans les 5 langues déclarées (voir [GameDefinition.LocalizedText
+     * .matches]), pas seulement la langue affichée. */
+    var searchText by mutableStateOf("")
+        private set
+
+    val games: List<GameDefinition>
+        get() {
+            val all = catalog.allGames.sortedBy { it.name.localized }
+            if (searchText.isBlank()) return all
+            return all.filter { game ->
+                game.name.matches(searchText) || (game.shortDescription?.matches(searchText) ?: false)
+            }
+        }
+
+    fun updateSearchText(value: String) {
+        searchText = value
+    }
 
     init {
         refresh()

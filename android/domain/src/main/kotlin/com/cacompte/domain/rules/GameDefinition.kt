@@ -58,10 +58,15 @@ data class LocalizedText(
             return translated ?: fr
         }
 
+    /** Insensible aux espaces (pas seulement en début/fin — partout dans la chaîne, des deux
+     * côtés) et à la langue affichée : compare contre les 5 traductions déclarées, pas seulement
+     * celle actuellement montrée — miroir de `LocalizedText.matches(_:)` (Swift). */
     fun matches(term: String): Boolean {
-        val needle = term.trim()
+        val needle = term.filter { !it.isWhitespace() }
         if (needle.isEmpty()) return false
-        return listOfNotNull(fr, en, es, de, it).any { it.trim().contains(needle, ignoreCase = true) }
+        return listOfNotNull(fr, en, es, de, it).any { candidate ->
+            candidate.filter { !it.isWhitespace() }.contains(needle, ignoreCase = true)
+        }
     }
 }
 

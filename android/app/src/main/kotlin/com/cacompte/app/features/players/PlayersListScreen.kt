@@ -3,12 +3,8 @@ package com.cacompte.app.features.players
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,7 +27,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
@@ -59,7 +54,6 @@ fun PlayersListScreen(
     val viewModel = rememberViewModel { PlayersListViewModel(container.playerRepository, container.appSettings) }
     val state by viewModel.uiState.collectAsState()
     val colors = LocalAppColors.current
-    val layoutDirection = LocalLayoutDirection.current
 
     Scaffold(
         topBar = {
@@ -97,14 +91,11 @@ fun PlayersListScreen(
             if (!viewModel.isSelecting) {
                 FloatingActionButton(
                     onClick = onAddPlayer,
-                    modifier =
-                        Modifier.padding(
-                            end = WindowInsets.navigationBars.asPaddingValues().calculateEndPadding(layoutDirection),
-                            bottom =
-                                WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() +
-                                    LocalFloatingNavBarHeight.current +
-                                    Space.sm,
-                        ),
+                    // Scaffold place déjà le FAB en tenant compte de systemBarsForVisualComponents
+                    // (ScaffoldDefaults.contentWindowInsets) — ajouter à nouveau WindowInsets
+                    // .navigationBars ici double-compterait l'inset système et ferait flotter le
+                    // bouton trop haut. Seule la hauteur de l'îlot flottant (pas un inset) manque.
+                    modifier = Modifier.padding(bottom = LocalFloatingNavBarHeight.current + Space.sm),
                 ) {
                     Icon(Icons.Filled.Add, contentDescription = "Ajouter un joueur")
                 }
