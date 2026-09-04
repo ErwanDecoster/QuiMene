@@ -30,8 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
@@ -44,6 +46,9 @@ import com.cacompte.designsystem.tokens.LocalAppColors
 import com.cacompte.designsystem.tokens.Space
 import com.cacompte.store.ProfileStats
 import java.time.YearMonth
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.util.Locale
 import java.util.UUID
@@ -83,7 +88,7 @@ fun ProfileScreen(
                 },
                 actions = {
                     IconButton(onClick = { onEdit(playerId) }) {
-                        Icon(Icons.Filled.Edit, contentDescription = "Modifier")
+                        Icon(Icons.Filled.Edit, contentDescription = stringResource(R.string.modifier))
                     }
                 },
             )
@@ -116,7 +121,7 @@ fun ProfileScreen(
             if (stats.played == 0) {
                 EmptyState(
                     icon = Icons.Filled.BarChart,
-                    message = "Aucune partie terminée pour l'instant. La fiche se remplit après la première partie.",
+                    message = stringResource(R.string.aucune_partie_terminee_pour_l_instant_la_fiche_se_remplit),
                 )
                 return@Column
             }
@@ -136,6 +141,9 @@ fun ProfileScreen(
     }
 }
 
+private val dateFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
+
 @Composable
 private fun SummarySection(stats: ProfileStats) {
     val colors = LocalAppColors.current
@@ -144,13 +152,17 @@ private fun SummarySection(stats: ProfileStats) {
     // pendant que l'app tourne ne redéclencherait jamais le formatage de ce nombre).
     val locale = LocalConfiguration.current.locales[0]
     Column(verticalArrangement = Arrangement.spacedBy(Space.sm)) {
-        Text("En bref", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(
+            stringResource(R.string.en_bref),
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.textSecondary,
+        )
         Card {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                StatBlock("Parties", "${stats.played}")
-                StatBlock("Victoires", "${stats.wins}")
-                StatBlock("Taux de victoire", "${(stats.winRate * 100).roundToInt()} %")
-                StatBlock("Rang moyen", String.format(locale, "%.1f", stats.averageRank))
+                StatBlock(stringResource(R.string.parties), "${stats.played}")
+                StatBlock(stringResource(R.string.victoires), "${stats.wins}")
+                StatBlock(stringResource(R.string.taux_de_victoire), "${(stats.winRate * 100).roundToInt()} %")
+                StatBlock(stringResource(R.string.rang_moyen), String.format(locale, "%.1f", stats.averageRank))
             }
         }
     }
@@ -163,7 +175,11 @@ private fun ByGameSection(
 ) {
     val colors = LocalAppColors.current
     Column(verticalArrangement = Arrangement.spacedBy(Space.sm)) {
-        Text("Par jeu", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(
+            stringResource(R.string.par_jeu),
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.textSecondary,
+        )
         for (game in stats.byGame) {
             Card {
                 Column {
@@ -175,27 +191,40 @@ private fun ByGameSection(
                         if (game.gameID in topGameIDs) {
                             Icon(
                                 Icons.Filled.EmojiEvents,
-                                contentDescription = "Meilleur joueur",
+                                contentDescription = stringResource(R.string.meilleur_joueur),
                                 tint = colors.brandBrass,
                                 modifier = Modifier.padding(start = Space.xxs),
                             )
                         }
                     }
                     Text(
-                        "${game.played} partie(s) · ${game.wins} victoire(s) · ${(game.winRate * 100).roundToInt()} %",
+                        stringResource(
+                            R.string.count1_partie_s_count2_victoire_s_value3,
+                            game.played,
+                            game.wins,
+                            "${(game.winRate * 100).roundToInt()} %",
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.textSecondary,
                     )
                     game.bestScore?.let {
                         Text(
-                            "Meilleur score : ${it.value}",
+                            stringResource(
+                                R.string.meilleur_score_count1_value2,
+                                it.value,
+                                dateFormatter.format(it.date.atZone(ZoneId.systemDefault())),
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.textTertiary,
                         )
                     }
                     game.worstScore?.let {
                         Text(
-                            "Pire score : ${it.value}",
+                            stringResource(
+                                R.string.pire_score_count1_value2,
+                                it.value,
+                                dateFormatter.format(it.date.atZone(ZoneId.systemDefault())),
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.textTertiary,
                         )
@@ -210,13 +239,20 @@ private fun ByGameSection(
 private fun NemesisSection(nemesis: ProfileStats.Nemesis) {
     val colors = LocalAppColors.current
     Column(verticalArrangement = Arrangement.spacedBy(Space.sm)) {
-        Text("Némésis", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(
+            stringResource(R.string.nemesis),
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.textSecondary,
+        )
         Card {
             Column {
                 Text(nemesis.name, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
                 Text(
-                    "${nemesis.matchesTogether} partie(s) ensemble · " +
-                        "${(nemesis.winRateWithThemPresent * 100).roundToInt()} % de victoires",
+                    stringResource(
+                        R.string.count1_partie_s_ensemble_value2_de_victoires,
+                        nemesis.matchesTogether,
+                        "${(nemesis.winRateWithThemPresent * 100).roundToInt()} %",
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textSecondary,
                 )
@@ -229,11 +265,11 @@ private fun NemesisSection(nemesis: ProfileStats.Nemesis) {
 private fun StreaksSection(stats: ProfileStats) {
     val colors = LocalAppColors.current
     Column(verticalArrangement = Arrangement.spacedBy(Space.sm)) {
-        Text("Séries", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(stringResource(R.string.series), style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
         Card {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                StatBlock("Série en cours", "${stats.currentWinStreak}")
-                StatBlock("Record", "${stats.bestWinStreak}")
+                StatBlock(stringResource(R.string.serie_en_cours), "${stats.currentWinStreak}")
+                StatBlock(stringResource(R.string.record), "${stats.bestWinStreak}")
             }
         }
     }
@@ -252,16 +288,28 @@ private fun ActivitySection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text("Activité", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+            Text(
+                stringResource(R.string.activite),
+                style = MaterialTheme.typography.labelLarge,
+                color = colors.textSecondary,
+            )
             TextButton(onClick = onToggle) {
-                Text(if (isShowingFullYear) "Voir le mois" else "Voir l'année")
+                Text(
+                    if (isShowingFullYear) {
+                        stringResource(
+                            R.string.voir_le_mois,
+                        )
+                    } else {
+                        stringResource(R.string.voir_l_annee)
+                    },
+                )
             }
         }
         Card {
             if (isShowingFullYear) {
                 ActivityYearChart(stats.activity)
             } else {
-                StatBlock("Parties ce mois-ci", "${stats.activity.lastOrNull()?.count ?: 0}")
+                StatBlock(stringResource(R.string.parties_ce_mois_ci), "${stats.activity.lastOrNull()?.count ?: 0}")
             }
         }
     }

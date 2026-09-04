@@ -36,9 +36,11 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
@@ -81,7 +83,11 @@ fun ResultsScreen(
     val state = viewModel.uiState
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(state.definition?.name?.localized ?: "Résultats") }) },
+        topBar = {
+            TopAppBar(
+                title = { Text(state.definition?.name?.localized ?: stringResource(R.string.resultats)) },
+            )
+        },
     ) { innerPadding ->
         if (state.isLoading) {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
@@ -92,7 +98,7 @@ fun ResultsScreen(
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             MatchSummaryContent(state, modifier = Modifier.weight(1f))
             PrimaryButton(
-                text = "Terminé",
+                text = stringResource(R.string.termine),
                 onClick = onDone,
                 modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
             )
@@ -197,7 +203,11 @@ private fun PodiumRow(
 private fun InsightsSection(insights: List<Insight>) {
     val colors = LocalAppColors.current
     Column(verticalArrangement = Arrangement.spacedBy(Space.md)) {
-        Text("Faits marquants", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(
+            stringResource(R.string.faits_marquants),
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.textSecondary,
+        )
         Column(verticalArrangement = Arrangement.spacedBy(CardGutterResults)) {
             for (insight in insights) {
                 Card {
@@ -239,7 +249,11 @@ private fun EvolutionSection(
 ) {
     val colors = LocalAppColors.current
     Column(verticalArrangement = Arrangement.spacedBy(Space.md)) {
-        Text("Évolution", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(
+            stringResource(R.string.evolution),
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.textSecondary,
+        )
         Card {
             Column(verticalArrangement = Arrangement.spacedBy(Space.sm)) {
                 EvolutionChart(series, participants, direction, threshold)
@@ -362,7 +376,11 @@ private fun RoundByRoundSection(
 ) {
     val colors = LocalAppColors.current
     Column(verticalArrangement = Arrangement.spacedBy(Space.md)) {
-        Text("Manche par manche", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(
+            stringResource(R.string.manche_par_manche),
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.textSecondary,
+        )
         Card {
             Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                 Column {

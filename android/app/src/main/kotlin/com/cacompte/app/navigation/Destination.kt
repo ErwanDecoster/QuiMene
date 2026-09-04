@@ -1,11 +1,13 @@
 package com.cacompte.app.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Games
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.cacompte.app.R
 import kotlinx.serialization.Serializable
 
 /**
@@ -90,11 +92,11 @@ sealed interface Destination {
  * libellés que `CaCompteApp.swift` (Joueurs, Jeux, Rejoindre, Historique). */
 enum class RootDestination(
     val destination: Destination,
-    val label: String,
+    @param:StringRes val labelRes: Int,
     val icon: ImageVector,
 ) {
-    Players(Destination.PlayersList, "Joueurs", Icons.Filled.Group),
-    Games(Destination.GamesCatalog, "Jeux", Icons.Filled.Games),
-    Join(Destination.Join, "Rejoindre", Icons.Filled.QrCodeScanner),
-    History(Destination.History(), "Historique", Icons.Filled.History),
+    Players(Destination.PlayersList, R.string.joueurs, Icons.Filled.Group),
+    Games(Destination.GamesCatalog, R.string.jeux, Icons.Filled.Games),
+    Join(Destination.Join, R.string.rejoindre, Icons.Filled.QrCodeScanner),
+    History(Destination.History(), R.string.historique, Icons.Filled.History),
 }

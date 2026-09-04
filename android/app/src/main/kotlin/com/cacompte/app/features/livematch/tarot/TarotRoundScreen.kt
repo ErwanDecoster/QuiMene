@@ -13,6 +13,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
@@ -39,7 +41,7 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
         ) {
             item {
                 Text(
-                    "Scores",
+                    stringResource(R.string.scores),
                     style = MaterialTheme.typography.labelLarge,
                     color = colors.textSecondary,
                     modifier = Modifier.padding(top = Space.lg),
@@ -50,7 +52,7 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
             }
             item {
                 Text(
-                    "Cette donne",
+                    stringResource(R.string.cette_donne),
                     style = MaterialTheme.typography.labelLarge,
                     color = colors.textSecondary,
                     modifier = Modifier.padding(top = Space.lg),
@@ -65,7 +67,7 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                "Personne ne prend",
+                                stringResource(R.string.personne_ne_prend),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = colors.textPrimary,
                             )
@@ -73,7 +75,11 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
                         }
 
                         if (!viewModel.isPassed) {
-                            Text("Preneur", style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
+                            Text(
+                                stringResource(R.string.preneur),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.textPrimary,
+                            )
                             Row(horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
                                 for (participant in liveMatch.participants) {
                                     Chip(
@@ -86,7 +92,7 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
 
                             if (viewModel.needsPartner) {
                                 Text(
-                                    "Partenaire (roi appelé)",
+                                    stringResource(R.string.partenaire_roi_appele),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = colors.textPrimary,
                                 )
@@ -102,11 +108,15 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
                                 }
                             }
 
-                            Text("Contrat", style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
+                            Text(
+                                stringResource(R.string.contrat),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.textPrimary,
+                            )
                             Row(horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
-                                TarotRoundViewModel.contractLabels.forEachIndexed { index, label ->
+                                TarotRoundViewModel.contractLabels.forEachIndexed { index, labelRes ->
                                     Chip(
-                                        title = label,
+                                        title = stringResource(labelRes),
                                         isSelected = viewModel.contract == index,
                                         onClick = { viewModel.selectContract(index) },
                                     )
@@ -131,18 +141,22 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    "Petit au bout",
+                                    stringResource(R.string.petit_au_bout),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = colors.textPrimary,
                                 )
                                 Switch(checked = viewModel.petitAuBout, onCheckedChange = viewModel::updatePetitAuBout)
                             }
 
-                            Text("Poignée", style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
+                            Text(
+                                stringResource(R.string.poignee),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.textPrimary,
+                            )
                             Row(horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
-                                TarotRoundViewModel.poigneeLabels.forEachIndexed { index, label ->
+                                TarotRoundViewModel.poigneeLabels.forEachIndexed { index, labelRes ->
                                     Chip(
-                                        title = label,
+                                        title = stringResource(labelRes),
                                         isSelected = viewModel.poignee == index,
                                         onClick = { viewModel.selectPoignee(index) },
                                     )
@@ -155,7 +169,7 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    "Chelem annoncé",
+                                    stringResource(R.string.chelem_annonce),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = colors.textPrimary,
                                 )
@@ -170,7 +184,7 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Text(
-                                    "Chelem réalisé",
+                                    stringResource(R.string.chelem_realise),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = colors.textPrimary,
                                 )
@@ -185,7 +199,7 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
             }
         }
         PrimaryButton(
-            text = "Valider la donne",
+            text = stringResource(R.string.valider_la_donne),
             onClick = viewModel::submit,
             modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
         )

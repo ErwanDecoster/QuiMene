@@ -34,7 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.ui.GameRequestMail
 import com.cacompte.designsystem.components.Card
@@ -66,7 +68,7 @@ fun SettingsScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Réglages") },
+                title = { Text(stringResource(R.string.reglages)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Retour") }
                 },
@@ -95,7 +97,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                                 ) {
                                     "Automatique (habitués d'abord)"
                                 } else {
-                                    "Manuel"
+                                    stringResource(R.string.manuel)
                                 },
                             color = colors.textPrimary,
                         )
@@ -106,7 +108,7 @@ fun SettingsScreen(onBack: () -> Unit) {
             Column(verticalArrangement = Arrangement.spacedBy(Space.sm)) {
                 Card(modifier = Modifier.fillMaxWidth().clickable { openAppLocaleSettings(context) }) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Langue", color = colors.textPrimary)
+                        Text(stringResource(R.string.langue), color = colors.textPrimary)
                         Text(
                             currentLocale.getDisplayName(currentLocale).replaceFirstChar { it.uppercase() },
                             color = colors.textSecondary,
@@ -133,12 +135,12 @@ fun SettingsScreen(onBack: () -> Unit) {
                         },
                 ) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Demander l'ajout d'un jeu", color = colors.textPrimary)
+                        Text(stringResource(R.string.demander_l_ajout_d_un_jeu), color = colors.textPrimary)
                         Icon(Icons.Filled.Email, contentDescription = null, tint = colors.textSecondary)
                     }
                 }
                 Text(
-                    "Suggère un jeu à ajouter à l'app par e-mail.",
+                    stringResource(R.string.suggere_un_jeu_a_ajouter_a_l_app_par_e_mail),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textTertiary,
                 )
@@ -149,15 +151,18 @@ fun SettingsScreen(onBack: () -> Unit) {
     if (isPresentingMailFallback) {
         AlertDialog(
             onDismissRequest = { isPresentingMailFallback = false },
-            title = { Text("Aucune messagerie configurée") },
+            title = { Text(stringResource(R.string.aucune_messagerie_configuree)) },
             text = {
                 Text(
-                    "Envoie ta demande à ${GameRequestMail.RECIPIENT} depuis l'application de ton choix.",
+                    stringResource(
+                        R.string.envoie_ta_demande_a_value1_depuis_l_application_de_ton_choix,
+                        GameRequestMail.RECIPIENT,
+                    ),
                     textAlign = TextAlign.Start,
                 )
             },
             confirmButton = {
-                TextButton(onClick = { isPresentingMailFallback = false }) { Text("OK") }
+                TextButton(onClick = { isPresentingMailFallback = false }) { Text(stringResource(R.string.ok)) }
             },
         )
     }

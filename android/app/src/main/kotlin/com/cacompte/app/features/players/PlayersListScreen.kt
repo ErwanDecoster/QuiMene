@@ -28,6 +28,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
@@ -78,7 +80,7 @@ fun PlayersListScreen(
                 )
             } else {
                 TopAppBar(
-                    title = { Text("Joueurs") },
+                    title = { Text(stringResource(R.string.joueurs)) },
                     actions = {
                         if (state.active.isNotEmpty()) {
                             IconButton(onClick = viewModel::toggleSelectionMode) {
@@ -99,7 +101,7 @@ fun PlayersListScreen(
                     // bouton trop haut. Seule la hauteur de l'îlot flottant (pas un inset) manque.
                     modifier = Modifier.padding(bottom = LocalFloatingNavBarHeight.current + Space.sm),
                 ) {
-                    Icon(Icons.Filled.Add, contentDescription = "Ajouter un joueur")
+                    Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.ajouter_un_joueur))
                 }
             }
         },
@@ -109,7 +111,7 @@ fun PlayersListScreen(
                 icon = Icons.Filled.Add,
                 message = "Aucun joueur pour l'instant — ajoutez le premier pour commencer une partie.",
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
-                actionTitle = "Ajouter un joueur",
+                actionTitle = stringResource(R.string.ajouter_un_joueur),
                 onAction = onAddPlayer,
             )
             return@Scaffold
@@ -192,7 +194,7 @@ private fun ArchivedPlayersLink(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text("Joueurs archivés ($count)", color = colors.textSecondary)
+        Text(stringResource(R.string.joueurs_archives_count1, count), color = colors.textSecondary)
         Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = colors.textTertiary)
     }
 }

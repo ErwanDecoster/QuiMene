@@ -22,10 +22,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cacompte.app.R
 import com.cacompte.app.livesync.JoinLink
 import com.cacompte.app.livesync.LiveShareCoordinator
 import com.cacompte.designsystem.components.Banner
@@ -95,7 +97,7 @@ fun ShareSessionDialog(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         CircularProgressIndicator()
-                        Text("Démarrage du partage…", modifier = Modifier.padding(top = Space.md))
+                        Text(stringResource(R.string.demarrage_du_partage), modifier = Modifier.padding(top = Space.md))
                     }
                 else ->
                     SharingContent(
@@ -145,7 +147,11 @@ private fun SharingContent(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text("Autoriser les contributeurs", style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
+            Text(
+                stringResource(R.string.autoriser_les_contributeurs),
+                style = MaterialTheme.typography.bodyLarge,
+                color = colors.textPrimary,
+            )
             Text(
                 if (coordinator.allowsContributors) {
                     "Les appareils qui rejoignent peuvent proposer des manches, validées par toi."
@@ -164,10 +170,14 @@ private fun SharingContent(
 
     HorizontalDivider()
 
-    Text("Appareils connectés", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+    Text(
+        stringResource(R.string.appareils_connectes),
+        style = MaterialTheme.typography.labelLarge,
+        color = colors.textSecondary,
+    )
     if (coordinator.connectedPeers.isEmpty()) {
         Text(
-            "En attente d'un appareil qui rejoint…",
+            stringResource(R.string.en_attente_d_un_appareil_qui_rejoint),
             style = MaterialTheme.typography.bodyMedium,
             color = colors.textTertiary,
         )
@@ -180,12 +190,17 @@ private fun SharingContent(
         }
     }
 
-    SecondaryButton(text = "Arrêter le partage", onClick = onStop, modifier = Modifier.fillMaxWidth())
+    SecondaryButton(
+        text = stringResource(R.string.arreter_le_partage),
+        onClick = onStop,
+        modifier = Modifier.fillMaxWidth(),
+    )
 }
 
+@Composable
 private fun roleLabel(role: Role): String =
     when (role) {
-        Role.Host -> "Hôte"
-        Role.Contributor -> "Contributeur"
-        Role.Observer -> "Observateur"
+        Role.Host -> stringResource(R.string.hote)
+        Role.Contributor -> stringResource(R.string.contributeur)
+        Role.Observer -> stringResource(R.string.observateur)
     }

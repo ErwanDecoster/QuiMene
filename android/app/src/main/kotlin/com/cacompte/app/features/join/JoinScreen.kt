@@ -24,10 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import com.cacompte.app.BuildConfig
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.livesync.JoinLink
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
@@ -94,7 +96,7 @@ fun JoinScreen() {
         }
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text("Rejoindre") }) }) { innerPadding ->
+    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.rejoindre)) }) }) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             QrScannerView(
                 onScan = { raw ->
@@ -118,7 +120,7 @@ fun JoinScreen() {
             }
 
             PrimaryButton(
-                text = "Saisir un code",
+                text = stringResource(R.string.saisir_un_code),
                 enabled = !isConnecting,
                 onClick = { isManualEntryVisible = true },
                 modifier =
@@ -180,7 +182,7 @@ private fun ManualCodeEntrySheet(
                 enabled = !isConnecting,
             )
             PrimaryButton(
-                text = "Rejoindre",
+                text = stringResource(R.string.rejoindre),
                 enabled = code.length == 6 && !isConnecting,
                 onClick = onJoin,
                 modifier = Modifier.fillMaxWidth(),

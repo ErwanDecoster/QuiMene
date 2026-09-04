@@ -13,6 +13,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.features.livematch.RoundEntryDispatch
 import com.cacompte.app.livesync.SharedMatchViewModel
 import com.cacompte.designsystem.components.Banner
@@ -36,17 +38,21 @@ fun SharedMatchScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state?.let { viewModel.definition.name.localized } ?: "Connexion…") },
-                actions = { TextButton(onClick = onQuit) { Text("Quitter") } },
+                title = {
+                    Text(
+                        state?.let { viewModel.definition.name.localized } ?: stringResource(R.string.connexion),
+                    )
+                },
+                actions = { TextButton(onClick = onQuit) { Text(stringResource(R.string.quitter)) } },
             )
         },
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             if (!viewModel.isHostConnected) {
                 Banner(
-                    message = "Connexion à l'hôte perdue.",
+                    message = stringResource(R.string.connexion_a_l_hote_perdue_le_tableau_affiche_est_le_dernier),
                     modifier = Modifier.padding(Space.lg),
-                    actionTitle = "Réessayer",
+                    actionTitle = stringResource(R.string.reessayer),
                     onAction = onReconnect,
                 )
             }

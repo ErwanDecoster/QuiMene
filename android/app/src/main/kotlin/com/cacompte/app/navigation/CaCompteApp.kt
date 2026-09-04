@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -252,7 +253,7 @@ private fun RootNavigationBar(
                         }
                     },
                     icon = { Icon(root.icon, contentDescription = null) },
-                    label = { Text(root.label) },
+                    label = { Text(stringResource(root.labelRes)) },
                 )
             }
         }

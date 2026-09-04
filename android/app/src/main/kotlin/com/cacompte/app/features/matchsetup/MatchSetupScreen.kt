@@ -22,6 +22,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
@@ -88,7 +90,7 @@ private fun MatchSetupContent(
         ) {
             item {
                 Text(
-                    "Joueurs",
+                    stringResource(R.string.joueurs),
                     style = MaterialTheme.typography.labelLarge,
                     color = colors.textSecondary,
                     modifier = Modifier.padding(top = Space.lg),
@@ -110,7 +112,7 @@ private fun MatchSetupContent(
             if (viewModel.definition.variants.isNotEmpty()) {
                 item {
                     Text(
-                        "Variantes",
+                        stringResource(R.string.variantes),
                         style = MaterialTheme.typography.labelLarge,
                         color = colors.textSecondary,
                         modifier = Modifier.padding(top = Space.lg),
@@ -123,7 +125,7 @@ private fun MatchSetupContent(
         }
 
         PrimaryButton(
-            text = "Commencer",
+            text = stringResource(R.string.commencer),
             enabled = viewModel.canStart,
             onClick = { viewModel.start { match -> onMatchStarted(match.id.toString()) } },
             modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
@@ -155,7 +157,7 @@ private fun PlayerSelectionRow(
                 modifier = Modifier.weight(1f),
             )
             if (showTeam && team != null) {
-                Chip(title = "Équipe $team", isSelected = true, onClick = onCycleTeam)
+                Chip(title = stringResource(R.string.equipe_value1, team), isSelected = true, onClick = onCycleTeam)
             }
             Switch(checked = isSelected, onCheckedChange = { onToggle() })
         }

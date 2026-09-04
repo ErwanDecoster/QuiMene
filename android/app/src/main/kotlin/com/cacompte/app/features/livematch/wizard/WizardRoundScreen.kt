@@ -11,6 +11,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.app.features.livematch.tarot.SteppedValue
@@ -39,9 +41,13 @@ fun WizardRoundScreen(liveMatch: LiveRoundEntryState) {
                 val matches = viewModel.totalTricks == viewModel.roundNumber
                 Card(modifier = Modifier.fillMaxWidth().padding(top = Space.lg)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Plis distribués", style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
                         Text(
-                            "${viewModel.totalTricks} / ${viewModel.roundNumber}",
+                            stringResource(R.string.plis_distribues),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = colors.textPrimary,
+                        )
+                        Text(
+                            stringResource(R.string.count1_count2, viewModel.totalTricks, viewModel.roundNumber),
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (matches) colors.semanticSuccess else colors.semanticError,
                         )
@@ -50,7 +56,7 @@ fun WizardRoundScreen(liveMatch: LiveRoundEntryState) {
             }
             item {
                 Text(
-                    "Manche ${viewModel.roundNumber}",
+                    stringResource(R.string.manche_count1, viewModel.roundNumber),
                     style = MaterialTheme.typography.labelLarge,
                     color = colors.textSecondary,
                     modifier = Modifier.padding(top = Space.lg),
@@ -61,7 +67,7 @@ fun WizardRoundScreen(liveMatch: LiveRoundEntryState) {
             }
         }
         PrimaryButton(
-            text = "Valider la manche",
+            text = stringResource(R.string.valider_la_manche),
             onClick = viewModel::submit,
             modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
         )

@@ -45,11 +45,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.join.QrScannerView
@@ -94,7 +96,7 @@ fun PlayerEditorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (playerId == null) "Nouveau joueur" else "Modifier") },
+                title = { Text(if (playerId == null) "Nouveau joueur" else stringResource(R.string.modifier)) },
                 navigationIcon = {
                     IconButton(onClick = onDone) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Retour")
@@ -160,13 +162,13 @@ private fun PlayerEditorContent(
         OutlinedTextField(
             value = viewModel.nickname,
             onValueChange = viewModel::updateNickname,
-            label = { Text("Pseudo") },
+            label = { Text(stringResource(R.string.pseudo)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words),
             modifier = Modifier.fillMaxWidth().focusRequester(nicknameFocusRequester),
         )
 
-        Text("Emoji", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(stringResource(R.string.emoji), style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
         LazyRow(horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
             items(Avatar.curatedEmoji) { emoji ->
                 val isSelected = viewModel.avatarKind == "emoji" && viewModel.emojiValue == emoji
@@ -205,11 +207,14 @@ private fun PlayerEditorContent(
         }
 
         if (viewModel.hasManualAvatarOverride) {
-            TertiaryButton(text = "Revenir à l'avatar généré", onClick = viewModel::resetToGeneratedAvatar)
+            TertiaryButton(
+                text = stringResource(R.string.reinitialiser_l_avatar_genere),
+                onClick = viewModel::resetToGeneratedAvatar,
+            )
         }
 
         PrimaryButton(
-            text = "Enregistrer",
+            text = stringResource(R.string.enregistrer),
             onClick = { viewModel.save(onDone) },
             enabled = viewModel.canSave,
         )
@@ -218,9 +223,15 @@ private fun PlayerEditorContent(
             SharedProfileSection(viewModel)
 
             if (viewModel.isArchivedPlayer) {
-                TertiaryButton(text = "Supprimer ce joueur", onClick = { showDeleteConfirmation = true })
+                TertiaryButton(text = stringResource(R.string.supprimer_ce_joueur), onClick = {
+                    showDeleteConfirmation =
+                        true
+                })
             } else {
-                SecondaryButton(text = "Archiver ce joueur", onClick = { viewModel.archive(onDone) })
+                SecondaryButton(
+                    text = stringResource(R.string.archiver_ce_joueur),
+                    onClick = { viewModel.archive(onDone) },
+                )
             }
         }
     }
@@ -228,18 +239,15 @@ private fun PlayerEditorContent(
     if (showDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = false },
-            title = { Text("Supprimer définitivement ce joueur ?") },
+            title = { Text(stringResource(R.string.supprimer_definitivement_ce_joueur)) },
             text = {
-                Text(
-                    "La fiche joueur sera définitivement supprimée. Les parties déjà jouées restent dans " +
-                        "l'historique, mais ne pointeront plus vers ce joueur. Cette action ne peut pas être annulée.",
-                )
+                Text(stringResource(R.string.la_fiche_joueur_sera_definitivement_supprimee_les_parties))
             },
             confirmButton = {
-                TextButton(onClick = { viewModel.delete(onDone) }) { Text("Supprimer") }
+                TextButton(onClick = { viewModel.delete(onDone) }) { Text(stringResource(R.string.supprimer)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirmation = false }) { Text("Annuler") }
+                TextButton(onClick = { showDeleteConfirmation = false }) { Text(stringResource(R.string.annuler)) }
             },
         )
     }
@@ -254,7 +262,11 @@ private fun SharedProfileSection(viewModel: PlayerEditorViewModel) {
     var isPresentingScanner by remember { mutableStateOf(false) }
 
     Column(verticalArrangement = Arrangement.spacedBy(Space.md)) {
-        Text("Profil partagé", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(
+            stringResource(R.string.profil_partage),
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.textSecondary,
+        )
 
         val shareURL = viewModel.shareURL
         val linkedName = viewModel.linkedProfileName
@@ -268,40 +280,48 @@ private fun SharedProfileSection(viewModel: PlayerEditorViewModel) {
                 ) {
                     QrCodeView(content = shareURL, modifier = Modifier.size(160.dp))
                     Text(
-                        "Fais scanner ce code par l'ami avec qui tu veux partager ton historique, depuis sa " +
-                            "propre fiche « Suivre un profil reçu ».",
+                        stringResource(R.string.fais_scanner_ce_code_par_l_ami_avec_qui_tu_veux_partager),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.textSecondary,
                         textAlign = TextAlign.Center,
                     )
                 }
-                SecondaryButton(text = "Ne plus partager", onClick = viewModel::unlinkProfile)
+                SecondaryButton(text = stringResource(R.string.ne_plus_partager), onClick = viewModel::unlinkProfile)
             }
             linkedName != null -> {
                 Text(
-                    "Tu suis **$linkedName**" +
-                        (linkedDate?.let { ", depuis le ${dateFormatter.format(it)}" } ?: ""),
+                    linkedDate?.let {
+                        stringResource(R.string.tu_suis_value1_depuis_le_value2, linkedName, dateFormatter.format(it))
+                    } ?: linkedName,
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textSecondary,
                 )
                 SecondaryButton(
-                    text = "Suivre quelqu'un d'autre (remplace $linkedName)",
+                    text = stringResource(R.string.suivre_quelqu_un_d_autre_remplace_value1, linkedName),
                     onClick = { isPresentingScanner = true },
                 )
-                SecondaryButton(text = "Ne plus suivre ce profil", onClick = viewModel::unlinkProfile)
+                SecondaryButton(
+                    text = stringResource(R.string.ne_plus_suivre_ce_profil),
+                    onClick = viewModel::unlinkProfile,
+                )
             }
             else -> {
-                SecondaryButton(text = "Partager ce profil (c'est moi)", onClick = viewModel::ensureSharedProfileID)
+                SecondaryButton(
+                    text = stringResource(R.string.partager_ce_profil_c_est_moi),
+                    onClick = viewModel::ensureSharedProfileID,
+                )
                 viewModel.shareConflictMessage?.let {
                     Text(it, style = MaterialTheme.typography.bodySmall, color = colors.semanticError)
                 }
-                SecondaryButton(text = "Suivre un profil reçu", onClick = { isPresentingScanner = true })
+                SecondaryButton(text = stringResource(R.string.suivre_un_profil_recu), onClick = {
+                    isPresentingScanner =
+                        true
+                })
             }
         }
 
         Text(
-            "Partage ta fiche pour que tes amis puissent te suivre. Suis un ami pour retrouver vos parties " +
-                "jouées ensemble dans son historique.",
+            stringResource(R.string.partage_ta_fiche_pour_que_tes_amis_puissent_te_suivre_suis),
             style = MaterialTheme.typography.labelSmall,
             color = colors.textTertiary,
         )
@@ -375,7 +395,7 @@ private fun ProfileLinkDialog(
                     modifier = Modifier.fillMaxSize(),
                 )
                 IconButton(onClick = onDismiss, modifier = Modifier.align(Alignment.TopEnd).padding(Space.lg)) {
-                    Icon(Icons.Filled.Close, contentDescription = "Fermer", tint = Color.White)
+                    Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.fermer), tint = Color.White)
                 }
             }
         }
@@ -406,10 +426,10 @@ private fun ConfirmProfileLinkScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Suivre ce profil ?") },
+                title = { Text(stringResource(R.string.suivre_ce_profil)) },
                 navigationIcon = {
                     IconButton(onClick = onCancel, enabled = !isLinking) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Annuler")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = stringResource(R.string.annuler))
                     }
                 },
             )
@@ -444,16 +464,19 @@ private fun ConfirmProfileLinkScreen(
 
             existingLinkName?.let {
                 Text(
-                    "Cette fiche suit actuellement $it. Continuer la fera suivre ${payload.name} à la place : " +
-                        "$it ne recevra plus les parties jouées avec cette fiche.",
+                    stringResource(
+                        R.string.cette_fiche_suit_actuellement_value1_continuer_la_fera,
+                        it,
+                        payload.name,
+                        it,
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.semanticError,
                 )
             }
             conflictingPlayerName?.let {
                 Text(
-                    "Ce profil est déjà suivi par la fiche « $it » sur cet appareil. Continuer le fera suivre " +
-                        "aussi par celle-ci — à ne faire que si c'est la même personne (par exemple une fiche recréée).",
+                    stringResource(R.string.ce_profil_est_deja_suivi_par_la_fiche_value1_sur_cet, it),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.semanticError,
                 )
@@ -464,11 +487,11 @@ private fun ConfirmProfileLinkScreen(
                 horizontalArrangement = Arrangement.spacedBy(Space.sm),
             ) {
                 Switch(checked = adoptNameAndAvatar, onCheckedChange = { adoptNameAndAvatar = it })
-                Text("Adopter aussi son pseudo et son avatar", color = colors.textPrimary)
+                Text(stringResource(R.string.adopter_aussi_son_pseudo_et_son_avatar), color = colors.textPrimary)
             }
             if (!canAdoptAvatar) {
                 Text(
-                    "Son avatar est une photo : seul le pseudo peut être repris.",
+                    stringResource(R.string.son_avatar_est_une_photo_seul_le_pseudo_peut_etre_repris),
                     style = MaterialTheme.typography.labelSmall,
                     color = colors.textTertiary,
                 )

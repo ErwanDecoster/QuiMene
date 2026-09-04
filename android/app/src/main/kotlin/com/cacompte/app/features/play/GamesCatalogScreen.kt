@@ -44,8 +44,10 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.livematch.ShareSessionDialog
@@ -102,7 +104,7 @@ fun GamesCatalogScreen(
                             value = viewModel.searchText,
                             onValueChange = viewModel::updateSearchText,
                             modifier = Modifier.fillMaxWidth().focusRequester(searchFocusRequester),
-                            placeholder = { Text("Rechercher un jeu") },
+                            placeholder = { Text(stringResource(R.string.rechercher_un_jeu)) },
                             singleLine = true,
                             colors =
                                 TextFieldDefaults.colors(
@@ -113,7 +115,7 @@ fun GamesCatalogScreen(
                                 ),
                         )
                     } else {
-                        Text("Jeux")
+                        Text(stringResource(R.string.jeux))
                     }
                 },
                 navigationIcon = {
@@ -137,11 +139,14 @@ fun GamesCatalogScreen(
                         }
                     } else {
                         IconButton(onClick = { isSearching = true }) {
-                            Icon(Icons.Filled.Search, contentDescription = "Rechercher un jeu")
+                            Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.rechercher_un_jeu))
                         }
                         if (isSharing) {
                             IconButton(onClick = { isPresentingActiveShare = true }) {
-                                Icon(Icons.Filled.Wifi, contentDescription = "Session partagée en cours")
+                                Icon(
+                                    Icons.Filled.Wifi,
+                                    contentDescription = stringResource(R.string.session_partagee_en_cours),
+                                )
                             }
                         }
                     }
@@ -152,9 +157,9 @@ fun GamesCatalogScreen(
         if (viewModel.searchText.isNotBlank() && viewModel.games.isEmpty()) {
             EmptyState(
                 icon = Icons.Filled.Search,
-                message = "Aucun jeu ne correspond à ta recherche.",
+                message = stringResource(R.string.aucun_jeu_ne_correspond_a_ta_recherche),
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
-                actionTitle = "Demander ce jeu",
+                actionTitle = stringResource(R.string.demander_ce_jeu),
                 onAction = {
                     if (!GameRequestMail.open(context, viewModel.searchText)) isPresentingMailFallback = true
                 },
@@ -201,18 +206,25 @@ fun GamesCatalogScreen(
     if (isPresentingMailFallback) {
         AlertDialog(
             onDismissRequest = { isPresentingMailFallback = false },
-            title = { Text("Aucune messagerie configurée") },
-            text = { Text("Envoie ta demande à ${GameRequestMail.RECIPIENT} depuis l'application de ton choix.") },
+            title = { Text(stringResource(R.string.aucune_messagerie_configuree)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.envoie_ta_demande_a_value1_depuis_l_application_de_ton_choix,
+                        GameRequestMail.RECIPIENT,
+                    ),
+                )
+            },
             confirmButton = {
                 TextButton(
                     onClick = {
                         clipboardManager.setText(AnnotatedString(GameRequestMail.RECIPIENT))
                         isPresentingMailFallback = false
                     },
-                ) { Text("Copier l'adresse") }
+                ) { Text(stringResource(R.string.copier_l_adresse)) }
             },
             dismissButton = {
-                TextButton(onClick = { isPresentingMailFallback = false }) { Text("OK") }
+                TextButton(onClick = { isPresentingMailFallback = false }) { Text(stringResource(R.string.ok)) }
             },
         )
     }
@@ -220,12 +232,9 @@ fun GamesCatalogScreen(
     matchPendingAbandon?.let { match ->
         AlertDialog(
             onDismissRequest = { matchPendingAbandon = null },
-            title = { Text("Abandonner cette partie ?") },
+            title = { Text(stringResource(R.string.abandonner_cette_partie)) },
             text = {
-                Text(
-                    "La partie sera classée comme abandonnée dans l'historique, avec le classement " +
-                        "atteint jusque-là. Cette action ne peut pas être annulée.",
-                )
+                Text(stringResource(R.string.la_partie_sera_classee_comme_abandonnee_dans_l_historique))
             },
             confirmButton = {
                 TextButton(
@@ -233,9 +242,13 @@ fun GamesCatalogScreen(
                         matchPendingAbandon = null
                         scope.launch { viewModel.abandon(match, DeviceIdentity.current(context)) }
                     },
-                ) { Text("Abandonner") }
+                ) { Text(stringResource(R.string.abandonner)) }
             },
-            dismissButton = { TextButton(onClick = { matchPendingAbandon = null }) { Text("Annuler") } },
+            dismissButton = {
+                TextButton(
+                    onClick = { matchPendingAbandon = null },
+                ) { Text(stringResource(R.string.annuler)) }
+            },
         )
     }
 
@@ -274,7 +287,7 @@ private fun ResumeMatchRow(
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Reprendre la partie en cours",
+                text = stringResource(R.string.reprendre_la_partie_en_cours),
                 style = MaterialTheme.typography.titleMedium,
                 color = colors.textPrimary,
             )

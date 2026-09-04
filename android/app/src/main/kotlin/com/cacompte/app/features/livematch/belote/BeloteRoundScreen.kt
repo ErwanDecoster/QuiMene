@@ -14,6 +14,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
@@ -40,7 +42,7 @@ fun BeloteRoundScreen(liveMatch: LiveRoundEntryState) {
         ) {
             item {
                 Text(
-                    "Scores",
+                    stringResource(R.string.scores),
                     style = MaterialTheme.typography.labelLarge,
                     color = colors.textSecondary,
                     modifier = Modifier.padding(top = Space.lg),
@@ -51,7 +53,7 @@ fun BeloteRoundScreen(liveMatch: LiveRoundEntryState) {
             }
             item {
                 Text(
-                    "Cette donne",
+                    stringResource(R.string.cette_donne),
                     style = MaterialTheme.typography.labelLarge,
                     color = colors.textSecondary,
                     modifier = Modifier.padding(top = Space.lg),
@@ -61,7 +63,7 @@ fun BeloteRoundScreen(liveMatch: LiveRoundEntryState) {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(verticalArrangement = Arrangement.spacedBy(Space.md)) {
                         Text(
-                            "Équipe preneuse",
+                            stringResource(R.string.equipe_preneuse),
                             style = MaterialTheme.typography.bodyMedium,
                             color = colors.textPrimary,
                         )
@@ -76,7 +78,7 @@ fun BeloteRoundScreen(liveMatch: LiveRoundEntryState) {
                         }
 
                         Text(
-                            "Points du preneur : ${viewModel.takerPoints}",
+                            stringResource(R.string.points_du_preneur_count1, viewModel.takerPoints),
                             style = MaterialTheme.typography.bodyMedium,
                             color = colors.textPrimary,
                         )
@@ -111,14 +113,22 @@ fun BeloteRoundScreen(liveMatch: LiveRoundEntryState) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Text("Capot", style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
+                            Text(
+                                stringResource(R.string.capot),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = colors.textPrimary,
+                            )
                             Switch(checked = viewModel.isCapot, onCheckedChange = viewModel::updateCapot)
                         }
 
-                        Text("Belote-rebelote", style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
+                        Text(
+                            stringResource(R.string.belote_rebelote),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = colors.textPrimary,
+                        )
                         Row(horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
                             Chip(
-                                title = "Aucune",
+                                title = stringResource(R.string.aucune),
                                 isSelected = viewModel.beloteRebeloteTeamID == null,
                                 onClick = { viewModel.selectBeloteRebelote(null) },
                             )
@@ -135,7 +145,7 @@ fun BeloteRoundScreen(liveMatch: LiveRoundEntryState) {
             }
         }
         PrimaryButton(
-            text = "Valider la donne",
+            text = stringResource(R.string.valider_la_donne),
             onClick = viewModel::submit,
             modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
         )

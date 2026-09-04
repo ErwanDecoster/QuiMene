@@ -27,6 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.floatingNavBarContentPadding
@@ -55,7 +57,7 @@ fun ArchivedMatchesScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Parties archivées") },
+                title = { Text(stringResource(R.string.parties_archivees)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Retour")
@@ -67,7 +69,7 @@ fun ArchivedMatchesScreen(onBack: () -> Unit) {
         if (viewModel.matches.isEmpty()) {
             EmptyState(
                 icon = Icons.Filled.Archive,
-                message = "Aucune partie archivée.",
+                message = stringResource(R.string.aucune_partie_archivee),
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
             )
             return@Scaffold
@@ -91,12 +93,9 @@ fun ArchivedMatchesScreen(onBack: () -> Unit) {
     matchPendingDeletion?.let { match ->
         AlertDialog(
             onDismissRequest = { matchPendingDeletion = null },
-            title = { Text("Supprimer définitivement cette partie ?") },
+            title = { Text(stringResource(R.string.supprimer_definitivement_cette_partie)) },
             text = {
-                Text(
-                    "La partie et ses manches seront définitivement supprimées, y compris des " +
-                        "statistiques des joueurs concernés. Cette action ne peut pas être annulée.",
-                )
+                Text(stringResource(R.string.la_partie_et_ses_manches_seront_definitivement_supprimees_y))
             },
             confirmButton = {
                 TextButton(
@@ -104,9 +103,13 @@ fun ArchivedMatchesScreen(onBack: () -> Unit) {
                         matchPendingDeletion = null
                         viewModel.delete(match)
                     },
-                ) { Text("Supprimer") }
+                ) { Text(stringResource(R.string.supprimer)) }
             },
-            dismissButton = { TextButton(onClick = { matchPendingDeletion = null }) { Text("Annuler") } },
+            dismissButton = {
+                TextButton(
+                    onClick = { matchPendingDeletion = null },
+                ) { Text(stringResource(R.string.annuler)) }
+            },
         )
     }
 }
@@ -133,7 +136,7 @@ private fun ArchivedMatchRow(
                     color = colors.textSecondary,
                 )
             }
-            TertiaryButton(text = "Réactiver", onClick = onUnarchive)
+            TertiaryButton(text = stringResource(R.string.reactiver), onClick = onUnarchive)
             IconButton(onClick = onDelete) {
                 Icon(Icons.Filled.Delete, contentDescription = "Supprimer définitivement")
             }

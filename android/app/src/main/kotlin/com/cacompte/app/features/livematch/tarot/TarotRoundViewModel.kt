@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.cacompte.app.R
 import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.catalog.games.TarotHandDetail
 import com.cacompte.catalog.toScoreDetail
@@ -123,8 +124,11 @@ class TarotRoundViewModel(
     }
 
     companion object {
-        /** Miroir des libellés `TarotRoundView.swift`. */
-        val contractLabels = listOf("Petite", "Garde", "Garde sans le chien", "Garde contre le chien")
-        val poigneeLabels = listOf("Aucune", "Simple", "Double", "Triple")
+        /** Miroir des libellés `TarotRoundView.swift` — des identifiants de ressource, pas des
+         * `String` : cette `companion object` n'est pas dans un contexte composable, `stringResource()`
+         * ne peut être appelé que là où [TarotRoundScreen] affiche effectivement chaque libellé. */
+        val contractLabels =
+            listOf(R.string.petite, R.string.garde, R.string.garde_sans_le_chien, R.string.garde_contre_le_chien)
+        val poigneeLabels = listOf(R.string.aucune, R.string.simple, R.string.double_label, R.string.triple)
     }
 }

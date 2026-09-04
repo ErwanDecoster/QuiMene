@@ -28,7 +28,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cacompte.app.R
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.features.livematch.LiveRoundEntryState
 import com.cacompte.app.navigation.LocalFloatingNavBarHeight
@@ -169,7 +171,7 @@ private fun BonusRow(
     val colors = LocalAppColors.current
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = Space.xxs)) {
         Text(
-            text = "Bonus",
+            text = stringResource(R.string.bonus),
             style = MaterialTheme.typography.bodyMedium,
             color = colors.textSecondary,
             modifier = Modifier.width(LabelColumnWidth),
@@ -178,7 +180,13 @@ private fun BonusRow(
             val filled = viewModel.filledEntries(participant.id)
             val text =
                 if (upperCategories.all { filled[it.id] != null }) {
-                    if (upperCategories.any { filled[it.id]?.explanation != null }) "+35" else "0"
+                    if (upperCategories.any { filled[it.id]?.explanation != null }) {
+                        "+35"
+                    } else {
+                        stringResource(
+                            R.string.n_0,
+                        )
+                    }
                 } else {
                     "—"
                 }
@@ -200,7 +208,7 @@ private fun TotalRow(
     val colors = LocalAppColors.current
     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = Space.xxs)) {
         Text(
-            text = "Total",
+            text = stringResource(R.string.total),
             style = MaterialTheme.typography.titleMedium,
             color = colors.textPrimary,
             modifier = Modifier.width(LabelColumnWidth),
@@ -242,7 +250,7 @@ private fun YamsCategoryEntrySheet(
                 Category.Scoring.Kind.MultipleOf -> {
                     rawValue = diceCount
                     Text(
-                        "Nombre de dés : $diceCount",
+                        stringResource(R.string.nombre_de_des_count1, diceCount),
                         style = MaterialTheme.typography.bodyMedium,
                         color = colors.textPrimary,
                     )
@@ -252,7 +260,7 @@ private fun YamsCategoryEntrySheet(
                         }
                     }
                     Text(
-                        "${diceCount * (category.scoring.value ?: 0)} points",
+                        stringResource(R.string.count1_points, diceCount * (category.scoring.value ?: 0)),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.textSecondary,
                     )
@@ -261,7 +269,11 @@ private fun YamsCategoryEntrySheet(
                 Category.Scoring.Kind.SumOfDice -> {
                     rawValue = sum
                     val max = category.scoring.max ?: 30
-                    Text("Somme : $sum", style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
+                    Text(
+                        stringResource(R.string.somme_count1, sum),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.textPrimary,
+                    )
                     Row(horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
                         DiceOption(0, isSelected = sum == 0, onClick = { sum = 0 })
                         for (n in 5..max) {
@@ -278,7 +290,13 @@ private fun YamsCategoryEntrySheet(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            if (achieved) "Obtenu (${category.scoring.value ?: 0})" else "Raté (0)",
+                            if (achieved) {
+                                stringResource(R.string.obtenu_count1, category.scoring.value ?: 0)
+                            } else {
+                                stringResource(
+                                    R.string.rate_0,
+                                )
+                            },
                             style = MaterialTheme.typography.bodyMedium,
                             color = colors.textPrimary,
                         )
@@ -287,7 +305,7 @@ private fun YamsCategoryEntrySheet(
                 }
             }
 
-            PrimaryButton(text = "Valider", onClick = { onSubmit(rawValue) })
+            PrimaryButton(text = stringResource(R.string.valider), onClick = { onSubmit(rawValue) })
         }
     }
 }

@@ -24,7 +24,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.floatingNavBarContentPadding
@@ -115,7 +117,7 @@ private fun LeaderboardRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(entry.name, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
                 Text(
-                    text = "${entry.played} parties · ${entry.wins} victoires",
+                    text = stringResource(R.string.count1_partie_s_count2_victoire_s, entry.played, entry.wins),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textSecondary,
                 )

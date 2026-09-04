@@ -28,6 +28,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.designsystem.components.Banner
@@ -153,7 +155,10 @@ private fun LiveMatchScaffold(
                 actions = {
                     if (viewModel.canEndManually) {
                         IconButton(onClick = { viewModel.undoLastRound() }) {
-                            Icon(Icons.Filled.Undo, contentDescription = "Annuler la dernière manche")
+                            Icon(
+                                Icons.Filled.Undo,
+                                contentDescription = stringResource(R.string.annuler_la_derniere_manche),
+                            )
                         }
                     }
                     IconButton(onClick = { menuExpanded = true }) {
@@ -163,7 +168,13 @@ private fun LiveMatchScaffold(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    if (viewModel.isSharing) "Voir la session partagée" else "Partager en direct",
+                                    if (viewModel.isSharing) {
+                                        stringResource(
+                                            R.string.voir_la_session_partagee,
+                                        )
+                                    } else {
+                                        stringResource(R.string.partager_en_direct)
+                                    },
                                 )
                             },
                             onClick = {
@@ -172,14 +183,14 @@ private fun LiveMatchScaffold(
                             },
                         )
                         DropdownMenuItem(
-                            text = { Text("Voir les manches") },
+                            text = { Text(stringResource(R.string.voir_les_manches)) },
                             onClick = {
                                 menuExpanded = false
                                 isPresentingRoundHistory = true
                             },
                         )
                         DropdownMenuItem(
-                            text = { Text("Terminer la partie") },
+                            text = { Text(stringResource(R.string.terminer_la_partie)) },
                             enabled = viewModel.canEndManually,
                             onClick = {
                                 menuExpanded = false
@@ -187,7 +198,7 @@ private fun LiveMatchScaffold(
                             },
                         )
                         DropdownMenuItem(
-                            text = { Text("Abandonner la partie") },
+                            text = { Text(stringResource(R.string.abandonner_la_partie)) },
                             onClick = {
                                 menuExpanded = false
                                 isConfirmingAbandon = true
@@ -224,33 +235,31 @@ private fun LiveMatchScaffold(
     if (isConfirmingEnd) {
         AlertDialog(
             onDismissRequest = { isConfirmingEnd = false },
-            title = { Text("Terminer la partie ?") },
+            title = { Text(stringResource(R.string.terminer_la_partie_2)) },
             text = {
-                Text(
-                    "Le classement final sera calculé à partir des manches jouées. " +
-                        "Cette action ne peut pas être annulée.",
-                )
+                Text(stringResource(R.string.le_classement_final_sera_calcule_a_partir_des_manches))
             },
             confirmButton = {
                 TextButton(onClick = {
                     isConfirmingEnd = false
                     viewModel.endManually()
                 }) {
-                    Text("Terminer la partie")
+                    Text(stringResource(R.string.terminer_la_partie))
                 }
             },
-            dismissButton = { TextButton(onClick = { isConfirmingEnd = false }) { Text("Annuler") } },
+            dismissButton = {
+                TextButton(
+                    onClick = { isConfirmingEnd = false },
+                ) { Text(stringResource(R.string.annuler)) }
+            },
         )
     }
     if (isConfirmingAbandon) {
         AlertDialog(
             onDismissRequest = { isConfirmingAbandon = false },
-            title = { Text("Abandonner cette partie ?") },
+            title = { Text(stringResource(R.string.abandonner_cette_partie)) },
             text = {
-                Text(
-                    "La partie sera classée comme abandonnée dans l'historique, avec le classement " +
-                        "atteint jusque-là. Cette action ne peut pas être annulée.",
-                )
+                Text(stringResource(R.string.la_partie_sera_classee_comme_abandonnee_dans_l_historique))
             },
             confirmButton = {
                 TextButton(
@@ -259,9 +268,13 @@ private fun LiveMatchScaffold(
                         viewModel.abandon()
                         onAbandoned()
                     },
-                ) { Text("Abandonner") }
+                ) { Text(stringResource(R.string.abandonner)) }
             },
-            dismissButton = { TextButton(onClick = { isConfirmingAbandon = false }) { Text("Annuler") } },
+            dismissButton = {
+                TextButton(
+                    onClick = { isConfirmingAbandon = false },
+                ) { Text(stringResource(R.string.annuler)) }
+            },
         )
     }
 }

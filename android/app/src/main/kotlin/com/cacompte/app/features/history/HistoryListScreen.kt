@@ -31,6 +31,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.floatingNavBarContentPadding
@@ -87,10 +89,10 @@ fun HistoryListScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Historique") },
+                title = { Text(stringResource(R.string.historique)) },
                 actions = {
                     IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Filled.Settings, contentDescription = "Réglages")
+                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.reglages))
                     }
                 },
             )
@@ -174,13 +176,13 @@ private fun GameFilterChip(
 
     Box {
         Chip(
-            title = label ?: "Tous les jeux",
+            title = label ?: stringResource(R.string.tous_les_jeux),
             isSelected = label != null,
             onClick = { menuExpanded = true },
         )
         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
             DropdownMenuItem(
-                text = { Text("Tous les jeux") },
+                text = { Text(stringResource(R.string.tous_les_jeux)) },
                 onClick = {
                     menuExpanded = false
                     viewModel.selectGame(null)
@@ -209,13 +211,13 @@ private fun PlayerFilterChip(
 
     Box {
         Chip(
-            title = label ?: "Tous les joueurs",
+            title = label ?: stringResource(R.string.tous_les_joueurs),
             isSelected = label != null,
             onClick = { menuExpanded = true },
         )
         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
             DropdownMenuItem(
-                text = { Text("Tous les joueurs") },
+                text = { Text(stringResource(R.string.tous_les_joueurs)) },
                 onClick = {
                     menuExpanded = false
                     viewModel.selectPlayer(null)
@@ -281,7 +283,7 @@ private fun ArchivedMatchesLink(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text("Parties archivées ($count)", color = colors.textSecondary)
+        Text(stringResource(R.string.parties_archivees_count1, count), color = colors.textSecondary)
         Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = colors.textTertiary)
     }
 }

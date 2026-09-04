@@ -28,6 +28,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.cacompte.app.R
 import com.cacompte.app.di.LocalAppContainer
 import com.cacompte.app.di.rememberViewModel
 import com.cacompte.app.navigation.floatingNavBarContentPadding
@@ -59,7 +61,7 @@ fun ArchivedPlayersScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Joueurs archivés") },
+                title = { Text(stringResource(R.string.joueurs_archives)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "Retour")
@@ -73,7 +75,7 @@ fun ArchivedPlayersScreen(
         if (currentArchived.isEmpty()) {
             EmptyState(
                 icon = Icons.Filled.Group,
-                message = "Aucun joueur archivé.",
+                message = stringResource(R.string.aucun_joueur_archive),
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
             )
             return@Scaffold
@@ -97,12 +99,9 @@ fun ArchivedPlayersScreen(
     playerPendingDeletion?.let { player ->
         AlertDialog(
             onDismissRequest = { playerPendingDeletion = null },
-            title = { Text("Supprimer définitivement ce joueur ?") },
+            title = { Text(stringResource(R.string.supprimer_definitivement_ce_joueur)) },
             text = {
-                Text(
-                    "La fiche joueur sera définitivement supprimée. Les parties déjà jouées restent dans " +
-                        "l'historique, mais ne pointeront plus vers ce joueur. Cette action ne peut pas être annulée.",
-                )
+                Text(stringResource(R.string.la_fiche_joueur_sera_definitivement_supprimee_les_parties))
             },
             confirmButton = {
                 TextButton(
@@ -110,9 +109,13 @@ fun ArchivedPlayersScreen(
                         playerPendingDeletion = null
                         viewModel.delete(player)
                     },
-                ) { Text("Supprimer") }
+                ) { Text(stringResource(R.string.supprimer)) }
             },
-            dismissButton = { TextButton(onClick = { playerPendingDeletion = null }) { Text("Annuler") } },
+            dismissButton = {
+                TextButton(
+                    onClick = { playerPendingDeletion = null },
+                ) { Text(stringResource(R.string.annuler)) }
+            },
         )
     }
 }
@@ -135,7 +138,7 @@ private fun ArchivedPlayerRow(
                 AvatarView(player.toAvatar(), size = AvatarSize.Medium)
                 Text(player.nickname, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
             }
-            TertiaryButton(text = "Réactiver", onClick = onUnarchive)
+            TertiaryButton(text = stringResource(R.string.reactiver), onClick = onUnarchive)
             IconButton(onClick = onDelete) {
                 Icon(Icons.Filled.Delete, contentDescription = "Supprimer définitivement ${player.nickname}")
             }

@@ -17,7 +17,9 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.cacompte.app.R
 import com.cacompte.designsystem.components.Card
 import com.cacompte.designsystem.components.EmptyState
 import com.cacompte.designsystem.tokens.LocalAppColors
@@ -42,12 +44,16 @@ fun RoundHistoryDialog(
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState) {
         Column(modifier = Modifier.fillMaxWidth().padding(Space.lg)) {
-            Text("Manches précédentes", style = MaterialTheme.typography.titleLarge, color = colors.textPrimary)
+            Text(
+                stringResource(R.string.manches_precedentes),
+                style = MaterialTheme.typography.titleLarge,
+                color = colors.textPrimary,
+            )
 
             if (rounds.isEmpty()) {
                 EmptyState(
                     icon = Icons.AutoMirrored.Filled.List,
-                    message = "Aucune manche jouée pour l'instant.",
+                    message = stringResource(R.string.aucune_manche_jouee_pour_l_instant),
                     modifier = Modifier.padding(top = Space.lg),
                 )
             } else {
