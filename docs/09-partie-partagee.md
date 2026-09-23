@@ -111,13 +111,13 @@ connecter, où que soient les deux appareils.
 ```
 Hôte (Marion)                                          Rejoint (Théo)
  │
- ├─ advertise(sessionID, ...) : upsert cacompte_open_games,
+ ├─ advertise(sessionID, ...) : cacompte_advertise_game,
  │  souscrit au canal session:<sessionID>
  │  affiche : code d'appairage à 6 chiffres
  │
  │                                                       ├─ saisit ou scanne le code
- │                                                       ├─ resolveGame(code) → lit
- │                                                       │  cacompte_open_games, obtient sessionID
+ │                                                       ├─ resolveGame(code) →
+ │                                                       │  cacompte_resolve_game, obtient sessionID
  │                                                       ├─ connect(host) : souscrit au même canal
  │◀──────────────────────────────────────────────────────┤  attachToHost(...) : hello chiffré
  │  welcome(log) ────────────────────────────────────────▶│  (le code ne sert qu'au chiffrement,
@@ -346,9 +346,19 @@ présente, mais pour le scanner de QR (`QRScannerView`), sans rapport avec le tr
 - L'invitation reste explicite des deux côtés — l'hôte affiche le code, le pair le saisit ou le
   scanne.
 - La clé Supabase embarquée dans le client est la clé **anon/publique**, conçue pour être
-  distribuée (protégée par les politiques RLS de `cacompte_open_games`, pas par le secret) — le
-  contenu des manches reste protégé par le chiffrement de bout en bout ci-dessus, pas par cette
-  clé.
+  distribuée — le contenu des manches reste protégé par le chiffrement de bout en bout ci-dessus,
+  pas par cette clé.
+- **Aucun accès direct à `cacompte_open_games`.** La clé de chiffrement dérive du code
+  d'appairage et du `sessionID`, tous deux dans la ligne : des policies `using (true)` laissaient
+  lister tous les codes ouverts, donc lire toutes les parties en cours, et l'`upsert` sur
+  `pairing_code` permettait d'écraser la partie d'un autre. La table n'a plus de policy `anon` ;
+  l'app passe par quatre fonctions `security definer` : `cacompte_advertise_game` (refuse un code
+  déjà pris par une autre session valide), `cacompte_resolve_game` (une ligne par code, jamais la
+  liste, rien au-delà de 24 h), `cacompte_update_open_game` et `cacompte_close_open_game`. Purge
+  horaire des lignes de plus de 24 h (`pg_cron`).
+- **Limite assumée** : un code à 6 chiffres reste devinable par essais répétés sur
+  `cacompte_resolve_game`. Accepté pour la v1 (durée de vie de 24 h au plus, pas de compte
+  utilisateur) ; une limitation de fréquence côté serveur serait la parade suivante.
 
 ## Dégradation
 

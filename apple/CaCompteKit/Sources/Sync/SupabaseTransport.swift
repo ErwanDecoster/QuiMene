@@ -71,11 +71,13 @@ public final class SupabaseTransport {
     sessionID: UUID, matchID: UUID, gameID: String, participantCount: Int, pairingCode: String
   ) async throws {
     hostSessionID = sessionID
-    try await client.from("cacompte_open_games").upsert(
-      OpenGameRow(
+    // Doc utilisateur — la table n'est plus accessible directement (migration
+    // `secure_cacompte_open_games`) ; la fonction refuse un code déjà pris par une autre session.
+    try await client.rpc(
+      "cacompte_advertise_game",
+      params: AdvertiseParams(
         pairingCode: pairingCode, sessionID: sessionID, matchID: matchID, gameID: gameID,
-        participantCount: participantCount, deviceName: deviceName, platform: platform.rawValue),
-      onConflict: "pairing_code"
+        participantCount: participantCount, deviceName: deviceName, platform: platform.rawValue)
     ).execute()
 
     let channel = client.channel("session:\(sessionID.uuidString)") { config in
@@ -121,12 +123,12 @@ public final class SupabaseTransport {
   /// Realtime ni aux pairs déjà connectés — c'est `LiveSession.switchMatch` qui les prévient.
   public func updateActiveMatch(matchID: UUID, gameID: String, participantCount: Int) async throws {
     guard let hostSessionID else { return }
-    try await client.from("cacompte_open_games")
-      .update(
-        ActiveMatchUpdate(matchID: matchID, gameID: gameID, participantCount: participantCount)
-      )
-      .eq("session_id", value: hostSessionID.uuidString)
-      .execute()
+    try await client.rpc(
+      "cacompte_update_open_game",
+      params: ActiveMatchUpdate(
+        sessionID: hostSessionID, matchID: matchID, gameID: gameID,
+        participantCount: participantCount)
+    ).execute()
   }
 
   public func stopAdvertising() async {
@@ -142,8 +144,8 @@ public final class SupabaseTransport {
     }
     hostChannel = nil
     if let hostSessionID {
-      _ = try? await client.from("cacompte_open_games").delete().eq(
-        "session_id", value: hostSessionID.uuidString
+      _ = try? await client.rpc(
+        "cacompte_close_open_game", params: ["p_session_id": hostSessionID.uuidString]
       ).execute()
     }
     hostSessionID = nil
@@ -200,9 +202,7 @@ public final class SupabaseTransport {
   public func resolveGame(code: String) async throws -> DiscoveredHost {
     let row: OpenGameRow
     do {
-      row = try await client.from("cacompte_open_games")
-        .select()
-        .eq("pairing_code", value: code)
+      row = try await client.rpc("cacompte_resolve_game", params: ["p_pairing_code": code])
         .single()
         .execute()
         .value
@@ -298,22 +298,46 @@ struct OpenGameRow: Codable {
   }
 }
 
-/// Corps de la requête `update` de `updateActiveMatch` — seules les colonnes qui décrivent la
-/// partie courante changent à un changement de partie, jamais `pairing_code`/`session_id`.
+/// Paramètres de `cacompte_advertise_game` — clés encodées = noms des paramètres SQL.
+private struct AdvertiseParams: Encodable {
+  let pairingCode: String
+  let sessionID: UUID
+  let matchID: UUID
+  let gameID: String
+  let participantCount: Int
+  let deviceName: String
+  let platform: String
+
+  enum CodingKeys: String, CodingKey {
+    case pairingCode = "p_pairing_code"
+    case sessionID = "p_session_id"
+    case matchID = "p_match_id"
+    case gameID = "p_game_id"
+    case participantCount = "p_participant_count"
+    case deviceName = "p_device_name"
+    case platform = "p_platform"
+  }
+}
+
+/// Paramètres de `cacompte_update_open_game` (`updateActiveMatch`) — seules les colonnes qui
+/// décrivent la partie courante changent à un changement de partie, jamais le code ni la session.
 private struct ActiveMatchUpdate: Encodable {
+  let sessionID: UUID
   let matchID: UUID
   let gameID: String
   let participantCount: Int
 
   enum CodingKeys: String, CodingKey {
-    case matchID = "match_id"
-    case gameID = "game_id"
-    case participantCount = "participant_count"
+    case sessionID = "p_session_id"
+    case matchID = "p_match_id"
+    case gameID = "p_game_id"
+    case participantCount = "p_participant_count"
   }
 }
 
 /// Doc utilisateur P9 — clé **anon/publique** Supabase : conçue pour être embarquée dans un client
-/// (protégée par les politiques RLS de `cacompte_open_games`, pas par le secret), à la différence d'une clé
+/// (l'accès aux tables passe par des fonctions SQL qui exigent un code ou un identifiant, pas par
+/// le secret), à la différence d'une clé
 /// `service_role`. Le contenu réel des manches reste protégé par `SessionCrypto` (chiffrement dérivé
 /// du code d'appairage), pas par cette clé.
 enum SupabaseSyncConfig {

@@ -4,6 +4,7 @@ import com.cacompte.domain.model.UUIDSerializer
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.realtime.PresenceAction
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
@@ -20,6 +21,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import java.util.Base64
 import java.util.UUID
 
@@ -89,19 +92,20 @@ class SupabaseTransport(
         pairingCode: String,
     ) {
         hostSessionID = sessionID
-        client.postgrest.from(OPEN_GAMES_TABLE).upsert(
-            OpenGameRow(
-                pairingCode = pairingCode,
-                sessionID = sessionID,
-                matchID = matchID,
-                gameID = gameID,
-                participantCount = participantCount,
-                deviceName = deviceName,
-                platform = platform.wireValue,
-            ),
-        ) {
-            onConflict = "pairing_code"
-        }
+        // Doc utilisateur — la table n'est plus accessible directement (migration
+        // `secure_cacompte_open_games`) ; la fonction refuse un code déjà pris par une autre session.
+        client.postgrest.rpc(
+            "cacompte_advertise_game",
+            buildJsonObject {
+                put("p_pairing_code", pairingCode)
+                put("p_session_id", sessionID.toString())
+                put("p_match_id", matchID.toString())
+                put("p_game_id", gameID)
+                put("p_participant_count", participantCount)
+                put("p_device_name", deviceName)
+                put("p_platform", platform.wireValue)
+            },
+        )
 
         val channel = client.realtime.channel("session:$sessionID") { presence { key = HOST_PRESENCE_KEY } }
         hostChannel = channel
@@ -141,11 +145,15 @@ class SupabaseTransport(
         participantCount: Int,
     ) {
         val sessionID = hostSessionID ?: return
-        client.postgrest.from(OPEN_GAMES_TABLE).update(
-            ActiveMatchUpdate(matchID, gameID, participantCount),
-        ) {
-            filter { eq("session_id", sessionID.toString()) }
-        }
+        client.postgrest.rpc(
+            "cacompte_update_open_game",
+            buildJsonObject {
+                put("p_session_id", sessionID.toString())
+                put("p_match_id", matchID.toString())
+                put("p_game_id", gameID)
+                put("p_participant_count", participantCount)
+            },
+        )
     }
 
     suspend fun stopAdvertising() {
@@ -160,9 +168,10 @@ class SupabaseTransport(
         hostChannel = null
         hostSessionID?.let { sessionID ->
             trySuspend {
-                client.postgrest.from(OPEN_GAMES_TABLE).delete {
-                    filter { eq("session_id", sessionID.toString()) }
-                }
+                client.postgrest.rpc(
+                    "cacompte_close_open_game",
+                    buildJsonObject { put("p_session_id", sessionID.toString()) },
+                )
             }
         }
         hostSessionID = null
@@ -211,17 +220,15 @@ class SupabaseTransport(
     // region Pair
 
     /** Doc utilisateur — remplace le scan Wi-Fi/BLE : une simple lecture par code, sans aucune
-     * notion de proximité physique. `maybeSingle()` renvoie `null` plutôt que de lever une
-     * exception PostgREST quand aucune ligne ne correspond — plus direct que l'inspection du code
-     * d'erreur PostgREST que fait la version Swift. */
+     * notion de proximité physique. `cacompte_resolve_game` renvoie zéro ou une ligne (jamais la
+     * liste des parties ouvertes) : une liste vide veut dire « aucun code correspondant » — plus
+     * direct que l'inspection du code d'erreur PostgREST que fait la version Swift. */
     suspend fun resolveGame(code: String): DiscoveredHost {
         val row =
             client.postgrest
-                .from(OPEN_GAMES_TABLE)
-                .select {
-                    filter { eq("pairing_code", code) }
-                    maybeSingle()
-                }.decodeAsOrNull<OpenGameRow>() ?: throw SupabaseTransportError.GameNotFound
+                .rpc("cacompte_resolve_game", buildJsonObject { put("p_pairing_code", code) })
+                .decodeList<OpenGameRow>()
+                .firstOrNull() ?: throw SupabaseTransportError.GameNotFound
         return DiscoveredHost(
             id = row.sessionID,
             deviceName = row.deviceName,
@@ -277,7 +284,6 @@ class SupabaseTransport(
          * besoin de connaître que ce sentinel, pas un identifiant d'appareil qu'il n'a aucun
          * moyen d'obtenir à l'avance. */
         private const val HOST_PRESENCE_KEY = "host"
-        private const val OPEN_GAMES_TABLE = "cacompte_open_games"
     }
 }
 
@@ -324,17 +330,10 @@ data class OpenGameRow(
     val platform: String,
 )
 
-/** Corps de la requête `update` de [SupabaseTransport.updateActiveMatch] — seules les colonnes
- * qui décrivent la partie courante changent, jamais `pairing_code`/`session_id`. */
-@Serializable
-private data class ActiveMatchUpdate(
-    @SerialName("match_id") @Serializable(with = UUIDSerializer::class) val matchID: UUID,
-    @SerialName("game_id") val gameID: String,
-    @SerialName("participant_count") val participantCount: Int,
-)
 
 /** Doc utilisateur P9 — clé **anon/publique** Supabase : conçue pour être embarquée dans un
- * client (protégée par les politiques RLS de `cacompte_open_games`, pas par le secret), à la
+ * client (l'accès aux tables passe par des fonctions SQL qui exigent un code ou un identifiant,
+ * pas par le secret), à la
  * différence d'une clé `service_role`. Le contenu réel des manches reste protégé par
  * [SessionCrypto] (chiffrement dérivé du code d'appairage), pas par cette clé. Même projet que
  * l'app Apple (`SupabaseSyncConfig.swift`) : les deux plateformes doivent pointer vers le même
