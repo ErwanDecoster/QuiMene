@@ -30,3 +30,6 @@ android/.idea/
 # Secrets
 *.p8
 .env.local
+
+# Supabase
+supabase/.temp/
