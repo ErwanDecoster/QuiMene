@@ -5,7 +5,7 @@ import SwiftData
 import SwiftUI
 
 /// Doc utilisateur — onglets adressables par un deep link (`CaCompteApp.selectedTab`) : sans ça,
-/// un lien `cacompte://`/Handoff/App Intent qui arrive alors que l'onglet visé n'est pas actif
+/// un lien `cacompte://`/Handoff qui arrive alors que l'onglet visé n'est pas actif
 /// pouvait rester sans effet visible — `TabView` ne construit un onglet non sélectionné qu'à la
 /// demande, la vue cible n'existait donc pas encore pour recevoir l'événement (remontée
 /// utilisateur : « le scan du QR code ouvre bien l'application mais rien ne se passe »).
@@ -86,17 +86,14 @@ struct CaCompteApp: App {
         guard let matchID = MatchContinuation.matchID(from: activity) else { return }
         deepLinkRouter.pendingContinuedMatchID = matchID
       }
-      // Doc utilisateur — chacun de ces déclencheurs (lien, Handoff, App Intents « Commence »/
-      // « Reprends », classement → historique) vise un onglet précis. Posé ici (le `Group`
+      // Doc utilisateur — chacun de ces déclencheurs (lien, Handoff, Live Activity « Reprends »,
+      // classement → historique) vise un onglet précis. Posé ici (le `Group`
       // racine, toujours monté dès le lancement) plutôt que dans la vue cible : c'est
       // justement ce qui manquait pour que l'onglet soit *construit* à temps.
       .onChange(of: deepLinkRouter.pendingJoin) { _, newValue in
         if newValue != nil { selectedTab = .join }
       }
       .onChange(of: deepLinkRouter.pendingContinuedMatchID) { _, newValue in
-        if newValue != nil { selectedTab = .games }
-      }
-      .onChange(of: deepLinkRouter.pendingGameID) { _, newValue in
         if newValue != nil { selectedTab = .games }
       }
       .onChange(of: deepLinkRouter.wantsResume) { _, newValue in

@@ -2,14 +2,13 @@ import Foundation
 import Observation
 
 /// Doc utilisateur — pont entre les points d'entrée déclenchés hors de tout écran particulier
-/// (`.onOpenURL` pour un lien `cacompte://`, `.onContinueUserActivity` pour une reprise Handoff,
-/// `perform()` d'un App Intent qui tourne dans le process de l'app via `openAppWhenRun`) et
+/// (`.onOpenURL` pour un lien `cacompte://`, `.onContinueUserActivity` pour une reprise Handoff) et
 /// l'onglet visé (Jeux, Rejoindre ou Historique selon le signal), qui peut être plusieurs onglets
 /// plus loin au moment où l'un ou l'autre arrive. Pas de pattern d'environnement existant dans le
 /// projet pour ça (aucun `@Entry`
 /// ailleurs) — un unique objet observable partagé, sur le même principe que `AppSettings`.
-/// `.shared` (plutôt qu'une instance injectée) est nécessaire pour les App Intents : `perform()`
-/// n'a pas accès à l'environnement SwiftUI de la scène.
+/// `.shared` (plutôt qu'une instance injectée) : utilisable hors de l'environnement SwiftUI de la
+/// scène (App Intents, retirés de la v1.0 mais prévus à nouveau — voir roadmap P9).
 @MainActor
 @Observable
 final class DeepLinkRouter {
@@ -17,7 +16,6 @@ final class DeepLinkRouter {
 
   var pendingJoin: JoinLink.Payload?
   var pendingContinuedMatchID: UUID?
-  var pendingGameID: String?
   var wantsResume = false
   /// Doc utilisateur — bascule sur l'onglet Historique, déjà filtré sur ce jeu (déclenché depuis
   /// `GameLeaderboardView`, même patron que les autres signaux de cette classe).

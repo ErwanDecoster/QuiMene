@@ -162,9 +162,9 @@ struct GamesTabView: View {
     }
   }
 
-  // Doc utilisateur — Handoff/App Intents (« Commence »/« Reprends ») arrivent ici,
+  // Doc utilisateur — Handoff et « Reprends » (Live Activity) arrivent ici,
   // potentiellement alors qu'on est sur un autre onglet ; `DeepLinkRouter` fait le pont depuis
-  // `.onContinueUserActivity`/`perform()` (CaCompteApp). Le lien `cacompte://join` est consommé
+  // `.onContinueUserActivity`/`.onOpenURL` (CaCompteApp). Le lien `cacompte://join` est consommé
   // par `JoinTabView`, pas ici (doc utilisateur — onglet dédié). `CaCompteApp.selectedTab`
   // garantit que cet onglet est déjà construit quand l'un de ces événements arrive — reste à le
   // consommer, ici et dans `.onAppear` ci-dessous pour le cas où il était déjà en attente au
@@ -172,7 +172,6 @@ struct GamesTabView: View {
   private func withNavigationHandling<Content: View>(_ content: Content) -> some View {
     content
       .onChange(of: deepLinkRouter.pendingContinuedMatchID) { _, _ in consumePendingDeepLinks() }
-      .onChange(of: deepLinkRouter.pendingGameID) { _, _ in consumePendingDeepLinks() }
       .onChange(of: deepLinkRouter.wantsResume) { _, _ in consumePendingDeepLinks() }
       .navigationDestination(item: $activeMatch) { match in
         MatchPlayView(match: match, context: modelContext, catalog: catalog)
@@ -212,7 +211,7 @@ struct GamesTabView: View {
       }
   }
 
-  /// Doc utilisateur — un seul point qui vérifie les quatre déclencheurs possibles
+  /// Doc utilisateur — un seul point qui vérifie les déclencheurs possibles
   /// (`DeepLinkRouter`) et agit sur ceux effectivement en attente ; appelé aussi bien depuis
   /// chaque `.onChange` (nouvel événement pendant que cet onglet est déjà affiché) que depuis
   /// `.onAppear` (événement déjà arrivé avant que cet onglet n'existe).
@@ -221,14 +220,10 @@ struct GamesTabView: View {
       deepLinkRouter.pendingContinuedMatchID = nil
       activeMatch = try? MatchRepository(context: modelContext).match(withID: matchID)
     }
-    if let gameID = deepLinkRouter.pendingGameID {
-      deepLinkRouter.pendingGameID = nil
-      selectedDefinition = catalog.allGames.first { $0.id == gameID }
-    }
     if deepLinkRouter.wantsResume {
       deepLinkRouter.wantsResume = false
       refreshInProgressMatches()
-      // Doc utilisateur — Widget/App Intent « Reprends » : sans précision de laquelle,
+      // Doc utilisateur — Live Activity « Reprends » : sans précision de laquelle,
       // reprend la plus récemment démarrée (déjà l'ordre de `inProgressMatches`).
       if let mostRecent = inProgressMatches.first {
         activeMatch = mostRecent

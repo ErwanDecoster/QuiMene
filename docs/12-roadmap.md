@@ -156,7 +156,9 @@ Apple, recette manuelle réussie sur appareil réel ; Android reste à faire.** 
   cours sur un autre appareil au même compte iCloud. Vérifié par l'auteur sur appareil physique :
   fonctionne tel quel, jugé d'un intérêt limité au quotidien — aucun développement supplémentaire
   prévu au-delà de ce qui existe
-- ⏳ **App Intents / Siri (`MatchShortcuts`) — non fonctionnel, mis en pause.** Testé par l'auteur
+- ❌ **App Intents / Siri (`MatchShortcuts`) — retiré de la v1.0** (fichier et capacité Siri
+  supprimés, récupérables dans l'historique Git) : une fonction déclarée à Siri mais inopérante
+  est un motif de refus App Store (2.1). Diagnostic d'origine : non fonctionnel. Testé par l'auteur
   sur appareil physique, plusieurs allers-retours : la couverture insuffisante des phrases
   déclarées (une seule formulation par intent à l'origine) et l'absence de la capacité Siri
   (`com.apple.developer.siri`, ajoutée depuis) ont chacune été corrigées sans résoudre le
