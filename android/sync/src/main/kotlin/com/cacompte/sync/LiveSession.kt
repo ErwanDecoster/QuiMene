@@ -61,6 +61,9 @@ class LiveSession(
 
     data class RemoteValidationFailure(
         val reason: String,
+        /** La proposition partait d'un état périmé (une manche lui a échappé) — le pair doit être
+         * resynchronisé, pas seulement prévenu. Voir [arbitrateLocked]. */
+        val isStale: Boolean = false,
     ) : Exception(reason)
 
     private val mutex = Mutex()
@@ -352,6 +355,9 @@ class LiveSession(
             throw cancellation
         } catch (failure: RemoteValidationFailure) {
             rejectLocked(proposed.id, failure.reason, session)
+            if (failure.isStale) {
+                resendLocked(hostLog, session)
+            }
         } catch (error: Exception) {
             rejectLocked(proposed.id, "Aucune partie active.", session)
         }
@@ -370,6 +376,16 @@ class LiveSession(
         val currentState = hostState ?: throw SessionError.NoActiveMatch
 
         if (event is MatchEvent.RoundCommitted) {
+            // Doc 09 — une manche porte le numéro que son auteur croyait être le suivant ; le
+            // reducer *remplace* une manche de même numéro. Un pair qui a manqué une diffusion
+            // proposait donc un numéro déjà pris, et sa manche écrasait silencieusement celle de
+            // l'hôte (remontée : +10 saisis sur l'hôte, effacés par +1 saisi sur le pair).
+            if (event.draft.index != currentState.nextRoundIndex) {
+                throw RemoteValidationFailure(
+                    "Une autre manche a été validée entre-temps. Le tableau est à jour, ressaisis ta manche.",
+                    isStale = true,
+                )
+            }
             val validation = rules.validate(event.draft, currentState, definition)
             if (validation is ValidationResult.Invalid) {
                 throw RemoteValidationFailure(validation.errors.firstOrNull()?.message ?: "Manche invalide.")
@@ -395,6 +411,19 @@ class LiveSession(
                 session,
                 key,
             )
+        }
+    }
+
+    /** Rattrapage d'un pair en retard : renvoie tout le journal, le pair ignore ce qu'il a déjà
+     * (dédoublonnage par id) — plus simple et plus sûr que de deviner quels événements lui manquent. */
+    private suspend fun resendLocked(
+        log: List<StampedEvent>,
+        session: TransportSession,
+    ) {
+        val key = pairingKey ?: return
+        val currentSessionID = sessionID ?: return
+        trySend {
+            sendLocked(WireMessage(sessionID = currentSessionID, kind = WireMessage.Kind.Events(log)), session, key)
         }
     }
 

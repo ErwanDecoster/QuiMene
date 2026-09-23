@@ -27,6 +27,9 @@ public actor LiveSession {
 
   public struct RemoteValidationFailure: Error, Sendable, Equatable {
     public let reason: String
+    /// La proposition partait d'un état périmé (une manche lui a échappé) — le pair doit être
+    /// resynchronisé, pas seulement prévenu. Voir `arbitrate`.
+    public var isStale = false
   }
 
   private let deviceID: String
@@ -288,6 +291,9 @@ public actor LiveSession {
       await broadcastToConnectedPeers(.events([stamped]))
     } catch let failure as RemoteValidationFailure {
       await reject(proposed.id, reason: failure.reason, to: session)
+      if failure.isStale {
+        await resend(hostLog, to: session)
+      }
     } catch {
       await reject(proposed.id, reason: "Aucune partie active.", to: session)
     }
@@ -301,11 +307,21 @@ public actor LiveSession {
     guard let hostRules, let hostDefinition, let currentState = hostState else {
       throw SessionError.noActiveMatch
     }
-    if case .roundCommitted(let draft) = event,
-      case .invalid(let errors) = hostRules.validate(
+    if case .roundCommitted(let draft) = event {
+      // Doc 09 — une manche porte le numéro que son auteur croyait être le suivant ; le reducer
+      // *remplace* une manche de même numéro (`MatchState.commitRound`). Un pair qui a manqué une
+      // diffusion proposait donc un numéro déjà pris, et sa manche écrasait silencieusement celle
+      // de l'hôte (remontée : +10 saisis sur l'hôte, effacés par +1 saisi sur le pair).
+      guard draft.index == currentState.nextRoundIndex else {
+        throw RemoteValidationFailure(
+          reason: "Une autre manche a été validée entre-temps. Le tableau est à jour, ressaisis ta manche.",
+          isStale: true)
+      }
+      if case .invalid(let errors) = hostRules.validate(
         draft, in: currentState, definition: hostDefinition)
-    {
-      throw RemoteValidationFailure(reason: errors.first?.message ?? "Manche invalide.")
+      {
+        throw RemoteValidationFailure(reason: errors.first?.message ?? "Manche invalide.")
+      }
     }
     let stamped = stamp(event, id: id)
     hostState = engine.reduce(
@@ -320,6 +336,15 @@ public actor LiveSession {
     try? await send(
       WireMessage(sessionID: sessionID, kind: .rejection(eventID: eventID, reason: reason)),
       to: session, key: pairingKey)
+  }
+
+  /// Rattrapage d'un pair en retard : renvoie tout le journal, le pair ignore ce qu'il a déjà
+  /// (`SharedMatchModel.apply` dédoublonne par id) — plus simple et plus sûr que de deviner quels
+  /// événements lui manquent.
+  private func resend(_ log: [StampedEvent], to session: any TransportSession) async {
+    guard let pairingKey, let sessionID else { return }
+    try? await send(
+      WireMessage(sessionID: sessionID, kind: .events(log)), to: session, key: pairingKey)
   }
 
   private func broadcastToConnectedPeers(_ kind: WireMessage.Kind) async {

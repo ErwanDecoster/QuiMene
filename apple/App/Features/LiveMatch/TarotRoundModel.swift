@@ -80,7 +80,7 @@ final class TarotRoundModel {
     let draft: RoundDraft
     if isPassed {
       draft = RoundDraft(
-        index: state.rounds.count,
+        index: state.nextRoundIndex,
         inputs: [ScoreInput(participantID: takerID, rawValue: 0, modifiers: ["passed"])])
     } else {
       var modifiers: Set<ModifierID> = ["isTaker"]
@@ -101,7 +101,7 @@ final class TarotRoundModel {
       if needsPartner, let partnerID, partnerID != takerID {
         inputs.append(ScoreInput(participantID: partnerID, rawValue: 0, modifiers: ["isPartner"]))
       }
-      draft = RoundDraft(index: state.rounds.count, inputs: inputs)
+      draft = RoundDraft(index: state.nextRoundIndex, inputs: inputs)
     }
 
     if case .invalid(let errors) = rules.validate(draft, in: state, definition: definition) {

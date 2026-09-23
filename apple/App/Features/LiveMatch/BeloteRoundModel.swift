@@ -90,7 +90,7 @@ final class BeloteRoundModel {
     if beloteRebeloteTeamID == defenderTeamID { defenderModifiers.insert("beloteRebelote") }
 
     let draft = RoundDraft(
-      index: state.rounds.count,
+      index: state.nextRoundIndex,
       inputs: [
         ScoreInput(
           participantID: takerRepresentative.id, rawValue: takerPoints, modifiers: takerModifiers),

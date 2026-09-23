@@ -223,6 +223,14 @@ malgré le rejet, donnant l'impression qu'aucune validation n'avait lieu côté 
 qu'elle avait bien lieu, seul l'affichage ne la reflétait pas. Corrigé : une `rejection` retire
 l'événement du journal par son id et rejoue, ce qui annule visuellement la manche proposée.
 
+**Une proposition au numéro déjà pris est périmée, pas valide.** Une manche porte le numéro que
+son auteur croyait être le suivant (`RoundDraft.index`), et le reducer *remplace* une manche de
+même numéro. Un pair qui avait manqué une diffusion (broadcast éphémère, sans rejeu) proposait
+donc un numéro déjà pris, et l'hôte l'acceptait : sa manche écrasait silencieusement celle déjà
+validée (remontée : +10 saisis sur l'hôte, effacés par +1 saisi ensuite sur le pair). L'hôte
+exige désormais `draft.index == rounds.count`, sinon il rejette, puis renvoie tout son journal
+(`.events`) au pair, qui ignore ce qu'il a déjà par dédoublonnage d'id et rattrape le reste.
+
 **Reconnexion.** Un pair qui perd la connexion (poche, mise en veille, sortie de portée) relance
 `discover()` et reçoit un `welcome` complet à la reconnexion. Pas de reprise incrémentale : un
 instantané de partie pèse quelques kilo-octets, la complexité d'un delta ne se justifie pas.

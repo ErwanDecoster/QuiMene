@@ -75,7 +75,7 @@ final class WizardRoundModel {
 
   func submit() {
     let draft = RoundDraft(
-      index: state.rounds.count,
+      index: state.nextRoundIndex,
       inputs: participants.map { participant in
         let detail = ScoreDetail(
           payload: try! JSONEncoder().encode(WizardBidDetail(bid: bid(for: participant.id))))

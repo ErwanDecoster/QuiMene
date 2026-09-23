@@ -53,7 +53,7 @@ final class SharedMatchModel {
   /// message d'erreur s'affiche immédiatement, la manche n'est jamais montrée comme acceptée.
   func validate(_ inputs: [ScoreInput]) -> ValidationResult? {
     guard let state, let rules, let definition else { return nil }
-    let draft = RoundDraft(index: state.rounds.count, inputs: inputs)
+    let draft = RoundDraft(index: state.nextRoundIndex, inputs: inputs)
     return rules.validate(draft, in: state, definition: definition)
   }
 
@@ -120,7 +120,7 @@ final class SharedMatchModel {
 
   func propose(_ inputs: [ScoreInput], note: String? = nil) async {
     guard canPropose, let state else { return }
-    let draft = RoundDraft(index: state.rounds.count, inputs: inputs, note: note)
+    let draft = RoundDraft(index: state.nextRoundIndex, inputs: inputs, note: note)
     latestRejectionReason = nil
     try? await session.propose(.roundCommitted(draft))
   }

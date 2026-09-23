@@ -176,7 +176,7 @@ final class LiveMatchModel {
         modifiers: participant.id == closedParticipantID ? [.closedRound] : []
       )
     }
-    let draft = RoundDraft(index: state.rounds.count, inputs: inputs)
+    let draft = RoundDraft(index: state.nextRoundIndex, inputs: inputs)
 
     if case .invalid(let errors) = rules.validate(draft, in: state, definition: definition) {
       validationErrorMessage = errors.first?.message

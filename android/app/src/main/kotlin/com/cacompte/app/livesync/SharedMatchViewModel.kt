@@ -96,6 +96,10 @@ class SharedMatchViewModel(
     }
 
     private fun apply(stamped: StampedEvent) {
+        // Doc 04 « Event sourcing » — dédoublonnage par id, comme `SharedMatchModel.apply` côté
+        // Apple : la confirmation d'une proposition optimiste porte le même id qu'elle, et l'hôte
+        // renvoie tout son journal à un pair en retard (`LiveSession.resendLocked`).
+        if (log.any { it.id == stamped.id }) return
         log = log + stamped
         val roundCountBefore = stateInternal?.rounds?.size ?: 0
         replay()
@@ -160,7 +164,7 @@ class SharedMatchViewModel(
         onCommitted: () -> Unit,
     ) {
         if (!canPropose) return
-        val draft = RoundDraft(index = state.rounds.size, inputs = inputs)
+        val draft = RoundDraft(index = state.nextRoundIndex, inputs = inputs)
         val rules = catalog.rules(state.gameID, state.rulesVersion)
         val validation = rules.validate(draft, state, definition)
         if (validation is ValidationResult.Invalid) {

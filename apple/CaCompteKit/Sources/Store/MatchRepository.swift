@@ -104,11 +104,10 @@ public struct MatchRepository {
   public func undoLastRound(in match: MatchRecord, catalog: GameCatalog, deviceID: String = "local")
     throws -> MatchState
   {
-    let events = try JSONDecoder().decode([StampedEvent].self, from: match.eventLogData)
-    let lastIndex = events.compactMap { stamped -> Int? in
-      if case .roundCommitted(let draft) = stamped.event { return draft.index }
-      return nil
-    }.max()
+    // La dernière manche *présente*, pas la plus grande jamais validée dans le journal : une
+    // manche déjà annulée y figure toujours, et une deuxième annulation de suite la visait à
+    // nouveau au lieu de retirer la précédente (sans effet visible).
+    let lastIndex = try loadState(match, catalog: catalog).rounds.map(\.index).max()
 
     guard let lastIndex else {
       return try loadState(match, catalog: catalog)

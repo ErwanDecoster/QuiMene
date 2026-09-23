@@ -48,6 +48,14 @@ data class MatchState internal constructor(
         ): MatchState = MatchState(matchID, gameID, rulesVersion, variants, participants)
     }
 
+    /** Numéro de la prochaine manche : un de plus que le plus grand numéro existant, jamais
+     * `rounds.size`. Le reducer *remplace* une manche de même numéro ; une partie dont les
+     * numéros ont un trou (manche d'un pair perdue en route, acceptée ensuite hors séquence par
+     * un hôte d'avant le contrôle `LiveSession.hostCommitLocked`) voyait sinon chaque nouvelle
+     * manche écraser la dernière — totaux qui bougent, « Manche 8 » figé. Miroir de
+     * `MatchState.nextRoundIndex` côté Apple. */
+    val nextRoundIndex: Int get() = (rounds.maxOfOrNull { it.index } ?: -1) + 1
+
     fun totals(): Map<UUID, Int> {
         val result = LinkedHashMap<UUID, Int>()
         for (participant in participants) result[participant.id] = 0

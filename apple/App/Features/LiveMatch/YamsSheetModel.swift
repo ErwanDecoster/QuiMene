@@ -79,7 +79,7 @@ final class YamsSheetModel {
     let detail = ScoreDetail(
       payload: try! JSONEncoder().encode(YamsCategoryDetail(categoryID: categoryID)))
     let draft = RoundDraft(
-      index: state.rounds.count,
+      index: state.nextRoundIndex,
       inputs: [ScoreInput(participantID: participantID, rawValue: rawValue, detail: detail)]
     )
 

@@ -199,7 +199,7 @@ class LiveMatchViewModel(
         inputs: List<ScoreInput>,
         onCommitted: () -> Unit,
     ) {
-        val draft = RoundDraft(index = state.rounds.size, inputs = inputs)
+        val draft = RoundDraft(index = state.nextRoundIndex, inputs = inputs)
 
         val validation = rules.validate(draft, state, definition)
         if (validation is ValidationResult.Invalid) {

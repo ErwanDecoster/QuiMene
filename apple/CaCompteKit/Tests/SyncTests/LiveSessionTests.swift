@@ -173,6 +173,52 @@ struct LiveSessionTests {
     #expect(rejections.count == 1)
   }
 
+  @Test("L'hôte rejette une manche au numéro déjà pris et renvoie son journal au pair en retard")
+  func hostRejectsStaleRoundAndResyncsPeer() async throws {
+    let participants = [Participant(displayName: "Marion", seatIndex: 0)]
+    let catalog = makeCatalog()
+    // L'hôte a déjà validé la manche 0 — celle que le pair a manquée (remontée : +10 saisis sur
+    // l'hôte, écrasés par +1 saisi ensuite sur le pair).
+    let hostRound = StampedEvent(
+      lamport: 1,
+      deviceID: "host-device",
+      occurredAt: Date(timeIntervalSince1970: 1),
+      event: .roundCommitted(
+        RoundDraft(
+          index: 0, inputs: [ScoreInput(participantID: participants[0].id, rawValue: 10)]))
+    )
+    let hostLog = makeInitialLog(participants: participants) + [hostRound]
+    let sessionID = UUID()
+
+    let host = LiveSession(deviceID: "host-device", catalog: catalog)
+    try await host.startHosting(log: hostLog, sessionID: sessionID, pairingCode: "042817")
+
+    let (hostChannel, peerChannel) = InMemoryChannel.pair()
+    await host.acceptConnection(hostChannel)
+
+    let contributor = LiveSession(deviceID: "peer-device", catalog: catalog)
+    try await contributor.attachToHost(
+      peerChannel,
+      sessionID: sessionID,
+      pairingCode: "042817",
+      requestedRole: .contributor,
+      deviceName: "Théo",
+      appVersion: "1.0"
+    )
+    _ = await collectFirst(2, from: contributor.events)  // welcome
+
+    let stale = RoundDraft(
+      index: 0, inputs: [ScoreInput(participantID: participants[0].id, rawValue: 1)])
+    try await contributor.propose(.roundCommitted(stale))
+
+    let rejections = await collectFirst(1, from: contributor.rejections)
+    #expect(rejections.count == 1)
+
+    // Application optimiste, puis le journal complet de l'hôte en rattrapage.
+    let events = await collectFirst(3, from: contributor.events)
+    #expect(events.suffix(2).map(\.id) == hostLog.map(\.id))
+  }
+
   @Test(
     "L'hôte peut changer de partie sans rompre la connexion d'un pair, ni changer la clé de chiffrement"
   )

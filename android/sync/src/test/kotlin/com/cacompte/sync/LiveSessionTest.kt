@@ -174,6 +174,50 @@ class LiveSessionTest {
         }
 
     @Test
+    fun `the host rejects a round whose number is already taken and resends its log to the lagging peer`() =
+        runTest {
+            val participants = listOf(Participant(displayName = "Marion", seatIndex = 0))
+            val catalog = makeCatalog()
+            // L'hôte a déjà validé la manche 0 — celle que le pair a manquée (remontée : +10 saisis
+            // sur l'hôte, écrasés par +1 saisi ensuite sur le pair).
+            val hostRound =
+                StampedEvent(
+                    lamport = 1uL,
+                    deviceID = "host-device",
+                    occurredAt = Instant.ofEpochSecond(1),
+                    event =
+                        MatchEvent.RoundCommitted(
+                            RoundDraft(
+                                index = 0,
+                                inputs = listOf(ScoreInput(participantID = participants[0].id, rawValue = 10)),
+                            ),
+                        ),
+                )
+            val hostLog = makeInitialLog(participants) + hostRound
+            val sessionID = UUID.randomUUID()
+
+            val host = LiveSession(deviceID = "host-device", catalog = catalog, scope = backgroundScope)
+            host.startHosting(hostLog, sessionID, "042817")
+
+            val (hostChannel, peerChannel) = InMemoryChannel.pair()
+            host.acceptConnection(hostChannel)
+
+            val contributor = LiveSession(deviceID = "peer-device", catalog = catalog, scope = backgroundScope)
+            contributor.attachToHost(peerChannel, sessionID, "042817", Role.Contributor, "Théo", "1.0")
+            contributor.events.take(2).toList() // welcome.
+
+            val stale =
+                RoundDraft(index = 0, inputs = listOf(ScoreInput(participantID = participants[0].id, rawValue = 1)))
+            val rejectionDeferred = async { contributor.rejections.take(1).toList() }
+            val eventsDeferred = async { contributor.events.take(3).toList() }
+            contributor.propose(MatchEvent.RoundCommitted(stale))
+
+            rejectionDeferred.await() shouldHaveSize 1
+            // Application optimiste, puis le journal complet de l'hôte en rattrapage.
+            eventsDeferred.await().takeLast(2).map { it.id } shouldBe hostLog.map { it.id }
+        }
+
+    @Test
     fun `the host can switch matches without breaking the connection or changing the encryption key`() =
         runTest {
             val participantsA =

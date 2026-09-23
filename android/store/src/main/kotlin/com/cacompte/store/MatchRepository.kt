@@ -115,12 +115,11 @@ class MatchRepository(
         catalog: GameCatalog,
         deviceID: String = "local",
     ): MatchState {
-        val events = decodeEvents(match.eventLogData)
+        // La dernière manche *présente*, pas la plus grande jamais validée dans le journal : une
+        // manche déjà annulée y figure toujours, et une deuxième annulation de suite la visait à
+        // nouveau au lieu de retirer la précédente (sans effet visible).
         val lastIndex =
-            events
-                .mapNotNull { stamped ->
-                    (stamped.event as? MatchEvent.RoundCommitted)?.draft?.index
-                }.maxOrNull() ?: return loadState(match, catalog)
+            loadState(match, catalog).rounds.maxOfOrNull { it.index } ?: return loadState(match, catalog)
         return appendEvent(MatchEvent.RoundRemoved(lastIndex), match, catalog, deviceID)
     }
 

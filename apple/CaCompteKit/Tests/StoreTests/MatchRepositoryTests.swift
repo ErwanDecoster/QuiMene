@@ -118,6 +118,42 @@ struct MatchRepositoryTests {
     #expect(afterUndo.rounds.isEmpty)
   }
 
+  @Test("Une partie aux numéros de manche troués continue d'avancer, et deux annulations de suite en retirent deux")
+  func gappedRoundIndicesStillAdvance() throws {
+    let schema = Schema(CaCompteSchemaV1.models)
+    let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+    let container = try ModelContainer(for: schema, configurations: [config])
+    let repository = MatchRepository(context: container.mainContext)
+    let catalog = makeCatalog(roundLimit: 1000)
+
+    let seeds = [
+      MatchRepository.ParticipantSeed(
+        player: nil, nickname: "Alice", avatarKind: "symbol", avatarValue: "hare.fill",
+        paletteID: "1")
+    ]
+    let match = try repository.createMatch(
+      gameID: "dummy", rulesVersion: 1, variants: VariantSelection(), seeds: seeds)
+    let id = try #require(try repository.loadState(match, catalog: catalog).participants.first?.id)
+    func commit(_ index: Int) throws -> MatchState {
+      try repository.commitRound(
+        RoundDraft(index: index, inputs: [ScoreInput(participantID: id, rawValue: 1)]),
+        to: match, catalog: catalog)
+    }
+
+    // Manche 1 perdue en route : l'ancien hôte acceptait la 2 hors séquence (remontée).
+    _ = try commit(0)
+    let gapped = try commit(2)
+    #expect(gapped.rounds.count == 2)
+    #expect(gapped.nextRoundIndex == 3)
+
+    let advanced = try commit(gapped.nextRoundIndex)
+    #expect(advanced.rounds.count == 3, "la nouvelle manche s'ajoute au lieu d'écraser la dernière")
+
+    _ = try repository.undoLastRound(in: match, catalog: catalog)
+    let afterSecondUndo = try repository.undoLastRound(in: match, catalog: catalog)
+    #expect(afterSecondUndo.rounds.map(\.index) == [0])
+  }
+
   @Test("endMatchManually termine la partie et écrit le classement final (doc 05 « Jeu libre »)")
   func endMatchManuallyWritesFinalStandings() throws {
     let schema = Schema(CaCompteSchemaV1.models)
