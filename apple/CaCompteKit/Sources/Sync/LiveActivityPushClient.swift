@@ -16,38 +16,34 @@ public enum LiveActivityPushClient {
   private static let logger = Logger(
     subsystem: "com.cacompte.app", category: "LiveActivityPushClient")
 
-  private struct TokenRow: Encodable {
+  /// Paramètres de `cacompte_register_live_activity_token` — clés encodées = noms SQL.
+  private struct RegisterParams: Encodable {
     let activityKey: String
     let deviceID: String
     let pushToken: String
 
     enum CodingKeys: String, CodingKey {
-      case activityKey = "activity_key"
-      case deviceID = "device_id"
-      case pushToken = "push_token"
+      case activityKey = "p_activity_key"
+      case deviceID = "p_device_id"
+      case pushToken = "p_push_token"
     }
   }
 
   /// Doc utilisateur — appelé à chaque rotation de jeton signalée par
   /// `Activity.pushTokenUpdates` (création de la Live Activity, ou rotation ultérieure par
-  /// iOS) : `upsert` sur la clé primaire `(activity_key, device_id)` remplace toujours l'ancien
-  /// jeton plutôt que d'en accumuler plusieurs par appareil. Doc 09 « Fin de partie » —
+  /// iOS) : la fonction SQL remplace toujours l'ancien jeton de `(activity_key, device_id)`
+  /// plutôt que d'en accumuler plusieurs par appareil. Doc 09 « Fin de partie » —
   /// `activityKey` identifie la session de partage (stable au changement de partie), pas
   /// forcément la seule partie courante — voir `MatchLiveActivityController.activityKey`.
-  ///
-  /// `returning: .minimal` explicite — sans policy `select` pour l'anon sur cette table
-  /// (volontaire, `supabase/migrations`), le comportement par défaut de `upsert`
-  /// (`.representation`, qui tente de relire la ligne pour construire la réponse) échoue avec
-  /// une erreur RLS trompeuse même quand l'insert a réellement eu lieu.
+  /// La table elle-même n'est plus accessible à l'anon (migration
+  /// `secure_cacompte_live_activity_tokens`).
   public static func registerToken(activityKey: String, deviceID: String, pushToken: String) async {
     do {
-      try await client.from("cacompte_live_activity_tokens")
-        .upsert(
-          TokenRow(activityKey: activityKey, deviceID: deviceID, pushToken: pushToken),
-          onConflict: "activity_key,device_id",
-          returning: .minimal
-        )
-        .execute()
+      try await client.rpc(
+        "cacompte_register_live_activity_token",
+        params: RegisterParams(activityKey: activityKey, deviceID: deviceID, pushToken: pushToken)
+      )
+      .execute()
       logger.info(
         "registerToken OK key=\(activityKey, privacy: .public) device=\(deviceID, privacy: .public)"
       )
