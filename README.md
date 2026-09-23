@@ -1,7 +1,9 @@
 # Ça Compte
 
-Application de suivi de scores pour jeux de société, tour par tour, **100 % hors-ligne** et
-**sans serveur**.
+Application de suivi de scores pour jeux de société, tour par tour, **sans compte** et
+**hors-ligne pour tout ce qui se joue sur un seul appareil**. Seuls le partage en direct, les
+profils partagés et la mise à jour de l'écran verrouillé passent par Supabase (données
+transitoires, purgées automatiquement), voir [ADR-0016](docs/13-decisions-adr.md).
 
 Apple d'abord (iPhone + iPad, SwiftUI + SwiftData), Android ensuite (Kotlin + Compose + Room),
 avec une **spécification de règles partagée** qui garantit que les deux plateformes calculent
