@@ -124,12 +124,15 @@ create table cacompte_shared_match_summaries (
 
 Clé primaire composite plutôt qu'un `id` généré, pour que le push soit un `upsert` idempotent
 (`SharedProfileTransport.push`) : une tentative retentée après une réponse perdue ne duplique
-jamais la ligne, même si le serveur avait bien reçu la première. Même politique RLS que le reste
-(`anon`, connaître l'id suffit — cohérent avec le seuil de sécurité déjà accepté doc 09). Purge de
-sécurité à 30 jours (comme `cacompte_open_games`, en plus généreux puisqu'un ami peut rester hors
-ligne des semaines) pour le cas où personne ne vient jamais la récupérer — l'index existe
-(`cacompte_shared_match_summaries_created_at_idx`), le job de purge lui-même reste à brancher
-séparément (même remarque que `cacompte-live-activity-sweep`, hors de ce dépôt).
+jamais la ligne, même si le serveur avait bien reçu la première. Connaître l'id suffit (cohérent
+avec le seuil de sécurité déjà accepté doc 09), mais *seulement* l'id : la table n'a aucune policy
+`anon` (RLS ne sait pas exiger un filtre, et des policies `using (true)` laissaient lister ou vider
+toute la table), l'app passe par trois fonctions `security definer` qui prennent l'identifiant en
+paramètre — `cacompte_push_shared_match_summaries`, `cacompte_fetch_shared_match_summaries`,
+`cacompte_delete_shared_match_summary`. Purge de sécurité à 30 jours (comme `cacompte_open_games`,
+en plus généreux puisqu'un ami peut rester hors ligne des semaines) pour le cas où personne ne
+vient jamais la récupérer : job `pg_cron` quotidien déclaré dans la migration
+`secure_cacompte_shared_match_summaries`, appuyé sur `cacompte_shared_match_summaries_created_at_idx`.
 
 `MatchRecord.pendingSharedProfileSync` marque une partie conclue avec au moins un participant lié,
 mis à jour à chaque conclusion (`MatchRepository.persist`, jamais figé à la création). Côté ami,
@@ -191,9 +194,8 @@ supplémentaire.
    qu'un résumé) ; alimente aussi « Statistiques de groupe » ([roadmap](12-roadmap.md), face-à-face
    entre profils liés).
 
-Reste manuel, hors de ce dépôt : brancher une purge programmée (30 jours) sur
-`cacompte_shared_match_summaries`, comme `cacompte-live-activity-sweep` pour les Live Activity —
-l'index existe, pas le job.
+Purge programmée (30 jours) sur `cacompte_shared_match_summaries` : job `pg_cron` de la migration
+`secure_cacompte_shared_match_summaries`.
 
 ## Limites de confiance — ce que `sharedProfileID` prouve, et ce qu'il ne prouve pas
 
@@ -330,7 +332,7 @@ plusieurs amis suivent la même personne (cas normal et voulu, voir plus haut), 
 supprimait la ligne avant que les autres n'aient pu la récupérer, leur faisant perdre la partie
 silencieusement. Seul l'appareil qui fait autorité sur un identifiant (le sien, jamais partagé par
 construction désormais) supprime après lecture ; les autres laissent la purge programmée (30
-jours, toujours hors de ce dépôt) s'en charger.
+jours, `pg_cron`) s'en charger.
 
 **Effet de bord additionnel** : la fiche partagée d'un appareil apparaît maintenant toujours en
 tête des listes de joueurs (`PlayersListView`, présélection de `MatchSetupModel`), quel que soit

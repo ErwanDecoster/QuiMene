@@ -15,32 +15,61 @@ public struct SharedProfileTransport: Sendable {
       supabaseURL: SupabaseSyncConfig.projectURL, supabaseKey: SupabaseSyncConfig.anonKey)
   }
 
-  /// `upsert` sur `(match_id, shared_profile_id)` plutôt qu'un simple `insert` : un push
+  /// Upsert sur `(match_id, shared_profile_id)` (côté SQL) plutôt qu'un simple `insert` : un push
   /// retenté après une réponse perdue (mais un succès côté serveur) ne doit jamais dupliquer la
   /// ligne — l'appelant (`SharedProfileSyncCoordinator`) ne sait retenter qu'en entier, pas
   /// distinguer « jamais reçu » de « reçu mais confirmation perdue ».
   public func push(_ rows: [SharedMatchSummaryRow]) async throws {
     guard !rows.isEmpty else { return }
-    try await client.from("cacompte_shared_match_summaries")
-      .upsert(rows, onConflict: "match_id,shared_profile_id")
+    try await client.rpc("cacompte_push_shared_match_summaries", params: PushParams(rows: rows))
       .execute()
   }
 
   public func fetchPending(for sharedProfileIDs: [UUID]) async throws -> [SharedMatchSummaryRow] {
     guard !sharedProfileIDs.isEmpty else { return [] }
-    return try await client.from("cacompte_shared_match_summaries")
-      .select()
-      .in("shared_profile_id", values: sharedProfileIDs.map(\.uuidString))
-      .execute()
-      .value
+    return try await client.rpc(
+      "cacompte_fetch_shared_match_summaries",
+      params: FetchParams(sharedProfileIDs: sharedProfileIDs)
+    )
+    .execute()
+    .value
   }
 
   public func delete(matchID: UUID, sharedProfileID: UUID) async throws {
-    try await client.from("cacompte_shared_match_summaries")
-      .delete()
-      .eq("match_id", value: matchID.uuidString)
-      .eq("shared_profile_id", value: sharedProfileID.uuidString)
-      .execute()
+    try await client.rpc(
+      "cacompte_delete_shared_match_summary",
+      params: DeleteParams(matchID: matchID, sharedProfileID: sharedProfileID)
+    )
+    .execute()
+  }
+}
+
+// Doc utilisateur — la table n'est plus accessible directement (aucune policy `anon`, voir la
+// migration `secure_cacompte_shared_match_summaries`) : seules ces trois fonctions, qui exigent
+// l'identifiant partagé, y donnent accès. Les clés encodées sont les noms des paramètres SQL.
+private struct PushParams: Encodable {
+  let rows: [SharedMatchSummaryRow]
+
+  enum CodingKeys: String, CodingKey {
+    case rows = "p_rows"
+  }
+}
+
+private struct FetchParams: Encodable {
+  let sharedProfileIDs: [UUID]
+
+  enum CodingKeys: String, CodingKey {
+    case sharedProfileIDs = "p_shared_profile_ids"
+  }
+}
+
+private struct DeleteParams: Encodable {
+  let matchID: UUID
+  let sharedProfileID: UUID
+
+  enum CodingKeys: String, CodingKey {
+    case matchID = "p_match_id"
+    case sharedProfileID = "p_shared_profile_id"
   }
 }
 
