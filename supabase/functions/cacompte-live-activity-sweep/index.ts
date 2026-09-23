@@ -19,13 +19,18 @@ const APNS_KEY_ID = Deno.env.get("APNS_KEY_ID")!;
 const APNS_TEAM_ID = Deno.env.get("APNS_TEAM_ID")!;
 const APNS_PRIVATE_KEY = Deno.env.get("APNS_PRIVATE_KEY")!;
 const APNS_BUNDLE_ID = Deno.env.get("APNS_BUNDLE_ID") ?? "com.cacompte.app";
-// Doc utilisateur — `CaCompte.entitlements` déclare `aps-environment: development` tant que l'app
-// n'est distribuée qu'en debug/TestFlight interne ; il faudra basculer cette variable (et
-// l'entitlement) sur "production" au passage App Store / TestFlight public.
-const APNS_ENVIRONMENT = Deno.env.get("APNS_ENVIRONMENT") ?? "development";
-const APNS_HOST = APNS_ENVIRONMENT === "production"
-  ? "api.push.apple.com"
-  : "api.sandbox.push.apple.com";
+// Doc utilisateur — un jeton ActivityKit n'est valide que sur le serveur APNs de l'environnement
+// qui l'a émis : sandbox pour une app lancée depuis Xcode, production pour TestFlight et l'App
+// Store (Xcode réécrit `aps-environment` à l'export, l'entitlement du repo reste "development").
+// Les deux coexistent en permanence (l'auteur en debug, les testeurs et le public en production),
+// donc par défaut ("auto") on tente la production puis on retombe sur le sandbox quand Apple
+// répond `BadDeviceToken`. "production" ou "development" forcent un seul serveur.
+const APNS_ENVIRONMENT = Deno.env.get("APNS_ENVIRONMENT") ?? "auto";
+const APNS_HOSTS = APNS_ENVIRONMENT === "production"
+  ? ["api.push.apple.com"]
+  : APNS_ENVIRONMENT === "development"
+  ? ["api.sandbox.push.apple.com"]
+  : ["api.push.apple.com", "api.sandbox.push.apple.com"];
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -95,18 +100,32 @@ async function sendToToken(pushToken: string, body: { event: "update" | "end"; c
       "content-state": body.contentState,
     },
   };
-  const response = await fetch(`https://${APNS_HOST}/3/device/${pushToken}`, {
-    method: "POST",
-    headers: {
-      authorization: `bearer ${token}`,
-      "apns-topic": `${APNS_BUNDLE_ID}.push-type.liveactivity`,
-      "apns-push-type": "liveactivity",
-      "apns-priority": "10",
-    },
-    body: JSON.stringify(payload),
-  });
-  if (response.ok) return { ok: true, shouldForget: false };
-  const shouldForget = response.status === 400 || response.status === 410;
+  let response: Response | null = null;
+  let reason: string | undefined;
+  for (const host of APNS_HOSTS) {
+    response = await fetch(`https://${host}/3/device/${pushToken}`, {
+      method: "POST",
+      headers: {
+        authorization: `bearer ${token}`,
+        "apns-topic": `${APNS_BUNDLE_ID}.push-type.liveactivity`,
+        "apns-push-type": "liveactivity",
+        "apns-priority": "10",
+      },
+      body: JSON.stringify(payload),
+    });
+    if (response.ok) return { ok: true, shouldForget: false };
+    // Doc utilisateur — la raison d'Apple est la seule piste quand un écran verrouillé ne suit
+    // plus : visible dans les logs de la fonction (tableau de bord Supabase).
+    reason = (await response.json().catch(() => ({})))?.reason;
+    console.warn(`APNs ${host} status=${response.status} reason=${reason} token=${pushToken.slice(0, 8)}…`);
+    // Doc utilisateur — un jeton de l'autre environnement ne produit pas toujours
+    // `BadDeviceToken` : une clé APNs restreinte à un seul environnement répond 403
+    // `BadEnvironmentKeyInToken` sur l'autre serveur. On ne s'arrête donc que sur 410
+    // (`Unregistered` : bon serveur, jeton mort) ; le coût d'un essai inutile est un appel de plus.
+    if (response.status === 410) break;
+  }
+  if (!response) return { ok: false, shouldForget: false };
+  const shouldForget = response.status === 410 || reason === "BadDeviceToken";
   return { ok: false, shouldForget };
 }
 
