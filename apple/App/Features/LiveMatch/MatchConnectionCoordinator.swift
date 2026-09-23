@@ -87,13 +87,25 @@ final class MatchConnectionCoordinator {
   /// sûr. Sans effet visible si tout allait déjà bien : l'ancien `sharedModel` reste affiché
   /// jusqu'à ce que le nouveau soit prêt (voir `rejoin`), pas de flash d'écran de chargement.
   private func reconnectIfNeeded() async {
-    guard sharedModel != nil else { return }
-    _ = await reconnectNow()
+    guard let model = sharedModel else { return }
+    // L'ancienne connexion est déjà fermée à ce stade (voir `rejoin`) : un échec ici doit
+    // relancer la reprise automatique, sinon le pair resterait figé sur un modèle déconnecté.
+    if await !reconnectNow(), sharedModel === model {
+      scheduleAutoRetry(for: model)
+    }
   }
 
   private func rejoin(_ persisted: PersistedSession) async throws -> Role {
     attemptGeneration += 1
     let myGeneration = attemptGeneration
+
+    // Doc utilisateur — remontée : « après réouverture, les scores reviennent mais plus aucune
+    // mise à jour ». L'ancienne connexion était fermée *après* l'ouverture de la nouvelle ; or
+    // l'hôte identifie un pair par son `deviceID`, identique sur les deux. Le `goodbye` et la
+    // sortie de présence de l'ancienne arrivaient donc chez l'hôte après le `hello` de la
+    // nouvelle, et il retirait la connexion toute neuve : plus rien ne partait vers ce pair.
+    // Fermer d'abord ; le modèle précédent reste affiché (dernier état connu) jusqu'au nouveau.
+    await sharedModel?.closeConnection()
 
     let transport = SupabaseTransport(
       deviceID: DeviceIdentity.current, deviceName: persisted.deviceName)
@@ -128,7 +140,7 @@ final class MatchConnectionCoordinator {
     }
     sharedModel = newModel
     persisted.save()
-    await previous?.closeConnection()
+    await previous?.closeConnection()  // déjà fermée en tête de `rejoin`, sans effet sauf course
     return assignedRole
   }
 

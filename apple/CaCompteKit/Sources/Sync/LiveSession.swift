@@ -432,6 +432,16 @@ public actor LiveSession {
     self.hostConnection = nil
   }
 
+  /// Remplacement de connexion (reconnexion au retour au premier plan) : ferme le socket sans
+  /// `goodbye`. L'hôte identifie le pair par son `deviceID`, le même sur la connexion suivante —
+  /// un `goodbye` traité après coup lui ferait retirer (ou ignorer) la nouvelle. La sortie de
+  /// présence suffit à lui faire oublier l'ancienne.
+  public func disconnect() async {
+    guard role != .host, let hostConnection else { return }
+    await hostConnection.close()
+    self.hostConnection = nil
+  }
+
   private func listenToHost(_ session: any TransportSession) async {
     for await data in session.incoming {
       await handleFromHost(data)

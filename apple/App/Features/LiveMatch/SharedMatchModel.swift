@@ -134,14 +134,16 @@ final class SharedMatchModel {
     if let matchID = state?.matchID {
       MatchLiveActivityController.stopTracking(matchID: matchID)
     }
-    await closeConnection()
+    await session.leave()
+    for task in tasks { task.cancel() }
+    tasks = []
   }
 
   /// Doc utilisateur P9 — ferme la connexion transport sans toucher à la Live Activity : utilisé
   /// quand `MatchConnectionCoordinator` remplace cette session par une nouvelle (reconnexion),
   /// où l'utilisateur n'a pas quitté la partie, seule la connexion sous-jacente change.
   func closeConnection() async {
-    await session.leave()
+    await session.disconnect()
     for task in tasks { task.cancel() }
     tasks = []
   }
