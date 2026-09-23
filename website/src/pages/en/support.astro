@@ -1,0 +1,110 @@
+---
+import Base from '../../layouts/Base.astro';
+import { site } from '../../site';
+
+const faq = [
+  {
+    id: 'share',
+    q: 'Share a game with other phones',
+    a: 'During the game, open the menu at the top of the screen, then “Share Live”. A six-digit code and a QR code appear. On the other device, open the “Join” tab and enter the code or scan the QR code. Each device needs an Internet connection.',
+  },
+  {
+    id: 'connection',
+    q: 'The shared game stopped updating',
+    a: 'Coming back to the app usually fixes it: the connection restores itself when the app returns to the foreground. Otherwise, tap “Retry Now” under the lost-connection banner. If the device that started sharing was closed, start sharing again from that device.',
+  },
+  {
+    id: 'lock-screen',
+    q: 'The score does not show on the Lock Screen',
+    a: `Check that “Live Activities” is on in Settings › ${site.name}. The display ends by itself 30 minutes after the last round.`,
+  },
+  {
+    id: 'undo',
+    q: 'Fix a round entered by mistake',
+    a: '“Undo the last round”, in the top bar of the game screen, removes the most recent round. You can repeat it.',
+  },
+  {
+    id: 'new-device',
+    q: 'Get your games on a new device',
+    a: 'Turn on “iCloud Sync” in the app’s Settings (History tab), on both devices, with the same Apple Account.',
+  },
+];
+---
+
+<Base title="Support" lang="en" description={`Help and contact for ${site.name}.`} alternate="/assistance">
+  <article class="container prose page">
+    <h1>Support</h1>
+    <p class="muted">Answers to common questions, and a contact if they are not enough.</p>
+
+    <h2>Frequently asked questions</h2>
+    {
+      faq.map((item) => (
+        <details class="card faq" id={item.id}>
+          <summary>{item.q}</summary>
+          <p class="muted">{item.a}</p>
+        </details>
+      ))
+    }
+
+    <h2 id="request-a-game">Request a game</h2>
+    <p>
+      A game is missing from the catalog? The app offers to write to us when a search in the Games
+      tab finds nothing, or from Settings. Otherwise, write to
+      <a href={`mailto:${site.email}?subject=${encodeURIComponent(`Game request — ${site.name}`)}`}>{site.email}</a>
+      with the name of the game and, if possible, its scoring rules.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      For a problem, a suggestion or a question about your data:
+      <a href={`mailto:${site.email}`}>{site.email}</a>. Mentioning your device model and iOS
+      version helps us answer faster.
+    </p>
+  </article>
+</Base>
+
+<style>
+  .page {
+    padding-block: var(--space-2xl);
+  }
+
+  .faq {
+    padding: 0;
+    margin-bottom: var(--space-sm);
+  }
+
+  .faq summary {
+    cursor: pointer;
+    min-height: 56px;
+    display: flex;
+    align-items: center;
+    padding: var(--space-md) var(--space-lg);
+    font-weight: 600;
+    list-style: none;
+  }
+
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq summary::after {
+    content: '';
+    margin-left: auto;
+    padding-left: var(--space-lg);
+    width: 0.5rem;
+    height: 0.5rem;
+    border-right: 2px solid var(--text-tertiary);
+    border-bottom: 2px solid var(--text-tertiary);
+    transform: rotate(45deg);
+    transition: transform var(--motion-micro) ease-out;
+  }
+
+  .faq[open] summary::after {
+    transform: rotate(-135deg);
+  }
+
+  .faq p {
+    margin: 0;
+    padding: 0 var(--space-lg) var(--space-lg);
+  }
+</style>

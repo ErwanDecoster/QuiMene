@@ -1,0 +1,148 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../site';
+---
+
+<Base
+  title="Confidentialité"
+  description={`Politique de confidentialité de ${site.name} : quelles données quittent l'appareil, pourquoi, et combien de temps.`}
+  alternate="/en/privacy"
+>
+  <article class="container prose page">
+    <h1>Politique de confidentialité</h1>
+    <p class="muted">Dernière mise à jour : {site.privacyUpdated.fr}</p>
+
+    <div class="summary">
+      <p><strong>En résumé</strong></p>
+      <ul>
+        <li>Aucun compte à créer, aucune publicité, aucune mesure d’audience, aucun pistage.</li>
+        <li>Les parties, les joueurs et l’historique restent sur l’appareil et dans votre iCloud.</li>
+        <li>
+          Trois fonctions facultatives passent par un serveur, uniquement le temps nécessaire : le
+          partage en direct, le score sur l’écran verrouillé et les profils partagés.
+        </li>
+        <li>Aucune donnée n’est vendue ni utilisée à des fins publicitaires.</li>
+      </ul>
+    </div>
+
+    <h2>Qui est responsable</h2>
+    <p>
+      {site.name} est éditée par {site.publisher}. Pour toute question sur vos données :
+      <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+
+    <h2>Ce qui reste sur votre appareil</h2>
+    <p>
+      Les parties, les manches, les joueurs, leurs avatars et l’historique sont enregistrés sur
+      l’appareil. Si iCloud est activé, ils sont aussi synchronisés dans votre base iCloud privée,
+      gérée par Apple, entre vos propres appareils. L’éditeur n’y a aucun accès.
+    </p>
+    <p>
+      L’appareil photo sert uniquement à scanner un QR code (rejoindre une partie, lier un profil).
+      Aucune image n’est enregistrée ni envoyée.
+    </p>
+
+    <h2>Ce qui quitte votre appareil, et pourquoi</h2>
+    <p>
+      Les trois fonctions ci-dessous utilisent Supabase (hébergement de base de données et de
+      messagerie en temps réel, région : {site.supabaseRegion.fr}). Elles ne s’activent que si vous
+      les utilisez.
+    </p>
+
+    <h3>Partage d’une partie en direct</h3>
+    <p>
+      Pendant qu’une partie est partagée, le serveur conserve : le code d’appairage à six chiffres,
+      un identifiant de session aléatoire, l’identifiant de la partie, le jeu, le nombre de joueurs,
+      le nom générique de l’appareil (par exemple « iPhone ») et sa plateforme. Ces informations
+      permettent aux autres appareils de retrouver la partie avec le code.
+    </p>
+    <p>
+      Le contenu de la partie (pseudos, scores, manches) transite entre les appareils
+      <strong>chiffré de bout en bout</strong>, avec une clé dérivée du code d’appairage. Il n’est
+      pas stocké, et le serveur ne peut pas le lire.
+    </p>
+
+    <h3>Score sur l’écran verrouillé (Activité en direct)</h3>
+    <p>
+      Pour mettre à jour l’écran verrouillé et la Dynamic Island pendant que l’app est en
+      arrière-plan, le serveur conserve le jeton de notification fourni par Apple, un identifiant
+      d’appareil aléatoire créé par l’app, et le dernier classement affiché (pseudos et scores des
+      quatre premiers). La mise à jour est acheminée par le service de notifications d’Apple. Cette
+      fonction se désactive dans Réglages › {site.name} › Activités en direct.
+    </p>
+
+    <h3>Profils partagés</h3>
+    <p>
+      Quand vous liez la fiche d’un joueur avec un ami (par QR code), le résumé de chaque partie
+      terminée à laquelle il a participé (pseudo, avatar simple, rang et score de chaque joueur) est
+      déposé sur le serveur pour son appareil, qui le récupère à sa prochaine ouverture de l’app.
+    </p>
+
+    <h2>Durées de conservation</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Données</th><th scope="col">Supprimées</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Partie partagée en direct</td>
+            <td>À l’arrêt du partage, et au plus tard 24 heures après son début</td>
+          </tr>
+          <tr>
+            <td>Écran verrouillé</td>
+            <td>Au plus tard 30 minutes après la dernière manche</td>
+          </tr>
+          <tr>
+            <td>Résumé pour un profil partagé</td>
+            <td>Dès sa récupération, et au plus tard après 30 jours</td>
+          </tr>
+          <tr>
+            <td>Données sur l’appareil et dans iCloud</td>
+            <td>Quand vous les supprimez, ou en supprimant l’app et ses données iCloud</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Base légale</h2>
+    <p>
+      Les données envoyées au serveur sont traitées uniquement pour fournir la fonction que vous
+      avez choisi d’utiliser (article 6.1.b du RGPD). Elles ne sont jamais rattachées à une identité :
+      l’app n’a pas de compte.
+    </p>
+
+    <h2>Destinataires</h2>
+    <ul>
+      <li>Supabase, pour l’hébergement des données transitoires décrites ci-dessus.</li>
+      <li>Apple, pour iCloud et l’acheminement des mises à jour de l’écran verrouillé.</li>
+    </ul>
+    <p>Aucun autre tiers ne reçoit de données.</p>
+
+    <h2>Vos droits</h2>
+    <p>
+      Vous disposez d’un droit d’accès, de rectification, d’effacement et d’opposition. Comme l’app
+      n’a pas de compte, les données du serveur ne sont pas rattachées à votre identité et
+      disparaissent d’elles-mêmes dans les délais ci-dessus. Pour toute demande :
+      <a href={`mailto:${site.email}`}>{site.email}</a>. Vous pouvez aussi adresser une réclamation
+      à la CNIL (<a href="https://www.cnil.fr">cnil.fr</a>).
+    </p>
+
+    <h2>Enfants</h2>
+    <p>
+      L’app ne demande aucune information personnelle et convient à tous les âges. Aucune donnée
+      n’est collectée spécifiquement auprès des enfants.
+    </p>
+
+    <h2>Modifications</h2>
+    <p>
+      Toute modification de cette politique est publiée sur cette page, avec sa date de mise à jour.
+    </p>
+  </article>
+</Base>
+
+<style>
+  .page {
+    padding-block: var(--space-2xl);
+  }
+</style>

@@ -1,0 +1,35 @@
+---
+// Logo « barre de comptage » (charte §11.1) : quatre traits verticaux barrés d'une diagonale,
+// extrémités arrondies. Reproduit l'icône d'app (AppIcon-light.png), fond encre.
+interface Props {
+  size?: number;
+  label?: string;
+}
+const { size = 40, label } = Astro.props;
+---
+
+<svg
+  class="mark"
+  width={size}
+  height={size}
+  viewBox="0 0 1024 1024"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <rect width="1024" height="1024" rx="230" fill="#1F4899"></rect>
+  <g stroke="#FFFFFF" stroke-width="50" stroke-linecap="round" fill="none">
+    <line x1="306" y1="313" x2="306" y2="710"></line>
+    <line x1="430" y1="313" x2="430" y2="710"></line>
+    <line x1="553" y1="313" x2="553" y2="710"></line>
+    <line x1="677" y1="313" x2="677" y2="710"></line>
+    <line x1="243" y1="610" x2="740" y2="410"></line>
+  </g>
+</svg>
+
+<style>
+  .mark {
+    flex: none;
+    display: block;
+  }
+</style>

@@ -1,0 +1,295 @@
+---
+import Base from '../layouts/Base.astro';
+import Mark from '../components/Mark.astro';
+import Scoreboard from '../components/Scoreboard.astro';
+import { site, games } from '../site';
+
+const features = [
+  {
+    title: 'Les règles comptent à votre place',
+    text: 'Doublement du Skyjo, contrats du Tarot, grille du Yams : chaque jeu applique ses propres règles. Il ne reste qu’à saisir les scores de la manche.',
+  },
+  {
+    title: 'Une partie, plusieurs téléphones',
+    text: 'Un code à six chiffres ou un QR code, et chacun suit le tableau sur son appareil. Les manches peuvent être saisies de n’importe quel téléphone autour de la table.',
+  },
+  {
+    title: 'Le classement sur l’écran verrouillé',
+    text: 'Le score se met à jour sur l’écran verrouillé et dans la Dynamic Island, sans rouvrir l’app.',
+  },
+  {
+    title: 'Historique et statistiques',
+    text: 'Chaque partie est enregistrée. Profils de joueurs, victoires, séries : le groupe garde la mémoire de ses soirées.',
+  },
+];
+---
+
+<Base
+  description={`${site.name} compte les scores de vos jeux de société, manche après manche, sur iPhone et iPad.`}
+>
+  <section class="hero container">
+    <div class="hero-text">
+      <Mark size={72} />
+      <h1 class="title" set:html={site.name.replace(' ', '&nbsp;')} />
+      <p class="lead">Le score de la partie, sans papier ni calcul.</p>
+      <p class="muted">
+        Saisir chaque manche, laisser les règles compter, voir d’un coup d’œil qui mène. Pour 20 jeux
+        de société, sur iPhone et iPad.
+      </p>
+      <div class="cta">
+        {
+          site.appStoreUrl ? (
+            <a class="button" href={site.appStoreUrl}>
+              Télécharger sur l’App Store
+            </a>
+          ) : (
+            <span class="button" aria-disabled="true">
+              Bientôt sur l’App Store
+            </span>
+          )
+        }
+      </div>
+    </div>
+    <Scoreboard />
+  </section>
+
+  <section class="container section" aria-labelledby="features-title">
+    <h2 id="features-title">Pendant la partie, rien ne se met entre vous et le jeu</h2>
+    <div class="grid">
+      {
+        features.map((f) => (
+          <article class="card feature">
+            <h3>{f.title}</h3>
+            <p class="muted">{f.text}</p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="container section podium-section" aria-labelledby="podium-title">
+    <div>
+      <h2 id="podium-title">Et à la fin, un podium</h2>
+      <p class="muted">
+        Sobre pendant la partie, festif au moment du résultat : classement final, écarts, meilleure
+        manche.
+      </p>
+    </div>
+    <div class="podium" aria-label="Podium : Marion première, Théo deuxième, David troisième">
+      <div class="step second">
+        <span class="avatar" style="background:var(--player-2)" aria-hidden="true">T</span>
+        <span class="score">27</span>
+        <div class="block">2</div>
+      </div>
+      <div class="step first">
+        <span class="avatar" style="background:var(--player-1)" aria-hidden="true">M</span>
+        <span class="score">18</span>
+        <div class="block">1</div>
+      </div>
+      <div class="step third">
+        <span class="avatar" style="background:var(--player-3)" aria-hidden="true">D</span>
+        <span class="score">31</span>
+        <div class="block">3</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container section" aria-labelledby="games-title">
+    <h2 id="games-title">20 jeux, règles comprises</h2>
+    <ul class="chips">
+      {games.map((g) => <li class="chip" set:html={g.replace(' ', '&nbsp;')} />)}
+    </ul>
+    <p class="muted small">
+      Un jeu manque ? <a href="/assistance#demander-un-jeu">Le demander</a>.
+    </p>
+  </section>
+
+  <section class="container section">
+    <div class="card privacy">
+      <h2>Sans compte, sans publicité, sans pistage</h2>
+      <p class="muted">
+        Les parties restent sur l’appareil et dans votre iCloud. Seules trois fonctions facultatives
+        passent par un serveur, et seulement le temps nécessaire : le partage en direct, le score
+        sur l’écran verrouillé et les profils partagés.
+        <a href="/confidentialite">Politique de confidentialité</a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--space-3xl);
+    align-items: center;
+    padding-block: var(--space-3xl);
+  }
+
+  @media (min-width: 860px) {
+    .hero {
+      grid-template-columns: 1.1fr 1fr;
+      padding-block: var(--space-4xl);
+    }
+  }
+
+  .hero-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    align-items: flex-start;
+  }
+
+  .title {
+    font-family: var(--font-logo);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  .lead {
+    font-size: 1.375rem;
+    font-weight: 600;
+  }
+
+  .cta {
+    margin-top: var(--space-sm);
+  }
+
+  .hero :global(.board) {
+    justify-self: center;
+  }
+
+  .section {
+    padding-block: var(--space-2xl);
+  }
+
+  .section > h2 {
+    margin-bottom: var(--space-xl);
+    max-width: 22ch;
+  }
+
+  .grid {
+    display: grid;
+    gap: var(--space-md);
+  }
+
+  @media (min-width: 700px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .feature {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .podium-section {
+    display: grid;
+    gap: var(--space-2xl);
+    align-items: end;
+  }
+
+  @media (min-width: 700px) {
+    .podium-section {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .podium-section h2 {
+    margin-bottom: var(--space-md);
+  }
+
+  .podium {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: var(--space-sm);
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    width: 6.5rem;
+  }
+
+  .step .score {
+    font-size: 1.375rem;
+  }
+
+  .avatar {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-full);
+    display: grid;
+    place-items: center;
+    color: var(--on-ink);
+    font-weight: 600;
+  }
+
+  .block {
+    width: 100%;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    background: var(--neutral-surface);
+    border: 1px solid var(--card-border);
+    color: var(--text-secondary);
+    font-family: var(--font-score);
+    font-weight: 600;
+    font-size: 1.375rem;
+  }
+
+  .first .block {
+    height: 7rem;
+    background: var(--brand-brass);
+    border-color: var(--brand-brass);
+    color: var(--on-ink);
+  }
+
+  .second .block {
+    height: 5rem;
+  }
+
+  .third .block {
+    height: 3.75rem;
+  }
+
+  .chips {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 var(--space-lg);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+
+  .chip {
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--neutral-fill);
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .small {
+    font-size: 0.9375rem;
+  }
+
+  .privacy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-xl);
+  }
+
+  .privacy h2 {
+    font-size: 1.25rem;
+  }
+</style>

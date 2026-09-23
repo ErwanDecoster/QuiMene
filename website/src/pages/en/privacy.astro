@@ -1,0 +1,144 @@
+---
+import Base from '../../layouts/Base.astro';
+import { site } from '../../site';
+---
+
+<Base
+  title="Privacy"
+  lang="en"
+  description={`${site.name} privacy policy: what data leaves your device, why, and for how long.`}
+  alternate="/confidentialite"
+>
+  <article class="container prose page">
+    <h1>Privacy policy</h1>
+    <p class="muted">Last updated: {site.privacyUpdated.en}</p>
+
+    <div class="summary">
+      <p><strong>In short</strong></p>
+      <ul>
+        <li>No account, no ads, no analytics, no tracking.</li>
+        <li>Games, players and history stay on your device and in your iCloud.</li>
+        <li>
+          Three optional features go through a server, only for as long as needed: live sharing,
+          the score on the Lock Screen, and shared profiles.
+        </li>
+        <li>No data is sold or used for advertising.</li>
+      </ul>
+    </div>
+
+    <h2>Who is responsible</h2>
+    <p>
+      {site.name} is published by {site.publisher}. For any question about your data:
+      <a href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+
+    <h2>What stays on your device</h2>
+    <p>
+      Games, rounds, players, their avatars and your history are stored on the device. If iCloud is
+      turned on, they also sync to your private iCloud database, managed by Apple, across your own
+      devices. The publisher has no access to it.
+    </p>
+    <p>
+      The camera is only used to scan a QR code (to join a game or link a profile). No image is
+      saved or sent.
+    </p>
+
+    <h2>What leaves your device, and why</h2>
+    <p>
+      The three features below use Supabase (database and real-time messaging hosting, region:
+      {site.supabaseRegion.en}). They only run if you use them.
+    </p>
+
+    <h3>Live game sharing</h3>
+    <p>
+      While a game is shared, the server keeps: the six-digit pairing code, a random session
+      identifier, the game identifier, which game is played, the number of players, the generic
+      device name (for example “iPhone”) and its platform. This lets other devices find the game
+      from the code.
+    </p>
+    <p>
+      The game content (nicknames, scores, rounds) travels between devices
+      <strong>end-to-end encrypted</strong>, with a key derived from the pairing code. It is not
+      stored, and the server cannot read it.
+    </p>
+
+    <h3>Score on the Lock Screen (Live Activity)</h3>
+    <p>
+      To update the Lock Screen and the Dynamic Island while the app is in the background, the
+      server keeps the notification token provided by Apple, a random device identifier created by
+      the app, and the latest standings shown (nicknames and scores of the top four). The update is
+      delivered by Apple’s notification service. You can turn this off in Settings › {site.name} ›
+      Live Activities.
+    </p>
+
+    <h3>Shared profiles</h3>
+    <p>
+      When you link a player’s profile with a friend (by QR code), a summary of each finished game
+      they took part in (nickname, simple avatar, rank and score of each player) is left on the
+      server for their device, which picks it up the next time they open the app.
+    </p>
+
+    <h2>Retention</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Data</th><th scope="col">Deleted</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Live shared game</td>
+            <td>When sharing stops, and at most 24 hours after it started</td>
+          </tr>
+          <tr>
+            <td>Lock Screen</td>
+            <td>At most 30 minutes after the last round</td>
+          </tr>
+          <tr>
+            <td>Shared profile summary</td>
+            <td>As soon as it is picked up, and at most after 30 days</td>
+          </tr>
+          <tr>
+            <td>Data on the device and in iCloud</td>
+            <td>When you delete it, or by deleting the app and its iCloud data</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Legal basis</h2>
+    <p>
+      Data sent to the server is processed only to provide the feature you chose to use (GDPR
+      Article 6(1)(b)). It is never tied to an identity: the app has no accounts.
+    </p>
+
+    <h2>Recipients</h2>
+    <ul>
+      <li>Supabase, to host the temporary data described above.</li>
+      <li>Apple, for iCloud and to deliver Lock Screen updates.</li>
+    </ul>
+    <p>No other third party receives any data.</p>
+
+    <h2>Your rights</h2>
+    <p>
+      You have the right to access, correct, erase and object. Since the app has no accounts, server
+      data is not tied to your identity and deletes itself within the periods above. For any
+      request: <a href={`mailto:${site.email}`}>{site.email}</a>. You may also lodge a complaint
+      with your data protection authority (in France, the <a href="https://www.cnil.fr">CNIL</a>).
+    </p>
+
+    <h2>Children</h2>
+    <p>
+      The app asks for no personal information and is suitable for all ages. No data is
+      specifically collected from children.
+    </p>
+
+    <h2>Changes</h2>
+    <p>Any change to this policy is published on this page, with its update date.</p>
+  </article>
+</Base>
+
+<style>
+  .page {
+    padding-block: var(--space-2xl);
+  }
+</style>

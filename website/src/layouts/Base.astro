@@ -1,0 +1,139 @@
+---
+import '@fontsource/outfit/600.css';
+import '../styles/global.css';
+import Mark from '../components/Mark.astro';
+import { site } from '../site';
+
+interface Props {
+  title?: string;
+  description: string;
+  lang?: 'fr' | 'en';
+  /** Chemin de la même page dans l'autre langue, s'il existe. */
+  alternate?: string;
+}
+
+const { title, description, lang = 'fr', alternate } = Astro.props;
+const fullTitle = title ? `${title} · ${site.name}` : site.name;
+const year = new Date().getFullYear();
+const t =
+  lang === 'fr'
+    ? { home: '/', privacy: '/confidentialite', support: '/assistance', privacyLabel: 'Confidentialité', supportLabel: 'Assistance', switchLabel: 'English' }
+    : { home: '/', privacy: '/en/privacy', support: '/en/support', privacyLabel: 'Privacy', supportLabel: 'Support', switchLabel: 'Français' };
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#F6F7F9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B0E14" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <title>{fullTitle}</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container bar">
+        <a class="brand" href={t.home} aria-label={`${site.name}, accueil`}>
+          <Mark size={32} />
+          <span class="wordmark" set:html={site.name.replace(' ', '&nbsp;')} />
+        </a>
+        <nav aria-label={lang === 'fr' ? 'Navigation principale' : 'Main navigation'}>
+          <a href={t.privacy}>{t.privacyLabel}</a>
+          <a href={t.support}>{t.supportLabel}</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container foot">
+        <p class="muted">© {year} {site.publisher}</p>
+        <nav aria-label={lang === 'fr' ? 'Liens de bas de page' : 'Footer links'}>
+          <a href={t.privacy}>{t.privacyLabel}</a>
+          <a href={t.support}>{t.supportLabel}</a>
+          {alternate && <a href={alternate} hreflang={lang === 'fr' ? 'en' : 'fr'}>{t.switchLabel}</a>}
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: color-mix(in srgb, var(--neutral-bg) 82%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 0.5px solid var(--neutral-border);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 56px;
+    gap: var(--space-lg);
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .wordmark {
+    font-family: var(--font-logo);
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-lg);
+    font-size: 0.9375rem;
+  }
+
+  nav a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    text-decoration: underline;
+  }
+
+  main {
+    min-height: 70vh;
+  }
+
+  .site-footer {
+    margin-top: var(--space-4xl);
+    border-top: 0.5px solid var(--neutral-border);
+    font-size: 0.8125rem;
+  }
+
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm) var(--space-lg);
+    padding-block: var(--space-lg);
+  }
+</style>

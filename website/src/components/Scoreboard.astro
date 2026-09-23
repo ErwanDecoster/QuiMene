@@ -1,0 +1,115 @@
+---
+// Reproduction statique du tableau de partie (charte §0 : « un instrument ») — neutres et
+// couleurs joueurs uniquement, jamais le laiton ; scores en chiffres arrondis à chasse fixe.
+const players = [
+  { name: 'Marion', color: 'var(--player-1)', score: 18, delta: '+3' },
+  { name: 'Théo', color: 'var(--player-2)', score: 27, delta: '+11' },
+  { name: 'David', color: 'var(--player-3)', score: 31, delta: '−2' },
+  { name: 'Léa', color: 'var(--player-4)', score: 44, delta: '+9' },
+];
+---
+
+<figure class="board card" aria-label="Aperçu d'une partie de Skyjo en cours, manche 6">
+  <figcaption class="board-title">Skyjo · Manche 6</figcaption>
+  <ol class="rows">
+    {
+      players.map((p, i) => (
+        <li class="row">
+          <span class="rank">{i + 1}</span>
+          <span class="avatar" style={`background:${p.color}`} aria-hidden="true">
+            {p.name[0]}
+          </span>
+          <span class="name">{p.name}</span>
+          <span class="delta score">{p.delta}</span>
+          <span class="total score">{p.score}</span>
+        </li>
+      ))
+    }
+  </ol>
+  <div class="validate" aria-hidden="true">Valider la manche</div>
+</figure>
+
+<style>
+  .board {
+    margin: 0;
+    padding: var(--space-lg) 0 var(--space-lg);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 380px;
+    box-shadow:
+      0 4px 16px rgba(22, 27, 36, 0.1),
+      0 1px 3px rgba(22, 27, 36, 0.08);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .board {
+      box-shadow: none;
+    }
+  }
+
+  .board-title {
+    font-weight: 600;
+    text-align: center;
+    padding: 0 var(--space-lg) var(--space-md);
+    border-bottom: 0.5px solid var(--neutral-border);
+  }
+
+  .rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1.25rem 2.25rem 1fr auto 3.25rem;
+    align-items: center;
+    gap: var(--space-md);
+    min-height: 56px;
+    padding: 0 var(--space-lg);
+    border-bottom: 0.5px solid var(--neutral-border);
+  }
+
+  .rank {
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    font-weight: 500;
+  }
+
+  .avatar {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--radius-full);
+    display: grid;
+    place-items: center;
+    color: var(--on-ink);
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .name {
+    font-weight: 400;
+  }
+
+  .delta {
+    color: var(--text-tertiary);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .total {
+    font-size: 1.375rem;
+    text-align: right;
+  }
+
+  .validate {
+    margin: var(--space-lg) var(--space-lg) 0;
+    min-height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius-md);
+    background: var(--brand-ink);
+    color: var(--on-ink);
+    font-weight: 600;
+  }
+</style>
