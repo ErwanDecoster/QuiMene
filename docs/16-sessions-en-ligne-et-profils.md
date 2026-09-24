@@ -75,7 +75,7 @@ iCloud résolu au lancement (`PlayerRepository.resolveDuplicateOwnProfiles`).
 | Phase | Contenu | Dépend de |
 |---|---|---|
 | **A. Profil local** ✅ iOS + Android | Page Profil, création au premier lancement, onglets réorganisés, profil explicite (plus « la fiche partagée »), amis liés, profil sauvegardé via iCloud. | — |
-| **B. Sessions serveur** | Tables session / parties / événements chiffrés, fonctions SQL (créer, ajouter avec numéro attendu, lire depuis un numéro, fermer), notification des appareils, expiration 14 jours. | — |
+| **B. Sessions serveur** ✅ (migration `create_quimene_sessions`) | Tables session / parties / événements chiffrés, fonctions SQL (créer, ajouter avec numéro attendu, lire depuis un numéro, fermer), notification des appareils, expiration 14 jours. | — |
 | **C. Mode en ligne dans l'app** | L'écran de partie lit et écrit la session ; écrans créateur/participant unifiés ; rattrapage par numéro ; saisie bloquée hors ligne ; partie suivante par n'importe quel participant. | B |
 | **D. « Qui es-tu ? »** | Association à l'arrivée, liaison durable dans les deux sens, notification du créateur avec annulation, « Je regarde seulement ». | A, C |
 | **E. Historique partagé** | Enregistrement de la partie complète chez chaque participant connecté ; boîte aux lettres chiffrée par profil pour les absents, qui remplace les résumés. | A, C |
