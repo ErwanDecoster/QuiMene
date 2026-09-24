@@ -32,14 +32,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.quimene.designsystem.components.PrimaryButton
-import com.quimene.designsystem.tokens.LocalAppColors
-import com.quimene.designsystem.tokens.Space
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.quimene.designsystem.components.PrimaryButton
+import com.quimene.designsystem.tokens.LocalAppColors
+import com.quimene.designsystem.tokens.Space
 
 /**
  * Aperçu caméra intégré à l'écran, scan continu de QR — miroir de `QRScannerView.swift`

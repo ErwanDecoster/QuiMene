@@ -10,11 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import com.quimene.designsystem.tokens.AppColors
-import com.quimene.designsystem.tokens.QuiMeneTypography
 import com.quimene.designsystem.tokens.DarkAppColors
 import com.quimene.designsystem.tokens.LightAppColors
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.LocalIsDarkTheme
+import com.quimene.designsystem.tokens.QuiMeneTypography
 import com.quimene.designsystem.tokens.appColorScheme
 import com.quimene.designsystem.tokens.dynamicAppColors
 

@@ -330,7 +330,6 @@ data class OpenGameRow(
     val platform: String,
 )
 
-
 /** Doc utilisateur P9 — clé **anon/publique** Supabase : conçue pour être embarquée dans un
  * client (l'accès aux tables passe par des fonctions SQL qui exigent un code ou un identifiant,
  * pas par le secret), à la

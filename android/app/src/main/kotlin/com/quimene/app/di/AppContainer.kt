@@ -7,12 +7,12 @@ import com.quimene.app.profilesharing.SharedProfileSyncCoordinator
 import com.quimene.catalog.GameCatalogEmbedded
 import com.quimene.domain.rules.GameCatalog
 import com.quimene.store.AppSettings
-import com.quimene.store.QuiMeneDatabase
 import com.quimene.store.DeviceIdentity
 import com.quimene.store.LeaderboardRepository
 import com.quimene.store.MatchRepository
 import com.quimene.store.PlayerRepository
 import com.quimene.store.ProfileRepository
+import com.quimene.store.QuiMeneDatabase
 import kotlinx.coroutines.CoroutineScope
 
 /**
