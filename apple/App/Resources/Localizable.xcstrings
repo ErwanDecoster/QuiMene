@@ -4,6 +4,174 @@
     "" : {
 
     },
+    "Déjà un profil sur un autre appareil ? Avec iCloud, il arrive tout seul d'ici quelques instants." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already have a profile on another device? With iCloud, it arrives on its own in a few moments."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Ya tienes un perfil en otro dispositivo? Con iCloud, llega solo en unos instantes."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schon ein Profil auf einem anderen Gerät? Mit iCloud kommt es in wenigen Augenblicken von selbst."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai già un profilo su un altro dispositivo? Con iCloud arriva da solo tra pochi istanti."
+          }
+        }
+      }
+    },
+    "Mon profil" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My profile"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi perfil"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mein Profil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il mio profilo"
+          }
+        }
+      }
+    },
+    "Supprimer mon profil" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete my profile"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar mi perfil"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mein Profil löschen"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina il mio profilo"
+          }
+        }
+      }
+    },
+    "Supprimer ton profil ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete your profile?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar tu perfil?"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Profil löschen?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare il tuo profilo?"
+          }
+        }
+      }
+    },
+    "Tes amis ne recevront plus les parties jouées avec toi. Ta fiche et son historique sont conservés, et tu créeras ensuite un nouveau profil." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your friends will no longer receive the matches played with you. Your player card and its history are kept, and you will then create a new profile."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus amigos ya no recibirán las partidas jugadas contigo. Tu ficha y su historial se conservan, y después crearás un nuevo perfil."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Freunde erhalten die mit dir gespielten Partien nicht mehr. Deine Karte und ihr Verlauf bleiben erhalten, danach erstellst du ein neues Profil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi amici non riceveranno più le partite giocate con te. La tua scheda e la sua cronologia vengono conservate, poi creerai un nuovo profilo."
+          }
+        }
+      }
+    },
+    "Un pseudo et un avatar, rien de plus : aucun compte à créer." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A nickname and an avatar, nothing more: no account to create."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un apodo y un avatar, nada más: ninguna cuenta que crear."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Spitzname und ein Avatar, mehr nicht: kein Konto nötig."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un nickname e un avatar, niente di più: nessun account da creare."
+          }
+        }
+      }
+    },
     "—" : {
 
     },
@@ -71,6 +239,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ · Manche %2$lld"
+          }
+        }
+      }
+    },
+    "%@ est déjà ton ami, sur la fiche « %@ »." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ist bereits dein Freund, auf der Karte „%2$@“."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ is already your friend, on the “%2$@” player card."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ya es tu amigo, en la ficha «%2$@»."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ est déjà ton ami, sur la fiche « %2$@ »."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ è già tuo amico, sulla scheda «%2$@»."
           }
         }
       }
@@ -660,6 +862,7 @@
 
     },
     "Adopter aussi son pseudo et son avatar" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -683,6 +886,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adotta anche il suo nickname e il suo avatar"
+          }
+        }
+      }
+    },
+    "Ajouter un ami" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freund hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a friend"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadir un amigo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungi un amico"
           }
         }
       }
@@ -711,6 +942,90 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aggiungi un giocatore"
+          }
+        }
+      }
+    },
+    "Ami" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friend"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amigo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amico"
+          }
+        }
+      }
+    },
+    "Ami lié" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verknüpfter Freund"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linked friend"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amigo vinculado"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amico collegato"
+          }
+        }
+      }
+    },
+    "Amis" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Freunde"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Friends"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amigos"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amici"
           }
         }
       }
@@ -963,6 +1278,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nessuno"
+          }
+        }
+      }
+    },
+    "Aucun ami lié pour l'instant." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch keine verknüpften Freunde."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No linked friends yet."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todavía no hay amigos vinculados."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessun amico collegato per ora."
           }
         }
       }
@@ -1501,6 +1844,34 @@
         }
       }
     },
+    "C'est ton propre profil." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das ist dein eigenes Profil."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is your own profile."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es tu propio perfil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È il tuo profilo."
+          }
+        }
+      }
+    },
     "Capot" : {
       "localizations" : {
         "de" : {
@@ -1530,6 +1901,7 @@
       }
     },
     "Ce profil est déjà suivi par la fiche « %@ » sur cet appareil. Continuer le fera suivre aussi par celle-ci — à ne faire que si c'est la même personne (par exemple une fiche recréée)." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1586,6 +1958,7 @@
       }
     },
     "Cette fiche suit actuellement **%@**. Continuer la fera suivre **%@** à la place : %@ ne recevra plus les parties jouées avec cette fiche." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1815,6 +2188,34 @@
         }
       }
     },
+    "Code QR de ton profil" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "QR-Code deines Profils"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your profile QR code"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código QR de tu perfil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Codice QR del tuo profilo"
+          }
+        }
+      }
+    },
     "Commencer" : {
       "localizations" : {
         "de" : {
@@ -1957,6 +2358,35 @@
         }
       }
     },
+    "Connexion perdue — dernier score reçu" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung verloren — letzter empfangener Punktestand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connection lost — last score received"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Conexión perdida — última puntuación recibida"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connessione persa — ultimo punteggio ricevuto"
+          }
+        }
+      }
+    },
     "Connexion…" : {
       "localizations" : {
         "de" : {
@@ -2065,6 +2495,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copia l'indirizzo"
+          }
+        }
+      }
+    },
+    "Créer la fiche « %@ »" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Karte „%@“ erstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create the “%@” player card"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear la ficha «%@»"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea la scheda «%@»"
+          }
+        }
+      }
+    },
+    "Créer mon profil" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mein Profil erstellen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create my profile"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crear mi perfil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Crea il mio profilo"
           }
         }
       }
@@ -2547,9 +3033,35 @@
       }
     },
     "Évolution des scores" : {
-
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Punkteverlauf"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score progression"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evolución de las puntuaciones"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Andamento dei punteggi"
+          }
+        }
+      }
     },
     "Fais scanner ce code par l'ami avec qui tu veux partager ton historique, depuis sa propre fiche « Suivre un profil reçu »." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2573,6 +3085,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fai scansionare questo codice dall'amico con cui vuoi condividere la tua cronologia, dalla sua scheda «Segui un profilo ricevuto»."
+          }
+        }
+      }
+    },
+    "Fais scanner ce code par un ami, depuis « Ajouter un ami » dans son onglet Profil. Vos parties jouées ensemble apparaîtront dans vos deux historiques." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lass einen Freund diesen Code über „Freund hinzufügen“ in seinem Profil-Tab scannen. Eure gemeinsamen Partien erscheinen in euren beiden Verläufen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Have a friend scan this code from “Add a friend” in their Profile tab. Matches you play together will appear in both your histories."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pide a un amigo que escanee este código desde «Añadir un amigo» en su pestaña Perfil. Las partidas que juguéis juntos aparecerán en vuestros dos historiales."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fai scansionare questo codice a un amico da «Aggiungi un amico» nella sua scheda Profilo. Le partite giocate insieme appariranno nelle vostre due cronologie."
           }
         }
       }
@@ -3254,6 +3794,96 @@
         }
       }
     },
+    "Lié au profil de **%@** depuis le %@." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seit %2$@ mit dem Profil von **%1$@** verknüpft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linked to **%1$@**'s profile since %2$@."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinculado al perfil de **%1$@** desde el %2$@."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lié au profil de **%1$@** depuis le %2$@."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collegato al profilo di **%1$@** dal %2$@."
+          }
+        }
+      }
+    },
+    "Lié au profil de **%@**." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit dem Profil von **%@** verknüpft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Linked to **%@**'s profile."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vinculado al perfil de **%@**."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collegato al profilo di **%@**."
+          }
+        }
+      }
+    },
+    "M'ajouter comme ami" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mich als Freund hinzufügen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add me as a friend"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Añadirme como amigo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aggiungimi come amico"
+          }
+        }
+      }
+    },
     "Manche" : {
       "localizations" : {
         "de" : {
@@ -3485,6 +4115,34 @@
         }
       }
     },
+    "Mes statistiques" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meine Statistiken"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My statistics"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mis estadísticas"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mie statistiche"
+          }
+        }
+      }
+    },
     "Modifier" : {
       "localizations" : {
         "de" : {
@@ -3541,6 +4199,34 @@
         }
       }
     },
+    "Modifier le profil" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil bearbeiten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit profile"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editar perfil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifica profilo"
+          }
+        }
+      }
+    },
     "Mois" : {
       "localizations" : {
         "de" : {
@@ -3570,6 +4256,7 @@
       }
     },
     "Ne plus partager" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3598,6 +4285,7 @@
       }
     },
     "Ne plus suivre ce profil" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3677,6 +4365,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Numero di dadi: %lld"
+          }
+        }
+      }
+    },
+    "Nouvelle fiche avec son pseudo et son avatar." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neue Karte mit Spitzname und Avatar."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New player card with their nickname and avatar."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva ficha con su apodo y su avatar."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nuova scheda con il suo nickname e il suo avatar."
           }
         }
       }
@@ -3765,6 +4481,34 @@
         }
       }
     },
+    "Ou c'est une de mes fiches" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oder es ist eine meiner Karten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Or it's one of my player cards"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O es una de mis fichas"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Oppure è una delle mie schede"
+          }
+        }
+      }
+    },
     "Ouvre les réglages système pour choisir la langue de l'app." : {
       "localizations" : {
         "de" : {
@@ -3822,6 +4566,7 @@
       }
     },
     "Partage ta fiche pour que tes amis puissent te suivre. Suis un ami pour retrouver vos parties jouées ensemble dans son historique." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3850,6 +4595,7 @@
       }
     },
     "Partager ce profil (c'est moi)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4013,6 +4759,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Compagno (re chiamato)"
+          }
+        }
+      }
+    },
+    "Partie partagée en cours · Reprendre" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geteilte Partie läuft · Fortsetzen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shared match in progress · Resume"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partida compartida en curso · Reanudar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partita condivisa in corso · Riprendi"
           }
         }
       }
@@ -4450,7 +5224,36 @@
         }
       }
     },
+    "Profil" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perfil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profilo"
+          }
+        }
+      }
+    },
     "Profil partagé" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4507,6 +5310,7 @@
       }
     },
     "Quitter" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4530,6 +5334,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esci"
+          }
+        }
+      }
+    },
+    "Quitter la partie" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partie verlassen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leave the match"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir de la partida"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esci dalla partita"
           }
         }
       }
@@ -4899,6 +5731,62 @@
         }
       }
     },
+    "Rejoindre les parties de tes amis et y être reconnu." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An den Partien deiner Freunde teilnehmen und erkannt werden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join your friends' matches and be recognized in them."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unirte a las partidas de tus amigos y ser reconocido."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unirti alle partite dei tuoi amici ed esservi riconosciuto."
+          }
+        }
+      }
+    },
+    "Rejoindre une partie" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einer Partie beitreten"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join a match"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unirse a una partida"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unisciti a una partita"
+          }
+        }
+      }
+    },
     "Remplacer la partie partagée ?" : {
       "localizations" : {
         "de" : {
@@ -5067,6 +5955,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Risultati — %@"
+          }
+        }
+      }
+    },
+    "Retirer des amis" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus Freunden entfernen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove from friends"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quitar de amigos"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rimuovi dagli amici"
+          }
+        }
+      }
+    },
+    "Retrouver vos parties jouées ensemble dans ton historique." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eure gemeinsamen Partien in deinem Verlauf wiederfinden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find the matches you played together in your history."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encontrar en tu historial las partidas jugadas juntos."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ritrovare nella tua cronologia le partite giocate insieme."
           }
         }
       }
@@ -5325,6 +6269,7 @@
       }
     },
     "Son avatar est une photo : seul le pseudo peut être repris." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5409,6 +6354,7 @@
       }
     },
     "Suivre ce profil ?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5437,6 +6383,7 @@
       }
     },
     "Suivre quelqu'un d'autre (remplace %@)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5465,6 +6412,7 @@
       }
     },
     "Suivre un profil reçu" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -5945,6 +6893,7 @@
       }
     },
     "Tu suis **%@**, depuis le %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -6254,6 +7203,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vedi le manche"
+          }
+        }
+      }
+    },
+    "Vos parties jouées ensemble apparaissent dans vos deux historiques." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eure gemeinsamen Partien erscheinen in euren beiden Verläufen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matches you play together appear in both your histories."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las partidas que jugáis juntos aparecen en vuestros dos historiales."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le partite giocate insieme appaiono nelle vostre due cronologie."
+          }
+        }
+      }
+    },
+    "Vos prochaines parties jouées ensemble n'arriveront plus dans son historique." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eure nächsten gemeinsamen Partien erscheinen nicht mehr in seinem Verlauf."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your next matches together will no longer reach their history."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vuestras próximas partidas juntos ya no llegarán a su historial."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le vostre prossime partite insieme non arriveranno più nella sua cronologia."
           }
         }
       }

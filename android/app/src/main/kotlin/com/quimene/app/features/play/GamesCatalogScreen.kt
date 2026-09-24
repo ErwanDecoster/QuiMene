@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Wifi
@@ -76,6 +77,7 @@ fun GamesCatalogScreen(
     onGameSelected: (String) -> Unit,
     onOpenLeaderboard: (String) -> Unit,
     onResumeMatch: (String) -> Unit,
+    onJoin: () -> Unit,
 ) {
     val container = LocalAppContainer.current
     val context = LocalContext.current
@@ -141,6 +143,14 @@ fun GamesCatalogScreen(
                         IconButton(onClick = { isSearching = true }) {
                             Icon(Icons.Filled.Search, contentDescription = stringResource(R.string.rechercher_un_jeu))
                         }
+                        // Doc 16, phase A — Rejoindre n'est plus un onglet : entrée depuis Jeux
+                        // (et Profil).
+                        IconButton(onClick = onJoin) {
+                            Icon(
+                                Icons.Filled.QrCodeScanner,
+                                contentDescription = stringResource(R.string.rejoindre_une_partie),
+                            )
+                        }
                         if (isSharing) {
                             IconButton(onClick = { isPresentingActiveShare = true }) {
                                 Icon(
@@ -176,6 +186,28 @@ fun GamesCatalogScreen(
                     .padding(floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding())),
             verticalArrangement = Arrangement.spacedBy(Space.lg),
         ) {
+            // Doc 16, phase A — la partie suivie chez quelqu'un d'autre vit dans l'écran Rejoindre,
+            // qu'on peut quitter en arrière sans la quitter : ce bandeau est le chemin du retour.
+            if (viewModel.searchText.isBlank() && container.matchConnectionCoordinator.sharedMatch != null) {
+                ListContainer(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable(onClick = onJoin)
+                                .padding(horizontal = Space.lg, vertical = Space.md),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(Space.md),
+                    ) {
+                        Icon(Icons.Filled.Wifi, contentDescription = null, tint = LocalAppColors.current.brandInk)
+                        Text(
+                            stringResource(R.string.partie_partagee_en_cours_reprendre),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = LocalAppColors.current.brandInk,
+                        )
+                    }
+                }
+            }
             if (viewModel.searchText.isBlank() && inProgressMatches.isNotEmpty()) {
                 ListContainer(modifier = Modifier.fillMaxWidth()) {
                     inProgressMatches.forEachIndexed { index, match ->

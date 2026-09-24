@@ -1,12 +1,4 @@
 {
-  "value1": {
-    "key": "%@",
-    "fr": "%@",
-    "en": "%@",
-    "es": "%@",
-    "de": "%@",
-    "it": "%@"
-  },
   "value1_count2": {
     "key": "%@ : %lld",
     "fr": "%1$@ : %2$lld",
@@ -14,6 +6,14 @@
     "es": "%1$@: %2$lld",
     "de": "%1$@: %2$lld",
     "it": "%1$@: %2$lld"
+  },
+  "value1_est_deja_ton_ami_sur_la_fiche_value2": {
+    "key": "%@ est déjà ton ami, sur la fiche « %@ ».",
+    "fr": "%1$@ est déjà ton ami, sur la fiche « %2$@ ».",
+    "en": "%1$@ is already your friend, on the “%2$@” player card.",
+    "es": "%1$@ ya es tu amigo, en la ficha «%2$@».",
+    "de": "%1$@ ist bereits dein Freund, auf der Karte „%2$@“.",
+    "it": "%1$@ è già tuo amico, sulla scheda «%2$@»."
   },
   "value1_manche_count2": {
     "key": "%@ · Manche %lld",
@@ -239,6 +239,14 @@
     "de": "Auch dessen Spitznamen und Avatar übernehmen",
     "it": "Adotta anche il suo nickname e il suo avatar"
   },
+  "ajouter_un_ami": {
+    "key": "Ajouter un ami",
+    "fr": "Ajouter un ami",
+    "en": "Add a friend",
+    "es": "Añadir un amigo",
+    "de": "Freund hinzufügen",
+    "it": "Aggiungi un amico"
+  },
   "ajouter_un_joueur": {
     "key": "Ajouter un joueur",
     "fr": "Ajouter un joueur",
@@ -246,6 +254,30 @@
     "es": "Añadir un jugador",
     "de": "Spieler hinzufügen",
     "it": "Aggiungi un giocatore"
+  },
+  "ami": {
+    "key": "Ami",
+    "fr": "Ami",
+    "en": "Friend",
+    "es": "Amigo",
+    "de": "Freund",
+    "it": "Amico"
+  },
+  "ami_lie": {
+    "key": "Ami lié",
+    "fr": "Ami lié",
+    "en": "Linked friend",
+    "es": "Amigo vinculado",
+    "de": "Verknüpfter Freund",
+    "it": "Amico collegato"
+  },
+  "amis": {
+    "key": "Amis",
+    "fr": "Amis",
+    "en": "Friends",
+    "es": "Amigos",
+    "de": "Freunde",
+    "it": "Amici"
   },
   "annonce_count1": {
     "key": "Annonce : %lld",
@@ -318,6 +350,14 @@
     "es": "Ninguno",
     "de": "Keiner",
     "it": "Nessuno"
+  },
+  "aucun_ami_lie_pour_l_instant": {
+    "key": "Aucun ami lié pour l'instant.",
+    "fr": "Aucun ami lié pour l'instant.",
+    "en": "No linked friends yet.",
+    "es": "Todavía no hay amigos vinculados.",
+    "de": "Noch keine verknüpften Freunde.",
+    "it": "Nessun amico collegato per ora."
   },
   "aucun_jeu_ne_correspond_a_ta_recherche": {
     "key": "Aucun jeu ne correspond à ta recherche.",
@@ -471,6 +511,14 @@
     "de": "Bouts: %lld",
     "it": "Bouts: %lld"
   },
+  "c_est_ton_propre_profil": {
+    "key": "C'est ton propre profil.",
+    "fr": "C'est ton propre profil.",
+    "en": "This is your own profile.",
+    "es": "Es tu propio perfil.",
+    "de": "Das ist dein eigenes Profil.",
+    "it": "È il tuo profilo."
+  },
   "capot": {
     "key": "Capot",
     "fr": "Capot",
@@ -551,6 +599,14 @@
     "de": "QR-Kopplungscode",
     "it": "Codice QR di associazione"
   },
+  "code_qr_de_ton_profil": {
+    "key": "Code QR de ton profil",
+    "fr": "Code QR de ton profil",
+    "en": "Your profile QR code",
+    "es": "Código QR de tu perfil",
+    "de": "QR-Code deines Profils",
+    "it": "Codice QR del tuo profilo"
+  },
   "code_d_appairage": {
     "key": "Code d'appairage",
     "fr": "Code d'appairage",
@@ -582,6 +638,14 @@
     "es": "Empezar una partida de ${game}",
     "de": "Eine Partie ${game} starten",
     "it": "Inizia una partita di ${game}"
+  },
+  "connexion_perdue_dernier_score_recu": {
+    "key": "Connexion perdue — dernier score reçu",
+    "fr": "Connexion perdue — dernier score reçu",
+    "en": "Connection lost — last score received",
+    "es": "Conexión perdida — última puntuación recibida",
+    "de": "Verbindung verloren — letzter empfangener Punktestand",
+    "it": "Connessione persa — ultimo punteggio ricevuto"
   },
   "connexion_a_l_hote_perdue_le_tableau_affiche_est_le_dernier": {
     "key": "Connexion à l'hôte perdue. Le tableau affiché est le dernier reçu.",
@@ -631,6 +695,22 @@
     "de": "Adresse kopieren",
     "it": "Copia l'indirizzo"
   },
+  "creer_la_fiche_value1": {
+    "key": "Créer la fiche « %@ »",
+    "fr": "Créer la fiche « %@ »",
+    "en": "Create the “%@” player card",
+    "es": "Crear la ficha «%@»",
+    "de": "Karte „%@“ erstellen",
+    "it": "Crea la scheda «%@»"
+  },
+  "creer_mon_profil": {
+    "key": "Créer mon profil",
+    "fr": "Créer mon profil",
+    "en": "Create my profile",
+    "es": "Crear mi perfil",
+    "de": "Mein Profil erstellen",
+    "it": "Crea il mio profilo"
+  },
   "demande_d_ajout_d_un_jeu_qui_mene": {
     "key": "Demande d'ajout d'un jeu — Qui Mène ?",
     "fr": "Demande d'ajout d'un jeu — Qui Mène ?",
@@ -662,6 +742,14 @@
     "es": "Doble",
     "de": "Doppelt",
     "it": "Doppia"
+  },
+  "deja_un_profil_sur_un_autre_appareil_avec_icloud_il_arrive": {
+    "key": "Déjà un profil sur un autre appareil ? Avec iCloud, il arrive tout seul d'ici quelques instants.",
+    "fr": "Déjà un profil sur un autre appareil ? Avec iCloud, il arrive tout seul d'ici quelques instants.",
+    "en": "Already have a profile on another device? With iCloud, it arrives on its own in a few moments.",
+    "es": "¿Ya tienes un perfil en otro dispositivo? Con iCloud, llega solo en unos instantes.",
+    "de": "Schon ein Profil auf einem anderen Gerät? Mit iCloud kommt es in wenigen Augenblicken von selbst.",
+    "it": "Hai già un profilo su un altro dispositivo? Con iCloud arriva da solo tra pochi istanti."
   },
   "demarrage_du_partage": {
     "key": "Démarrage du partage…",
@@ -734,6 +822,14 @@
     "es": "Haz que el amigo con quien quieres compartir tu historial escanee este código, desde su propia ficha «Seguir un perfil recibido».",
     "de": "Lass diesen Code von dem Freund scannen, mit dem du deinen Verlauf teilen möchtest, über dessen eigene Karte „Empfangenes Profil folgen“.",
     "it": "Fai scansionare questo codice dall'amico con cui vuoi condividere la tua cronologia, dalla sua scheda «Segui un profilo ricevuto»."
+  },
+  "fais_scanner_ce_code_par_un_ami_depuis_ajouter_un_ami_dans": {
+    "key": "Fais scanner ce code par un ami, depuis « Ajouter un ami » dans son onglet Profil. Vos parties jouées ensemble apparaîtront dans vos deux historiques.",
+    "fr": "Fais scanner ce code par un ami, depuis « Ajouter un ami » dans son onglet Profil. Vos parties jouées ensemble apparaîtront dans vos deux historiques.",
+    "en": "Have a friend scan this code from “Add a friend” in their Profile tab. Matches you play together will appear in both your histories.",
+    "es": "Pide a un amigo que escanee este código desde «Añadir un amigo» en su pestaña Perfil. Las partidas que juguéis juntos aparecerán en vuestros dos historiales.",
+    "de": "Lass einen Freund diesen Code über „Freund hinzufügen“ in seinem Profil-Tab scannen. Eure gemeinsamen Partien erscheinen in euren beiden Verläufen.",
+    "it": "Fai scansionare questo codice a un amico da «Aggiungi un amico» nella sua scheda Profilo. Le partite giocate insieme appariranno nelle vostre due cronologie."
   },
   "faits_marquants": {
     "key": "Faits marquants",
@@ -927,6 +1023,30 @@
     "de": "Beitretende Personen können wählen, ob sie beobachten oder Runden vorschlagen möchten.",
     "it": "Le persone che si uniscono possono scegliere di osservare o di proporre manche."
   },
+  "lie_au_profil_de_value1_depuis_le_value2": {
+    "key": "Lié au profil de **%@** depuis le %@.",
+    "fr": "Lié au profil de **%1$@** depuis le %2$@.",
+    "en": "Linked to **%1$@**'s profile since %2$@.",
+    "es": "Vinculado al perfil de **%1$@** desde el %2$@.",
+    "de": "Seit %2$@ mit dem Profil von **%1$@** verknüpft.",
+    "it": "Collegato al profilo di **%1$@** dal %2$@."
+  },
+  "lie_au_profil_de_value1": {
+    "key": "Lié au profil de **%@**.",
+    "fr": "Lié au profil de **%@**.",
+    "en": "Linked to **%@**'s profile.",
+    "es": "Vinculado al perfil de **%@**.",
+    "de": "Mit dem Profil von **%@** verknüpft.",
+    "it": "Collegato al profilo di **%@**."
+  },
+  "m_ajouter_comme_ami": {
+    "key": "M'ajouter comme ami",
+    "fr": "M'ajouter comme ami",
+    "en": "Add me as a friend",
+    "es": "Añadirme como amigo",
+    "de": "Mich als Freund hinzufügen",
+    "it": "Aggiungimi come amico"
+  },
   "manche": {
     "key": "Manche",
     "fr": "Manche",
@@ -991,6 +1111,14 @@
     "de": "Beste Spieler",
     "it": "Migliori giocatori"
   },
+  "mes_statistiques": {
+    "key": "Mes statistiques",
+    "fr": "Mes statistiques",
+    "en": "My statistics",
+    "es": "Mis estadísticas",
+    "de": "Meine Statistiken",
+    "it": "Le mie statistiche"
+  },
   "modifier": {
     "key": "Modifier",
     "fr": "Modifier",
@@ -1007,6 +1135,14 @@
     "de": "Spieler bearbeiten",
     "it": "Modifica il giocatore"
   },
+  "modifier_le_profil": {
+    "key": "Modifier le profil",
+    "fr": "Modifier le profil",
+    "en": "Edit profile",
+    "es": "Editar perfil",
+    "de": "Profil bearbeiten",
+    "it": "Modifica profilo"
+  },
   "mois": {
     "key": "Mois",
     "fr": "Mois",
@@ -1014,6 +1150,14 @@
     "es": "Mes",
     "de": "Monat",
     "it": "Mese"
+  },
+  "mon_profil": {
+    "key": "Mon profil",
+    "fr": "Mon profil",
+    "en": "My profile",
+    "es": "Mi perfil",
+    "de": "Mein Profil",
+    "it": "Il mio profilo"
   },
   "ne_plus_partager": {
     "key": "Ne plus partager",
@@ -1038,6 +1182,14 @@
     "es": "Número de dados: %lld",
     "de": "Anzahl Würfel: %lld",
     "it": "Numero di dadi: %lld"
+  },
+  "nouvelle_fiche_avec_son_pseudo_et_son_avatar": {
+    "key": "Nouvelle fiche avec son pseudo et son avatar.",
+    "fr": "Nouvelle fiche avec son pseudo et son avatar.",
+    "en": "New player card with their nickname and avatar.",
+    "es": "Nueva ficha con su apodo y su avatar.",
+    "de": "Neue Karte mit Spitzname und Avatar.",
+    "it": "Nuova scheda con il suo nickname e il suo avatar."
   },
   "nemesis": {
     "key": "Némésis",
@@ -1070,6 +1222,14 @@
     "es": "Conseguido (%lld)",
     "de": "Erzielt (%lld)",
     "it": "Ottenuto (%lld)"
+  },
+  "ou_c_est_une_de_mes_fiches": {
+    "key": "Ou c'est une de mes fiches",
+    "fr": "Ou c'est une de mes fiches",
+    "en": "Or it's one of my player cards",
+    "es": "O es una de mis fichas",
+    "de": "Oder es ist eine meiner Karten",
+    "it": "Oppure è una delle mie schede"
   },
   "ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app": {
     "key": "Ouvre les réglages système pour choisir la langue de l'app.",
@@ -1142,6 +1302,14 @@
     "es": "Compañero (rey llamado)",
     "de": "Partner (gerufener König)",
     "it": "Compagno (re chiamato)"
+  },
+  "partie_partagee_en_cours_reprendre": {
+    "key": "Partie partagée en cours · Reprendre",
+    "fr": "Partie partagée en cours · Reprendre",
+    "en": "Shared match in progress · Resume",
+    "es": "Partida compartida en curso · Reanudar",
+    "de": "Geteilte Partie läuft · Fortsetzen",
+    "it": "Partita condivisa in corso · Riprendi"
   },
   "partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par": {
     "key": "Partie reçue de l'appareil d'un ami : le détail manche par manche n'est pas disponible ici.",
@@ -1263,6 +1431,14 @@
     "de": "Angreifer",
     "it": "Attaccante"
   },
+  "profil": {
+    "key": "Profil",
+    "fr": "Profil",
+    "en": "Profile",
+    "es": "Perfil",
+    "de": "Profil",
+    "it": "Profilo"
+  },
   "profil_partage": {
     "key": "Profil partagé",
     "fr": "Profil partagé",
@@ -1286,6 +1462,14 @@
     "es": "Salir",
     "de": "Verlassen",
     "it": "Esci"
+  },
+  "quitter_la_partie": {
+    "key": "Quitter la partie",
+    "fr": "Quitter la partie",
+    "en": "Leave the match",
+    "es": "Salir de la partida",
+    "de": "Partie verlassen",
+    "it": "Esci dalla partita"
   },
   "rang_moyen": {
     "key": "Rang moyen",
@@ -1335,6 +1519,22 @@
     "de": "Beitreten",
     "it": "Unisciti"
   },
+  "rejoindre_les_parties_de_tes_amis_et_y_etre_reconnu": {
+    "key": "Rejoindre les parties de tes amis et y être reconnu.",
+    "fr": "Rejoindre les parties de tes amis et y être reconnu.",
+    "en": "Join your friends' matches and be recognized in them.",
+    "es": "Unirte a las partidas de tus amigos y ser reconocido.",
+    "de": "An den Partien deiner Freunde teilnehmen und erkannt werden.",
+    "it": "Unirti alle partite dei tuoi amici ed esservi riconosciuto."
+  },
+  "rejoindre_une_partie": {
+    "key": "Rejoindre une partie",
+    "fr": "Rejoindre une partie",
+    "en": "Join a match",
+    "es": "Unirse a una partida",
+    "de": "Einer Partie beitreten",
+    "it": "Unisciti a una partita"
+  },
   "remplacer_la_partie_partagee": {
     "key": "Remplacer la partie partagée ?",
     "fr": "Remplacer la partie partagée ?",
@@ -1374,6 +1574,22 @@
     "es": "Reanudación automática en curso.",
     "de": "Automatische Fortsetzung läuft.",
     "it": "Ripresa automatica in corso."
+  },
+  "retirer_des_amis": {
+    "key": "Retirer des amis",
+    "fr": "Retirer des amis",
+    "en": "Remove from friends",
+    "es": "Quitar de amigos",
+    "de": "Aus Freunden entfernen",
+    "it": "Rimuovi dagli amici"
+  },
+  "retrouver_vos_parties_jouees_ensemble_dans_ton_historique": {
+    "key": "Retrouver vos parties jouées ensemble dans ton historique.",
+    "fr": "Retrouver vos parties jouées ensemble dans ton historique.",
+    "en": "Find the matches you played together in your history.",
+    "es": "Encontrar en tu historial las partidas jugadas juntos.",
+    "de": "Eure gemeinsamen Partien in deinem Verlauf wiederfinden.",
+    "it": "Ritrovare nella tua cronologia le partite giocate insieme."
   },
   "regles_ou_lien_vers_les_regles_facultatif": {
     "key": "Règles ou lien vers les règles (facultatif) :",
@@ -1583,6 +1799,22 @@
     "de": "Diese Partie endgültig löschen?",
     "it": "Eliminare definitivamente questa partita?"
   },
+  "supprimer_mon_profil": {
+    "key": "Supprimer mon profil",
+    "fr": "Supprimer mon profil",
+    "en": "Delete my profile",
+    "es": "Eliminar mi perfil",
+    "de": "Mein Profil löschen",
+    "it": "Elimina il mio profilo"
+  },
+  "supprimer_ton_profil": {
+    "key": "Supprimer ton profil ?",
+    "fr": "Supprimer ton profil ?",
+    "en": "Delete your profile?",
+    "es": "¿Eliminar tu perfil?",
+    "de": "Dein Profil löschen?",
+    "it": "Eliminare il tuo profilo?"
+  },
   "synchronisation_icloud": {
     "key": "Synchronisation iCloud",
     "fr": "Synchronisation iCloud",
@@ -1647,6 +1879,14 @@
     "de": "Fertig",
     "it": "Fatto"
   },
+  "tes_amis_ne_recevront_plus_les_parties_jouees_avec_toi_ta": {
+    "key": "Tes amis ne recevront plus les parties jouées avec toi. Ta fiche et son historique sont conservés, et tu créeras ensuite un nouveau profil.",
+    "fr": "Tes amis ne recevront plus les parties jouées avec toi. Ta fiche et son historique sont conservés, et tu créeras ensuite un nouveau profil.",
+    "en": "Your friends will no longer receive the matches played with you. Your player card and its history are kept, and you will then create a new profile.",
+    "es": "Tus amigos ya no recibirán las partidas jugadas contigo. Tu ficha y su historial se conservan, y después crearás un nuevo perfil.",
+    "de": "Deine Freunde erhalten die mit dir gespielten Partien nicht mehr. Deine Karte und ihr Verlauf bleiben erhalten, danach erstellst du ein neues Profil.",
+    "it": "I tuoi amici non riceveranno più le partite giocate con te. La tua scheda e la sua cronologia vengono conservate, poi creerai un nuovo profilo."
+  },
   "total": {
     "key": "Total",
     "fr": "Total",
@@ -1702,6 +1942,14 @@
     "es": "Sigues a **%1$@** desde el %2$@",
     "de": "Du folgst **%1$@** seit dem %2$@",
     "it": "Segui **%1$@** dal %2$@"
+  },
+  "un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer": {
+    "key": "Un pseudo et un avatar, rien de plus : aucun compte à créer.",
+    "fr": "Un pseudo et un avatar, rien de plus : aucun compte à créer.",
+    "en": "A nickname and an avatar, nothing more: no account to create.",
+    "es": "Un apodo y un avatar, nada más: ninguna cuenta que crear.",
+    "de": "Ein Spitzname und ein Avatar, mehr nicht: kein Konto nötig.",
+    "it": "Un nickname e un avatar, niente di più: nessun account da creare."
   },
   "une_session_est_en_cours_de_partage_sur_value1_continuer": {
     "key": "Une session est en cours de partage sur %@. Continuer ici la remplacera : les personnes connectées verront cette partie à la place.",
@@ -1783,6 +2031,22 @@
     "de": "Runden anzeigen",
     "it": "Vedi le manche"
   },
+  "vos_parties_jouees_ensemble_apparaissent_dans_vos_deux": {
+    "key": "Vos parties jouées ensemble apparaissent dans vos deux historiques.",
+    "fr": "Vos parties jouées ensemble apparaissent dans vos deux historiques.",
+    "en": "Matches you play together appear in both your histories.",
+    "es": "Las partidas que jugáis juntos aparecen en vuestros dos historiales.",
+    "de": "Eure gemeinsamen Partien erscheinen in euren beiden Verläufen.",
+    "it": "Le partite giocate insieme appaiono nelle vostre due cronologie."
+  },
+  "vos_prochaines_parties_jouees_ensemble_n_arriveront_plus": {
+    "key": "Vos prochaines parties jouées ensemble n'arriveront plus dans son historique.",
+    "fr": "Vos prochaines parties jouées ensemble n'arriveront plus dans son historique.",
+    "en": "Your next matches together will no longer reach their history.",
+    "es": "Vuestras próximas partidas juntos ya no llegarán a su historial.",
+    "de": "Eure nächsten gemeinsamen Partien erscheinen nicht mehr in seinem Verlauf.",
+    "it": "Le vostre prossime partite insieme non arriveranno più nella sua cronologia."
+  },
   "a_scanner_bouton_scanner_un_code_sur_l_appareil_qui_rejoint": {
     "key": "À scanner (bouton « Scanner un code » sur l'appareil qui rejoint) ou à saisir — aucune connexion Wi-Fi commune n'est nécessaire, juste une connexion Internet des deux côtés.",
     "fr": "À scanner (bouton « Scanner un code » sur l'appareil qui rejoint) ou à saisir — aucune connexion Wi-Fi commune n'est nécessaire, juste une connexion Internet des deux côtés.",
@@ -1834,9 +2098,9 @@
   "evolution_des_scores": {
     "key": "Évolution des scores",
     "fr": "Évolution des scores",
-    "en": "Évolution des scores",
-    "es": "Évolution des scores",
-    "de": "Évolution des scores",
-    "it": "Évolution des scores"
+    "en": "Score progression",
+    "es": "Evolución de las puntuaciones",
+    "de": "Punkteverlauf",
+    "it": "Andamento dei punteggi"
   }
 }

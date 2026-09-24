@@ -17,6 +17,12 @@ final class DeepLinkRouter {
   var pendingJoin: JoinLink.Payload?
   var pendingContinuedMatchID: UUID?
   var wantsResume = false
+  /// Doc 16, phase A — « Rejoindre » n'est plus un onglet mais un écran plein écran, ouvert
+  /// depuis un bouton (Jeux, Profil), un lien ou un QR scanné par l'appareil photo système.
+  var isPresentingJoin = false
+  /// Doc 16, phase A — toucher sa propre fiche dans Joueurs ouvre l'onglet Profil, pas une
+  /// page de fiche parmi d'autres : c'est là que vit mon profil.
+  var wantsProfileTab = false
   /// Doc utilisateur — bascule sur l'onglet Historique, déjà filtré sur ce jeu (déclenché depuis
   /// `GameLeaderboardView`, même patron que les autres signaux de cette classe).
   var pendingHistoryGameID: String?

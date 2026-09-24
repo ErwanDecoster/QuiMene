@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		032C564DC8A0F3D4D62BC798 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96207CDBA3609DE06C4239DF /* ProfileView.swift */; };
+		B16A0000000000000000B001 /* ProfileTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B16A0000000000000000A001 /* ProfileTabView.swift */; };
 		033FC47E3D81ABFB62F0C352 /* Domain in Frameworks */ = {isa = PBXBuildFile; productRef = 62ED812F1D8049CBAE6F6278 /* Domain */; };
 		12BA3242BD0820C1F303E6D0 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = F1447FC049859DEDCC4CDB4A /* DesignSystem */; };
 		163489A6E89B817A87D107A0 /* MatchPlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AA1BD3EAD4A3DC5B516CC7 /* MatchPlayView.swift */; };
@@ -158,6 +159,7 @@
 		8E82C29D2632630F7291EE5F /* QuiMeneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuiMeneApp.swift; sourceTree = "<group>"; };
 		8FF955D9B59F4DB880763DAD /* QuiMeneUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuiMeneUITests.swift; sourceTree = "<group>"; };
 		96207CDBA3609DE06C4239DF /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		B16A0000000000000000A001 /* ProfileTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTabView.swift; sourceTree = "<group>"; };
 		995D8274A3CEAA3E755A72E6 /* PlayerRecord+Avatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerRecord+Avatar.swift"; sourceTree = "<group>"; };
 		9BB59FBD1B31E852B0902041 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1C0FFEE00000000000000A1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -317,6 +319,7 @@
 			isa = PBXGroup;
 			children = (
 				96207CDBA3609DE06C4239DF /* ProfileView.swift */,
+				B16A0000000000000000A001 /* ProfileTabView.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -672,6 +675,7 @@
 				B6B7C455B24B036B4984AF64 /* HistoryDetailView.swift in Sources */,
 				7345EA92A33843BEABBBA361 /* ReceivedMatchDetailView.swift in Sources */,
 				032C564DC8A0F3D4D62BC798 /* ProfileView.swift in Sources */,
+				B16A0000000000000000B001 /* ProfileTabView.swift in Sources */,
 				60FC842FC3B1BA12ED6EC82B /* SettingsView.swift in Sources */,
 				163489A6E89B817A87D107A0 /* MatchPlayView.swift in Sources */,
 				BE1477E7D8965E3F525C95B7 /* ArchivedPlayersView.swift in Sources */,

@@ -10,7 +10,7 @@ import SwiftUI
 /// demande, la vue cible n'existait donc pas encore pour recevoir l'événement (remontée
 /// utilisateur : « le scan du QR code ouvre bien l'application mais rien ne se passe »).
 private enum AppTab: Hashable {
-  case players, games, join, history
+  case players, games, history, profile
 }
 
 @main
@@ -38,13 +38,23 @@ struct QuiMeneApp: App {
             GamesTabView()
               .tabItem { Label("Jeux", systemImage: "die.face.5.fill") }
               .tag(AppTab.games)
-            JoinTabView()
-              .tabItem { Label("Rejoindre", systemImage: "qrcode.viewfinder") }
-              .tag(AppTab.join)
             HistoryListView(context: container.mainContext, catalog: .embedded)
               .tabItem { Label("Historique", systemImage: "clock.arrow.circlepath") }
               .tag(AppTab.history)
+            // Doc 16, phase A — Profil remplace l'onglet Rejoindre, devenu un écran plein
+            // écran (ci-dessous) ouvert depuis Jeux, Profil, un lien ou un QR système.
+            ProfileTabView()
+              .tabItem { Label("Profil", systemImage: "person.crop.circle") }
+              .tag(AppTab.profile)
           }
+          .fullScreenCover(
+            isPresented: Binding(
+              get: { deepLinkRouter.isPresentingJoin },
+              set: { deepLinkRouter.isPresentingJoin = $0 })
+          ) {
+            JoinTabView()
+          }
+          .modifier(ProfileRequirement())
           .environment(settings)
           .environment(deepLinkRouter)
           .modelContainer(container)
@@ -53,6 +63,7 @@ struct QuiMeneApp: App {
           // plan (voir `.onChange(of: scenePhase)` plus bas) : même déclencheur que
           // `MatchConnectionCoordinator`, pas de minuteur propre à inventer.
           .task {
+            try? PlayerRepository(context: container.mainContext).resolveDuplicateOwnProfiles()
             let repository = MatchRepository(context: container.mainContext)
             MatchLiveActivityController.reconcileOnLaunch { matchID in
               guard let match = try? repository.match(withID: matchID) else { return false }
@@ -74,7 +85,13 @@ struct QuiMeneApp: App {
         // Doc utilisateur — Live Activity (P9) : tap sur l'écran verrouillé ou la Dynamic
         // Island (`quimene://resume`, posé par `MatchLiveActivityWidget.widgetURL`).
         if url.host == "resume" {
-          deepLinkRouter.wantsResume = true
+          // Doc 16, phase A — un pair suit sa partie dans l'écran Rejoindre, plus dans un
+          // onglet : c'est lui qu'il faut rouvrir, pas la partie locale la plus récente.
+          if matchConnectionCoordinator.sharedModel != nil {
+            deepLinkRouter.isPresentingJoin = true
+          } else {
+            deepLinkRouter.wantsResume = true
+          }
           return
         }
         guard let payload = JoinLink.parse(url) else { return }
@@ -82,6 +99,7 @@ struct QuiMeneApp: App {
       }
       .onChange(of: scenePhase) { _, newPhase in
         if newPhase == .active, let container {
+          try? PlayerRepository(context: container.mainContext).resolveDuplicateOwnProfiles()
           Task { await SharedProfileSyncCoordinator.shared.sync(context: container.mainContext) }
         }
       }
@@ -96,7 +114,7 @@ struct QuiMeneApp: App {
       // racine, toujours monté dès le lancement) plutôt que dans la vue cible : c'est
       // justement ce qui manquait pour que l'onglet soit *construit* à temps.
       .onChange(of: deepLinkRouter.pendingJoin) { _, newValue in
-        if newValue != nil { selectedTab = .join }
+        if newValue != nil { deepLinkRouter.isPresentingJoin = true }
       }
       .onChange(of: deepLinkRouter.pendingContinuedMatchID) { _, newValue in
         if newValue != nil { selectedTab = .games }
@@ -106,6 +124,11 @@ struct QuiMeneApp: App {
       }
       .onChange(of: deepLinkRouter.pendingHistoryGameID) { _, newValue in
         if newValue != nil { selectedTab = .history }
+      }
+      .onChange(of: deepLinkRouter.wantsProfileTab) { _, newValue in
+        guard newValue else { return }
+        deepLinkRouter.wantsProfileTab = false
+        selectedTab = .profile
       }
     }
   }

@@ -70,4 +70,30 @@ struct PlayerRepositoryTests {
     #expect(bob.sortIndex == 0)
     #expect(alice.sortIndex == 1)
   }
+
+  @Test("Deux profils « à moi » après une synchronisation : le plus ancien reste, le doublon vierge disparaît")
+  func resolveDuplicateOwnProfilesKeepsOldest() throws {
+    let schema = Schema(QuiMeneSchemaV1.models)
+    let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+    let container = try ModelContainer(for: schema, configurations: [config])
+    let repository = PlayerRepository(context: container.mainContext)
+
+    let original = try repository.create(nickname: "Erwan", avatarKind: "emoji", avatarValue: "🦊")
+    original.createdAt = Date(timeIntervalSince1970: 1_000)
+    let originalID = try repository.sharedProfileID(for: original)
+
+    // Arrivé par iCloud après qu'un second profil a été créé sur le nouvel appareil.
+    let duplicate = try repository.create(nickname: "Erwan", avatarKind: "emoji", avatarValue: "🦊")
+    duplicate.createdAt = Date(timeIntervalSince1970: 2_000)
+    duplicate.sharedProfileID = UUID()
+    duplicate.sharedProfileIsMine = true
+    try repository.save()
+
+    try repository.resolveDuplicateOwnProfiles()
+
+    let mine = try repository.myOwnSharedPlayer()
+    #expect(mine?.sharedProfileID == originalID)
+    let remaining = try container.mainContext.fetch(FetchDescriptor<PlayerRecord>())
+    #expect(remaining.count == 1, "le doublon n'avait joué aucune partie : supprimé")
+  }
 }

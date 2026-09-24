@@ -6,10 +6,11 @@ import SwiftUI
 import Sync
 import UIKit
 
-/// Onglet « Rejoindre » — remplace l'ancienne feuille modale `JoinMatchView` (voir historique
-/// Git). Doc utilisateur : réduire le nombre de taps pour rejoindre une partie — arriver
-/// directement sur cet onglet ouvre la caméra, prête à scanner, plutôt que de demander un tap
-/// supplémentaire pour révéler le scanner depuis un formulaire.
+/// Écran « Rejoindre », présenté en plein écran depuis la racine (`DeepLinkRouter.isPresentingJoin`)
+/// — c'était un onglet jusqu'à la doc 16 (phase A), où Profil l'a remplacé. Doc utilisateur :
+/// réduire le nombre de taps pour rejoindre une partie — l'ouvrir affiche directement la caméra,
+/// prête à scanner. « Fermer » masque l'écran sans quitter la partie suivie (bandeau de reprise
+/// dans Jeux) ; seul « Quitter la partie » déconnecte.
 ///
 /// Le rôle n'est plus choisi ici : ce n'est pas à la personne qui rejoint de décider si elle peut
 /// modifier la partie, mais à l'hôte (`ShareSessionView`, « Autoriser les contributeurs »). On
@@ -19,6 +20,7 @@ import UIKit
 /// accordé une fois connecté.
 struct JoinTabView: View {
   @Environment(DeepLinkRouter.self) private var deepLinkRouter
+  @Environment(\.dismiss) private var dismiss
   private var coordinator: MatchConnectionCoordinator { .shared }
   @State private var pairingCode = ""
   @State private var isConnecting = false
@@ -32,13 +34,21 @@ struct JoinTabView: View {
           SharedMatchView(model: sharedModel, onReconnect: reconnect)
             .toolbar {
               ToolbarItem(placement: .cancellationAction) {
-                Button("Quitter") {
+                Button("Fermer") { dismiss() }
+              }
+              ToolbarItem(placement: .primaryAction) {
+                Button("Quitter la partie", role: .destructive) {
                   Task { await coordinator.stop() }
                 }
               }
             }
         } else {
           scannerView
+            .toolbar {
+              ToolbarItem(placement: .cancellationAction) {
+                Button("Fermer") { dismiss() }
+              }
+            }
         }
       }
     }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="value1">%1$s</string>
     <string name="value1_count2">%1$s: %2$d</string>
+    <string name="value1_est_deja_ton_ami_sur_la_fiche_value2">%1$s ya es tu amigo, en la ficha «%2$s».</string>
     <string name="value1_manche_count2">%1$s · Manga %2$d</string>
     <string name="value1_value2">%1$s, %2$s</string>
     <string name="value1_value2_count3">%1$s, %2$s : %3$d</string>
@@ -30,7 +30,11 @@
     <string name="activite">Actividad</string>
     <string name="activite_par_mois">Activité par mois</string>
     <string name="adopter_aussi_son_pseudo_et_son_avatar">Adoptar también su apodo y su avatar</string>
+    <string name="ajouter_un_ami">Añadir un amigo</string>
     <string name="ajouter_un_joueur">Añadir un jugador</string>
+    <string name="ami">Amigo</string>
+    <string name="ami_lie">Amigo vinculado</string>
+    <string name="amis">Amigos</string>
     <string name="annonce_count1">Apuesta: %1$d</string>
     <string name="annuler">Cancelar</string>
     <string name="annuler_la_derniere_manche">Deshacer la última manga</string>
@@ -40,6 +44,7 @@
     <string name="archiver_ce_joueur">Archivar este jugador</string>
     <string name="arreter_le_partage">Detener el uso compartido</string>
     <string name="aucun">Ninguno</string>
+    <string name="aucun_ami_lie_pour_l_instant">Todavía no hay amigos vinculados.</string>
     <string name="aucun_jeu_ne_correspond_a_ta_recherche">Ningún juego coincide con tu búsqueda.</string>
     <string name="aucun_joueur_archive">Ningún jugador archivado.</string>
     <string name="aucun_joueur_ajouter_un_joueur">Ningún jugador. Añadir un jugador</string>
@@ -59,6 +64,7 @@
     <string name="belote_rebelote">Belote-rebelote</string>
     <string name="bonus">Bonus</string>
     <string name="bouts_count1">Bouts: %1$d</string>
+    <string name="c_est_ton_propre_profil">Es tu propio perfil.</string>
     <string name="capot">Capot</string>
     <string name="ce_profil_est_deja_suivi_par_la_fiche_value1_sur_cet">Este perfil ya lo sigue la ficha «%1$s» en este dispositivo. Continuar hará que esta ficha también lo siga — hazlo solo si es la misma persona (por ejemplo, una ficha recreada).</string>
     <string name="cette_donne">Esta mano</string>
@@ -69,20 +75,25 @@
     <string name="chelem_realise">Chelem logrado</string>
     <string name="choisir_une_photo">Elegir una foto</string>
     <string name="code_qr_d_appairage">Código QR de emparejamiento</string>
+    <string name="code_qr_de_ton_profil">Código QR de tu perfil</string>
     <string name="code_d_appairage">Código de emparejamiento</string>
     <string name="commencer">Empezar</string>
     <string name="commencer_une_partie">Empezar una partida</string>
     <string name="commencer_une_partie_de_game">Empezar una partida de ${game}</string>
+    <string name="connexion_perdue_dernier_score_recu">Conexión perdida — última puntuación recibida</string>
     <string name="connexion_a_l_hote_perdue_le_tableau_affiche_est_le_dernier">Se perdió la conexión con el anfitrión. El tablero mostrado es el último recibido.</string>
     <string name="connexion_a_la_partie">Conectando a la partida…</string>
     <string name="connexion">Conectando…</string>
     <string name="contrat">Contrato</string>
     <string name="contributeur">Colaborador</string>
     <string name="copier_l_adresse">Copiar la dirección</string>
+    <string name="creer_la_fiche_value1">Crear la ficha «%1$s»</string>
+    <string name="creer_mon_profil">Crear mi perfil</string>
     <string name="demande_d_ajout_d_un_jeu_qui_mene">Solicitud para añadir un juego — Qui Mène ?</string>
     <string name="demander_ce_jeu">Solicitar este juego</string>
     <string name="demander_l_ajout_d_un_jeu">Solicitar un juego</string>
     <string name="double_label">Doble</string>
+    <string name="deja_un_profil_sur_un_autre_appareil_avec_icloud_il_arrive">¿Ya tienes un perfil en otro dispositivo? Con iCloud, llega solo en unos instantes.</string>
     <string name="demarrage_du_partage">Iniciando el uso compartido…</string>
     <string name="derive_automatiquement_du_pseudo_modifiable_ci_dessous">Derivado automáticamente del apodo — modificable a continuación.</string>
     <string name="emoji">Emoji</string>
@@ -92,6 +103,7 @@
     <string name="envoie_ta_demande_a_value1_depuis_l_application_de_ton_choix">Envía tu solicitud a %1$s desde la app que prefieras.</string>
     <string name="envoyer">Enviar</string>
     <string name="fais_scanner_ce_code_par_l_ami_avec_qui_tu_veux_partager">Haz que el amigo con quien quieres compartir tu historial escanee este código, desde su propia ficha «Seguir un perfil recibido».</string>
+    <string name="fais_scanner_ce_code_par_un_ami_depuis_ajouter_un_ami_dans">Pide a un amigo que escanee este código desde «Añadir un amigo» en su pestaña Perfil. Las partidas que juguéis juntos aparecerán en vuestros dos historiales.</string>
     <string name="faits_marquants">Momentos destacados</string>
     <string name="fermer">Cerrar</string>
     <string name="garde">Garde</string>
@@ -116,6 +128,9 @@
     <string name="le_jeu_que_je_souhaite_voir_ajoute">El juego que me gustaría que añadierais:</string>
     <string name="les_personnes_qui_rejoignent_ne_peuvent_qu_observer_quel">Las personas que se unan solo podrán observar, sea cual sea su elección — esto no cambia nada para los colaboradores ya conectados.</string>
     <string name="les_personnes_qui_rejoignent_peuvent_choisir_d_observer_ou">Las personas que se unan pueden elegir observar o proponer mangas.</string>
+    <string name="lie_au_profil_de_value1_depuis_le_value2">Vinculado al perfil de %1$s desde el %2$s.</string>
+    <string name="lie_au_profil_de_value1">Vinculado al perfil de %1$s.</string>
+    <string name="m_ajouter_comme_ami">Añadirme como amigo</string>
     <string name="manche">Manga</string>
     <string name="manche_count1">Manga %1$d</string>
     <string name="manche_par_manche">Manga por manga</string>
@@ -124,16 +139,21 @@
     <string name="meilleur_joueur">Mejor jugador</string>
     <string name="meilleur_score_count1_value2">Mejor puntuación: %1$d — %2$s</string>
     <string name="meilleurs_joueurs">Mejores jugadores</string>
+    <string name="mes_statistiques">Mis estadísticas</string>
     <string name="modifier">Editar</string>
     <string name="modifier_le_joueur">Editar el jugador</string>
+    <string name="modifier_le_profil">Editar perfil</string>
     <string name="mois">Mes</string>
+    <string name="mon_profil">Mi perfil</string>
     <string name="ne_plus_partager">Dejar de compartir</string>
     <string name="ne_plus_suivre_ce_profil">Dejar de seguir este perfil</string>
     <string name="nombre_de_des_count1">Número de dados: %1$d</string>
+    <string name="nouvelle_fiche_avec_son_pseudo_et_son_avatar">Nueva ficha con su apodo y su avatar.</string>
     <string name="nemesis">Némesis</string>
     <string name="ok">OK</string>
     <string name="observateur">Observador</string>
     <string name="obtenu_count1">Conseguido (%1$d)</string>
+    <string name="ou_c_est_une_de_mes_fiches">O es una de mis fichas</string>
     <string name="ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app">Abre los ajustes del sistema para elegir el idioma de la app.</string>
     <string name="par_jeu">Por juego</string>
     <string name="partage_ta_fiche_pour_que_tes_amis_puissent_te_suivre_suis">Comparte tu ficha para que tus amigos puedan seguirte. Sigue a un amigo para encontrar las partidas jugadas juntos en su historial.</string>
@@ -143,6 +163,7 @@
     <string name="partager_la_partie">Compartir la partida</string>
     <string name="partager_le_resume">Compartir el resumen</string>
     <string name="partenaire_roi_appele">Compañero (rey llamado)</string>
+    <string name="partie_partagee_en_cours_reprendre">Partida compartida en curso · Reanudar</string>
     <string name="partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par">Partida recibida del dispositivo de un amigo: el detalle manga por manga no está disponible aquí.</string>
     <string name="parties">Partidas</string>
     <string name="parties_archivees">Partidas archivadas</string>
@@ -158,20 +179,26 @@
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Puntos del atacante: %1$d</string>
     <string name="preneur">Atacante</string>
+    <string name="profil">Perfil</string>
     <string name="profil_partage">Perfil compartido</string>
     <string name="pseudo">Apodo</string>
     <string name="quitter">Salir</string>
+    <string name="quitter_la_partie">Salir de la partida</string>
     <string name="rang_moyen">Rango medio</string>
     <string name="rate_0">Fallado (0)</string>
     <string name="rechercher_un_jeu">Buscar un juego</string>
     <string name="reconnexion">Reconectando…</string>
     <string name="record">Récord</string>
     <string name="rejoindre">Unirse</string>
+    <string name="rejoindre_les_parties_de_tes_amis_et_y_etre_reconnu">Unirte a las partidas de tus amigos y ser reconocido.</string>
+    <string name="rejoindre_une_partie">Unirse a una partida</string>
     <string name="remplacer_la_partie_partagee">¿Reemplazar la partida compartida?</string>
     <string name="reprendre_la_partie">Reanudar la partida</string>
     <string name="reprendre_la_partie_en_cours">Reanudar la partida en curso</string>
     <string name="reprendre_la_partie_en_cours_value1">Reprendre la partie en cours, %1$s</string>
     <string name="reprise_automatique_en_cours">Reanudación automática en curso.</string>
+    <string name="retirer_des_amis">Quitar de amigos</string>
+    <string name="retrouver_vos_parties_jouees_ensemble_dans_ton_historique">Encontrar en tu historial las partidas jugadas juntos.</string>
     <string name="regles_ou_lien_vers_les_regles_facultatif">Reglas o un enlace a las reglas (opcional):</string>
     <string name="reactiver">Reactivar</string>
     <string name="realise_count1">Resultado: %1$d</string>
@@ -198,6 +225,8 @@
     <string name="supprimer_ce_joueur">Eliminar este jugador</string>
     <string name="supprimer_definitivement_ce_joueur">¿Eliminar definitivamente a este jugador?</string>
     <string name="supprimer_definitivement_cette_partie">¿Eliminar definitivamente esta partida?</string>
+    <string name="supprimer_mon_profil">Eliminar mi perfil</string>
+    <string name="supprimer_ton_profil">¿Eliminar tu perfil?</string>
     <string name="synchronisation_icloud">Sincronización de iCloud</string>
     <string name="synchronise_les_joueurs_et_les_parties_entre_tes_appareils">Sincroniza los jugadores y las partidas entre tus dispositivos mediante iCloud. Si está desactivada, la app sigue siendo totalmente funcional en local. El cambio se aplica en el próximo inicio de la app.</string>
     <string name="serie_en_cours">Racha actual</string>
@@ -206,6 +235,7 @@
     <string name="terminer_la_partie">Terminar la partida</string>
     <string name="terminer_la_partie_2">¿Terminar la partida?</string>
     <string name="termine">Hecho</string>
+    <string name="tes_amis_ne_recevront_plus_les_parties_jouees_avec_toi_ta">Tus amigos ya no recibirán las partidas jugadas contigo. Tu ficha y su historial se conservan, y después crearás un nuevo perfil.</string>
     <string name="total">Total</string>
     <string name="toujours_pas_de_connexion_nouvelle_tentative_automatique_en">Sigue sin haber conexión — nuevo intento automático en curso.</string>
     <string name="tous_les_jeux">Todos los juegos</string>
@@ -213,6 +243,7 @@
     <string name="tri_des_joueurs">Orden de los jugadores</string>
     <string name="triple">Triple</string>
     <string name="tu_suis_value1_depuis_le_value2">Sigues a %1$s desde el %2$s</string>
+    <string name="un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer">Un apodo y un avatar, nada más: ninguna cuenta que crear.</string>
     <string name="une_session_est_en_cours_de_partage_sur_value1_continuer">Hay una sesión en curso de compartición en %1$s. Continuar aquí la reemplazará: las personas conectadas verán esta partida en su lugar.</string>
     <string name="valider">Validar</string>
     <string name="valider_la_donne">Validar la mano</string>
@@ -223,11 +254,13 @@
     <string name="voir_la_session_partagee">Ver la sesión compartida</string>
     <string name="voir_le_mois">Ver el mes</string>
     <string name="voir_les_manches">Ver las mangas</string>
+    <string name="vos_parties_jouees_ensemble_apparaissent_dans_vos_deux">Las partidas que jugáis juntos aparecen en vuestros dos historiales.</string>
+    <string name="vos_prochaines_parties_jouees_ensemble_n_arriveront_plus">Vuestras próximas partidas juntos ya no llegarán a su historial.</string>
     <string name="a_scanner_bouton_scanner_un_code_sur_l_appareil_qui_rejoint">Para escanear (botón «Escanear un código» en el dispositivo que se une) o para introducir — no se necesita ninguna conexión Wi-Fi común, solo una conexión a Internet en ambos lados.</string>
     <string name="equipe">Equipo</string>
     <string name="equipe_value1">Equipo %1$s</string>
     <string name="equipe_preneuse">Equipo atacante</string>
     <string name="equipes">Equipos</string>
     <string name="evolution">Evolución</string>
-    <string name="evolution_des_scores">Évolution des scores</string>
+    <string name="evolution_des_scores">Evolución de las puntuaciones</string>
 </resources>

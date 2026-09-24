@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,6 +35,7 @@ fun SharedMatchScreen(
     viewModel: SharedMatchViewModel,
     onQuit: () -> Unit,
     onReconnect: () -> Unit,
+    onClose: () -> Unit,
 ) {
     val colors = LocalAppColors.current
     val state = viewModel.stateOrNull
@@ -43,7 +48,14 @@ fun SharedMatchScreen(
                         state?.let { viewModel.definition.name.localized } ?: stringResource(R.string.connexion),
                     )
                 },
-                actions = { TextButton(onClick = onQuit) { Text(stringResource(R.string.quitter)) } },
+                // Doc 16, phase A — revenir en arrière garde la partie suivie (bandeau de reprise
+                // dans Jeux) ; seul « Quitter la partie » déconnecte.
+                navigationIcon = {
+                    IconButton(onClick = onClose) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.fermer))
+                    }
+                },
+                actions = { TextButton(onClick = onQuit) { Text(stringResource(R.string.quitter_la_partie)) } },
             )
         },
     ) { innerPadding ->

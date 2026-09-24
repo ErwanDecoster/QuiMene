@@ -7,6 +7,7 @@ import SwiftUI
 struct PlayersListView: View {
   @Environment(\.modelContext) private var modelContext
   @Environment(AppSettings.self) private var settings
+  @Environment(DeepLinkRouter.self) private var deepLinkRouter
   @Query(sort: \PlayerRecord.sortIndex) private var allPlayers: [PlayerRecord]
   @State private var isPresentingCreation = false
   @State private var editMode: EditMode = .inactive
@@ -15,7 +16,9 @@ struct PlayersListView: View {
   /// Doc 01 : tri automatique par nombre de parties jouées (habitués d'abord) par défaut,
   /// tri manuel (glisser-déposer) en option — réglable dans Réglages.
   private var activePlayers: [PlayerRecord] {
-    let filtered = allPlayers.filter { !$0.isArchived }
+    // Doc 16, phase A — mon profil a sa propre section en tête (`myProfileSection`) : il ne
+    // se trie, ne se déplace et ne se sélectionne pas avec les autres joueurs.
+    let filtered = allPlayers.filter { !$0.isArchived && !$0.sharedProfileIsMine }
     let sorted: [PlayerRecord]
     if settings.playerSortMode == .automatic {
       sorted = filtered.sorted { lhs, rhs in
@@ -27,20 +30,10 @@ struct PlayersListView: View {
     } else {
       sorted = filtered
     }
-    return pinningMine(in: sorted)
+    return sorted
   }
 
-  /// Doc utilisateur — la fiche que cet appareil partage comme la sienne (doc 14, phase 4)
-  /// reste toujours en tête, quel que soit le tri choisi par ailleurs : c'est la seule qui
-  /// représente l'utilisateur de cet appareil, elle ne se perd pas dans le tri des habitués.
-  private func pinningMine(in players: [PlayerRecord]) -> [PlayerRecord] {
-    guard let mineIndex = players.firstIndex(where: { $0.sharedProfileIsMine }), mineIndex != 0
-    else { return players }
-    var reordered = players
-    let mine = reordered.remove(at: mineIndex)
-    reordered.insert(mine, at: 0)
-    return reordered
-  }
+  private var me: PlayerRecord? { allPlayers.first { $0.sharedProfileIsMine } }
 
   private var archivedCount: Int { allPlayers.count { $0.isArchived } }
 
@@ -52,6 +45,10 @@ struct PlayersListView: View {
   var body: some View {
     NavigationStack {
       List(selection: $selectedPlayerIDs) {
+        if let me, !editMode.isEditing {
+          myProfileSection(me)
+        }
+
         Section {
           if activePlayers.isEmpty {
             EmptyState(
@@ -138,13 +135,50 @@ struct PlayersListView: View {
       Text(player.nickname)
         .font(.bodyText)
         .foregroundStyle(.textPrimary)
+      // Doc 16, phase A — une fiche liée est un ami qui reçoit nos parties communes.
+      if player.sharedProfileID != nil {
+        Image(systemName: "link")
+          .font(.label)
+          .foregroundStyle(.textTertiary)
+          .accessibilityLabel("Ami lié")
+      }
       Spacer(minLength: 0)
     }
     .padding(.vertical, Space.xs)
     .frame(maxWidth: .infinity, alignment: .leading)
     .contentShape(Rectangle())
     .accessibilityElement(children: .combine)
-    .accessibilityLabel(player.nickname)
+  }
+
+  /// Doc 16, phase A — moi, au-dessus de la liste et en dehors : un toucher ouvre l'onglet
+  /// Profil, où vit tout ce qui me concerne.
+  private func myProfileSection(_ me: PlayerRecord) -> some View {
+    Section {
+      Button {
+        deepLinkRouter.wantsProfileTab = true
+      } label: {
+        HStack(spacing: Space.md) {
+          AvatarView(avatar: me.avatar, size: .medium)
+          VStack(alignment: .leading, spacing: Space.xxs) {
+            Text(me.nickname)
+              .font(.h6)
+              .foregroundStyle(.textPrimary)
+            Text("Mon profil")
+              .font(.label)
+              .foregroundStyle(.textSecondary)
+          }
+          Spacer(minLength: 0)
+          Image(systemName: "chevron.right")
+            .font(.label)
+            .foregroundStyle(.textTertiary)
+            .accessibilityHidden(true)
+        }
+        .padding(.vertical, Space.xs)
+        .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+      .accessibilityElement(children: .combine)
+    }
   }
 
   private func matchesPlayedCount(for player: PlayerRecord) -> Int {

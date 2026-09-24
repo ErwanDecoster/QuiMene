@@ -7,7 +7,6 @@ import SwiftUI
 
 struct HistoryListView: View {
   @State private var model: HistoryListModel
-  @State private var isPresentingSettings = false
   @State private var editMode: EditMode = .inactive
   @State private var selectedMatchIDs = Set<UUID>()
   @Environment(DeepLinkRouter.self) private var deepLinkRouter
@@ -76,10 +75,6 @@ struct HistoryListView: View {
             }
             .tint(.semanticError)
             .disabled(selectedMatchIDs.isEmpty)
-          } else {
-            Button("Réglages", systemImage: "gearshape") {
-              isPresentingSettings = true
-            }
           }
         }
         if !model.matches.isEmpty {
@@ -89,9 +84,6 @@ struct HistoryListView: View {
         }
       }
       .environment(\.editMode, $editMode)
-      .sheet(isPresented: $isPresentingSettings) {
-        SettingsView()
-      }
       .onAppear {
         model.reload()
         consumePendingHistoryFilter()

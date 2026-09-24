@@ -5,6 +5,8 @@ import SwiftData
 
 enum PlayerEditorMode {
   case create
+  /// Doc 16, phase A — crée la fiche de l'utilisateur de cet appareil : « mon profil ».
+  case createProfile
   case edit(PlayerRecord)
 }
 
@@ -51,26 +53,8 @@ final class PlayerEditorModel {
   private(set) var linkedProfileName: String?
   private(set) var linkedProfileDate: Date?
   /// Doc 14, phase 4 — `true` si *cette* fiche est celle que cet appareil partage comme la
-  /// sienne (par opposition à une fiche qui suit un ami, liée en scannant son code).
+  /// sienne (mon profil, doc 16) par opposition à une fiche qui suit un ami.
   private(set) var isMyOwnSharedProfile = false
-  /// Doc 14, phase 4 — non-`nil` juste après un « Partager ce profil » refusé parce qu'une
-  /// autre fiche est déjà celle de cet appareil.
-  private(set) var shareConflictMessage: String?
-
-  /// Lien QR à faire scanner par l'ami avec qui partager l'historique — recalculé depuis
-  /// `sharedProfileID`/le pseudo/l'avatar courants, jamais stocké séparément. `nil` pour une
-  /// fiche qui suit un ami (liée, pas partagée) : seule *la* fiche de cet appareil se partage,
-  /// on ne rediffuse pas l'identité de quelqu'un d'autre en aval.
-  var shareURL: URL? {
-    guard isMyOwnSharedProfile, let sharedProfileID else { return nil }
-    return ProfileShareLink.url(
-      id: sharedProfileID,
-      name: nickname,
-      avatarKind: avatarKind,
-      avatarValue: avatarKind == "photo" ? "" : emojiValue,
-      paletteID: paletteID
-    )
-  }
 
   var paletteID: String {
     didSet {
@@ -92,6 +76,11 @@ final class PlayerEditorModel {
     return false
   }
 
+  var isCreatingProfile: Bool {
+    if case .createProfile = mode { return true }
+    return false
+  }
+
   /// Un joueur archivé n'a plus de sens à ré-archiver depuis son éditeur — la seule action
   /// destructive qui reste pertinente ici est la suppression définitive.
   var isArchivedPlayer: Bool {
@@ -108,7 +97,7 @@ final class PlayerEditorModel {
     self.repository = PlayerRepository(context: context)
 
     switch mode {
-    case .create:
+    case .create, .createProfile:
       nickname = ""
       avatarKind = "emoji"
       let generated = Avatar.generated(for: "")
@@ -191,6 +180,15 @@ final class PlayerEditorModel {
         avatarPhoto: photo,
         paletteID: paletteID
       )
+    case .createProfile:
+      let player = try repository.create(
+        nickname: nickname,
+        avatarKind: avatarKind,
+        avatarValue: value,
+        avatarPhoto: photo,
+        paletteID: paletteID
+      )
+      try repository.sharedProfileID(for: player)
     case .edit(let player):
       player.nickname = nickname
       player.avatarKind = avatarKind
@@ -204,65 +202,6 @@ final class PlayerEditorModel {
   private var editedPlayer: PlayerRecord? {
     if case .edit(let player) = mode { return player }
     return nil
-  }
-
-  /// Doc 14, phase 4 — génère l'identifiant partageable de cette fiche s'il n'existe pas
-  /// encore, pour que « Partager ce profil » ait un QR à afficher immédiatement après le tap.
-  /// Refuse si une *autre* fiche de cet appareil est déjà « la sienne » — une seule à la fois.
-  func ensureSharedProfileID() {
-    guard let player = editedPlayer else { return }
-    shareConflictMessage = nil
-    do {
-      sharedProfileID = try repository.sharedProfileID(for: player)
-      isMyOwnSharedProfile = true
-    } catch PlayerRepositoryError.alreadySharingAnotherProfile(let nickname) {
-      shareConflictMessage =
-        "Tu partages déjà ta fiche « \(nickname) » comme la tienne. Une seule fiche par appareil peut l'être — délie-la d'abord si tu veux la remplacer par celle-ci."
-    } catch PlayerRepositoryError.cannotShareALinkedProfile {
-      // Doc 14, phase 4 — ne devrait plus arriver : la vue ne propose plus ce bouton sur
-      // une fiche déjà liée à un ami. Filet de sécurité si jamais appelé autrement.
-      shareConflictMessage =
-        "Cette fiche suit déjà un ami : elle ne peut pas aussi être partagée comme la tienne."
-    } catch {
-      sharedProfileID = nil
-    }
-  }
-
-  /// Doc 14, phase 3 « Limites de confiance » — si cet identifiant est déjà utilisé par une
-  /// *autre* fiche locale, la vue doit avertir avant de continuer plutôt que lier en silence
-  /// (rien ne distingue sinon un scan malencontreux d'une liaison volontaire).
-  func conflictingPlayerName(forSharedProfileID id: UUID) -> String? {
-    guard let player = editedPlayer,
-      let existing = try? repository.player(withSharedProfileID: id),
-      existing.id != player.id
-    else { return nil }
-    return existing.nickname
-  }
-
-  /// Doc 14 — lie cette fiche à l'identifiant scanné sur le téléphone d'un ami. `adoptNameAndAvatar`
-  /// reprend le pseudo et l'avatar tels que connus au moment du scan (jamais une photo, qui ne
-  /// transite pas par le QR — voir `ProfileShareLink`) plutôt que de garder ceux, potentiellement
-  /// approximatifs, choisis à la création de cette fiche.
-  func linkProfile(
-    id: UUID, name: String, avatarKind: String, avatarValue: String, paletteID: String,
-    adoptNameAndAvatar: Bool
-  ) {
-    guard let player = editedPlayer else { return }
-    try? repository.linkSharedProfile(id, name: name, for: player)
-    sharedProfileID = id
-    linkedProfileName = name
-    linkedProfileDate = Date()
-
-    guard adoptNameAndAvatar else { return }
-    // Posé avant les changements ci-dessous : l'avatar adopté ne doit pas se faire écraser par
-    // la régénération automatique du pseudo.
-    hasManualAvatarOverride = true
-    nickname = name
-    if avatarKind != "photo" {
-      self.avatarKind = "emoji"
-      emojiValue = avatarValue
-      self.paletteID = paletteID
-    }
   }
 
   func unlinkProfile() {

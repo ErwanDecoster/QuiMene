@@ -5,13 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.quimene.app.profilesharing.ProfileShareLink
 import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarKind
 import com.quimene.store.PlayerEntity
 import com.quimene.store.PlayerRepository
-import com.quimene.store.PlayerRepositoryError
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.UUID
@@ -26,6 +23,9 @@ class PlayerEditorViewModel(
 ) : ViewModel() {
     sealed interface Mode {
         data object Create : Mode
+
+        /** Doc 16, phase A — crée la fiche de l'utilisateur de cet appareil : « mon profil ». */
+        data object CreateProfile : Mode
 
         data class Edit(
             val player: PlayerEntity,
@@ -67,32 +67,14 @@ class PlayerEditorViewModel(
     var isMyOwnSharedProfile by mutableStateOf(false)
         private set
 
-    /** Non-`null` juste après un « Partager ce profil » refusé parce qu'une autre fiche est déjà
-     * celle de cet appareil. */
-    var shareConflictMessage by mutableStateOf<String?>(null)
-        private set
-
-    /** Lien QR à faire scanner par l'ami avec qui partager l'historique — non-`null` seulement
-     * si cette fiche est *la* fiche partagée de cet appareil. */
-    val shareURL: String?
-        get() {
-            val id = sharedProfileID?.takeIf { isMyOwnSharedProfile } ?: return null
-            return ProfileShareLink.url(
-                id = id,
-                name = nickname,
-                avatarKind = avatarKind,
-                avatarValue = if (avatarKind == "photo") "" else emojiValue,
-                paletteID = paletteID,
-            )
-        }
-
     val isEditing: Boolean get() = mode is Mode.Edit
+    val isCreatingProfile: Boolean get() = mode is Mode.CreateProfile
     val isArchivedPlayer: Boolean get() = (mode as? Mode.Edit)?.player?.isArchived ?: false
     val canSave: Boolean get() = nickname.length in 1..24
 
     init {
         when (mode) {
-            is Mode.Create -> applyGenerated(Avatar.generated(""))
+            is Mode.Create, is Mode.CreateProfile -> applyGenerated(Avatar.generated(""))
             is Mode.Edit -> {
                 val player = mode.player
                 nickname = player.nickname
@@ -175,6 +157,10 @@ class PlayerEditorViewModel(
             val photo = if (avatarKind == "photo") photoData else null
             when (mode) {
                 is Mode.Create -> repository.create(nickname, avatarKind, value, photo, paletteID)
+                is Mode.CreateProfile -> {
+                    val player = repository.create(nickname, avatarKind, value, photo, paletteID)
+                    repository.sharedProfileID(player)
+                }
                 is Mode.Edit ->
                     repository.save(
                         mode.player.copy(
@@ -195,73 +181,6 @@ class PlayerEditorViewModel(
         viewModelScope.launch {
             repository.archive(player)
             onDone()
-        }
-    }
-
-    /** Doc 14, phase 4 — génère l'identifiant partageable de cette fiche s'il n'existe pas
-     * encore, pour que « Partager ce profil » ait un QR à afficher immédiatement après le tap.
-     * Refuse si une *autre* fiche de cet appareil est déjà « la sienne » — une seule à la fois. */
-    fun ensureSharedProfileID() {
-        val player = (mode as? Mode.Edit)?.player ?: return
-        shareConflictMessage = null
-        viewModelScope.launch {
-            try {
-                sharedProfileID = repository.sharedProfileID(player)
-                isMyOwnSharedProfile = true
-            } catch (cancellation: CancellationException) {
-                throw cancellation
-            } catch (error: PlayerRepositoryError.AlreadySharingAnotherProfile) {
-                shareConflictMessage =
-                    "Tu partages déjà ta fiche « ${error.nickname} » comme la tienne. Une seule fiche par " +
-                    "appareil peut l'être — délie-la d'abord si tu veux la remplacer par celle-ci."
-            } catch (error: PlayerRepositoryError.CannotShareALinkedProfile) {
-                shareConflictMessage =
-                    "Cette fiche suit déjà un ami : elle ne peut pas aussi être partagée comme la tienne."
-            } catch (error: Exception) {
-                sharedProfileID = null
-            }
-        }
-    }
-
-    /** Doc 14, phase 3 « Limites de confiance » — si cet identifiant est déjà utilisé par une
-     * *autre* fiche locale, l'écran de confirmation doit avertir avant de continuer plutôt que
-     * lier en silence. */
-    suspend fun conflictingPlayerName(id: UUID): String? {
-        val player = (mode as? Mode.Edit)?.player ?: return null
-        val existing = repository.player(id) ?: return null
-        return if (existing.id != player.id) existing.nickname else null
-    }
-
-    /** Lie cette fiche à l'identifiant scanné sur le téléphone d'un ami. [adoptNameAndAvatar]
-     * reprend le pseudo et l'avatar tels que connus au moment du scan (jamais une photo, qui ne
-     * transite pas par le QR) plutôt que de garder ceux, potentiellement approximatifs, choisis
-     * à la création de cette fiche. */
-    fun linkProfile(
-        id: UUID,
-        name: String,
-        scannedAvatarKind: String,
-        scannedAvatarValue: String,
-        scannedPaletteID: String,
-        adoptNameAndAvatar: Boolean,
-    ) {
-        val player = (mode as? Mode.Edit)?.player ?: return
-        viewModelScope.launch {
-            repository.linkSharedProfile(id, name, player)
-            sharedProfileID = id
-            isMyOwnSharedProfile = false
-            linkedProfileName = name
-            linkedProfileDate = Instant.now()
-
-            if (!adoptNameAndAvatar) return@launch
-            // Posé avant les changements ci-dessous : l'avatar adopté ne doit pas se faire
-            // écraser par la régénération automatique du pseudo.
-            hasManualAvatarOverride = true
-            nickname = name
-            if (scannedAvatarKind != "photo") {
-                avatarKind = "emoji"
-                emojiValue = scannedAvatarValue
-                paletteID = scannedPaletteID
-            }
         }
     }
 

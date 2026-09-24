@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="value1">%1$s</string>
     <string name="value1_count2">%1$s: %2$d</string>
+    <string name="value1_est_deja_ton_ami_sur_la_fiche_value2">%1$s ist bereits dein Freund, auf der Karte „%2$s“.</string>
     <string name="value1_manche_count2">%1$s · Runde %2$d</string>
     <string name="value1_value2">%1$s, %2$s</string>
     <string name="value1_value2_count3">%1$s, %2$s : %3$d</string>
@@ -30,7 +30,11 @@
     <string name="activite">Aktivität</string>
     <string name="activite_par_mois">Activité par mois</string>
     <string name="adopter_aussi_son_pseudo_et_son_avatar">Auch dessen Spitznamen und Avatar übernehmen</string>
+    <string name="ajouter_un_ami">Freund hinzufügen</string>
     <string name="ajouter_un_joueur">Spieler hinzufügen</string>
+    <string name="ami">Freund</string>
+    <string name="ami_lie">Verknüpfter Freund</string>
+    <string name="amis">Freunde</string>
     <string name="annonce_count1">Ansage: %1$d</string>
     <string name="annuler">Abbrechen</string>
     <string name="annuler_la_derniere_manche">Letzte Runde rückgängig machen</string>
@@ -40,6 +44,7 @@
     <string name="archiver_ce_joueur">Diesen Spieler archivieren</string>
     <string name="arreter_le_partage">Freigabe beenden</string>
     <string name="aucun">Keiner</string>
+    <string name="aucun_ami_lie_pour_l_instant">Noch keine verknüpften Freunde.</string>
     <string name="aucun_jeu_ne_correspond_a_ta_recherche">Kein Spiel entspricht deiner Suche.</string>
     <string name="aucun_joueur_archive">Keine archivierten Spieler.</string>
     <string name="aucun_joueur_ajouter_un_joueur">Keine Spieler. Spieler hinzufügen</string>
@@ -59,6 +64,7 @@
     <string name="belote_rebelote">Belote-rebelote</string>
     <string name="bonus">Bonus</string>
     <string name="bouts_count1">Bouts: %1$d</string>
+    <string name="c_est_ton_propre_profil">Das ist dein eigenes Profil.</string>
     <string name="capot">Capot</string>
     <string name="ce_profil_est_deja_suivi_par_la_fiche_value1_sur_cet">Dieses Profil wird auf diesem Gerät bereits von der Karte „%1$s“ verfolgt. Fortfahren lässt diese Karte es ebenfalls verfolgen — nur tun, wenn es dieselbe Person ist (z. B. eine neu erstellte Karte).</string>
     <string name="cette_donne">Diese Hand</string>
@@ -69,20 +75,25 @@
     <string name="chelem_realise">Erzielter Chelem</string>
     <string name="choisir_une_photo">Foto auswählen</string>
     <string name="code_qr_d_appairage">QR-Kopplungscode</string>
+    <string name="code_qr_de_ton_profil">QR-Code deines Profils</string>
     <string name="code_d_appairage">Kopplungscode</string>
     <string name="commencer">Starten</string>
     <string name="commencer_une_partie">Eine Partie starten</string>
     <string name="commencer_une_partie_de_game">Eine Partie ${game} starten</string>
+    <string name="connexion_perdue_dernier_score_recu">Verbindung verloren — letzter empfangener Punktestand</string>
     <string name="connexion_a_l_hote_perdue_le_tableau_affiche_est_le_dernier">Verbindung zum Host verloren. Die angezeigte Tafel ist die zuletzt empfangene.</string>
     <string name="connexion_a_la_partie">Verbindung zur Partie…</string>
     <string name="connexion">Verbindung…</string>
     <string name="contrat">Kontrakt</string>
     <string name="contributeur">Mitwirkender</string>
     <string name="copier_l_adresse">Adresse kopieren</string>
+    <string name="creer_la_fiche_value1">Karte „%1$s“ erstellen</string>
+    <string name="creer_mon_profil">Mein Profil erstellen</string>
     <string name="demande_d_ajout_d_un_jeu_qui_mene">Anfrage: Spiel hinzufügen — Qui Mène ?</string>
     <string name="demander_ce_jeu">Dieses Spiel anfragen</string>
     <string name="demander_l_ajout_d_un_jeu">Ein Spiel anfragen</string>
     <string name="double_label">Doppelt</string>
+    <string name="deja_un_profil_sur_un_autre_appareil_avec_icloud_il_arrive">Schon ein Profil auf einem anderen Gerät? Mit iCloud kommt es in wenigen Augenblicken von selbst.</string>
     <string name="demarrage_du_partage">Freigabe wird gestartet…</string>
     <string name="derive_automatiquement_du_pseudo_modifiable_ci_dessous">Automatisch vom Spitznamen abgeleitet — unten änderbar.</string>
     <string name="emoji">Emoji</string>
@@ -92,6 +103,7 @@
     <string name="envoie_ta_demande_a_value1_depuis_l_application_de_ton_choix">Sende deine Anfrage von einer beliebigen App an %1$s.</string>
     <string name="envoyer">Senden</string>
     <string name="fais_scanner_ce_code_par_l_ami_avec_qui_tu_veux_partager">Lass diesen Code von dem Freund scannen, mit dem du deinen Verlauf teilen möchtest, über dessen eigene Karte „Empfangenes Profil folgen“.</string>
+    <string name="fais_scanner_ce_code_par_un_ami_depuis_ajouter_un_ami_dans">Lass einen Freund diesen Code über „Freund hinzufügen“ in seinem Profil-Tab scannen. Eure gemeinsamen Partien erscheinen in euren beiden Verläufen.</string>
     <string name="faits_marquants">Highlights</string>
     <string name="fermer">Schließen</string>
     <string name="garde">Garde</string>
@@ -116,6 +128,9 @@
     <string name="le_jeu_que_je_souhaite_voir_ajoute">Das Spiel, das ich mir wünsche:</string>
     <string name="les_personnes_qui_rejoignent_ne_peuvent_qu_observer_quel">Beitretende Personen können nur beobachten, unabhängig von ihrer Wahl — das ändert nichts für bereits verbundene Mitwirkende.</string>
     <string name="les_personnes_qui_rejoignent_peuvent_choisir_d_observer_ou">Beitretende Personen können wählen, ob sie beobachten oder Runden vorschlagen möchten.</string>
+    <string name="lie_au_profil_de_value1_depuis_le_value2">Seit %2$s mit dem Profil von %1$s verknüpft.</string>
+    <string name="lie_au_profil_de_value1">Mit dem Profil von %1$s verknüpft.</string>
+    <string name="m_ajouter_comme_ami">Mich als Freund hinzufügen</string>
     <string name="manche">Runde</string>
     <string name="manche_count1">Runde %1$d</string>
     <string name="manche_par_manche">Runde für Runde</string>
@@ -124,16 +139,21 @@
     <string name="meilleur_joueur">Bester Spieler</string>
     <string name="meilleur_score_count1_value2">Beste Punktzahl: %1$d — %2$s</string>
     <string name="meilleurs_joueurs">Beste Spieler</string>
+    <string name="mes_statistiques">Meine Statistiken</string>
     <string name="modifier">Bearbeiten</string>
     <string name="modifier_le_joueur">Spieler bearbeiten</string>
+    <string name="modifier_le_profil">Profil bearbeiten</string>
     <string name="mois">Monat</string>
+    <string name="mon_profil">Mein Profil</string>
     <string name="ne_plus_partager">Nicht mehr teilen</string>
     <string name="ne_plus_suivre_ce_profil">Diesem Profil nicht mehr folgen</string>
     <string name="nombre_de_des_count1">Anzahl Würfel: %1$d</string>
+    <string name="nouvelle_fiche_avec_son_pseudo_et_son_avatar">Neue Karte mit Spitzname und Avatar.</string>
     <string name="nemesis">Nemesis</string>
     <string name="ok">OK</string>
     <string name="observateur">Beobachter</string>
     <string name="obtenu_count1">Erzielt (%1$d)</string>
+    <string name="ou_c_est_une_de_mes_fiches">Oder es ist eine meiner Karten</string>
     <string name="ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app">Öffnet die Systemeinstellungen, um die Sprache der App zu wählen.</string>
     <string name="par_jeu">Nach Spiel</string>
     <string name="partage_ta_fiche_pour_que_tes_amis_puissent_te_suivre_suis">Teile deine Karte, damit deine Freunde dir folgen können. Folge einem Freund, um eure gemeinsam gespielten Partien in dessen Verlauf zu finden.</string>
@@ -143,6 +163,7 @@
     <string name="partager_la_partie">Partie teilen</string>
     <string name="partager_le_resume">Zusammenfassung teilen</string>
     <string name="partenaire_roi_appele">Partner (gerufener König)</string>
+    <string name="partie_partagee_en_cours_reprendre">Geteilte Partie läuft · Fortsetzen</string>
     <string name="partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par">Partie vom Gerät eines Freundes empfangen: die Runde-für-Runde-Details sind hier nicht verfügbar.</string>
     <string name="parties">Partien</string>
     <string name="parties_archivees">Archivierte Partien</string>
@@ -158,20 +179,26 @@
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Punkte des Angreifers: %1$d</string>
     <string name="preneur">Angreifer</string>
+    <string name="profil">Profil</string>
     <string name="profil_partage">Geteiltes Profil</string>
     <string name="pseudo">Spitzname</string>
     <string name="quitter">Verlassen</string>
+    <string name="quitter_la_partie">Partie verlassen</string>
     <string name="rang_moyen">Durchschnittlicher Rang</string>
     <string name="rate_0">Verfehlt (0)</string>
     <string name="rechercher_un_jeu">Spiel suchen</string>
     <string name="reconnexion">Erneute Verbindung…</string>
     <string name="record">Rekord</string>
     <string name="rejoindre">Beitreten</string>
+    <string name="rejoindre_les_parties_de_tes_amis_et_y_etre_reconnu">An den Partien deiner Freunde teilnehmen und erkannt werden.</string>
+    <string name="rejoindre_une_partie">Einer Partie beitreten</string>
     <string name="remplacer_la_partie_partagee">Geteilte Partie ersetzen?</string>
     <string name="reprendre_la_partie">Partie fortsetzen</string>
     <string name="reprendre_la_partie_en_cours">Laufende Partie fortsetzen</string>
     <string name="reprendre_la_partie_en_cours_value1">Reprendre la partie en cours, %1$s</string>
     <string name="reprise_automatique_en_cours">Automatische Fortsetzung läuft.</string>
+    <string name="retirer_des_amis">Aus Freunden entfernen</string>
+    <string name="retrouver_vos_parties_jouees_ensemble_dans_ton_historique">Eure gemeinsamen Partien in deinem Verlauf wiederfinden.</string>
     <string name="regles_ou_lien_vers_les_regles_facultatif">Regeln oder ein Link zu den Regeln (optional):</string>
     <string name="reactiver">Reaktivieren</string>
     <string name="realise_count1">Ergebnis: %1$d</string>
@@ -198,6 +225,8 @@
     <string name="supprimer_ce_joueur">Diesen Spieler löschen</string>
     <string name="supprimer_definitivement_ce_joueur">Diesen Spieler endgültig löschen?</string>
     <string name="supprimer_definitivement_cette_partie">Diese Partie endgültig löschen?</string>
+    <string name="supprimer_mon_profil">Mein Profil löschen</string>
+    <string name="supprimer_ton_profil">Dein Profil löschen?</string>
     <string name="synchronisation_icloud">iCloud-Synchronisierung</string>
     <string name="synchronise_les_joueurs_et_les_parties_entre_tes_appareils">Synchronisiert Spieler und Partien über iCloud zwischen deinen Geräten. Deaktiviert bleibt die App lokal voll funktionsfähig. Die Änderung wird beim nächsten App-Start wirksam.</string>
     <string name="serie_en_cours">Aktuelle Serie</string>
@@ -206,6 +235,7 @@
     <string name="terminer_la_partie">Partie beenden</string>
     <string name="terminer_la_partie_2">Partie beenden?</string>
     <string name="termine">Fertig</string>
+    <string name="tes_amis_ne_recevront_plus_les_parties_jouees_avec_toi_ta">Deine Freunde erhalten die mit dir gespielten Partien nicht mehr. Deine Karte und ihr Verlauf bleiben erhalten, danach erstellst du ein neues Profil.</string>
     <string name="total">Gesamt</string>
     <string name="toujours_pas_de_connexion_nouvelle_tentative_automatique_en">Immer noch keine Verbindung — automatischer neuer Versuch läuft.</string>
     <string name="tous_les_jeux">Alle Spiele</string>
@@ -213,6 +243,7 @@
     <string name="tri_des_joueurs">Spielersortierung</string>
     <string name="triple">Dreifach</string>
     <string name="tu_suis_value1_depuis_le_value2">Du folgst %1$s seit dem %2$s</string>
+    <string name="un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer">Ein Spitzname und ein Avatar, mehr nicht: kein Konto nötig.</string>
     <string name="une_session_est_en_cours_de_partage_sur_value1_continuer">Es läuft bereits eine geteilte Sitzung für %1$s. Hier fortzufahren ersetzt sie: verbundene Personen sehen stattdessen diese Partie.</string>
     <string name="valider">Bestätigen</string>
     <string name="valider_la_donne">Hand bestätigen</string>
@@ -223,11 +254,13 @@
     <string name="voir_la_session_partagee">Geteilte Sitzung anzeigen</string>
     <string name="voir_le_mois">Monat anzeigen</string>
     <string name="voir_les_manches">Runden anzeigen</string>
+    <string name="vos_parties_jouees_ensemble_apparaissent_dans_vos_deux">Eure gemeinsamen Partien erscheinen in euren beiden Verläufen.</string>
+    <string name="vos_prochaines_parties_jouees_ensemble_n_arriveront_plus">Eure nächsten gemeinsamen Partien erscheinen nicht mehr in seinem Verlauf.</string>
     <string name="a_scanner_bouton_scanner_un_code_sur_l_appareil_qui_rejoint">Zum Scannen (Schaltfläche „Code scannen“ auf dem beitretenden Gerät) oder zur Eingabe — es ist keine gemeinsame WLAN-Verbindung nötig, nur eine Internetverbindung auf beiden Seiten.</string>
     <string name="equipe">Team</string>
     <string name="equipe_value1">Team %1$s</string>
     <string name="equipe_preneuse">Angreifendes Team</string>
     <string name="equipes">Teams</string>
     <string name="evolution">Entwicklung</string>
-    <string name="evolution_des_scores">Évolution des scores</string>
+    <string name="evolution_des_scores">Punkteverlauf</string>
 </resources>

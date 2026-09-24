@@ -91,6 +91,27 @@ public struct PlayerRepository {
     return id
   }
 
+  /// Doc 16, phase A — deux profils « à moi » peuvent coexister après une synchronisation iCloud :
+  /// sur un nouvel appareil, « Créer mon profil » peut être proposé avant que le profil existant
+  /// n'arrive. Le plus ancien reste le profil (c'est à lui que les amis sont liés) ; le doublon
+  /// est supprimé s'il n'a joué aucune partie, sinon il redevient une fiche ordinaire.
+  public func resolveDuplicateOwnProfiles() throws {
+    let descriptor = FetchDescriptor<PlayerRecord>(
+      predicate: #Predicate { $0.sharedProfileIsMine },
+      sortBy: [SortDescriptor(\.createdAt)])
+    let mine = try context.fetch(descriptor)
+    guard mine.count > 1 else { return }
+    for duplicate in mine.dropFirst() {
+      if duplicate.participations.isEmpty {
+        context.delete(duplicate)
+      } else {
+        duplicate.sharedProfileID = nil
+        duplicate.sharedProfileIsMine = false
+      }
+    }
+    try context.save()
+  }
+
   /// Doc 14, phase 4 — la fiche que cet appareil partage comme la sienne, s'il y en a une.
   public func myOwnSharedPlayer() throws -> PlayerRecord? {
     var descriptor = FetchDescriptor<PlayerRecord>(predicate: #Predicate { $0.sharedProfileIsMine })

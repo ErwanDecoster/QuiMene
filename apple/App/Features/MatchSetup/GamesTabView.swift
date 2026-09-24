@@ -63,6 +63,20 @@ struct GamesTabView: View {
 
   private var listView: some View {
     List {
+      // Doc 16, phase A — la partie suivie chez quelqu'un d'autre vit dans l'écran Rejoindre,
+      // qu'on peut fermer sans la quitter : ce bandeau est le chemin du retour.
+      if MatchConnectionCoordinator.shared.sharedModel != nil, searchText.isEmpty {
+        Section {
+          Button {
+            deepLinkRouter.isPresentingJoin = true
+          } label: {
+            Label("Partie partagée en cours · Reprendre", systemImage: "dot.radiowaves.left.and.right")
+              .font(.bodyText)
+              .foregroundStyle(.brandInk)
+          }
+        }
+      }
+
       // Doc 01 : reprendre une partie en cours reste possible, mais en simple
       // suggestion — un onglet qu'on revisite pour parcourir le catalogue ne doit pas
       // y être redirigé de force à chaque fois. Masquée pendant une recherche active
@@ -104,6 +118,13 @@ struct GamesTabView: View {
     }
     .navigationTitle("Jeux")
     .toolbar {
+      ToolbarItem(placement: .topBarLeading) {
+        Button {
+          deepLinkRouter.isPresentingJoin = true
+        } label: {
+          Label("Rejoindre une partie", systemImage: "qrcode.viewfinder")
+        }
+      }
       if LiveShareCoordinator.shared.isSharing {
         ToolbarItem(placement: .topBarTrailing) {
           Button {

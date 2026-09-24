@@ -47,7 +47,10 @@ import com.quimene.app.features.play.GamesCatalogScreen
 import com.quimene.app.features.players.ArchivedPlayersScreen
 import com.quimene.app.features.players.PlayerEditorScreen
 import com.quimene.app.features.players.PlayersListScreen
+import com.quimene.app.features.profile.MyProfileQrScreen
+import com.quimene.app.features.profile.ProfileRequirementGate
 import com.quimene.app.features.profile.ProfileScreen
+import com.quimene.app.features.profile.ProfileTabScreen
 import com.quimene.app.features.results.ResultsScreen
 import com.quimene.app.features.settings.SettingsScreen
 import com.quimene.designsystem.tokens.Space
@@ -59,8 +62,8 @@ import com.quimene.designsystem.tokens.Space
  * (première composition). */
 val LocalFloatingNavBarHeight = compositionLocalOf { 0.dp }
 
-/** Racine de l'UI — barre de navigation flottante à 4 onglets (Joueurs, Jeux, Rejoindre,
- * Historique — mêmes 4, même ordre que `QuiMeneApp.swift`) superposée au `NavHost`, qui occupe
+/** Racine de l'UI — barre de navigation flottante à 4 onglets (Joueurs, Jeux, Historique,
+ * Profil — mêmes 4, même ordre que `QuiMeneApp.swift`) superposée au `NavHost`, qui occupe
  * tout l'écran (le contenu défile derrière l'îlot plutôt que de s'arrêter au-dessus, doc
  * utilisateur) + `NavHost` typé sur [Destination]. */
 @Composable
@@ -80,6 +83,7 @@ fun QuiMeneApp() {
                         onGameSelected = { gameId -> navController.navigate(Destination.MatchSetup(gameId)) },
                         onOpenLeaderboard = { gameId -> navController.navigate(Destination.GameLeaderboard(gameId)) },
                         onResumeMatch = { matchId -> navController.navigate(Destination.LiveMatch(matchId)) },
+                        onJoin = { navController.navigate(Destination.Join) },
                     )
                 }
                 composable<Destination.MatchSetup> { backStackEntry ->
@@ -118,6 +122,7 @@ fun QuiMeneApp() {
                         onAddPlayer = { navController.navigate(Destination.PlayerEditor(null)) },
                         onOpenProfile = { playerId -> navController.navigate(Destination.PlayerProfile(playerId)) },
                         onOpenArchivedPlayers = { navController.navigate(Destination.ArchivedPlayers) },
+                        onOpenMyProfile = { navController.navigateToRoot(RootDestination.Profile) },
                     )
                 }
                 composable<Destination.PlayerEditor> { backStackEntry ->
@@ -147,7 +152,6 @@ fun QuiMeneApp() {
                         initialGameFilter = route.gameId,
                         onOpenMatch = { matchId -> navController.navigate(Destination.HistoryDetail(matchId)) },
                         onOpenArchivedMatches = { navController.navigate(Destination.ArchivedMatches) },
-                        onOpenSettings = { navController.navigate(Destination.Settings) },
                     )
                 }
                 composable<Destination.HistoryDetail> { backStackEntry ->
@@ -170,7 +174,19 @@ fun QuiMeneApp() {
                     )
                 }
                 composable<Destination.Join> {
-                    JoinScreen()
+                    JoinScreen(onBack = { navController.popBackStack() })
+                }
+                composable<Destination.Profile> {
+                    ProfileTabScreen(
+                        onEditProfile = { playerId -> navController.navigate(Destination.PlayerEditor(playerId)) },
+                        onOpenStats = { playerId -> navController.navigate(Destination.PlayerProfile(playerId)) },
+                        onShowMyQr = { navController.navigate(Destination.MyProfileQr) },
+                        onJoin = { navController.navigate(Destination.Join) },
+                        onOpenSettings = { navController.navigate(Destination.Settings) },
+                    )
+                }
+                composable<Destination.MyProfileQr> {
+                    MyProfileQrScreen(onBack = { navController.popBackStack() })
                 }
                 composable<Destination.Settings> {
                     SettingsScreen(onBack = { navController.popBackStack() })
@@ -183,6 +199,22 @@ fun QuiMeneApp() {
             modifier = Modifier.align(Alignment.BottomCenter),
             onIslandHeightMeasured = { height -> navBarHeight = height },
         )
+    }
+
+    // Doc 16, phase A — profil obligatoire : recouvre toute l'app tant qu'il n'existe pas.
+    ProfileRequirementGate()
+}
+
+/** Même comportement qu'un tap sur l'onglet [root] de [RootNavigationBar] : revient à sa racine
+ * si on y est déjà, sinon change d'onglet en préservant l'état de chacun. */
+private fun NavHostController.navigateToRoot(root: RootDestination) {
+    val poppedToTabRoot = popBackStack(root.destination, inclusive = false)
+    if (!poppedToTabRoot) {
+        navigate(root.destination) {
+            popUpTo(graph.findStartDestination().id) { saveState = true }
+            launchSingleTop = true
+            restoreState = true
+        }
     }
 }
 
@@ -228,8 +260,8 @@ private fun RootNavigationBar(
                         when (root) {
                             RootDestination.Players -> it.hasRoute<Destination.PlayersList>()
                             RootDestination.Games -> it.hasRoute<Destination.GamesCatalog>()
-                            RootDestination.Join -> it.hasRoute<Destination.Join>()
                             RootDestination.History -> it.hasRoute<Destination.History>()
+                            RootDestination.Profile -> it.hasRoute<Destination.Profile>()
                         }
                     } == true
 
@@ -243,14 +275,7 @@ private fun RootNavigationBar(
                         // actuelle (donc seulement quand on est *dans* cet onglet) ; sinon (on
                         // change réellement d'onglet), repli sur le patron standard qui préserve
                         // l'état de chaque onglet entre deux sélections.
-                        val poppedToTabRoot = navController.popBackStack(root.destination, inclusive = false)
-                        if (!poppedToTabRoot) {
-                            navController.navigate(root.destination) {
-                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
+                        navController.navigateToRoot(root)
                     },
                     icon = { Icon(root.icon, contentDescription = null) },
                     label = { Text(stringResource(root.labelRes)) },

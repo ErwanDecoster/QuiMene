@@ -7,7 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -50,7 +54,7 @@ import kotlinx.coroutines.launch
  * propre écran de scan). Une fois connecté, remplacé par [SharedMatchScreen].
  */
 @Composable
-fun JoinScreen() {
+fun JoinScreen(onBack: () -> Unit) {
     val container = LocalAppContainer.current
     val coordinator = container.matchConnectionCoordinator
     val context = LocalContext.current
@@ -62,6 +66,7 @@ fun JoinScreen() {
             sharedMatch,
             onQuit = { scope.launch { coordinator.stop() } },
             onReconnect = { scope.launch { coordinator.reconnectNow() } },
+            onClose = onBack,
         )
         return
     }
@@ -96,7 +101,18 @@ fun JoinScreen() {
         }
     }
 
-    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.rejoindre)) }) }) { innerPadding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.rejoindre_une_partie)) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.fermer))
+                    }
+                },
+            )
+        },
+    ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             QrScannerView(
                 onScan = { raw ->

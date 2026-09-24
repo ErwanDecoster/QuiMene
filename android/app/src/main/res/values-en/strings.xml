@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="value1">%1$s</string>
     <string name="value1_count2">%1$s: %2$d</string>
+    <string name="value1_est_deja_ton_ami_sur_la_fiche_value2">%1$s is already your friend, on the “%2$s” player card.</string>
     <string name="value1_manche_count2">%1$s · Round %2$d</string>
     <string name="value1_value2">%1$s, %2$s</string>
     <string name="value1_value2_count3">%1$s, %2$s : %3$d</string>
@@ -30,7 +30,11 @@
     <string name="activite">Activity</string>
     <string name="activite_par_mois">Activité par mois</string>
     <string name="adopter_aussi_son_pseudo_et_son_avatar">Also adopt their nickname and avatar</string>
+    <string name="ajouter_un_ami">Add a friend</string>
     <string name="ajouter_un_joueur">Add a player</string>
+    <string name="ami">Friend</string>
+    <string name="ami_lie">Linked friend</string>
+    <string name="amis">Friends</string>
     <string name="annonce_count1">Bid: %1$d</string>
     <string name="annuler">Cancel</string>
     <string name="annuler_la_derniere_manche">Undo the last round</string>
@@ -40,6 +44,7 @@
     <string name="archiver_ce_joueur">Archive this player</string>
     <string name="arreter_le_partage">Stop sharing</string>
     <string name="aucun">None</string>
+    <string name="aucun_ami_lie_pour_l_instant">No linked friends yet.</string>
     <string name="aucun_jeu_ne_correspond_a_ta_recherche">No game matches your search.</string>
     <string name="aucun_joueur_archive">No archived players.</string>
     <string name="aucun_joueur_ajouter_un_joueur">No players. Add a player</string>
@@ -59,6 +64,7 @@
     <string name="belote_rebelote">Belote-rebelote</string>
     <string name="bonus">Bonus</string>
     <string name="bouts_count1">Bouts: %1$d</string>
+    <string name="c_est_ton_propre_profil">This is your own profile.</string>
     <string name="capot">Capot</string>
     <string name="ce_profil_est_deja_suivi_par_la_fiche_value1_sur_cet">This profile is already followed by the “%1$s” profile card on this device. Continuing will make this card follow it too — only do this if it\'s the same person (for example, a recreated profile).</string>
     <string name="cette_donne">This Deal</string>
@@ -69,20 +75,25 @@
     <string name="chelem_realise">Slam Achieved</string>
     <string name="choisir_une_photo">Choose a photo</string>
     <string name="code_qr_d_appairage">Pairing QR code</string>
+    <string name="code_qr_de_ton_profil">Your profile QR code</string>
     <string name="code_d_appairage">Pairing code</string>
     <string name="commencer">Start</string>
     <string name="commencer_une_partie">Start a match</string>
     <string name="commencer_une_partie_de_game">Start a game of ${game}</string>
+    <string name="connexion_perdue_dernier_score_recu">Connection lost — last score received</string>
     <string name="connexion_a_l_hote_perdue_le_tableau_affiche_est_le_dernier">Connection to the host lost. The board shown is the last one received.</string>
     <string name="connexion_a_la_partie">Connecting to the match…</string>
     <string name="connexion">Connecting…</string>
     <string name="contrat">Contract</string>
     <string name="contributeur">Contributor</string>
     <string name="copier_l_adresse">Copy the address</string>
+    <string name="creer_la_fiche_value1">Create the “%1$s” player card</string>
+    <string name="creer_mon_profil">Create my profile</string>
     <string name="demande_d_ajout_d_un_jeu_qui_mene">Request to add a game — Qui Mène ?</string>
     <string name="demander_ce_jeu">Request this game</string>
     <string name="demander_l_ajout_d_un_jeu">Request a game</string>
     <string name="double_label">Double</string>
+    <string name="deja_un_profil_sur_un_autre_appareil_avec_icloud_il_arrive">Already have a profile on another device? With iCloud, it arrives on its own in a few moments.</string>
     <string name="demarrage_du_partage">Starting sharing…</string>
     <string name="derive_automatiquement_du_pseudo_modifiable_ci_dessous">Automatically derived from the nickname — editable below.</string>
     <string name="emoji">Emoji</string>
@@ -92,6 +103,7 @@
     <string name="envoie_ta_demande_a_value1_depuis_l_application_de_ton_choix">Send your request to %1$s from the app of your choice.</string>
     <string name="envoyer">Send</string>
     <string name="fais_scanner_ce_code_par_l_ami_avec_qui_tu_veux_partager">Have the friend you want to share your history with scan this code, from their own “Follow a received profile” screen.</string>
+    <string name="fais_scanner_ce_code_par_un_ami_depuis_ajouter_un_ami_dans">Have a friend scan this code from “Add a friend” in their Profile tab. Matches you play together will appear in both your histories.</string>
     <string name="faits_marquants">Highlights</string>
     <string name="fermer">Close</string>
     <string name="garde">Garde</string>
@@ -116,6 +128,9 @@
     <string name="le_jeu_que_je_souhaite_voir_ajoute">The game I\'d like to see added:</string>
     <string name="les_personnes_qui_rejoignent_ne_peuvent_qu_observer_quel">People who join can only observe, whatever they choose — this changes nothing for contributors already connected.</string>
     <string name="les_personnes_qui_rejoignent_peuvent_choisir_d_observer_ou">People who join can choose to observe or to propose rounds.</string>
+    <string name="lie_au_profil_de_value1_depuis_le_value2">Linked to %1$s\'s profile since %2$s.</string>
+    <string name="lie_au_profil_de_value1">Linked to %1$s\'s profile.</string>
+    <string name="m_ajouter_comme_ami">Add me as a friend</string>
     <string name="manche">Round</string>
     <string name="manche_count1">Round %1$d</string>
     <string name="manche_par_manche">Round by Round</string>
@@ -124,16 +139,21 @@
     <string name="meilleur_joueur">Best Player</string>
     <string name="meilleur_score_count1_value2">Best score: %1$d — %2$s</string>
     <string name="meilleurs_joueurs">Best Players</string>
+    <string name="mes_statistiques">My statistics</string>
     <string name="modifier">Edit</string>
     <string name="modifier_le_joueur">Edit Player</string>
+    <string name="modifier_le_profil">Edit profile</string>
     <string name="mois">Month</string>
+    <string name="mon_profil">My profile</string>
     <string name="ne_plus_partager">Stop Sharing</string>
     <string name="ne_plus_suivre_ce_profil">Unfollow this profile</string>
     <string name="nombre_de_des_count1">Number of dice: %1$d</string>
+    <string name="nouvelle_fiche_avec_son_pseudo_et_son_avatar">New player card with their nickname and avatar.</string>
     <string name="nemesis">Nemesis</string>
     <string name="ok">OK</string>
     <string name="observateur">Observer</string>
     <string name="obtenu_count1">Achieved (%1$d)</string>
+    <string name="ou_c_est_une_de_mes_fiches">Or it\'s one of my player cards</string>
     <string name="ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app">Opens system settings to choose the app\'s language.</string>
     <string name="par_jeu">By Game</string>
     <string name="partage_ta_fiche_pour_que_tes_amis_puissent_te_suivre_suis">Share your profile so your friends can follow you. Follow a friend to find the matches you\'ve played together in their history.</string>
@@ -143,6 +163,7 @@
     <string name="partager_la_partie">Share the Match</string>
     <string name="partager_le_resume">Share the Summary</string>
     <string name="partenaire_roi_appele">Partner (Called King)</string>
+    <string name="partie_partagee_en_cours_reprendre">Shared match in progress · Resume</string>
     <string name="partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par">Match received from a friend\'s device: round-by-round detail isn\'t available here.</string>
     <string name="parties">Matches</string>
     <string name="parties_archivees">Archived Matches</string>
@@ -158,20 +179,26 @@
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Taker\'s points: %1$d</string>
     <string name="preneur">Taker</string>
+    <string name="profil">Profile</string>
     <string name="profil_partage">Shared Profile</string>
     <string name="pseudo">Nickname</string>
     <string name="quitter">Leave</string>
+    <string name="quitter_la_partie">Leave the match</string>
     <string name="rang_moyen">Average Rank</string>
     <string name="rate_0">Missed (0)</string>
     <string name="rechercher_un_jeu">Search for a game</string>
     <string name="reconnexion">Reconnecting…</string>
     <string name="record">Record</string>
     <string name="rejoindre">Join</string>
+    <string name="rejoindre_les_parties_de_tes_amis_et_y_etre_reconnu">Join your friends\' matches and be recognized in them.</string>
+    <string name="rejoindre_une_partie">Join a match</string>
     <string name="remplacer_la_partie_partagee">Replace the shared match?</string>
     <string name="reprendre_la_partie">Resume the Match</string>
     <string name="reprendre_la_partie_en_cours">Resume the Match in Progress</string>
     <string name="reprendre_la_partie_en_cours_value1">Reprendre la partie en cours, %1$s</string>
     <string name="reprise_automatique_en_cours">Automatic resume in progress.</string>
+    <string name="retirer_des_amis">Remove from friends</string>
+    <string name="retrouver_vos_parties_jouees_ensemble_dans_ton_historique">Find the matches you played together in your history.</string>
     <string name="regles_ou_lien_vers_les_regles_facultatif">Rules or a link to the rules (optional):</string>
     <string name="reactiver">Reactivate</string>
     <string name="realise_count1">Result: %1$d</string>
@@ -198,6 +225,8 @@
     <string name="supprimer_ce_joueur">Delete This Player</string>
     <string name="supprimer_definitivement_ce_joueur">Permanently delete this player?</string>
     <string name="supprimer_definitivement_cette_partie">Permanently delete this match?</string>
+    <string name="supprimer_mon_profil">Delete my profile</string>
+    <string name="supprimer_ton_profil">Delete your profile?</string>
     <string name="synchronisation_icloud">iCloud Sync</string>
     <string name="synchronise_les_joueurs_et_les_parties_entre_tes_appareils">Syncs players and matches across your devices via iCloud. When off, the app stays fully functional locally. The change takes effect the next time you launch the app.</string>
     <string name="serie_en_cours">Current Streak</string>
@@ -206,6 +235,7 @@
     <string name="terminer_la_partie">End the Match</string>
     <string name="terminer_la_partie_2">End the match?</string>
     <string name="termine">Finished</string>
+    <string name="tes_amis_ne_recevront_plus_les_parties_jouees_avec_toi_ta">Your friends will no longer receive the matches played with you. Your player card and its history are kept, and you will then create a new profile.</string>
     <string name="total">Total</string>
     <string name="toujours_pas_de_connexion_nouvelle_tentative_automatique_en">Still no connection — automatically retrying.</string>
     <string name="tous_les_jeux">All Games</string>
@@ -213,6 +243,7 @@
     <string name="tri_des_joueurs">Player Sorting</string>
     <string name="triple">Triple</string>
     <string name="tu_suis_value1_depuis_le_value2">You\'ve followed %1$s since %2$s</string>
+    <string name="un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer">A nickname and an avatar, nothing more: no account to create.</string>
     <string name="une_session_est_en_cours_de_partage_sur_value1_continuer">A session is currently being shared for %1$s. Continuing here will replace it: connected people will see this match instead.</string>
     <string name="valider">Confirm</string>
     <string name="valider_la_donne">Confirm the Deal</string>
@@ -223,11 +254,13 @@
     <string name="voir_la_session_partagee">View the Shared Session</string>
     <string name="voir_le_mois">View the Month</string>
     <string name="voir_les_manches">View the Rounds</string>
+    <string name="vos_parties_jouees_ensemble_apparaissent_dans_vos_deux">Matches you play together appear in both your histories.</string>
+    <string name="vos_prochaines_parties_jouees_ensemble_n_arriveront_plus">Your next matches together will no longer reach their history.</string>
     <string name="a_scanner_bouton_scanner_un_code_sur_l_appareil_qui_rejoint">To scan (“Scan a code” button on the joining device) or to type in — no shared Wi-Fi connection is needed, just an internet connection on both sides.</string>
     <string name="equipe">Team</string>
     <string name="equipe_value1">Team %1$s</string>
     <string name="equipe_preneuse">Taking Team</string>
     <string name="equipes">Teams</string>
     <string name="evolution">Trend</string>
-    <string name="evolution_des_scores">Évolution des scores</string>
+    <string name="evolution_des_scores">Score progression</string>
 </resources>

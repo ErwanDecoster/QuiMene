@@ -26,6 +26,8 @@ class PlayersListViewModel(
     private val settings: AppSettings,
 ) : ViewModel() {
     data class UiState(
+        /** Doc 16, phase A — mon profil, affiché à part au-dessus de la liste. */
+        val me: PlayerEntity? = null,
         val active: List<PlayerEntity> = emptyList(),
         val archivedCount: Int = 0,
         val sortMode: AppSettings.PlayerSortMode = AppSettings.PlayerSortMode.Automatic,
@@ -33,13 +35,15 @@ class PlayersListViewModel(
 
     val uiState: StateFlow<UiState> =
         combine(repository.observeAll(), settings.playerSortMode) { players, sortMode ->
-            val (archived, active) = players.partition { it.isArchived }
+            val me = players.firstOrNull { it.sharedProfileIsMine }
+            val (archived, active) = players.filterNot { it.sharedProfileIsMine }.partition { it.isArchived }
             val orderedActive =
                 when (sortMode) {
                     AppSettings.PlayerSortMode.Automatic -> active.sortedBy { it.nickname.lowercase() }
                     AppSettings.PlayerSortMode.Manual -> active.sortedBy { it.sortIndex }
                 }
             UiState(
+                me = me,
                 active = orderedActive,
                 archivedCount = archived.size,
                 sortMode = sortMode,

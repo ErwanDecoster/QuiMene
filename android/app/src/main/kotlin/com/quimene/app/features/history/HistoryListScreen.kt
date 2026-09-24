@@ -14,7 +14,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -55,7 +54,6 @@ import java.util.Locale
 fun HistoryListScreen(
     onOpenMatch: (String) -> Unit,
     onOpenArchivedMatches: () -> Unit,
-    onOpenSettings: () -> Unit,
     initialGameFilter: String? = null,
 ) {
     val container = LocalAppContainer.current
@@ -90,11 +88,6 @@ fun HistoryListScreen(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.historique)) },
-                actions = {
-                    IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Filled.Settings, contentDescription = stringResource(R.string.reglages))
-                    }
-                },
             )
         },
     ) { innerPadding ->

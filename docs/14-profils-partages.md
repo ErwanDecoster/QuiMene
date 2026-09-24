@@ -32,7 +32,8 @@ seule session) serait déformer un outil conçu pour l'éphémère.
 ## Question par question
 
 **Une nouvelle page « Profil » doit-elle être ajoutée ?**
-Non, pas un nouvel onglet. `ProfileView` existe déjà par joueur (stats d'un participant tel
+*Révisé par la [doc 16](16-sessions-en-ligne-et-profils.md) : oui, un onglet Profil remplace
+Rejoindre.* Réponse d'origine : non, pas un nouvel onglet. `ProfileView` existe déjà par joueur (stats d'un participant tel
 qu'enregistré sur cet appareil) — ce qui manque n'est pas un écran de plus mais une action de
 plus sur l'écran d'édition d'un joueur existant (`PlayerEditorView`) : « Partager ce profil » /
 « Lier un profil ». Le modèle mental reste « des fiches joueur, dont certaines peuvent être

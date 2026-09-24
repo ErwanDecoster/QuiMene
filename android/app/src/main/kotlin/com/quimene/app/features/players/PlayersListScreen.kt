@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
@@ -53,6 +56,7 @@ fun PlayersListScreen(
     onAddPlayer: () -> Unit,
     onOpenProfile: (String) -> Unit,
     onOpenArchivedPlayers: () -> Unit,
+    onOpenMyProfile: () -> Unit,
 ) {
     val container = LocalAppContainer.current
     val viewModel = rememberViewModel { PlayersListViewModel(container.playerRepository, container.appSettings) }
@@ -106,7 +110,7 @@ fun PlayersListScreen(
             }
         },
     ) { innerPadding ->
-        if (state.active.isEmpty() && state.archivedCount == 0) {
+        if (state.me == null && state.active.isEmpty() && state.archivedCount == 0) {
             EmptyState(
                 icon = Icons.Filled.Add,
                 message = "Aucun joueur pour l'instant — ajoutez le premier pour commencer une partie.",
@@ -126,6 +130,14 @@ fun PlayersListScreen(
                     .padding(floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding())),
             verticalArrangement = Arrangement.spacedBy(Space.lg),
         ) {
+            // Doc 16, phase A — moi, au-dessus de la liste et en dehors : un toucher ouvre
+            // l'onglet Profil. Masqué en mode sélection, qui ne porte que sur les joueurs.
+            val me = state.me
+            if (me != null && !viewModel.isSelecting) {
+                ListContainer(modifier = Modifier.fillMaxWidth()) {
+                    MyProfileRow(player = me, onClick = onOpenMyProfile)
+                }
+            }
             if (state.active.isNotEmpty()) {
                 ListContainer(modifier = Modifier.fillMaxWidth()) {
                     state.active.forEachIndexed { index, player ->
@@ -176,6 +188,43 @@ private fun PlayerRow(
         }
         AvatarView(player.toAvatar(), size = AvatarSize.Medium)
         Text(player.nickname, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
+        // Doc 16, phase A — une fiche liée est un ami qui reçoit nos parties communes.
+        if (player.sharedProfileID != null) {
+            Icon(
+                Icons.Filled.Link,
+                contentDescription = stringResource(R.string.ami_lie),
+                tint = colors.textTertiary,
+                modifier = Modifier.size(16.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun MyProfileRow(
+    player: PlayerEntity,
+    onClick: () -> Unit,
+) {
+    val colors = LocalAppColors.current
+    Row(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = Space.lg, vertical = Space.md),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Space.md),
+    ) {
+        AvatarView(player.toAvatar(), size = AvatarSize.Medium)
+        Column(modifier = Modifier.weight(1f)) {
+            Text(player.nickname, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
+            Text(
+                stringResource(R.string.mon_profil),
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.textSecondary,
+            )
+        }
+        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = colors.textTertiary)
     }
 }
 

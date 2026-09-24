@@ -2,10 +2,10 @@ package com.quimene.app.navigation
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Games
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.QrCodeScanner
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.quimene.app.R
 import kotlinx.serialization.Serializable
@@ -79,17 +79,25 @@ sealed interface Destination {
         val gameId: String,
     ) : Destination
 
-    /** Miroir de `JoinTabView.swift` — code de pairage à 6 chiffres (pas de scan caméra dans
-     * cette version, voir [com.quimene.app.features.join.JoinScreen]). */
+    /** Miroir de `JoinTabView.swift` — écran poussé (plus un onglet depuis la doc 16, phase A),
+     * atteint depuis Jeux et Profil. */
     @Serializable
     data object Join : Destination
+
+    /** Doc 16, phase A — onglet Profil (remplace Rejoindre). */
+    @Serializable
+    data object Profile : Destination
+
+    /** Doc 16, phase A — mon QR, à faire scanner par un ami. */
+    @Serializable
+    data object MyProfileQr : Destination
 
     @Serializable
     data object Settings : Destination
 }
 
 /** Les 4 destinations racines de la barre de navigation — mêmes 4 onglets, même ordre, mêmes
- * libellés que `QuiMeneApp.swift` (Joueurs, Jeux, Rejoindre, Historique). */
+ * libellés que `QuiMeneApp.swift` (Joueurs, Jeux, Historique, Profil — doc 16, phase A). */
 enum class RootDestination(
     val destination: Destination,
     @param:StringRes val labelRes: Int,
@@ -97,6 +105,6 @@ enum class RootDestination(
 ) {
     Players(Destination.PlayersList, R.string.joueurs, Icons.Filled.Group),
     Games(Destination.GamesCatalog, R.string.jeux, Icons.Filled.Games),
-    Join(Destination.Join, R.string.rejoindre, Icons.Filled.QrCodeScanner),
     History(Destination.History(), R.string.historique, Icons.Filled.History),
+    Profile(Destination.Profile, R.string.profil, Icons.Filled.AccountCircle),
 }
