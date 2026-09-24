@@ -7,11 +7,8 @@ export const site = {
   email: 'contact@erwan-decoster.com',
   /** Lien App Store — `null` tant que l'app n'est pas publiée. */
   appStoreUrl: null as string | null,
-  /**
-   * Région d'hébergement du projet Supabase (tableau de bord → Project Settings → General).
-   * À renseigner avant publication : la politique de confidentialité l'affiche.
-   */
-  supabaseRegion: { fr: 'à préciser', en: 'to be specified' },
+  /** Région d'hébergement du projet Supabase (`eu-west-1`), affichée par la politique de confidentialité. */
+  supabaseRegion: { fr: 'Union européenne (Irlande)', en: 'European Union (Ireland)' },
   /** Date de dernière mise à jour de la politique de confidentialité. */
   privacyUpdated: { fr: '23 septembre 2026', en: 'September 23, 2026' },
 };
