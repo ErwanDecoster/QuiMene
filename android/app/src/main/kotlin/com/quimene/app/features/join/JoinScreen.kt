@@ -36,11 +36,11 @@ import com.quimene.app.BuildConfig
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.livesync.JoinLink
+import com.quimene.app.livesync.sessionDisplayName
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
 import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.components.PrimaryButton
 import com.quimene.designsystem.tokens.Space
-import com.quimene.store.DeviceIdentity
 import com.quimene.sync.OnlineSessionError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -86,7 +86,7 @@ fun JoinScreen(onBack: () -> Unit) {
             try {
                 coordinator.join(
                     code = code,
-                    deviceName = DeviceIdentity.name(context),
+                    deviceName = sessionDisplayName(context, container.playerRepository),
                     appVersion = BuildConfig.VERSION_NAME,
                 )
             } catch (cancellation: CancellationException) {

@@ -64,9 +64,13 @@ fun ShareSessionDialog(
     val sheetState = rememberModalBottomSheetState()
     var isStarting by remember { mutableStateOf(false) }
     var startError by remember { mutableStateOf<String?>(null) }
+    // Une seule tentative par ouverture de la feuille : après « Arrêter le partage », la partie
+    // n'est plus rattachée, et sans ce garde une nouvelle session s'ouvrait aussitôt.
+    var hasStarted by remember { mutableStateOf(false) }
 
     LaunchedEffect(isAttached) {
-        if (!isAttached && startAction != null) {
+        if (!isAttached && startAction != null && !hasStarted) {
+            hasStarted = true
             isStarting = true
             startError = null
             try {
@@ -102,7 +106,12 @@ fun ShareSessionDialog(
                 else ->
                     SharingContent(
                         coordinator = coordinator,
-                        onStop = { scope.launch { coordinator.stopSharing() } },
+                        onStop = {
+                            scope.launch {
+                                coordinator.stopSharing()
+                                onDismiss()
+                            }
+                        },
                     )
             }
         }

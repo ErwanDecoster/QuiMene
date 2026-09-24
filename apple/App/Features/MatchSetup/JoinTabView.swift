@@ -21,6 +21,7 @@ import UIKit
 struct JoinTabView: View {
   @Environment(DeepLinkRouter.self) private var deepLinkRouter
   @Environment(\.dismiss) private var dismiss
+  @Environment(\.modelContext) private var modelContext
   private var coordinator: MatchConnectionCoordinator { .shared }
   @State private var pairingCode = ""
   @State private var isConnecting = false
@@ -144,7 +145,7 @@ struct JoinTabView: View {
     do {
       try await coordinator.join(
         code: pairingCode,
-        deviceName: UIDevice.current.name,
+        deviceName: SessionDisplayName.current(in: modelContext),
         requestedRole: .contributor,
         appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
       )

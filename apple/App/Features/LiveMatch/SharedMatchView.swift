@@ -143,26 +143,28 @@ struct SharedMatchView: View {
           Label("Voir les manches", systemImage: "list.bullet")
         }
       }
-      if model.canPropose {
-        ScoreBoardView.keyboardAccessory(
-          allowsNegative: definition.scoring.entry.allowsNegative,
-          currentParticipantID: focusedParticipantID,
-          submitLabel: "Envoyer",
-          onToggleSign: toggleSign
-        ) {
-          Task { await sendRound() }
-        }
-      }
     }
     // Doc utilisateur — posé au niveau de l'écran, pas dans `ScoreBoardView` : un enfant de
     // liste qui porte lui-même `.safeAreaInset` faisait dupliquer tout le rendu (voir la note
-    // en tête de `ScoreBoardView.swift`).
+    // en tête de `ScoreBoardView.swift`). Pas de `ToolbarItemGroup(placement: .keyboard)` ici :
+    // cet écran vit dans le plein écran « Rejoindre » posé à la racine (doc 16, phase A), où
+    // SwiftUI n'affiche pas la barre d'accessoires du clavier — ni signe, ni « Envoyer ». La
+    // barre du bas, remontée au-dessus du clavier par la zone sûre, en tient lieu.
     .safeAreaInset(edge: .bottom) {
       if model.canPropose {
-        ScoreBoardView.submitBar(
-          isKeyboardVisible: keyboardObserver.isVisible, submitLabel: "Envoyer"
-        ) {
-          Task { await sendRound() }
+        if keyboardObserver.isVisible {
+          ScoreBoardView.keyboardBar(
+            allowsNegative: definition.scoring.entry.allowsNegative,
+            currentParticipantID: focusedParticipantID,
+            submitLabel: "Envoyer",
+            onToggleSign: toggleSign
+          ) {
+            Task { await sendRound() }
+          }
+        } else {
+          ScoreBoardView.submitBar(isKeyboardVisible: false, submitLabel: "Envoyer") {
+            Task { await sendRound() }
+          }
         }
       }
     }

@@ -295,7 +295,7 @@ final class LiveMatchModel {
   /// Démarre le partage — ou, si une session est déjà active (une autre partie partagée plus
   /// tôt dans la soirée), y rattache simplement cette partie (`LiveShareCoordinator`). Ouvre une
   /// session en ligne (doc 16) et y publie la partie, avec un code d'appairage à 6 chiffres.
-  /// `deviceName` vient de l'appelant (`UIDevice.current.name`) — ni `Sync` ni `QuiMeneKit` ne
+  /// `deviceName` vient de l'appelant (`SessionDisplayName`, le pseudo du profil) — ni `Sync` ni `QuiMeneKit` ne
   /// peuvent lire `UIDevice` (la cible compile aussi pour macOS).
   func startSharing(deviceName: String, allowsContributors: Bool = true) async throws {
     try await shareCoordinator.startSharing(

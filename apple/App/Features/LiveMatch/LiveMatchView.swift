@@ -18,6 +18,7 @@ struct LiveMatchView: View {
   @State private var keyboardObserver = KeyboardObserver()
   @State private var isPickingNextMatch = false
   @Environment(DeepLinkRouter.self) private var deepLinkRouter
+  @Environment(\.modelContext) private var modelContext
 
   /// Doc utilisateur (audit qualité, 15) — `MatchPlayView` a déjà vérifié que `definition`
   /// résout avant de router ici (sinon il affiche un `EmptyState` sans jamais construire cette
@@ -219,7 +220,8 @@ struct LiveMatchView: View {
     .sheet(isPresented: $isPresentingShareSession) {
       ShareSessionView { allowsContributors in
         try await model.startSharing(
-          deviceName: UIDevice.current.name, allowsContributors: allowsContributors)
+          deviceName: SessionDisplayName.current(in: modelContext),
+          allowsContributors: allowsContributors)
       }
     }
     .sheet(isPresented: $isPresentingRoundHistory) {

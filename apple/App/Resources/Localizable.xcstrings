@@ -2073,6 +2073,34 @@
         }
       }
     },
+    "Changer le signe" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorzeichen ändern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change sign"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar el signo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia segno"
+          }
+        }
+      }
+    },
     "Chaque équipe doit compter exactement %lld joueurs." : {
       "localizations" : {
         "de" : {

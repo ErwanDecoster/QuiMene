@@ -8,6 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.edit
 import com.quimene.domain.engine.MatchEvent
+import com.quimene.store.DeviceIdentity
+import com.quimene.store.PlayerRepository
 import com.quimene.sync.OnlineSession
 import com.quimene.sync.OnlineSessionError
 import com.quimene.sync.SessionChannel
@@ -184,3 +186,17 @@ data class PersistedOnlineSession(
         }
     }
 }
+
+/** Doc 16 — le nom montré aux autres appareils d'une session (appareils connectés, « X vient de
+ * valider une manche ») : le pseudo du profil, obligatoire depuis la phase A ; le nom de
+ * l'appareil seulement en repli. Miroir de `SessionDisplayName` (Swift). */
+suspend fun sessionDisplayName(
+    context: Context,
+    playerRepository: PlayerRepository,
+): String =
+    playerRepository
+        .myOwnSharedPlayer()
+        ?.nickname
+        ?.trim()
+        ?.takeIf { it.isNotEmpty() }
+        ?: DeviceIdentity.name(context)

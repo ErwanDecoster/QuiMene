@@ -180,6 +180,67 @@ extension ScoreBoardView {
     }
   }
 
+  /// Même contenu que `keyboardAccessory`, en barre ordinaire posée par l'écran appelant dans son
+  /// `.safeAreaInset(edge: .bottom)` tant que le clavier est visible — pour les écrans où la
+  /// barre d'accessoires native n'apparaît pas (plein écran « Rejoindre », `SharedMatchView`).
+  /// Depuis iOS 26, même apparence que la barre native : boutons en verre flottant au-dessus du
+  /// clavier, sans bandeau ; avant, le bandeau `.bar` des versions précédentes.
+  @ViewBuilder
+  static func keyboardBar(
+    allowsNegative: Bool,
+    currentParticipantID: Participant.ID?,
+    submitLabel: LocalizedStringResource,
+    onToggleSign: @escaping (Participant.ID) -> Void,
+    onSubmit: @escaping () -> Void
+  ) -> some View {
+    if #available(iOS 26, *) {
+      HStack {
+        if allowsNegative, let currentParticipantID {
+          Button {
+            onToggleSign(currentParticipantID)
+          } label: {
+            Image(systemName: "plusminus")
+              .font(.body.weight(.medium))
+              .frame(width: 24, height: 24)
+          }
+          .buttonStyle(.glass)
+          .buttonBorderShape(.circle)
+          .controlSize(.large)
+          .accessibilityLabel("Changer le signe")
+        }
+        Spacer()
+        Button {
+          onSubmit()
+        } label: {
+          Text(submitLabel).fontWeight(.semibold)
+        }
+        .buttonStyle(.glass)
+        .buttonBorderShape(.capsule)
+        .controlSize(.large)
+      }
+      .padding(.horizontal, Space.lg)
+      .padding(.vertical, Space.sm)
+    } else {
+      HStack {
+        if allowsNegative, let currentParticipantID {
+          Button {
+            onToggleSign(currentParticipantID)
+          } label: {
+            Image(systemName: "plusminus")
+              .frame(minWidth: 44, minHeight: 44)
+          }
+          .accessibilityLabel("Changer le signe")
+        }
+        Spacer()
+        Button(submitLabel) { onSubmit() }
+          .fontWeight(.semibold)
+          .frame(minHeight: 44)
+      }
+      .padding(.horizontal, Space.lg)
+      .background(.bar)
+    }
+  }
+
   /// Doc utilisateur — la barre d'accessoires du clavier (juste au-dessus) disparaît avec lui :
   /// sur iPad notamment, le bouton natif de fermeture du clavier laissait l'écran sans aucun
   /// moyen de valider la manche en cours (bug remonté). Ce bouton prend le relais, mais

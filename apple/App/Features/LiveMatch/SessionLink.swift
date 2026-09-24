@@ -2,6 +2,7 @@ import Domain
 import Foundation
 import Network
 import Store
+import SwiftData
 import Sync
 import UIKit
 
@@ -177,5 +178,17 @@ extension OnlineSession {
   /// Même générateur que l'ancien partage (`SessionCrypto`) : six chiffres.
   static func newPairingCode() -> String {
     String(format: "%06d", Int.random(in: 0...999_999))
+  }
+}
+
+/// Doc 16 — le nom montré aux autres appareils d'une session (appareils connectés, « X vient de
+/// valider une manche ») : le pseudo du profil, obligatoire depuis la phase A ; le nom de
+/// l'appareil seulement en repli.
+@MainActor
+enum SessionDisplayName {
+  static func current(in context: ModelContext) -> String {
+    let nickname = (try? PlayerRepository(context: context).myOwnSharedPlayer())?.nickname ?? ""
+    let trimmed = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+    return trimmed.isEmpty ? UIDevice.current.name : trimmed
   }
 }

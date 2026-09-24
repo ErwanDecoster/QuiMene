@@ -19,6 +19,7 @@ import com.quimene.sync.SessionEventRecord
 import com.quimene.sync.SessionPresence
 import com.quimene.sync.SupabaseSessionBackend
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.serialization.json.Json
@@ -81,8 +82,16 @@ class LiveShareCoordinator(
     val remoteStartedMatches: SharedFlow<RemoteStartedMatch> = remoteStartedMatchesFlow
 
     /** Ouvre une session (nouveau code, retiré si déjà pris) et y publie [match] ; si une session
-     * est déjà ouverte, y rattache simplement la partie. */
+     * est déjà ouverte, y rattache simplement la partie. Exécuté dans la portée applicative :
+     * l'appelant (la feuille de partage) peut être annulé — feuille fermée, ou recomposée dès que
+     * la partie est rattachée — sans interrompre la publication du journal. */
     suspend fun startSharing(
+        match: MatchEntity,
+        deviceName: String,
+        allowsContributors: Boolean,
+    ) = scope.async { startSharingDetached(match, deviceName, allowsContributors) }.await()
+
+    private suspend fun startSharingDetached(
         match: MatchEntity,
         deviceName: String,
         allowsContributors: Boolean,
@@ -109,21 +118,30 @@ class LiveShareCoordinator(
         attach(match)
     }
 
-    /** Rattache une partie : si le serveur ne la connaît pas encore, publie son journal local
-     * (mêmes identifiants : celui du `matchCreated` est celui de la partie) ; puis la copie
-     * locale devient le miroir du journal serveur. */
-    suspend fun attach(match: MatchEntity) {
-        val link = link ?: return
-        if (attachedMatchID == match.id) return
+    /** Rattache une partie : publie ce que le serveur n'a pas encore de son journal local, puis la
+     * copie locale devient le miroir du journal serveur. */
+    private suspend fun attach(match: MatchEntity) {
+        if (link == null) return
         attachedMatch = match
         attachedMatchID = match.id
-        if (link.session.eventsForMatch(match.id).isEmpty()) {
-            for (stamped in matchRepository.currentLog(match)) {
-                val result = link.submit(stamped.event, match.id, stamped.id, stamped.occurredAt)
-                if (result !is SessionLink.SubmitResult.Accepted) break
-            }
-        }
+        publishPendingEvents()
         mirrorAttachedMatch()
+    }
+
+    /** Publie la fin du journal local que le serveur n'a pas encore (mêmes identifiants : celui du
+     * `matchCreated` est celui de la partie ; l'ajout est idempotent par identifiant). Reprend une
+     * publication interrompue (réseau coupé) au prochain rattrapage. Rien si le journal serveur
+     * n'est pas un début du journal local : il a alors avancé ailleurs, et c'est lui qui fait foi. */
+    private suspend fun publishPendingEvents() {
+        val link = link ?: return
+        val match = attachedMatch?.let { matchRepository.match(it.id) } ?: return
+        val serverIDs = link.session.eventsForMatch(match.id).map { it.id }
+        val localLog = matchRepository.currentLog(match)
+        if (serverIDs.size >= localLog.size || localLog.take(serverIDs.size).map { it.id } != serverIDs) return
+        for (stamped in localLog.drop(serverIDs.size)) {
+            val result = link.submit(stamped.event, match.id, stamped.id, stamped.occurredAt)
+            if (result !is SessionLink.SubmitResult.Accepted) break
+        }
     }
 
     /** Au lancement : reprend la session que ce créateur avait ouverte, et sa partie courante. */
@@ -141,6 +159,7 @@ class LiveShareCoordinator(
 
     suspend fun onForeground() {
         link?.refresh()
+        publishPendingEvents()
     }
 
     private suspend fun connect(

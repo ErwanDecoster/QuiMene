@@ -32,6 +32,7 @@ import androidx.compose.ui.res.stringResource
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
+import com.quimene.app.livesync.sessionDisplayName
 import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.components.PrimaryButton
 import com.quimene.designsystem.tokens.Space
@@ -229,11 +230,17 @@ private fun LiveMatchScaffold(
     val coordinator = viewModel.shareCoordinator
     if (isPresentingShareSession && coordinator != null) {
         val context = LocalContext.current
+        val container = LocalAppContainer.current
         ShareSessionDialog(
             coordinator = coordinator,
             isAttached = viewModel.isSharing,
             onDismiss = { isPresentingShareSession = false },
-            startAction = { viewModel.startSharing(DeviceIdentity.name(context), allowsContributors = true) },
+            startAction = {
+                viewModel.startSharing(
+                    sessionDisplayName(context, container.playerRepository),
+                    allowsContributors = true,
+                )
+            },
         )
     }
     if (isPresentingRoundHistory) {
