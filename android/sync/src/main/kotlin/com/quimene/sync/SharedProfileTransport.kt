@@ -13,10 +13,10 @@ import java.util.UUID
  * Miroir de `SharedProfileTransport.swift` (doc 14, phase 2) — boîte aux lettres transitoire :
  * un résumé de partie terminée, poussé une fois par participant lié, retiré dès que l'appareil
  * concerné l'a récupéré. Jamais une copie durable côté serveur — même discipline que
- * `quimene_open_games` ([SupabaseTransport]), juste une fenêtre de purge plus généreuse (un ami
+ * les sessions en ligne ([SupabaseSessionBackend]), juste une fenêtre de purge plus généreuse (un ami
  * peut rester hors ligne des semaines, pas seulement le temps d'une soirée). Orchestré par
  * `com.quimene.app.profilesharing.SharedProfileSyncCoordinator` (`:app`), pas par cette classe
- * elle-même — miroir du même découpage que [SupabaseTransport]/`LiveShareCoordinator`.
+ * elle-même — miroir du même découpage que [SupabaseSessionBackend]/`LiveShareCoordinator`.
  */
 class SharedProfileTransport {
     private val client =

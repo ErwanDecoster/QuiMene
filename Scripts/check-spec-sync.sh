@@ -1,8 +1,9 @@
 #!/bin/sh
 # spec/ est la seule source de vérité (voir spec/README.md). Ce script échoue si une copie
-# embarquée diverge de spec/ : games/ -> Catalog/GameDefinitions (l'app), golden/ -> CatalogTests,
-# wire/ -> SyncTests (les tests ne peuvent pas référencer spec/ directement, SwiftPM exige des
-# ressources locales à la cible).
+# embarquée diverge de spec/ : games/ -> Catalog/GameDefinitions (l'app), golden/ -> CatalogTests
+# (les tests ne peuvent pas référencer spec/ directement, SwiftPM exige des ressources locales à la
+# cible). spec/wire/ (ancien protocole hôte/pair, doc 09) n'a plus de copie côté Apple depuis la
+# doc 16, phase C.
 set -eu
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -40,7 +41,6 @@ check_pair() {
 
 check_pair "Catalog/GameDefinitions" "$ROOT/spec/games" "$ROOT/apple/QuiMeneKit/Sources/Catalog/GameDefinitions"
 check_pair "Tests/CatalogTests/GoldenResources" "$ROOT/spec/golden" "$ROOT/apple/QuiMeneKit/Tests/CatalogTests/GoldenResources"
-check_pair "Tests/SyncTests/WireResources" "$ROOT/spec/wire" "$ROOT/apple/QuiMeneKit/Tests/SyncTests/WireResources"
 
 if [ "$status" -eq 0 ]; then
     echo "spec/ et ses copies embarquées sont synchronisés."

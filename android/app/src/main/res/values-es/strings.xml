@@ -2,6 +2,7 @@
 <resources>
     <string name="value1_count2">%1$s: %2$d</string>
     <string name="value1_est_deja_ton_ami_sur_la_fiche_value2">%1$s ya es tu amigo, en la ficha «%2$s».</string>
+    <string name="value1_vient_de_valider_une_manche_verifie_avant_de_valider">%1$s acaba de validar una ronda: revisa antes de validar la tuya.</string>
     <string name="value1_manche_count2">%1$s · Manga %2$d</string>
     <string name="value1_value2">%1$s, %2$s</string>
     <string name="value1_value2_count3">%1$s, %2$s : %3$d</string>
@@ -28,7 +29,7 @@
     <string name="abandonner_cette_partie">¿Abandonar esta partida?</string>
     <string name="abandonner_la_partie">Abandonar la partida</string>
     <string name="activite">Actividad</string>
-    <string name="activite_par_mois">Activité par mois</string>
+    <string name="activite_par_mois">Actividad por mes</string>
     <string name="adopter_aussi_son_pseudo_et_son_avatar">Adoptar también su apodo y su avatar</string>
     <string name="ajouter_un_ami">Añadir un amigo</string>
     <string name="ajouter_un_joueur">Añadir un jugador</string>
@@ -61,6 +62,7 @@
     <string name="automatique_les_joueurs_les_plus_actifs_nombre_de_parties">Automático: los jugadores más activos (número de partidas jugadas) primero. Manual: reordénalos tú mismo en la pestaña Jugadores.</string>
     <string name="autoriser_les_contributeurs">Permitir colaboradores</string>
     <string name="avatar">Avatar</string>
+    <string name="avec_les_memes_joueurs_tous_les_appareils_de_la_session">Con los mismos jugadores. Todos los dispositivos de la sesión pasan a la nueva partida.</string>
     <string name="belote_rebelote">Belote-rebelote</string>
     <string name="bonus">Bonus</string>
     <string name="bouts_count1">Bouts: %1$d</string>
@@ -87,6 +89,7 @@
     <string name="contrat">Contrato</string>
     <string name="contributeur">Colaborador</string>
     <string name="copier_l_adresse">Copiar la dirección</string>
+    <string name="createur">Creador</string>
     <string name="creer_la_fiche_value1">Crear la ficha «%1$s»</string>
     <string name="creer_mon_profil">Crear mi perfil</string>
     <string name="demande_d_ajout_d_un_jeu_qui_mene">Solicitud para añadir un juego — Qui Mène ?</string>
@@ -110,6 +113,9 @@
     <string name="garde_contre_le_chien">Garde contre le chien</string>
     <string name="garde_sans_le_chien">Garde sans le chien</string>
     <string name="historique">Historial</string>
+    <string name="hors_connexion">Sin conexión</string>
+    <string name="hors_connexion_la_saisie_reprendra_au_retour_du_reseau">Sin conexión: la introducción se reanudará cuando vuelva la red.</string>
+    <string name="hors_connexion_le_tableau_affiche_est_le_dernier_recu">Sin conexión. El marcador mostrado es el último recibido.</string>
     <string name="hote">Anfitrión</string>
     <string name="impossible_de_demarrer_le_partage_verifie_ta_connexion">No se pudo iniciar el uso compartido. Comprueba tu conexión a Internet e inténtalo de nuevo.</string>
     <string name="jeu">Juego</string>
@@ -122,8 +128,11 @@
     <string name="la_partie_est_terminee">La partida ha terminado.</string>
     <string name="la_partie_et_ses_manches_seront_definitivement_supprimees_y">La partida y sus mangas se eliminarán definitivamente, incluidas las estadísticas de los jugadores implicados. Esta acción no se puede deshacer.</string>
     <string name="la_partie_sera_classee_comme_abandonnee_dans_l_historique">La partida se clasificará como abandonada en el historial, con la clasificación alcanzada hasta ese momento. Esta acción no se puede deshacer.</string>
+    <string name="la_session_partagee_a_ete_arretee">La sesión compartida se ha detenido.</string>
     <string name="langue">Idioma</string>
     <string name="le_classement_final_sera_calcule_a_partir_des_manches">La clasificación final se calculará a partir de las mangas jugadas. Esta acción no se puede deshacer.</string>
+    <string name="le_createur_a_arrete_la_session">El creador detuvo la sesión.</string>
+    <string name="le_createur_a_arrete_la_session_le_tableau_affiche_est_le">El creador detuvo la sesión. El marcador mostrado es el último recibido.</string>
     <string name="le_jeu_que_je_cherche_value1">El juego que buscaba: %1$s</string>
     <string name="le_jeu_que_je_souhaite_voir_ajoute">El juego que me gustaría que añadierais:</string>
     <string name="les_personnes_qui_rejoignent_ne_peuvent_qu_observer_quel">Las personas que se unan solo podrán observar, sea cual sea su elección — esto no cambia nada para los colaboradores ya conectados.</string>
@@ -165,6 +174,7 @@
     <string name="partenaire_roi_appele">Compañero (rey llamado)</string>
     <string name="partie_partagee_en_cours_reprendre">Partida compartida en curso · Reanudar</string>
     <string name="partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par">Partida recibida del dispositivo de un amigo: el detalle manga por manga no está disponible aquí.</string>
+    <string name="partie_suivante">Siguiente partida</string>
     <string name="parties">Partidas</string>
     <string name="parties_archivees">Partidas archivadas</string>
     <string name="parties_archivees_count1">Partidas archivadas (%1$d)</string>
@@ -192,10 +202,11 @@
     <string name="rejoindre">Unirse</string>
     <string name="rejoindre_les_parties_de_tes_amis_et_y_etre_reconnu">Unirte a las partidas de tus amigos y ser reconocido.</string>
     <string name="rejoindre_une_partie">Unirse a una partida</string>
+    <string name="rejouer">Volver a jugar</string>
     <string name="remplacer_la_partie_partagee">¿Reemplazar la partida compartida?</string>
     <string name="reprendre_la_partie">Reanudar la partida</string>
     <string name="reprendre_la_partie_en_cours">Reanudar la partida en curso</string>
-    <string name="reprendre_la_partie_en_cours_value1">Reprendre la partie en cours, %1$s</string>
+    <string name="reprendre_la_partie_en_cours_value1">Reanudar la partida en curso, %1$s</string>
     <string name="reprise_automatique_en_cours">Reanudación automática en curso.</string>
     <string name="retirer_des_amis">Quitar de amigos</string>
     <string name="retrouver_vos_parties_jouees_ensemble_dans_ton_historique">Encontrar en tu historial las partidas jugadas juntos.</string>
@@ -244,6 +255,8 @@
     <string name="triple">Triple</string>
     <string name="tu_suis_value1_depuis_le_value2">Sigues a %1$s desde el %2$s</string>
     <string name="un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer">Un apodo y un avatar, nada más: ninguna cuenta que crear.</string>
+    <string name="une_autre_manche_vient_d_etre_validee_verifie_avant_de">Se acaba de validar otra ronda: revisa antes de validar la tuya.</string>
+    <string name="une_partie_vient_d_etre_lancee_sur_un_autre_appareil">Se acaba de iniciar una partida en otro dispositivo.</string>
     <string name="une_session_est_en_cours_de_partage_sur_value1_continuer">Hay una sesión en curso de compartición en %1$s. Continuar aquí la reemplazará: las personas conectadas verán esta partida en su lugar.</string>
     <string name="valider">Validar</string>
     <string name="valider_la_donne">Validar la mano</string>

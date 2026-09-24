@@ -10,15 +10,16 @@ kotlin {
     jvmToolchain(17)
 }
 
-// La contrainte SwiftPM ne s'applique pas à Gradle (voir :catalog) — golden files du protocole
-// applicatif (spec/wire/*.json, doc 09) copiés à chaque build plutôt que dupliqués à la main.
-val specWireDir = rootProject.layout.projectDirectory.dir("../spec/wire")
+// La contrainte SwiftPM ne s'applique pas à Gradle (voir :catalog) — événements de session
+// scellés par le code Swift (spec/session/*.json, doc 16) copiés à chaque build : Android doit les
+// relire à l'identique.
+val specSessionDir = rootProject.layout.projectDirectory.dir("../spec/session")
 val generatedTestResourcesDir = layout.buildDirectory.dir("generated/resources/test")
 
-val copyWireResources =
-    tasks.register<Copy>("copyWireResources") {
-        from(specWireDir)
-        into(generatedTestResourcesDir.map { it.dir("WireResources") })
+val copySessionResources =
+    tasks.register<Copy>("copySessionResources") {
+        from(specSessionDir)
+        into(generatedTestResourcesDir.map { it.dir("SessionResources") })
         include("*.json")
     }
 
@@ -29,7 +30,7 @@ sourceSets {
 }
 
 tasks.named("processTestResources") {
-    dependsOn(copyWireResources)
+    dependsOn(copySessionResources)
 }
 
 dependencies {

@@ -32,7 +32,7 @@ public struct MatchState: Sendable, Codable, Equatable {
   /// Numéro de la prochaine manche : un de plus que le plus grand numéro existant, jamais
   /// `rounds.count`. Le reducer *remplace* une manche de même numéro ; une partie dont les
   /// numéros ont un trou (manche d'un pair perdue en route, acceptée ensuite hors séquence par un
-  /// hôte d'avant le contrôle `LiveSession.hostCommit`) voyait sinon chaque nouvelle manche
+  /// hôte d'avant le contrôle du numéro de manche, doc 09) voyait sinon chaque nouvelle manche
   /// écraser la dernière — totaux qui bougent, « Manche 8 » figé.
   public var nextRoundIndex: Int { (rounds.map(\.index).max() ?? -1) + 1 }
 

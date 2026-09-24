@@ -15,6 +15,14 @@
     "de": "%1$@ ist bereits dein Freund, auf der Karte „%2$@“.",
     "it": "%1$@ è già tuo amico, sulla scheda «%2$@»."
   },
+  "value1_vient_de_valider_une_manche_verifie_avant_de_valider": {
+    "key": "%@ vient de valider une manche : vérifie avant de valider la tienne.",
+    "fr": "%@ vient de valider une manche : vérifie avant de valider la tienne.",
+    "en": "%@ just confirmed a round: check before confirming yours.",
+    "es": "%@ acaba de validar una ronda: revisa antes de validar la tuya.",
+    "de": "%@ hat gerade eine Runde bestätigt: prüfe, bevor du deine bestätigst.",
+    "it": "%@ ha appena convalidato un turno: controlla prima di convalidare il tuo."
+  },
   "value1_manche_count2": {
     "key": "%@ · Manche %lld",
     "fr": "%1$@ · Manche %2$lld",
@@ -226,10 +234,10 @@
   "activite_par_mois": {
     "key": "Activité par mois",
     "fr": "Activité par mois",
-    "en": "Activité par mois",
-    "es": "Activité par mois",
-    "de": "Activité par mois",
-    "it": "Activité par mois"
+    "en": "Activity by month",
+    "es": "Actividad por mes",
+    "de": "Aktivität pro Monat",
+    "it": "Attività per mese"
   },
   "adopter_aussi_son_pseudo_et_son_avatar": {
     "key": "Adopter aussi son pseudo et son avatar",
@@ -487,6 +495,14 @@
     "de": "Avatar",
     "it": "Avatar"
   },
+  "avec_les_memes_joueurs_tous_les_appareils_de_la_session": {
+    "key": "Avec les mêmes joueurs. Tous les appareils de la session passent à la nouvelle partie.",
+    "fr": "Avec les mêmes joueurs. Tous les appareils de la session passent à la nouvelle partie.",
+    "en": "With the same players. Every device in the session moves to the new match.",
+    "es": "Con los mismos jugadores. Todos los dispositivos de la sesión pasan a la nueva partida.",
+    "de": "Mit denselben Spielern. Alle Geräte der Sitzung wechseln zur neuen Partie.",
+    "it": "Con gli stessi giocatori. Tutti i dispositivi della sessione passano alla nuova partita."
+  },
   "belote_rebelote": {
     "key": "Belote-rebelote",
     "fr": "Belote-rebelote",
@@ -695,6 +711,14 @@
     "de": "Adresse kopieren",
     "it": "Copia l'indirizzo"
   },
+  "createur": {
+    "key": "Créateur",
+    "fr": "Créateur",
+    "en": "Creator",
+    "es": "Creador",
+    "de": "Ersteller",
+    "it": "Creatore"
+  },
   "creer_la_fiche_value1": {
     "key": "Créer la fiche « %@ »",
     "fr": "Créer la fiche « %@ »",
@@ -879,6 +903,30 @@
     "de": "Verlauf",
     "it": "Cronologia"
   },
+  "hors_connexion": {
+    "key": "Hors connexion",
+    "fr": "Hors connexion",
+    "en": "Offline",
+    "es": "Sin conexión",
+    "de": "Offline",
+    "it": "Offline"
+  },
+  "hors_connexion_la_saisie_reprendra_au_retour_du_reseau": {
+    "key": "Hors connexion : la saisie reprendra au retour du réseau.",
+    "fr": "Hors connexion : la saisie reprendra au retour du réseau.",
+    "en": "Offline: entry will resume when the network is back.",
+    "es": "Sin conexión: la introducción se reanudará cuando vuelva la red.",
+    "de": "Offline: Die Eingabe geht weiter, sobald das Netz zurück ist.",
+    "it": "Offline: l'inserimento riprenderà al ritorno della rete."
+  },
+  "hors_connexion_le_tableau_affiche_est_le_dernier_recu": {
+    "key": "Hors connexion. Le tableau affiché est le dernier reçu.",
+    "fr": "Hors connexion. Le tableau affiché est le dernier reçu.",
+    "en": "Offline. The board shown is the last one received.",
+    "es": "Sin conexión. El marcador mostrado es el último recibido.",
+    "de": "Offline. Die angezeigte Tabelle ist die zuletzt empfangene.",
+    "it": "Offline. Il tabellone mostrato è l'ultimo ricevuto."
+  },
   "hote": {
     "key": "Hôte",
     "fr": "Hôte",
@@ -975,6 +1023,14 @@
     "de": "Die Partie wird im Verlauf als abgebrochen markiert, mit dem bis dahin erreichten Stand. Diese Aktion kann nicht rückgängig gemacht werden.",
     "it": "La partita verrà classificata come abbandonata nella cronologia, con la classifica raggiunta fino a quel momento. Questa azione non può essere annullata."
   },
+  "la_session_partagee_a_ete_arretee": {
+    "key": "La session partagée a été arrêtée.",
+    "fr": "La session partagée a été arrêtée.",
+    "en": "The shared session was stopped.",
+    "es": "La sesión compartida se ha detenido.",
+    "de": "Die geteilte Sitzung wurde beendet.",
+    "it": "La sessione condivisa è stata interrotta."
+  },
   "langue": {
     "key": "Langue",
     "fr": "Langue",
@@ -990,6 +1046,22 @@
     "es": "La clasificación final se calculará a partir de las mangas jugadas. Esta acción no se puede deshacer.",
     "de": "Die Endwertung wird anhand der gespielten Runden berechnet. Diese Aktion kann nicht rückgängig gemacht werden.",
     "it": "La classifica finale verrà calcolata in base alle manche giocate. Questa azione non può essere annullata."
+  },
+  "le_createur_a_arrete_la_session": {
+    "key": "Le créateur a arrêté la session.",
+    "fr": "Le créateur a arrêté la session.",
+    "en": "The creator stopped the session.",
+    "es": "El creador detuvo la sesión.",
+    "de": "Der Ersteller hat die Sitzung beendet.",
+    "it": "Il creatore ha interrotto la sessione."
+  },
+  "le_createur_a_arrete_la_session_le_tableau_affiche_est_le": {
+    "key": "Le créateur a arrêté la session. Le tableau affiché est le dernier reçu.",
+    "fr": "Le créateur a arrêté la session. Le tableau affiché est le dernier reçu.",
+    "en": "The creator stopped the session. The board shown is the last one received.",
+    "es": "El creador detuvo la sesión. El marcador mostrado es el último recibido.",
+    "de": "Der Ersteller hat die Sitzung beendet. Die angezeigte Tabelle ist die zuletzt empfangene.",
+    "it": "Il creatore ha interrotto la sessione. Il tabellone mostrato è l'ultimo ricevuto."
   },
   "le_jeu_que_je_cherche_value1": {
     "key": "Le jeu que je cherche : %@",
@@ -1319,6 +1391,14 @@
     "de": "Partie vom Gerät eines Freundes empfangen: die Runde-für-Runde-Details sind hier nicht verfügbar.",
     "it": "Partita ricevuta dal dispositivo di un amico: il dettaglio manche per manche non è disponibile qui."
   },
+  "partie_suivante": {
+    "key": "Partie suivante",
+    "fr": "Partie suivante",
+    "en": "Next match",
+    "es": "Siguiente partida",
+    "de": "Nächste Partie",
+    "it": "Partita successiva"
+  },
   "parties": {
     "key": "Parties",
     "fr": "Parties",
@@ -1535,6 +1615,14 @@
     "de": "Einer Partie beitreten",
     "it": "Unisciti a una partita"
   },
+  "rejouer": {
+    "key": "Rejouer",
+    "fr": "Rejouer",
+    "en": "Play again",
+    "es": "Volver a jugar",
+    "de": "Nochmal spielen",
+    "it": "Gioca ancora"
+  },
   "remplacer_la_partie_partagee": {
     "key": "Remplacer la partie partagée ?",
     "fr": "Remplacer la partie partagée ?",
@@ -1562,10 +1650,10 @@
   "reprendre_la_partie_en_cours_value1": {
     "key": "Reprendre la partie en cours, %@",
     "fr": "Reprendre la partie en cours, %@",
-    "en": "Reprendre la partie en cours, %@",
-    "es": "Reprendre la partie en cours, %@",
-    "de": "Reprendre la partie en cours, %@",
-    "it": "Reprendre la partie en cours, %@"
+    "en": "Resume the match in progress, %@",
+    "es": "Reanudar la partida en curso, %@",
+    "de": "Laufende Partie fortsetzen, %@",
+    "it": "Riprendi la partita in corso, %@"
   },
   "reprise_automatique_en_cours": {
     "key": "Reprise automatique en cours.",
@@ -1950,6 +2038,22 @@
     "es": "Un apodo y un avatar, nada más: ninguna cuenta que crear.",
     "de": "Ein Spitzname und ein Avatar, mehr nicht: kein Konto nötig.",
     "it": "Un nickname e un avatar, niente di più: nessun account da creare."
+  },
+  "une_autre_manche_vient_d_etre_validee_verifie_avant_de": {
+    "key": "Une autre manche vient d'être validée : vérifie avant de valider la tienne.",
+    "fr": "Une autre manche vient d'être validée : vérifie avant de valider la tienne.",
+    "en": "Another round was just confirmed: check before confirming yours.",
+    "es": "Se acaba de validar otra ronda: revisa antes de validar la tuya.",
+    "de": "Gerade wurde eine andere Runde bestätigt: prüfe, bevor du deine bestätigst.",
+    "it": "È appena stato convalidato un altro turno: controlla prima di convalidare il tuo."
+  },
+  "une_partie_vient_d_etre_lancee_sur_un_autre_appareil": {
+    "key": "Une partie vient d'être lancée sur un autre appareil.",
+    "fr": "Une partie vient d'être lancée sur un autre appareil.",
+    "en": "A match was just started on another device.",
+    "es": "Se acaba de iniciar una partida en otro dispositivo.",
+    "de": "Auf einem anderen Gerät wurde gerade eine Partie gestartet.",
+    "it": "È appena stata avviata una partita su un altro dispositivo."
   },
   "une_session_est_en_cours_de_partage_sur_value1_continuer": {
     "key": "Une session est en cours de partage sur %@. Continuer ici la remplacera : les personnes connectées verront cette partie à la place.",

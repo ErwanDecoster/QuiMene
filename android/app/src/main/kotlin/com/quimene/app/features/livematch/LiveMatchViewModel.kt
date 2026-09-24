@@ -5,7 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.quimene.app.R
 import com.quimene.app.livesync.LiveShareCoordinator
+import com.quimene.app.livesync.SessionLink
+import com.quimene.app.livesync.SharedMatchViewModel
+import com.quimene.domain.engine.MatchEvent
 import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.MatchStatus
 import com.quimene.domain.model.ModifierID
@@ -21,22 +25,22 @@ import com.quimene.domain.rules.GameRules
 import com.quimene.domain.rules.Standing
 import com.quimene.store.MatchEntity
 import com.quimene.store.MatchRepository
-import com.quimene.sync.LiveSession
+import com.quimene.sync.SessionPresence
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.Instant
 import java.util.UUID
 
 /**
  * Miroir de `LiveMatchModel.swift` — porte l'état de la manche en cours, rien n'est écrit tant
  * qu'elle n'est pas validée. **Hôte** de sa propre partie : écrit toujours directement en local
- * ([MatchRepository]), jamais via `LiveSession.propose` (réservé aux contributeurs distants —
- * voir `SharedMatchViewModel`). Implémente [LiveRoundEntryState] : les 4 écrans de saisie dédiés
+ * ([MatchRepository]) — sauf si elle est partagée en ligne (doc 16, phase C) : chaque événement
+ * passe alors d'abord par le journal de la session, et la copie locale n'en est que le miroir. Implémente [LiveRoundEntryState] : les 4 écrans de saisie dédiés
  * (Belote/Tarot/Wizard/Yams) et [GenericRoundEntry] ne le savent jamais distinctement d'un
  * `SharedMatchViewModel` contributeur, exactement comme `ScoreBoardView.swift` côté Apple.
  * Le partage en direct (pairage, pairs connectés) vit dans [LiveShareCoordinator], injecté
- * plutôt que construit ici — un seul l'un `LiveSession`/`SupabaseTransport` par session, pas un
- * par écran.
+ * plutôt que construit ici — une seule session par appareil, pas une par écran.
  */
 class LiveMatchViewModel(
     private var match: MatchEntity,
@@ -69,10 +73,20 @@ class LiveMatchViewModel(
     var remoteActivityMessage by mutableStateOf<String?>(null)
         private set
 
+    /** Un envoi au journal de la session est en cours : « Terminé » est désactivé. */
+    var isSubmitting by mutableStateOf(false)
+        private set
+
+    val matchID: UUID get() = match.id
+    val gameID: String get() = match.gameID
+
     val isSharing: Boolean get() = shareCoordinator?.attachedMatchID == match.id
     val pairingCode: String? get() = if (isSharing) shareCoordinator?.pairingCode else null
     val allowsContributors: Boolean get() = shareCoordinator?.allowsContributors ?: true
-    val connectedPeers: List<LiveSession.ConnectedPeer> get() =
+
+    /** Doc 16 — partie partagée hors ligne : la saisie est bloquée. */
+    val isOfflineShared: Boolean get() = isSharing && shareCoordinator?.isReachable == false
+    val connectedPeers: List<SessionPresence> get() =
         if (isSharing) {
             shareCoordinator
                 ?.connectedPeers
@@ -111,7 +125,7 @@ class LiveMatchViewModel(
         deviceName: String,
         allowsContributors: Boolean,
     ) {
-        shareCoordinator?.startSharing(match, participants.size, deviceName, allowsContributors)
+        shareCoordinator?.startSharing(match, deviceName, allowsContributors)
     }
 
     private val state: MatchState get() = requireNotNull(stateInternal) { "MatchState pas encore chargé" }
@@ -139,11 +153,23 @@ class LiveMatchViewModel(
      * classement qui a du sens. */
     val canEndManually: Boolean get() = state.rounds.isNotEmpty()
 
-    fun endManually() = mutate { repository.endMatchManually(match, catalog, deviceID) }
+    fun endManually() {
+        if (isSharing) {
+            viewModelScope.launch { submitShared(MatchEvent.MatchEndedManually) }
+            return
+        }
+        mutate { repository.endMatchManually(match, catalog, deviceID) }
+    }
 
     /** Abandon volontaire — classée dans l'historique avec le classement atteint jusque-là,
      * contrairement à une suppression qui ferait tout perdre. */
-    fun abandon() = mutate { repository.abandonMatch(match, catalog, deviceID) }
+    fun abandon() {
+        if (isSharing) {
+            viewModelScope.launch { submitShared(MatchEvent.MatchAbandoned(Instant.now())) }
+            return
+        }
+        mutate { repository.abandonMatch(match, catalog, deviceID) }
+    }
 
     override fun setScore(
         participantID: UUID,
@@ -207,6 +233,21 @@ class LiveMatchViewModel(
             return
         }
 
+        if (isSharing) {
+            if (isSubmitting) return
+            validationErrorMessage = null
+            viewModelScope.launch {
+                if (!submitShared(MatchEvent.RoundCommitted(draft))) return@launch
+                onCommitted()
+                state.rounds
+                    .lastOrNull()
+                    ?.entries
+                    ?.firstNotNullOfOrNull { it.explanation }
+                    ?.let(::showRoundExplanation)
+            }
+            return
+        }
+
         viewModelScope.launch {
             val newState =
                 try {
@@ -226,7 +267,6 @@ class LiveMatchViewModel(
                 ?.entries
                 ?.firstNotNullOfOrNull { it.explanation }
                 ?.let(::showRoundExplanation)
-            syncSharedLogIfNeeded()
         }
     }
 
@@ -238,21 +278,60 @@ class LiveMatchViewModel(
         }
     }
 
-    fun undoLastRound() = mutate { repository.undoLastRound(match, catalog, deviceID) }
+    fun undoLastRound() {
+        if (isSharing) {
+            val lastIndex = state.rounds.maxOfOrNull { it.index } ?: return
+            viewModelScope.launch { submitShared(MatchEvent.RoundRemoved(lastIndex)) }
+            return
+        }
+        mutate { repository.undoLastRound(match, catalog, deviceID) }
+    }
 
     private fun mutate(block: suspend () -> MatchState) {
         viewModelScope.launch {
             stateInternal = block()
             match = requireNotNull(repository.match(match.id))
-            syncSharedLogIfNeeded()
         }
     }
 
-    /** Doc 09 « hôte autoritaire » — après chaque écriture locale, republie le journal complet
-     * vers les pairs déjà connectés (`LiveSession.syncHostLog`, qui ne diffuse que les nouveaux
-     * événements) si cette partie est celle actuellement partagée. Miroir de
-     * `LiveMatchModel.syncSharedLogIfNeeded`. */
-    private suspend fun syncSharedLogIfNeeded() {
-        if (isSharing) shareCoordinator?.syncLog(match.id)
+    /** Doc 16, phase C — envoie un événement au journal de la session, puis recharge la copie
+     * locale (déjà mise en miroir par [LiveShareCoordinator]). Pas de nouvel essai automatique si
+     * un autre appareil a saisi entre-temps : la saisie reste en place, avec un message. Miroir de
+     * `LiveMatchModel.submitShared`. */
+    private suspend fun submitShared(event: MatchEvent): Boolean {
+        val coordinator = shareCoordinator ?: return false
+        isSubmitting = true
+        try {
+            val result = coordinator.submit(event, match.id)
+            repository.match(match.id)?.let {
+                match = it
+                stateInternal = repository.loadState(it, catalog)
+            }
+            val context = coordinator.context
+            validationErrorMessage =
+                when (result) {
+                    is SessionLink.SubmitResult.Accepted -> null
+                    is SessionLink.SubmitResult.Overtaken ->
+                        SharedMatchViewModel.overtakenMessage(context, result.byDeviceName)
+                    SessionLink.SubmitResult.Offline ->
+                        context.getString(R.string.hors_connexion_la_saisie_reprendra_au_retour_du_reseau)
+                    SessionLink.SubmitResult.Closed -> context.getString(R.string.la_session_partagee_a_ete_arretee)
+                }
+            return result is SessionLink.SubmitResult.Accepted
+        } finally {
+            isSubmitting = false
+        }
+    }
+
+    /** Doc 16, phase C — « Partie suivante » du créateur, avec les mêmes joueurs ; renvoie la
+     * nouvelle partie, à ouvrir. */
+    suspend fun startNextMatch(next: GameDefinition): UUID? {
+        val coordinator = shareCoordinator ?: return null
+        isSubmitting = true
+        try {
+            return coordinator.startNextMatch(next, match)?.id
+        } finally {
+            isSubmitting = false
+        }
     }
 }

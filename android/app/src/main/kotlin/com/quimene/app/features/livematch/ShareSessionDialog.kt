@@ -35,7 +35,7 @@ import com.quimene.designsystem.components.QrCodeView
 import com.quimene.designsystem.components.SecondaryButton
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
-import com.quimene.sync.Role
+import com.quimene.sync.SessionPresence
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -131,7 +131,7 @@ private fun SharingContent(
             textAlign = TextAlign.Center,
         )
         Text(
-            "À communiquer à qui veut rejoindre — aucun réseau Wi-Fi commun n'est nécessaire, juste une connexion Internet des deux côtés.",
+            stringResource(R.string.a_scanner_bouton_scanner_un_code_sur_l_appareil_qui_rejoint),
             style = MaterialTheme.typography.bodySmall,
             color = colors.textSecondary,
             textAlign = TextAlign.Center,
@@ -154,9 +154,9 @@ private fun SharingContent(
             )
             Text(
                 if (coordinator.allowsContributors) {
-                    "Les appareils qui rejoignent peuvent proposer des manches, validées par toi."
+                    stringResource(R.string.les_personnes_qui_rejoignent_peuvent_choisir_d_observer_ou)
                 } else {
-                    "Désactivé, les appareils qui rejoignent ne peuvent qu'observer la partie."
+                    stringResource(R.string.les_personnes_qui_rejoignent_ne_peuvent_qu_observer_quel)
                 },
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.textSecondary,
@@ -185,7 +185,11 @@ private fun SharingContent(
         for (peer in coordinator.connectedPeers) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text(peer.deviceName, color = colors.textPrimary)
-                Text(roleLabel(peer.role), style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
+                Text(
+                    roleLabel(peer, coordinator.allowsContributors),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textSecondary,
+                )
             }
         }
     }
@@ -198,9 +202,12 @@ private fun SharingContent(
 }
 
 @Composable
-private fun roleLabel(role: Role): String =
-    when (role) {
-        Role.Host -> stringResource(R.string.hote)
-        Role.Contributor -> stringResource(R.string.contributeur)
-        Role.Observer -> stringResource(R.string.observateur)
+private fun roleLabel(
+    peer: SessionPresence,
+    allowsContributors: Boolean,
+): String =
+    when {
+        peer.isOwner -> stringResource(R.string.createur)
+        allowsContributors -> stringResource(R.string.contributeur)
+        else -> stringResource(R.string.observateur)
     }

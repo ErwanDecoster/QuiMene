@@ -41,8 +41,7 @@ import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.components.PrimaryButton
 import com.quimene.designsystem.tokens.Space
 import com.quimene.store.DeviceIdentity
-import com.quimene.sync.LiveSession
-import com.quimene.sync.SupabaseTransportError
+import com.quimene.sync.OnlineSessionError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
@@ -209,8 +208,7 @@ private fun ManualCodeEntrySheet(
 
 private fun describe(error: Throwable): String =
     when (error) {
-        is SupabaseTransportError.GameNotFound ->
+        is OnlineSessionError.SessionNotFound ->
             "Aucune partie ne correspond à ce code. Vérifie qu'il est bien à jour."
-        is LiveSession.SessionError.NoResponseFromHost -> "L'hôte n'a pas répondu — vérifie le code."
         else -> "Connexion impossible. Réessaie."
     }

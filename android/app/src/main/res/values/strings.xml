@@ -2,6 +2,7 @@
 <resources>
     <string name="value1_count2">%1$s : %2$d</string>
     <string name="value1_est_deja_ton_ami_sur_la_fiche_value2">%1$s est déjà ton ami, sur la fiche « %2$s ».</string>
+    <string name="value1_vient_de_valider_une_manche_verifie_avant_de_valider">%1$s vient de valider une manche : vérifie avant de valider la tienne.</string>
     <string name="value1_manche_count2">%1$s · Manche %2$d</string>
     <string name="value1_value2">%1$s, %2$s</string>
     <string name="value1_value2_count3">%1$s, %2$s : %3$d</string>
@@ -61,6 +62,7 @@
     <string name="automatique_les_joueurs_les_plus_actifs_nombre_de_parties">Automatique : les joueurs les plus actifs (nombre de parties jouées) en premier. Manuel : réordonne-les toi-même dans l\'onglet Joueurs.</string>
     <string name="autoriser_les_contributeurs">Autoriser les contributeurs</string>
     <string name="avatar">Avatar</string>
+    <string name="avec_les_memes_joueurs_tous_les_appareils_de_la_session">Avec les mêmes joueurs. Tous les appareils de la session passent à la nouvelle partie.</string>
     <string name="belote_rebelote">Belote-rebelote</string>
     <string name="bonus">Bonus</string>
     <string name="bouts_count1">Bouts : %1$d</string>
@@ -87,6 +89,7 @@
     <string name="contrat">Contrat</string>
     <string name="contributeur">Contributeur</string>
     <string name="copier_l_adresse">Copier l\'adresse</string>
+    <string name="createur">Créateur</string>
     <string name="creer_la_fiche_value1">Créer la fiche « %1$s »</string>
     <string name="creer_mon_profil">Créer mon profil</string>
     <string name="demande_d_ajout_d_un_jeu_qui_mene">Demande d\'ajout d\'un jeu — Qui Mène ?</string>
@@ -110,6 +113,9 @@
     <string name="garde_contre_le_chien">Garde contre le chien</string>
     <string name="garde_sans_le_chien">Garde sans le chien</string>
     <string name="historique">Historique</string>
+    <string name="hors_connexion">Hors connexion</string>
+    <string name="hors_connexion_la_saisie_reprendra_au_retour_du_reseau">Hors connexion : la saisie reprendra au retour du réseau.</string>
+    <string name="hors_connexion_le_tableau_affiche_est_le_dernier_recu">Hors connexion. Le tableau affiché est le dernier reçu.</string>
     <string name="hote">Hôte</string>
     <string name="impossible_de_demarrer_le_partage_verifie_ta_connexion">Impossible de démarrer le partage. Vérifie ta connexion Internet et réessaie.</string>
     <string name="jeu">Jeu</string>
@@ -122,8 +128,11 @@
     <string name="la_partie_est_terminee">La partie est terminée.</string>
     <string name="la_partie_et_ses_manches_seront_definitivement_supprimees_y">La partie et ses manches seront définitivement supprimées, y compris des statistiques des joueurs concernés. Cette action ne peut pas être annulée.</string>
     <string name="la_partie_sera_classee_comme_abandonnee_dans_l_historique">La partie sera classée comme abandonnée dans l\'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée.</string>
+    <string name="la_session_partagee_a_ete_arretee">La session partagée a été arrêtée.</string>
     <string name="langue">Langue</string>
     <string name="le_classement_final_sera_calcule_a_partir_des_manches">Le classement final sera calculé à partir des manches jouées. Cette action ne peut pas être annulée.</string>
+    <string name="le_createur_a_arrete_la_session">Le créateur a arrêté la session.</string>
+    <string name="le_createur_a_arrete_la_session_le_tableau_affiche_est_le">Le créateur a arrêté la session. Le tableau affiché est le dernier reçu.</string>
     <string name="le_jeu_que_je_cherche_value1">Le jeu que je cherche : %1$s</string>
     <string name="le_jeu_que_je_souhaite_voir_ajoute">Le jeu que je souhaite voir ajouté :</string>
     <string name="les_personnes_qui_rejoignent_ne_peuvent_qu_observer_quel">Les personnes qui rejoignent ne peuvent qu\'observer, quel que soit leur choix — ça ne change rien pour les contributeurs déjà connectés.</string>
@@ -165,6 +174,7 @@
     <string name="partenaire_roi_appele">Partenaire (roi appelé)</string>
     <string name="partie_partagee_en_cours_reprendre">Partie partagée en cours · Reprendre</string>
     <string name="partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par">Partie reçue de l\'appareil d\'un ami : le détail manche par manche n\'est pas disponible ici.</string>
+    <string name="partie_suivante">Partie suivante</string>
     <string name="parties">Parties</string>
     <string name="parties_archivees">Parties archivées</string>
     <string name="parties_archivees_count1">Parties archivées (%1$d)</string>
@@ -192,6 +202,7 @@
     <string name="rejoindre">Rejoindre</string>
     <string name="rejoindre_les_parties_de_tes_amis_et_y_etre_reconnu">Rejoindre les parties de tes amis et y être reconnu.</string>
     <string name="rejoindre_une_partie">Rejoindre une partie</string>
+    <string name="rejouer">Rejouer</string>
     <string name="remplacer_la_partie_partagee">Remplacer la partie partagée ?</string>
     <string name="reprendre_la_partie">Reprendre la partie</string>
     <string name="reprendre_la_partie_en_cours">Reprendre la partie en cours</string>
@@ -244,6 +255,8 @@
     <string name="triple">Triple</string>
     <string name="tu_suis_value1_depuis_le_value2">Tu suis %1$s, depuis le %2$s</string>
     <string name="un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer">Un pseudo et un avatar, rien de plus : aucun compte à créer.</string>
+    <string name="une_autre_manche_vient_d_etre_validee_verifie_avant_de">Une autre manche vient d\'être validée : vérifie avant de valider la tienne.</string>
+    <string name="une_partie_vient_d_etre_lancee_sur_un_autre_appareil">Une partie vient d\'être lancée sur un autre appareil.</string>
     <string name="une_session_est_en_cours_de_partage_sur_value1_continuer">Une session est en cours de partage sur %1$s. Continuer ici la remplacera : les personnes connectées verront cette partie à la place.</string>
     <string name="valider">Valider</string>
     <string name="valider_la_donne">Valider la donne</string>

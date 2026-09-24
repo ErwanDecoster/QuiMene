@@ -12,8 +12,8 @@ spec/
 ├── schema/game-definition.schema.json   contrat de format (JSON Schema 2020-12)
 ├── games/*.json                         définitions déclaratives des jeux
 ├── golden/*.json                        parties complètes + résultats attendus
-└── wire/*.json                          un WireMessage par Kind (doc 09), format d'échange
-                                          de la partie partagée en direct
+└── session/*.json                       événements de session en ligne scellés par le code
+                                          Swift (doc 16), à relire à l'identique sur Android
 ```
 
 ## Règle d'or
@@ -98,18 +98,15 @@ Les `insights` attendus sont un **sous-ensemble** : le test vérifie que ceux li
 présents et exacts, sans exiger l'exhaustivité. Les statistiques évoluent plus vite que les
 règles, et un golden ne doit pas casser parce qu'un nouvel indicateur a été ajouté.
 
-## Format d'une fixture `wire/`
+## Format d'une fixture `session/`
 
-Un fichier par cas de `WireMessage.Kind` (doc [09](../docs/09-partie-partagee.md)), en clair,
-jamais chiffré — `SessionCrypto` produit un nonce aléatoire à chaque appel, donc une identité
-d'octets chiffrés entre Swift et Kotlin n'est ni atteignable ni pertinente comme test. Généré une
-fois depuis les vrais types Swift (`WireMessage`/`JSONEncoder()`) plutôt qu'écrit à la main, pour
-refléter fidèlement le format que le compilateur synthétise pour un enum à valeurs associées
-(`{"nomDuCas": {"étiquette": valeur, …}}`, `{"_0": …}` pour un paramètre sans étiquette, `{}` pour
-un cas sans valeur associée).
+Doc [16](../docs/16-sessions-en-ligne-et-profils.md) — un événement de session en ligne est un
+`StampedEvent` en JSON, scellé en AES-GCM avec la clé de session (code d'appairage + identifiant
+de session), puis en base64. `sealed-events.json` est **généré par le code Swift réel**
+(`OnlineSession.seal`) avec un code et une session fixes : `plaintext` est le JSON que produit
+`JSONEncoder`, `ciphertext` sa version scellée. Le test Android déchiffre `ciphertext` et doit
+retrouver exactement l'événement décrit par `plaintext`. Le nonce étant aléatoire, l'inverse
+(identité d'octets chiffrés) n'est ni atteignable ni pertinent.
 
-Le test sur chaque fixture n'exige **pas** une identité d'octets entre les deux plateformes :
-décoder une fixture doit produire une valeur `WireMessage` égale, et la ré-encoder doit redonner
-la même valeur au décodage — un round-trip de schéma, pas une identité d'octets (deux
-sérialiseurs JSON différents ne produisent pas la même mise en forme pour une donnée
-sémantiquement identique).
+Remplace les fixtures `wire/` de l'ancien protocole hôte/pair (doc 09), supprimé des deux
+plateformes par la phase C de la doc 16.

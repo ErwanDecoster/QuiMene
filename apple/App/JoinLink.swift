@@ -1,9 +1,9 @@
 import Foundation
 
 /// Doc utilisateur, révisé P9 — code d'appairage encodé en lien, pour éviter la saisie manuelle.
-/// Contenu minimal : le code d'appairage lui-même — `SupabaseTransport.resolveGame(code:)` résout
-/// tout le reste (matchID, jeu, nombre de joueurs, nom de l'appareil) à partir de ce seul code, ce
-/// lien ne fait que remplacer la frappe des 6 chiffres.
+/// Contenu minimal : le code d'appairage lui-même — `quimene_session_resolve` retrouve la
+/// session à partir de ce seul code (doc 16), ce lien ne fait que remplacer la frappe des 6
+/// chiffres.
 ///
 /// Schéma personnalisé (`quimene://`) plutôt qu'un lien universel `https://` : ce dernier
 /// demanderait de posséder un nom de domaine et d'y héberger un fichier de vérification

@@ -72,11 +72,24 @@ avec « Fermer » distinct de « Quitter la partie » et un bandeau de reprise d
 « Ajouter un ami » (scan puis choix ou création de la fiche) ; doublon de profil arrivé par
 iCloud résolu au lancement (`PlayerRepository.resolveDuplicateOwnProfiles`).
 
+Phase C livrée (iOS puis Android) : `OnlineSession` (module Sync) tient le journal chiffré de la
+session, `SessionLink` (app) le rattrapage — notification du canal, retour du réseau, retour au
+premier plan — et l'ajout avec numéro attendu. Devancé, l'appareil rattrape et affiche « X vient
+de valider une manche : vérifie avant de valider la tienne. », sans nouvel essai automatique.
+Le créateur (`LiveShareCoordinator`) publie le journal local avec ses identifiants d'origine (celui
+du `matchCreated` est celui de la partie), puis sa copie locale devient le miroir du serveur ; il
+reprend sa session après un redémarrage, comme le participant (`PersistedOnlineSession`). La partie
+suivante, lancée par n'importe qui, garde les joueurs à leur place mais **avec de nouveaux
+identifiants de participant** (un identifiant ne sert qu'à une partie) ; le créateur retrouve fiche
+et avatar par place et pseudo. Format commun vérifié par `spec/session/sealed-events.json`, qui
+remplace `spec/wire`. Anciennes fonctions `quimene_open_games` inutilisées : à supprimer dans une
+migration ultérieure.
+
 | Phase | Contenu | Dépend de |
 |---|---|---|
 | **A. Profil local** ✅ iOS + Android | Page Profil, création au premier lancement, onglets réorganisés, profil explicite (plus « la fiche partagée »), amis liés, profil sauvegardé via iCloud. | — |
 | **B. Sessions serveur** ✅ (migration `create_quimene_sessions`) | Tables session / parties / événements chiffrés, fonctions SQL (créer, ajouter avec numéro attendu, lire depuis un numéro, fermer), notification des appareils, expiration 14 jours. | — |
-| **C. Mode en ligne dans l'app** | L'écran de partie lit et écrit la session ; écrans créateur/participant unifiés ; rattrapage par numéro ; saisie bloquée hors ligne ; partie suivante par n'importe quel participant. | B |
+| **C. Mode en ligne dans l'app** ✅ iOS + Android | L'écran de partie lit et écrit la session ; écrans créateur/participant unifiés ; rattrapage par numéro ; saisie bloquée hors ligne ; partie suivante par n'importe quel participant. | B |
 | **D. « Qui es-tu ? »** | Association à l'arrivée, liaison durable dans les deux sens, notification du créateur avec annulation, « Je regarde seulement ». | A, C |
 | **E. Historique partagé** | Enregistrement de la partie complète chez chaque participant connecté ; boîte aux lettres chiffrée par profil pour les absents, qui remplace les résumés. | A, C |
 | **F. Écran verrouillé** | Push envoyé par l'appareil qui saisit, indépendant du créateur. | C |

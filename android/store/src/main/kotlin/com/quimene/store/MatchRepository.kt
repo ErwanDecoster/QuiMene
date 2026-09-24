@@ -274,22 +274,58 @@ class MatchRepository(
         participantDao.insertAll(participants)
     }
 
-    /** Doc 09 — le journal complet d'une partie, tel que `LiveSession` (étape F) en a besoin
-     * pour s'y resynchroniser ou pour accueillir un nouveau pair. */
+    /** Doc 16 — le journal complet d'une partie, tel que `LiveShareCoordinator` le publie dans
+     * une session en ligne. */
     suspend fun currentLog(match: MatchEntity): List<StampedEvent> = decodeEvents(match.eventLogData)
 
-    /** Doc 09 « hôte autoritaire » — persiste un événement déjà validé et horodaté par
-     * `LiveSession` (une manche acceptée d'un contributeur distant). Idempotent par `id`. */
-    suspend fun appendRemoteEvent(
-        stamped: StampedEvent,
+    /** Doc 16, phase C — une partie partagée en ligne : le journal de la session (serveur) fait
+     * foi, la copie locale du créateur en est le miroir. Remplace le journal local en entier. */
+    suspend fun replaceLog(
+        events: List<StampedEvent>,
         match: MatchEntity,
         catalog: GameCatalog,
-    ): MatchState {
-        val events = currentLog(match)
-        if (events.any { it.id == stamped.id }) {
-            return MatchEngine().replay(events, catalog)
-        }
-        return persist(events + stamped, match, catalog)
+    ): MatchState = persist(events, match, catalog)
+
+    /** Doc 16, phase C — copie locale d'une partie lancée par un autre appareil de la session
+     * (« Partie suivante » d'un participant) — miroir de `createMirroredMatch` (Swift). Les
+     * participants gardent l'identifiant de son `matchCreated` ; [seed] donne, pour chacun, la
+     * fiche et l'avatar à retenir. `null` si le journal ne commence pas par un `matchCreated`. */
+    suspend fun createMirroredMatch(
+        id: UUID,
+        events: List<StampedEvent>,
+        catalog: GameCatalog,
+        seed: (Participant) -> ParticipantSeed,
+    ): MatchEntity? {
+        val first = events.firstOrNull() ?: return null
+        val created = first.event as? MatchEvent.MatchCreated ?: return null
+        val participantEntities =
+            created.participants.map { participant ->
+                val source = seed(participant)
+                ParticipantEntity(
+                    id = participant.id,
+                    playerId = source.player?.id,
+                    nicknameSnapshot = source.nickname,
+                    avatarKindSnapshot = source.avatarKind,
+                    avatarValueSnapshot = source.avatarValue,
+                    paletteIDSnapshot = source.paletteID,
+                    seatIndex = participant.seatIndex,
+                    teamID = participant.teamID,
+                    matchId = id,
+                )
+            }
+        val match =
+            MatchEntity(
+                id = id,
+                gameID = created.gameID,
+                rulesVersion = created.rulesVersion,
+                variantsData = encodeJson(VariantSelection.serializer(), created.variants),
+                deviceOrigin = first.deviceID,
+                eventLogData = encodeEvents(events),
+            )
+        matchDao.insert(match)
+        participantDao.insertAll(participantEntities)
+        persist(events, match, catalog)
+        return matchDao.get(id)
     }
 
     private suspend fun appendEvent(

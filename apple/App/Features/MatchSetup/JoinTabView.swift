@@ -159,14 +159,12 @@ struct JoinTabView: View {
     await coordinator.reconnectNow()
   }
 
-  /// Distingue l'échec de connexion (code introuvable) de l'absence de réponse (code trouvé
-  /// mais mauvais code de chiffrement, ou hôte muet) — deux causes différentes, deux messages.
+  /// Code introuvable (erroné, expiré, session arrêtée) ou échec réseau : deux causes, deux
+  /// messages. Plus d'hôte qui doit répondre (doc 16, phase C).
   private static func describe(_ error: Error) -> String {
     switch error {
-    case SupabaseTransportError.gameNotFound:
+    case OnlineSessionError.sessionNotFound:
       return "Aucune partie ne correspond à ce code. Vérifie qu'il est bien à jour."
-    case LiveSession.SessionError.noResponseFromHost:
-      return "L'hôte n'a pas répondu — vérifie le code."
     default:
       return "Connexion impossible (\(error.localizedDescription)). Réessaie."
     }

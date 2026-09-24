@@ -299,26 +299,60 @@ public struct MatchRepository {
     try context.save()
   }
 
-  /// Doc 09 — le journal complet d'une partie, tel que `LiveSession` en a besoin pour s'y
-  /// resynchroniser (`syncHostLog`) ou pour accueillir un nouveau pair (`welcome`).
+  /// Le journal complet d'une partie — publié tel quel quand elle rejoint une session en ligne
+  /// (doc 16, `LiveShareCoordinator.attach`).
   public func currentLog(for match: MatchRecord) throws -> [StampedEvent] {
     try JSONDecoder().decode([StampedEvent].self, from: match.eventLogData)
   }
 
-  /// Doc 09 « hôte autoritaire » — persiste un événement déjà validé et horodaté par
-  /// `LiveSession` (une manche acceptée d'un contributeur distant), plutôt que d'en construire
-  /// un nouveau comme le fait `appendEvent`. Idempotent par `id` : un événement redélivré par
-  /// le réseau ne s'applique pas deux fois (doc 09 « Tests », ADR-0005).
+  /// Doc 16, phase C — crée la copie locale d'une partie lancée par un autre appareil de la
+  /// session (« Partie suivante » d'un participant). Les participants gardent l'identifiant que
+  /// leur donne son `matchCreated` ; `seed` fournit, pour chacun, la fiche et l'avatar à retenir
+  /// (ceux de la partie précédente quand c'est le même joueur, à la même place). `nil` si le
+  /// journal ne commence pas par un `matchCreated`.
   @discardableResult
-  public func appendRemoteEvent(
-    _ stamped: StampedEvent, to match: MatchRecord, catalog: GameCatalog
-  ) throws -> MatchState {
-    var events = try currentLog(for: match)
-    guard !events.contains(where: { $0.id == stamped.id }) else {
-      return try MatchEngine().replay(events, catalog: catalog)
+  public func createMirroredMatch(
+    id: UUID, events: [StampedEvent], catalog: GameCatalog,
+    seed: (Participant) -> ParticipantSeed
+  ) throws -> MatchRecord? {
+    guard let first = events.first,
+      case .matchCreated(let gameID, let rulesVersion, let variants, let participants) = first.event
+    else { return nil }
+    let records = participants.map { participant in
+      let seed = seed(participant)
+      return ParticipantRecord(
+        id: participant.id,
+        player: seed.player,
+        nicknameSnapshot: seed.nickname,
+        avatarKindSnapshot: seed.avatarKind,
+        avatarValueSnapshot: seed.avatarValue,
+        paletteIDSnapshot: seed.paletteID,
+        seatIndex: participant.seatIndex,
+        teamID: participant.teamID
+      )
     }
-    events.append(stamped)
-    return try persist(events, to: match, catalog: catalog)
+    let match = MatchRecord(
+      id: id,
+      gameID: gameID,
+      rulesVersion: rulesVersion,
+      variantsData: try JSONEncoder().encode(variants),
+      deviceOrigin: first.deviceID,
+      eventLogData: try JSONEncoder().encode(events),
+      participants: records
+    )
+    context.insert(match)
+    try persist(events, to: match, catalog: catalog)
+    return match
+  }
+
+  /// Doc 16, phase C — une partie partagée en ligne : le journal de la session (serveur) fait foi,
+  /// la copie locale du créateur en est le miroir. Remplace le journal local en entier ; renvoie
+  /// l'état rejoué.
+  @discardableResult
+  public func replaceLog(
+    _ events: [StampedEvent], in match: MatchRecord, catalog: GameCatalog
+  ) throws -> MatchState {
+    try persist(events, to: match, catalog: catalog)
   }
 
   @discardableResult

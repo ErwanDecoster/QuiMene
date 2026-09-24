@@ -64,6 +64,9 @@ struct QuiMeneApp: App {
           // `MatchConnectionCoordinator`, pas de minuteur propre à inventer.
           .task {
             try? PlayerRepository(context: container.mainContext).resolveDuplicateOwnProfiles()
+            // Doc 16, phase C — une session ouverte par cet appareil survit au redémarrage de
+            // l'app : on la reprend avec sa partie courante.
+            await LiveShareCoordinator.shared.resumeIfNeeded(context: container.mainContext)
             let repository = MatchRepository(context: container.mainContext)
             MatchLiveActivityController.reconcileOnLaunch { matchID in
               guard let match = try? repository.match(withID: matchID) else { return false }

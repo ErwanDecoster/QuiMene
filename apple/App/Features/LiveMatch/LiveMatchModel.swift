@@ -12,8 +12,13 @@ import Sync
 @Observable
 final class LiveMatchModel {
   private(set) var state: MatchState {
-    didSet { refreshLiveActivity() }
+    // Doc 16, phase F — seul l'appareil qui vient de saisir pousse la mise à jour des écrans
+    // verrouillés ; un état rechargé après la saisie d'un autre appareil ne le fait pas.
+    didSet { refreshLiveActivity(isAuthoritative: !isApplyingRemoteState) }
   }
+  private var isApplyingRemoteState = false
+  /// Envoi en cours vers la session en ligne : le bouton de saisie attend la réponse.
+  private(set) var isSubmitting = false
 
   private(set) var pendingScores: [Participant.ID: Int] = [:]
   var closedParticipantID: Participant.ID?
@@ -49,9 +54,11 @@ final class LiveMatchModel {
 
   var isSharing: Bool { shareCoordinator.attachedMatchID == match.id }
   var pairingCode: String? { isSharing ? shareCoordinator.pairingCode : nil }
-  var connectedPeers: [LiveSession.ConnectedPeer] {
+  var connectedPeers: [SessionPresence] {
     isSharing ? shareCoordinator.connectedPeers : []
   }
+  /// Doc 16 — partie partagée et hors ligne : la saisie est bloquée jusqu'au retour du réseau.
+  var isOfflineShared: Bool { isSharing && !shareCoordinator.isReachable }
 
   /// Doc utilisateur — `true` seulement quand rattacher cette partie remplacerait, pour les
   /// pairs déjà connectés, une *autre* partie encore en cours : jamais vrai pour l'enchaînement
@@ -85,12 +92,12 @@ final class LiveMatchModel {
   /// Doc 09 « Fin de partie » — donne à `MatchLiveActivityController` la clé d'Activity qui
   /// convient : celle de la session en cours si cette partie lui est attachée (survit à un
   /// changement de partie), sinon celle de la partie elle-même (solo, comportement inchangé).
-  private func refreshLiveActivity() {
+  private func refreshLiveActivity(isAuthoritative: Bool = true) {
     MatchLiveActivityController.refresh(
       definition: definition,
       rules: rules,
       state: state,
-      isAuthoritative: true,
+      isAuthoritative: isAuthoritative,
       sessionID: isSharing ? shareCoordinator.sessionID : nil
     )
   }
@@ -135,19 +142,25 @@ final class LiveMatchModel {
   }
 
   func endManually() {
+    guard !isSharing else {
+      Task { await submitShared(.matchEndedManually) }
+      return
+    }
     state =
       (try? repository.endMatchManually(match, catalog: catalog, deviceID: DeviceIdentity.current))
       ?? state
-    syncSharedLogIfNeeded()
   }
 
   /// Abandon volontaire — classée dans l'historique avec le classement atteint jusque-là,
   /// contrairement à une suppression qui ferait tout perdre.
   func abandon() {
+    guard !isSharing else {
+      Task { await submitShared(.matchAbandoned(at: Date())) }
+      return
+    }
     state =
       (try? repository.abandonMatch(match, catalog: catalog, deviceID: DeviceIdentity.current))
       ?? state
-    syncSharedLogIfNeeded()
   }
 
   func setScore(_ value: Int, for participantID: Participant.ID) {
@@ -167,8 +180,28 @@ final class LiveMatchModel {
     activeSeatIndex = index
   }
 
-  @discardableResult
-  func commitRound() -> Bool {
+  var matchID: UUID { match.id }
+
+  /// Doc 16, phase C — « Partie suivante » du créateur, avec les mêmes joueurs ; renvoie la
+  /// nouvelle partie, à ouvrir.
+  func startNextMatch(definition next: GameDefinition) async -> UUID? {
+    isSubmitting = true
+    defer { isSubmitting = false }
+    return await shareCoordinator.startNextMatch(definition: next, after: match, context: context)?.id
+  }
+
+  /// Point d'entrée de la saisie (« Terminé ») : en local, écrit tout de suite ; dans une
+  /// partie partagée en ligne, passe d'abord par le journal de la session (doc 16, phase C) — la
+  /// copie locale n'est mise à jour qu'une fois la manche acceptée par le serveur.
+  func submitRound() async -> Bool {
+    guard isSharing else { return commitRound() }
+    guard !isSubmitting, let draft = validatedDraft() else { return false }
+    guard await submitShared(.roundCommitted(draft)) else { return false }
+    clearDraftAfterCommit()
+    return true
+  }
+
+  private func validatedDraft() -> RoundDraft? {
     let inputs = participants.map { participant in
       ScoreInput(
         participantID: participant.id,
@@ -177,11 +210,53 @@ final class LiveMatchModel {
       )
     }
     let draft = RoundDraft(index: state.nextRoundIndex, inputs: inputs)
-
     if case .invalid(let errors) = rules.validate(draft, in: state, definition: definition) {
       validationErrorMessage = errors.first?.message
-      return false
+      return nil
     }
+    return draft
+  }
+
+  private func clearDraftAfterCommit() {
+    pendingScores = [:]
+    closedParticipantID = nil
+    activeSeatIndex = 0
+    validationErrorMessage = nil
+    if let explanation = state.rounds.last?.entries.compactMap(\.explanation).first {
+      showRoundExplanation(explanation)
+    }
+  }
+
+  /// Envoie un événement au journal de la session, puis recharge la copie locale (déjà mise en
+  /// miroir par `LiveShareCoordinator`). Pas de nouvel essai automatique si un autre appareil a
+  /// saisi entre-temps : la saisie reste en place, avec un message (voir `SessionLink`).
+  @discardableResult
+  private func submitShared(_ event: MatchEvent) async -> Bool {
+    isSubmitting = true
+    defer { isSubmitting = false }
+    let result = await shareCoordinator.submit(event, matchID: match.id)
+    let accepted = if case .accepted = result { true } else { false }
+    if let newState = try? repository.loadState(match, catalog: catalog) {
+      isApplyingRemoteState = !accepted
+      state = newState
+      isApplyingRemoteState = false
+    }
+    switch result {
+    case .accepted:
+      validationErrorMessage = nil
+    case .overtaken(let name):
+      validationErrorMessage = SharedMatchModel.overtakenMessage(name)
+    case .offline:
+      validationErrorMessage = String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
+    case .closed:
+      validationErrorMessage = String(localized: "La session partagée a été arrêtée.")
+    }
+    return accepted
+  }
+
+  @discardableResult
+  func commitRound() -> Bool {
+    guard let draft = validatedDraft() else { return false }
 
     do {
       state = try repository.commitRound(
@@ -190,14 +265,7 @@ final class LiveMatchModel {
       validationErrorMessage = "La manche n'a pas pu être enregistrée."
       return false
     }
-    pendingScores = [:]
-    closedParticipantID = nil
-    activeSeatIndex = 0
-    validationErrorMessage = nil
-    if let explanation = state.rounds.last?.entries.compactMap(\.explanation).first {
-      showRoundExplanation(explanation)
-    }
-    syncSharedLogIfNeeded()
+    clearDraftAfterCommit()
     return true
   }
 
@@ -212,20 +280,23 @@ final class LiveMatchModel {
   }
 
   func undoLastRound() {
+    guard !isSharing else {
+      guard let lastIndex = state.rounds.map(\.index).max() else { return }
+      Task { await submitShared(.roundRemoved(index: lastIndex)) }
+      return
+    }
     state =
       (try? repository.undoLastRound(in: match, catalog: catalog, deviceID: DeviceIdentity.current))
       ?? state
-    syncSharedLogIfNeeded()
   }
 
   // MARK: - Doc 09 « Partie partagée »
 
   /// Démarre le partage — ou, si une session est déjà active (une autre partie partagée plus
-  /// tôt dans la soirée), y rattache simplement cette partie (`LiveShareCoordinator`). Publie la
-  /// partie via Supabase Realtime (`SupabaseTransport`, remplace Wi-Fi/BLE — voir sa doc),
-  /// affecte un code d'appairage à 6 chiffres, arbitre les propositions des contributeurs
-  /// distants (`LiveSession`). `deviceName` vient de l'appelant (`UIDevice.current.name`) — ni
-  /// `Sync` ni `QuiMeneKit` ne peuvent lire `UIDevice` (la cible compile aussi pour macOS).
+  /// tôt dans la soirée), y rattache simplement cette partie (`LiveShareCoordinator`). Ouvre une
+  /// session en ligne (doc 16) et y publie la partie, avec un code d'appairage à 6 chiffres.
+  /// `deviceName` vient de l'appelant (`UIDevice.current.name`) — ni `Sync` ni `QuiMeneKit` ne
+  /// peuvent lire `UIDevice` (la cible compile aussi pour macOS).
   func startSharing(deviceName: String, allowsContributors: Bool = true) async throws {
     try await shareCoordinator.startSharing(
       match: match, context: context, deviceName: deviceName, allowsContributors: allowsContributors
@@ -247,8 +318,8 @@ final class LiveMatchModel {
     Task { await shareCoordinator.attach(match: match, context: context) }
   }
 
-  /// Doc utilisateur P9 — s'applique aux prochaines connexions, pas aux contributeurs déjà
-  /// connectés (voir `LiveSession.setAllowsContributors`).
+  /// Doc utilisateur P9 — s'applique aux appareils qui rejoignent ensuite ; un contributeur déjà
+  /// connecté le reste (son rôle est fixé en rejoignant, `MatchConnectionCoordinator`).
   func setAllowsContributors(_ allowed: Bool) async {
     await shareCoordinator.setAllowsContributors(allowed)
   }
@@ -269,7 +340,9 @@ final class LiveMatchModel {
     guard shareCoordinator.remoteEventMatchID == match.id,
       let newState = try? repository.loadState(match, catalog: catalog)
     else { return }
+    isApplyingRemoteState = true
     state = newState
+    isApplyingRemoteState = false
     if shareCoordinator.remoteEventIsRoundCommit,
       let deviceID = shareCoordinator.remoteEventDeviceID
     {
@@ -290,15 +363,5 @@ final class LiveMatchModel {
       guard !Task.isCancelled else { return }
       self?.remoteActivityMessage = nil
     }
-  }
-
-  /// Après chaque écriture locale de l'hôte : la session doit refléter le journal réel pour
-  /// arbitrer juste, et rediffuser aux pairs connectés ce qui vient d'être ajouté (doc 09). Ne
-  /// touche plus jamais à l'arrêt du partage — même si cette écriture conclut la partie (fin
-  /// normale, fin manuelle, abandon), la session continue : c'est justement ce qui permet
-  /// d'enchaîner sur une autre partie sans se réappairer (doc 09 « Fin de partie », révisé).
-  private func syncSharedLogIfNeeded() {
-    guard isSharing else { return }
-    Task { await shareCoordinator.syncLog(for: match.id) }
   }
 }

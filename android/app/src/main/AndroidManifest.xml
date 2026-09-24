@@ -4,6 +4,9 @@
          code reste toujours disponible, donc pas d'appareil photo requis pour installer/utiliser
          l'app (android:required="false"). -->
     <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Doc 16 — sessions en ligne (Supabase) et état du réseau (saisie bloquée hors ligne). -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />

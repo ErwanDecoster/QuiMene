@@ -115,6 +115,11 @@ fun QuiMeneApp() {
                     ResultsScreen(
                         matchId = route.matchId,
                         onDone = { navController.popBackStack(Destination.GamesCatalog, inclusive = false) },
+                        onOpenMatch = { matchId ->
+                            navController.navigate(Destination.LiveMatch(matchId)) {
+                                popUpTo(Destination.GamesCatalog)
+                            }
+                        },
                     )
                 }
                 composable<Destination.PlayersList> {

@@ -4,170 +4,170 @@
     "" : {
 
     },
-    "Déjà un profil sur un autre appareil ? Avec iCloud, il arrive tout seul d'ici quelques instants." : {
+    "%@ vient de valider une manche : vérifie avant de valider la tienne." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Already have a profile on another device? With iCloud, it arrives on its own in a few moments."
+            "value" : "%@ just confirmed a round: check before confirming yours."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Ya tienes un perfil en otro dispositivo? Con iCloud, llega solo en unos instantes."
+            "value" : "%@ acaba de validar una ronda: revisa antes de validar la tuya."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schon ein Profil auf einem anderen Gerät? Mit iCloud kommt es in wenigen Augenblicken von selbst."
+            "value" : "%@ hat gerade eine Runde bestätigt: prüfe, bevor du deine bestätigst."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Hai già un profilo su un altro dispositivo? Con iCloud arriva da solo tra pochi istanti."
+            "value" : "%@ ha appena convalidato un turno: controlla prima di convalidare il tuo."
           }
         }
       }
     },
-    "Mon profil" : {
+    "Hors connexion : la saisie reprendra au retour du réseau." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "My profile"
+            "value" : "Offline: entry will resume when the network is back."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mi perfil"
+            "value" : "Sin conexión: la introducción se reanudará cuando vuelva la red."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mein Profil"
+            "value" : "Offline: Die Eingabe geht weiter, sobald das Netz zurück ist."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Il mio profilo"
+            "value" : "Offline: l'inserimento riprenderà al ritorno della rete."
           }
         }
       }
     },
-    "Supprimer mon profil" : {
+    "La session partagée a été arrêtée." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete my profile"
+            "value" : "The shared session was stopped."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eliminar mi perfil"
+            "value" : "La sesión compartida se ha detenido."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Mein Profil löschen"
+            "value" : "Die geteilte Sitzung wurde beendet."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Elimina il mio profilo"
+            "value" : "La sessione condivisa è stata interrotta."
           }
         }
       }
     },
-    "Supprimer ton profil ?" : {
+    "Le créateur a arrêté la session." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Delete your profile?"
+            "value" : "The creator stopped the session."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Eliminar tu perfil?"
+            "value" : "El creador detuvo la sesión."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dein Profil löschen?"
+            "value" : "Der Ersteller hat die Sitzung beendet."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Eliminare il tuo profilo?"
+            "value" : "Il creatore ha interrotto la sessione."
           }
         }
       }
     },
-    "Tes amis ne recevront plus les parties jouées avec toi. Ta fiche et son historique sont conservés, et tu créeras ensuite un nouveau profil." : {
+    "Une autre manche vient d'être validée : vérifie avant de valider la tienne." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Your friends will no longer receive the matches played with you. Your player card and its history are kept, and you will then create a new profile."
+            "value" : "Another round was just confirmed: check before confirming yours."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tus amigos ya no recibirán las partidas jugadas contigo. Tu ficha y su historial se conservan, y después crearás un nuevo perfil."
+            "value" : "Se acaba de validar otra ronda: revisa antes de validar la tuya."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Deine Freunde erhalten die mit dir gespielten Partien nicht mehr. Deine Karte und ihr Verlauf bleiben erhalten, danach erstellst du ein neues Profil."
+            "value" : "Gerade wurde eine andere Runde bestätigt: prüfe, bevor du deine bestätigst."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I tuoi amici non riceveranno più le partite giocate con te. La tua scheda e la sua cronologia vengono conservate, poi creerai un nuovo profilo."
+            "value" : "È appena stato convalidato un altro turno: controlla prima di convalidare il tuo."
           }
         }
       }
     },
-    "Un pseudo et un avatar, rien de plus : aucun compte à créer." : {
+    "Une partie vient d'être lancée sur un autre appareil." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "A nickname and an avatar, nothing more: no account to create."
+            "value" : "A match was just started on another device."
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un apodo y un avatar, nada más: ninguna cuenta que crear."
+            "value" : "Se acaba de iniciar una partida en otro dispositivo."
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ein Spitzname und ein Avatar, mehr nicht: kein Konto nötig."
+            "value" : "Auf einem anderen Gerät wurde gerade eine Partie gestartet."
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Un nickname e un avatar, niente di più: nessun account da creare."
+            "value" : "È appena stata avviata una partita su un altro dispositivo."
           }
         }
       }
@@ -859,7 +859,32 @@
       }
     },
     "Activité par mois" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activity by month"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actividad por mes"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivität pro Monat"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attività per mese"
+          }
+        }
+      }
     },
     "Adopter aussi son pseudo et son avatar" : {
       "extractionState" : "stale",
@@ -1760,6 +1785,34 @@
         }
       }
     },
+    "Avec les mêmes joueurs. Tous les appareils de la session passent à la nouvelle partie." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With the same players. Every device in the session moves to the new match."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con los mismos jugadores. Todos los dispositivos de la sesión pasan a la nueva partida."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit denselben Spielern. Alle Geräte der Sitzung wechseln zur neuen Partie."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con gli stessi giocatori. Tutti i dispositivi della sessione passano alla nuova partita."
+          }
+        }
+      }
+    },
     "Belote-rebelote" : {
       "localizations" : {
         "de" : {
@@ -2303,6 +2356,7 @@
       }
     },
     "Connexion à l'hôte perdue. Le tableau affiché est le dernier reçu." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2499,6 +2553,34 @@
         }
       }
     },
+    "Créateur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creator"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creador"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersteller"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creatore"
+          }
+        }
+      }
+    },
     "Créer la fiche « %@ »" : {
       "localizations" : {
         "de" : {
@@ -2551,6 +2633,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Crea il mio profilo"
+          }
+        }
+      }
+    },
+    "Déjà un profil sur un autre appareil ? Avec iCloud, il arrive tout seul d'ici quelques instants." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schon ein Profil auf einem anderen Gerät? Mit iCloud kommt es in wenigen Augenblicken von selbst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already have a profile on another device? With iCloud, it arrives on its own in a few moments."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Ya tienes un perfil en otro dispositivo? Con iCloud, llega solo en unos instantes."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hai già un profilo su un altro dispositivo? Con iCloud arriva da solo tra pochi istanti."
           }
         }
       }
@@ -3289,7 +3399,64 @@
         }
       }
     },
+    "Hors connexion" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline"
+          }
+        }
+      }
+    },
+    "Hors connexion. Le tableau affiché est le dernier reçu." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline. The board shown is the last one received."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión. El marcador mostrado es el último recibido."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline. Die angezeigte Tabelle ist die zuletzt empfangene."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline. Il tabellone mostrato è l'ultimo ricevuto."
+          }
+        }
+      }
+    },
     "Hôte" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3543,6 +3710,7 @@
       }
     },
     "La partie est terminée." : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -3678,6 +3846,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La classifica finale verrà calcolata in base alle manche giocate. Questa azione non può essere annullata."
+          }
+        }
+      }
+    },
+    "Le créateur a arrêté la session. Le tableau affiché est le dernier reçu." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The creator stopped the session. The board shown is the last one received."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El creador detuvo la sesión. El marcador mostrado es el último recibido."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ersteller hat die Sitzung beendet. Die angezeigte Tabelle ist die zuletzt empfangene."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il creatore ha interrotto la sessione. Il tabellone mostrato è l'ultimo ricevuto."
           }
         }
       }
@@ -4255,6 +4451,34 @@
         }
       }
     },
+    "Mon profil" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mein Profil"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My profile"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi perfil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il mio profilo"
+          }
+        }
+      }
+    },
     "Ne plus partager" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4815,6 +5039,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partita ricevuta dal dispositivo di un amico: il dettaglio manche per manche non è disponibile qui."
+          }
+        }
+      }
+    },
+    "Partie suivante" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next match"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Siguiente partida"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächste Partie"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partita successiva"
           }
         }
       }
@@ -5787,6 +6039,34 @@
         }
       }
     },
+    "Rejouer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play again"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volver a jugar"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nochmal spielen"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gioca ancora"
+          }
+        }
+      }
+    },
     "Remplacer la partie partagée ?" : {
       "localizations" : {
         "de" : {
@@ -5873,7 +6153,32 @@
       }
     },
     "Reprendre la partie en cours, %@" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume the match in progress, %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reanudar la partida en curso, %@"
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufende Partie fortsetzen, %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Riprendi la partita in corso, %@"
+          }
+        }
+      }
     },
     "Reprise automatique en cours." : {
       "localizations" : {
@@ -6552,6 +6857,62 @@
         }
       }
     },
+    "Supprimer mon profil" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mein Profil löschen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete my profile"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminar mi perfil"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elimina il mio profilo"
+          }
+        }
+      }
+    },
+    "Supprimer ton profil ?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Profil löschen?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete your profile?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Eliminar tu perfil?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eliminare il tuo profilo?"
+          }
+        }
+      }
+    },
     "Synchronisation iCloud" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -6718,6 +7079,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminare la partita?"
+          }
+        }
+      }
+    },
+    "Tes amis ne recevront plus les parties jouées avec toi. Ta fiche et son historique sont conservés, et tu créeras ensuite un nouveau profil." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deine Freunde erhalten die mit dir gespielten Partien nicht mehr. Deine Karte und ihr Verlauf bleiben erhalten, danach erstellst du ein neues Profil."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your friends will no longer receive the matches played with you. Your player card and its history are kept, and you will then create a new profile."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tus amigos ya no recibirán las partidas jugadas contigo. Tu ficha y su historial se conservan, y después crearás un nuevo perfil."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I tuoi amici non riceveranno più le partite giocate con te. La tua scheda e la sua cronologia vengono conservate, poi creerai un nuovo profilo."
           }
         }
       }
@@ -6923,6 +7312,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Segui **%1$@** dal %2$@"
+          }
+        }
+      }
+    },
+    "Un pseudo et un avatar, rien de plus : aucun compte à créer." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ein Spitzname und ein Avatar, mehr nicht: kein Konto nötig."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A nickname and an avatar, nothing more: no account to create."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un apodo y un avatar, nada más: ninguna cuenta que crear."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un nickname e un avatar, niente di più: nessun account da creare."
           }
         }
       }

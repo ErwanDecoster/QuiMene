@@ -5,11 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.Round
 import com.quimene.domain.rules.Direction
 import com.quimene.domain.rules.EndConditionType
 import com.quimene.domain.rules.GameCatalog
 import com.quimene.domain.rules.GameDefinition
+import com.quimene.domain.rules.GameRules
 import com.quimene.domain.rules.Standing
 import com.quimene.domain.stats.Badge
 import com.quimene.domain.stats.Insight
@@ -52,28 +54,36 @@ class MatchSummaryViewModel(
             val definition = catalog.definition(match.gameID, match.rulesVersion)
             val rules = catalog.rules(match.gameID, match.rulesVersion)
             val state = repository.loadState(match, catalog)
-            val standings = rules.standings(state, definition)
             val participants = repository.participants(matchID).associateBy { it.id }
-
-            val statsEngine = StatsEngine()
-            val threshold =
-                definition.end.conditions
-                    .firstOrNull { it.type == EndConditionType.ScoreThreshold }
-                    ?.resolvedValue(state.variants)
-
-            uiState =
-                UiState(
-                    definition = definition,
-                    standings = standings,
-                    participants = participants,
-                    badgeByParticipant = statsEngine.badges(state, definition).associateBy { it.participantID },
-                    insights = statsEngine.insights(state, definition),
-                    series = statsEngine.series(state),
-                    rounds = state.rounds.sortedBy { it.index },
-                    direction = definition.scoring.direction,
-                    scoreThreshold = threshold,
-                    isLoading = false,
-                )
+            uiState = matchSummaryState(state, definition, rules, participants)
         }
     }
+}
+
+/** L'écran de résultats d'une partie, à partir de son état rejoué — partagé par la partie locale
+ * (ci-dessus) et par la partie suivie d'un participant d'une session en ligne (doc 16, phase C),
+ * qui n'a pas de copie en base : ses [participants] sont alors des fiches en mémoire. */
+fun matchSummaryState(
+    state: MatchState,
+    definition: GameDefinition,
+    rules: GameRules,
+    participants: Map<UUID, ParticipantEntity>,
+): MatchSummaryViewModel.UiState {
+    val statsEngine = StatsEngine()
+    val threshold =
+        definition.end.conditions
+            .firstOrNull { it.type == EndConditionType.ScoreThreshold }
+            ?.resolvedValue(state.variants)
+    return MatchSummaryViewModel.UiState(
+        definition = definition,
+        standings = rules.standings(state, definition),
+        participants = participants,
+        badgeByParticipant = statsEngine.badges(state, definition).associateBy { it.participantID },
+        insights = statsEngine.insights(state, definition),
+        series = statsEngine.series(state),
+        rounds = state.rounds.sortedBy { it.index },
+        direction = definition.scoring.direction,
+        scoreThreshold = threshold,
+        isLoading = false,
+    )
 }

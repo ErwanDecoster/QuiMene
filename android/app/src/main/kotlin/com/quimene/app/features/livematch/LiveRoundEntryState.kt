@@ -11,8 +11,8 @@ import java.util.UUID
 /**
  * Surface commune aux 5 formes de saisie de manche (générique + les 4 dédiées Belote/Tarot/
  * Wizard/Yams) — aucune ne connaît la différence entre un hôte ([LiveMatchViewModel], qui écrit
- * directement en local) et un contributeur (`SharedMatchViewModel`, qui soumet via
- * `LiveSession.propose` pour validation par l'hôte distant). Miroir de la façon dont
+ * directement en local, ou via le journal de la session si elle est partagée) et un contributeur
+ * (`SharedMatchViewModel`, qui ajoute au journal de la session en ligne — doc 16). Miroir de la façon dont
  * `ScoreBoardView.swift` est partagée telle quelle entre `LiveMatchModel` (hôte) et
  * `SharedMatchModel` (contributeur/observateur) côté Apple.
  */

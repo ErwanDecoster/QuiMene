@@ -5,7 +5,7 @@ import Supabase
 /// Doc 14 « Profils partagés », phase 2 — boîte aux lettres transitoire : un résumé de partie
 /// terminée, poussé une fois par participant lié, retiré dès que l'appareil concerné l'a
 /// récupéré. Jamais une copie durable côté serveur — même discipline que `quimene_open_games`
-/// (`SupabaseTransport`), juste une fenêtre de purge plus généreuse (un ami peut rester hors
+/// (sessions en ligne, doc 16), juste une fenêtre de purge plus généreuse (un ami peut rester hors
 /// ligne des semaines, pas seulement le temps d'une soirée).
 public struct SharedProfileTransport: Sendable {
   private let client: SupabaseClient

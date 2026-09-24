@@ -27,6 +27,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,6 +49,8 @@ import androidx.compose.ui.unit.sp
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
+import com.quimene.app.features.livematch.NextMatchBar
+import com.quimene.app.features.livematch.NextMatchPicker
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
 import com.quimene.app.ui.insightIcon
 import com.quimene.app.ui.label
@@ -64,6 +72,7 @@ import com.quimene.domain.stats.Badge
 import com.quimene.domain.stats.Insight
 import com.quimene.domain.stats.ParticipantSeries
 import com.quimene.store.ParticipantEntity
+import kotlinx.coroutines.launch
 import java.util.UUID
 import kotlin.math.roundToInt
 
@@ -76,11 +85,23 @@ import kotlin.math.roundToInt
 fun ResultsScreen(
     matchId: String,
     onDone: () -> Unit,
+    onOpenMatch: (String) -> Unit,
 ) {
     val container = LocalAppContainer.current
     val id = UUID.fromString(matchId)
     val viewModel = rememberViewModel { MatchSummaryViewModel(id, container.catalog, container.matchRepository) }
     val state = viewModel.uiState
+    val shareCoordinator = container.liveShareCoordinator
+    val scope = rememberCoroutineScope()
+    var isPickingNextMatch by remember { mutableStateOf(false) }
+    var isStartingNextMatch by remember { mutableStateOf(false) }
+
+    // Doc 16, phase C — un autre appareil de la session a lancé la partie suivante : on la suit.
+    LaunchedEffect(id) {
+        shareCoordinator.remoteStartedMatches.collect { started ->
+            if (started.previousMatchID == id) onOpenMatch(started.newMatchID.toString())
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -97,11 +118,35 @@ fun ResultsScreen(
         }
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             MatchSummaryContent(state, modifier = Modifier.weight(1f))
+            if (shareCoordinator.attachedMatchID == id) {
+                NextMatchBar(
+                    isBusy = isStartingNextMatch,
+                    modifier = Modifier.padding(horizontal = Space.lg).padding(top = Space.lg),
+                ) { isPickingNextMatch = true }
+            }
             PrimaryButton(
                 text = stringResource(R.string.termine),
                 onClick = onDone,
                 modifier = Modifier.padding(Space.lg).padding(bottom = LocalFloatingNavBarHeight.current),
             )
+        }
+    }
+
+    if (isPickingNextMatch) {
+        NextMatchPicker(
+            playerCount = state.participants.size,
+            currentGameID = state.definition?.id.orEmpty(),
+            onDismiss = { isPickingNextMatch = false },
+        ) { next ->
+            scope.launch {
+                isStartingNextMatch = true
+                try {
+                    val previous = container.matchRepository.match(id) ?: return@launch
+                    shareCoordinator.startNextMatch(next, previous)?.let { onOpenMatch(it.id.toString()) }
+                } finally {
+                    isStartingNextMatch = false
+                }
+            }
         }
     }
 }

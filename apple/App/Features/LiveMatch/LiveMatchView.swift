@@ -16,6 +16,8 @@ struct LiveMatchView: View {
   @State private var isPresentingShareSession = false
   @State private var isPresentingRoundHistory = false
   @State private var keyboardObserver = KeyboardObserver()
+  @State private var isPickingNextMatch = false
+  @Environment(DeepLinkRouter.self) private var deepLinkRouter
 
   /// Doc utilisateur (audit qualité, 15) — `MatchPlayView` a déjà vérifié que `definition`
   /// résout avant de router ici (sinon il affiche un `EmptyState` sans jamais construire cette
@@ -29,6 +31,18 @@ struct LiveMatchView: View {
   }
 
   var body: some View {
+    content
+      // Doc 16, phase C — un participant a lancé la partie suivante pendant que cet écran
+      // affichait la précédente : le créateur la suit, comme tous les appareils de la session.
+      .onChange(of: LiveShareCoordinator.shared.remoteStartedToken) { _, _ in
+        guard let started = LiveShareCoordinator.shared.remoteStartedMatch,
+          started.previousMatchID == model.matchID
+        else { return }
+        deepLinkRouter.pendingContinuedMatchID = started.newMatchID
+      }
+  }
+
+  private var content: some View {
     Group {
       if model.isConcluded {
         ResultsView(
@@ -37,6 +51,23 @@ struct LiveMatchView: View {
           standings: model.finalStandings,
           participantRecords: model.participantRecords
         )
+        // Doc 16, phase C — dans une session en ligne, tout le monde peut enchaîner.
+        .safeAreaInset(edge: .bottom) {
+          if model.isSharing {
+            NextMatchBar(isBusy: model.isSubmitting) { isPickingNextMatch = true }
+          }
+        }
+        .sheet(isPresented: $isPickingNextMatch) {
+          NextMatchPicker(
+            playerCount: model.participants.count, currentGameID: model.definition.id
+          ) { definition in
+            Task {
+              if let next = await model.startNextMatch(definition: definition) {
+                deepLinkRouter.pendingContinuedMatchID = next
+              }
+            }
+          }
+        }
       } else {
         liveView
           .navigationTitle(
@@ -109,7 +140,7 @@ struct LiveMatchView: View {
       ScoreBoardView.keyboardAccessory(
         allowsNegative: model.definition.scoring.entry.allowsNegative,
         currentParticipantID: focusedParticipantID,
-        submitLabel: "Terminé",
+        submitLabel: submitLabel,
         onToggleSign: toggleSign,
         onSubmit: finishRound
       )
@@ -119,7 +150,7 @@ struct LiveMatchView: View {
     // en tête de `ScoreBoardView.swift`).
     .safeAreaInset(edge: .bottom) {
       ScoreBoardView.submitBar(
-        isKeyboardVisible: keyboardObserver.isVisible, submitLabel: "Terminé", onSubmit: finishRound
+        isKeyboardVisible: keyboardObserver.isVisible, submitLabel: submitLabel, onSubmit: finishRound
       )
     }
     .accessibleAnimation(.default, value: keyboardObserver.isVisible)
@@ -245,11 +276,20 @@ struct LiveMatchView: View {
   /// Doc utilisateur — les joueurs n'annoncent jamais leur score dans l'ordre des sièges :
   /// « Terminé » est donc toujours disponible et valide directement la manche avec ce qui a
   /// été saisi, plutôt que d'avancer champ par champ jusqu'au dernier joueur.
+  ///
+  /// Doc 16, phase C — dans une partie partagée en ligne, la manche passe d'abord par le serveur :
+  /// la saisie n'est effacée qu'une fois acceptée ; devancée ou hors ligne, elle reste en place.
   private func finishRound() {
-    let committed = model.commitRound()
-    if committed {
-      draftTexts = [:]
+    Task {
+      if await model.submitRound() {
+        draftTexts = [:]
+      }
+      focusedParticipantID = model.currentParticipant?.id
     }
-    focusedParticipantID = model.currentParticipant?.id
+  }
+
+  /// Hors ligne dans une partie partagée, le bouton dit pourquoi la saisie ne part pas (doc 16).
+  private var submitLabel: LocalizedStringResource {
+    model.isOfflineShared ? "Hors connexion" : "Terminé"
   }
 }

@@ -1,93 +1,88 @@
 package com.quimene.app.livesync
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.quimene.domain.rules.GameCatalog
-import com.quimene.sync.LiveSession
+import com.quimene.sync.OnlineSession
+import com.quimene.sync.OnlineSessionError
 import com.quimene.sync.Role
-import com.quimene.sync.SupabaseTransport
-import com.quimene.sync.WireMessage
+import com.quimene.sync.SessionPresence
+import com.quimene.sync.SupabaseSessionBackend
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
- * Coordinateur **joueur** (contributeur/observateur), durée de vie de l'application — miroir de
- * `MatchConnectionCoordinator.swift`. Point d'entrée unique pour [com.quimene.app.features.join.JoinScreen].
- *
- * Simplification assumée par rapport à Apple : pas de reprise automatique au lancement froid ni
- * au retour au premier plan (`PersistedSession`, `willEnterForegroundNotification`) — perdre la
- * connexion pendant que le processus est tué exige de retaper le code. `reconnectNow` couvre le
- * cas courant (coupure réseau pendant que l'app reste ouverte) en rejouant le dernier code de
- * pairage mémorisé.
+ * Doc 16, phase C — miroir de `MatchConnectionCoordinator.swift` : côté participant d'une session
+ * en ligne. Rejoindre, c'est résoudre le code, rattraper le journal serveur, puis écouter le canal :
+ * plus de poignée de main avec un hôte, qui n'a plus besoin d'être allumé. Retient la session
+ * ([PersistedOnlineSession]) : après un arrêt complet du processus, la partie suivie reprend sans
+ * redemander le code.
  */
 class MatchConnectionCoordinator(
     private val catalog: GameCatalog,
+    private val context: Context,
     private val resolveDeviceID: suspend () -> String,
     private val scope: CoroutineScope,
 ) {
+    private val backend = SupabaseSessionBackend()
+
     var sharedMatch: SharedMatchViewModel? by mutableStateOf(null)
         private set
 
-    private var lastPairingCode: String? = null
-    private var lastDeviceName: String? = null
-    private var lastAppVersion: String? = null
+    init {
+        PersistedOnlineSession.load(context, PersistedOnlineSession.Role.Participant)?.let { persisted ->
+            scope.launch { runCatching { connect(persisted.pairingCode, persisted.deviceName) } }
+        }
+    }
 
-    /** [requestedRole] est toujours [Role.Contributor] côté appelant (miroir de `JoinTabView` —
-     * l'utilisateur ne choisit jamais son rôle) ; l'hôte peut le rétrograder en [Role.Observer]
-     * si « Autoriser les contributeurs » est désactivé — [SharedMatchViewModel.role] porte le
-     * rôle réellement assigné, lu via `LiveSession.currentRole()` après la poignée de main. */
+    /** Point d'entrée unique de [com.quimene.app.features.join.JoinScreen]. Renvoie le rôle
+     * accordé : contributeur, ou observateur si le créateur n'autorise pas les contributeurs. */
+    @Suppress("UNUSED_PARAMETER")
     suspend fun join(
         code: String,
         deviceName: String,
         appVersion: String,
-    ): Role {
-        stop()
-        val deviceID = resolveDeviceID()
-        val transport =
-            SupabaseTransport(
-                deviceID = deviceID,
-                deviceName = deviceName,
-                scope = scope,
-                platform = WireMessage.Platform.Android,
-            )
-        val host = transport.resolveGame(code)
-        val transportSession = transport.connect(host)
-        val session = LiveSession(deviceID = deviceID, catalog = catalog, scope = scope)
-        session.attachToHost(
-            session = transportSession,
-            sessionID = host.id,
-            pairingCode = code,
-            requestedRole = Role.Contributor,
-            deviceName = deviceName,
-            appVersion = appVersion,
-        )
-        val assignedRole = session.currentRole()
+    ): Role = connect(code, deviceName)
 
-        lastPairingCode = code
-        lastDeviceName = deviceName
-        lastAppVersion = appVersion
-        sharedMatch = SharedMatchViewModel(session, assignedRole, catalog, scope) { sharedMatch = null }
-        return assignedRole
-    }
-
-    /** Reconnexion manuelle après une perte de connexion à l'hôte (bandeau « Connexion perdue »
-     * dans [com.quimene.app.features.join.JoinScreen]) — rejoue le dernier code avec les mêmes
-     * identifiants d'appareil. `false` si aucune tentative précédente n'existe. */
+    /** « Réessayer » : un rattrapage immédiat. */
     suspend fun reconnectNow(): Boolean {
-        val code = lastPairingCode ?: return false
-        val deviceName = lastDeviceName ?: return false
-        val appVersion = lastAppVersion ?: return false
-        join(code, deviceName, appVersion)
-        return true
+        val link = sharedMatch?.link ?: return false
+        link.refresh()
+        return link.isReachable
     }
 
-    /** « Quitter » explicite — contrairement à une perte de connexion, oublie le code mémorisé :
-     * un « Réessayer » après un `stop()` volontaire n'a pas de sens. */
-    suspend fun stop() {
+    /** Retour au premier plan ([com.quimene.app.QuiMeneApplication]) : rattraper. */
+    suspend fun onForeground() {
+        sharedMatch?.link?.refresh()
+    }
+
+    private suspend fun connect(
+        code: String,
+        deviceName: String,
+    ): Role {
+        val info = backend.resolve(code) ?: throw OnlineSessionError.SessionNotFound
+        sharedMatch?.link?.stop()
+
+        val deviceID = resolveDeviceID()
+        val session = OnlineSession(info.sessionID, code, deviceID, backend)
+        val link = SessionLink(session, code, SessionPresence(deviceID, deviceName, isOwner = false), context, scope)
+        val role = if (info.allowsContributors) Role.Contributor else Role.Observer
+        sharedMatch =
+            SharedMatchViewModel(link, role, catalog, scope) {
+                sharedMatch = null
+                PersistedOnlineSession.clear(context, PersistedOnlineSession.Role.Participant)
+            }
+        PersistedOnlineSession(info.sessionID, code, PersistedOnlineSession.Role.Participant, deviceName).save(context)
+        link.start()
+        return role
+    }
+
+    /** « Quitter la partie » : départ volontaire. */
+    fun stop() {
         sharedMatch?.stop()
         sharedMatch = null
-        lastPairingCode = null
-        lastDeviceName = null
-        lastAppVersion = null
+        PersistedOnlineSession.clear(context, PersistedOnlineSession.Role.Participant)
     }
 }

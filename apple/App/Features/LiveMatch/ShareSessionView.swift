@@ -19,8 +19,8 @@ struct ShareSessionView: View {
   @State private var errorMessage: String?
   @State private var isStopping = false
   /// Doc utilisateur P9 — remontée : pouvoir imposer « observateur uniquement » à la création
-  /// (ou en cours) du partage. Ne rétrograde pas un contributeur déjà connecté (doc
-  /// `LiveSession.setAllowsContributors`), seulement les prochaines connexions.
+  /// (ou en cours) du partage. Ne rétrograde pas un contributeur déjà connecté, seulement les
+  /// appareils qui rejoignent ensuite.
   @State private var allowsContributors = true
   private var coordinator: LiveShareCoordinator { .shared }
 
@@ -95,7 +95,7 @@ struct ShareSessionView: View {
                 Text(peer.deviceName)
                   .foregroundStyle(.textPrimary)
                 Spacer()
-                Text(roleLabel(peer.role))
+                Text(roleLabel(for: peer))
                   .font(.label)
                   .foregroundStyle(.textSecondary)
               }
@@ -147,11 +147,10 @@ struct ShareSessionView: View {
     }
   }
 
-  private func roleLabel(_ role: Role) -> LocalizedStringResource {
-    switch role {
-    case .host: "Hôte"
-    case .contributor: "Contributeur"
-    case .observer: "Observateur"
-    }
+  /// Doc 16, phase C — plus de rôle négocié par appareil : le créateur, puis les autres selon
+  /// « Autoriser les contributeurs ».
+  private func roleLabel(for peer: SessionPresence) -> LocalizedStringResource {
+    if peer.isOwner { return "Créateur" }
+    return coordinator.allowsContributors ? "Contributeur" : "Observateur"
   }
 }

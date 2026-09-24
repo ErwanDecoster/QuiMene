@@ -74,6 +74,8 @@
 		C3AA6E864D68EC394369D686 /* JoinLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BD054369BC077C799BBFF57 /* JoinLink.swift */; };
 		CC4C14AE1927D962679B0443 /* DeepLinkRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE229A134D6300341412C0E /* DeepLinkRouter.swift */; };
 		CC6D4E2BB43A69AB79637081 /* LiveShareCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15E03711B56AB6A5F9F7A288 /* LiveShareCoordinator.swift */; };
+		C16C0000000000000000B002 /* NextMatchPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16C0000000000000000A002 /* NextMatchPicker.swift */; };
+		C16C0000000000000000B001 /* SessionLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = C16C0000000000000000A001 /* SessionLink.swift */; };
 		DDF0CF323C42A6717A2F2536 /* SharedMatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED88C4CDA8CFDA746AC9588D /* SharedMatchModel.swift */; };
 		EA83AEE01FBE39E611E4EAA6 /* Store in Frameworks */ = {isa = PBXBuildFile; productRef = 4169DC47B02D4B5A5F243DE9 /* Store */; };
 		EB18547401CE403AA928257E /* ProfileShareLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = FECAC647297540EA84E48BF6 /* ProfileShareLink.swift */; };
@@ -129,6 +131,8 @@
 		0F88BAB91585ED031873F11E /* LiveMatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveMatchModel.swift; sourceTree = "<group>"; };
 		105261167430649BF69A491B /* YamsSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YamsSheetView.swift; sourceTree = "<group>"; };
 		15E03711B56AB6A5F9F7A288 /* LiveShareCoordinator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LiveShareCoordinator.swift; sourceTree = "<group>"; };
+		C16C0000000000000000A002 /* NextMatchPicker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NextMatchPicker.swift; sourceTree = "<group>"; };
+		C16C0000000000000000A001 /* SessionLink.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SessionLink.swift; sourceTree = "<group>"; };
 		166377630E42779B0C5793ED /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		1FD83055930B42098109B9DD /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		25AA1BD3EAD4A3DC5B516CC7 /* MatchPlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchPlayView.swift; sourceTree = "<group>"; };
@@ -409,6 +413,8 @@
 				4A9F5EDAC041F9E23EED5B5D /* SharedMatchView.swift */,
 				A9DA809DE7377203DF8A1FC3 /* MatchConnectionCoordinator.swift */,
 				15E03711B56AB6A5F9F7A288 /* LiveShareCoordinator.swift */,
+				C16C0000000000000000A002 /* NextMatchPicker.swift */,
+				C16C0000000000000000A001 /* SessionLink.swift */,
 				D90C5383931C73460C54F4F3 /* QRCodeView.swift */,
 				B18BE4332F79E7E4167B768D /* RoundHistoryView.swift */,
 			);
@@ -694,6 +700,8 @@
 				399BEAEE80010D1CAE1085DA /* SharedMatchView.swift in Sources */,
 				A8A8DA3BF70AD6F17224FC8F /* MatchConnectionCoordinator.swift in Sources */,
 				CC6D4E2BB43A69AB79637081 /* LiveShareCoordinator.swift in Sources */,
+				C16C0000000000000000B002 /* NextMatchPicker.swift in Sources */,
+				C16C0000000000000000B001 /* SessionLink.swift in Sources */,
 				9A65BC70B64D4BA9B175F5BF /* JoinTabView.swift in Sources */,
 				C3AA6E864D68EC394369D686 /* JoinLink.swift in Sources */,
 				EB18547401CE403AA928257E /* ProfileShareLink.swift in Sources */,

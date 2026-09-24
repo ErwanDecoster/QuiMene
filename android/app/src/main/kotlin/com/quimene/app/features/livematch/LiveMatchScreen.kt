@@ -210,6 +210,13 @@ private fun LiveMatchScaffold(
         },
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+            // Doc 16 — partie partagée hors ligne : la saisie est bloquée jusqu'au retour du réseau.
+            if (viewModel.isOfflineShared) {
+                Banner(
+                    message = stringResource(R.string.hors_connexion_la_saisie_reprendra_au_retour_du_reseau),
+                    modifier = Modifier.padding(Space.lg),
+                )
+            }
             viewModel.remoteActivityMessage?.let { Banner(message = it, modifier = Modifier.padding(Space.lg)) }
             viewModel.roundExplanationMessage?.let { Banner(message = it, modifier = Modifier.padding(Space.lg)) }
             viewModel.validationErrorMessage?.let {

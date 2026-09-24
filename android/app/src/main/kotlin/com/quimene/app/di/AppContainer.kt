@@ -36,19 +36,22 @@ class AppContainer(
 
     val appSettings = AppSettings(context, applicationScope)
 
-    /** Doc 09 — un seul `LiveSession` hôte et un seul rejoint à la fois, tous deux de durée de
-     * vie applicative (pas liés à un écran) : voir [LiveShareCoordinator]/
+    /** Doc 16 — une session en ligne créée et une rejointe au plus, toutes deux de durée de vie
+     * applicative (pas liées à un écran) : voir [LiveShareCoordinator]/
      * [MatchConnectionCoordinator]. */
     val liveShareCoordinator =
         LiveShareCoordinator(
             catalog = catalog,
             matchRepository = matchRepository,
+            resolvePlayer = { database.playerDao().get(it) },
+            context = context,
             resolveDeviceID = { DeviceIdentity.current(context) },
             scope = applicationScope,
         )
     val matchConnectionCoordinator =
         MatchConnectionCoordinator(
             catalog = catalog,
+            context = context,
             resolveDeviceID = { DeviceIdentity.current(context) },
             scope = applicationScope,
         )

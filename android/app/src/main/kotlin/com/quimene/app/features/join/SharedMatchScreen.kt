@@ -16,10 +16,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.quimene.app.R
+import com.quimene.app.features.livematch.NextMatchBar
+import com.quimene.app.features.livematch.NextMatchPicker
 import com.quimene.app.features.livematch.RoundEntryDispatch
+import com.quimene.app.features.results.MatchSummaryContent
 import com.quimene.app.livesync.SharedMatchViewModel
 import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.tokens.LocalAppColors
@@ -39,6 +46,7 @@ fun SharedMatchScreen(
 ) {
     val colors = LocalAppColors.current
     val state = viewModel.stateOrNull
+    var isPickingNextMatch by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -60,9 +68,16 @@ fun SharedMatchScreen(
         },
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-            if (!viewModel.isHostConnected) {
+            // Doc 16, phase C — plus d'hôte à rejoindre : seule la connexion de cet appareil compte.
+            // Le tableau reste celui du dernier rattrapage, la saisie est bloquée.
+            if (viewModel.isSessionClosed) {
                 Banner(
-                    message = stringResource(R.string.connexion_a_l_hote_perdue_le_tableau_affiche_est_le_dernier),
+                    message = stringResource(R.string.le_createur_a_arrete_la_session_le_tableau_affiche_est_le),
+                    modifier = Modifier.padding(Space.lg),
+                )
+            } else if (!viewModel.isHostConnected) {
+                Banner(
+                    message = stringResource(R.string.hors_connexion_le_tableau_affiche_est_le_dernier_recu),
                     modifier = Modifier.padding(Space.lg),
                     actionTitle = stringResource(R.string.reessayer),
                     onAction = onReconnect,
@@ -70,13 +85,33 @@ fun SharedMatchScreen(
             }
             viewModel.roundExplanationMessage?.let { Banner(message = it, modifier = Modifier.padding(Space.lg)) }
             viewModel.latestRejectionReason?.let {
-                Banner(message = "Manche refusée par l'hôte : $it", modifier = Modifier.padding(horizontal = Space.lg))
+                Banner(message = it, modifier = Modifier.padding(horizontal = Space.lg))
             }
             viewModel.validationErrorMessage?.let {
                 Banner(message = it, modifier = Modifier.padding(horizontal = Space.lg))
             }
 
             if (state == null) return@Column
+
+            // Doc 16, phase C — même écran de résultats que le créateur, puis « Partie suivante » :
+            // un participant peut enchaîner même si le créateur est absent.
+            if (viewModel.isConcluded) {
+                viewModel.summaryState()?.let { MatchSummaryContent(it, modifier = Modifier.weight(1f)) }
+                if (viewModel.canPropose) {
+                    NextMatchBar(
+                        isBusy = viewModel.isSubmitting,
+                        modifier = Modifier.padding(Space.lg),
+                    ) { isPickingNextMatch = true }
+                }
+                if (isPickingNextMatch) {
+                    NextMatchPicker(
+                        playerCount = state.participants.size,
+                        currentGameID = state.gameID,
+                        onDismiss = { isPickingNextMatch = false },
+                    ) { viewModel.startNextMatch(it) }
+                }
+                return@Column
+            }
 
             StandingsSection(viewModel)
 

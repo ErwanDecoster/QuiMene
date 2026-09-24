@@ -27,11 +27,16 @@ struct SharedMatchView: View {
   /// vite pour donner l'impression que rien n'empêchait de l'ajouter. `ScoreBoardView.validationMessage`
   /// combine ce contrôle local et un rejet distant tardif dans le même message.
   @State private var validationErrorMessage: String?
+  @State private var isPickingNextMatch = false
 
   var body: some View {
     Group {
       if let definition = model.definition, let state = model.state {
-        liveView(definition: definition, state: state)
+        if model.isConcluded {
+          resultsView(definition: definition, state: state)
+        } else {
+          liveView(definition: definition, state: state)
+        }
       } else {
         ProgressView("Connexion à la partie…")
           .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -39,6 +44,33 @@ struct SharedMatchView: View {
     }
     .navigationTitle(navigationTitle)
     .navigationBarTitleDisplayMode(.inline)
+  }
+
+  /// Doc 16, phase C — même écran de résultats que le créateur, puis « Partie suivante » : un
+  /// participant peut enchaîner même si le créateur est absent.
+  private func resultsView(definition: GameDefinition, state: MatchState) -> some View {
+    ResultsView(
+      state: state,
+      definition: definition,
+      standings: model.currentStandings,
+      participantRecords: model.transientRecords
+    )
+    .safeAreaInset(edge: .bottom) {
+      if model.canPropose {
+        VStack(spacing: Space.xs) {
+          if let reason = model.latestRejectionReason {
+            Text(reason).font(.label).foregroundStyle(.semanticError)
+          }
+          NextMatchBar(isBusy: model.isSubmitting) { isPickingNextMatch = true }
+        }
+      }
+    }
+    .sheet(isPresented: $isPickingNextMatch) {
+      NextMatchPicker(playerCount: state.participants.count, currentGameID: state.gameID) {
+        definition in
+        Task { await model.startNextMatch(definition: definition) }
+      }
+    }
   }
 
   private var navigationTitle: String {
@@ -51,12 +83,14 @@ struct SharedMatchView: View {
     List {
       if !model.isHostConnected {
         Section {
-          if model.isConcluded {
-            Text("La partie est terminée.")
+          if model.isSessionClosed {
+            Text("Le créateur a arrêté la session. Le tableau affiché est le dernier reçu.")
               .font(.label)
               .foregroundStyle(.textSecondary)
           } else {
-            Text("Connexion à l'hôte perdue. Le tableau affiché est le dernier reçu.")
+            // Doc 16, phase C — plus d'hôte à rejoindre : seule la connexion de cet appareil
+            // compte. Le tableau reste celui du dernier rattrapage, la saisie est bloquée.
+            Text("Hors connexion. Le tableau affiché est le dernier reçu.")
               .font(.label)
               .foregroundStyle(.semanticError)
             Text(
@@ -181,7 +215,9 @@ struct SharedMatchView: View {
     }
     validationErrorMessage = nil
 
-    await model.propose(inputs)
+    // Doc 16, phase C — la saisie n'est effacée qu'une fois acceptée par le serveur ; devancée
+    // ou hors ligne, elle reste en place (`latestRejectionReason` dit pourquoi).
+    guard await model.propose(inputs) else { return }
     draftTexts = [:]
     closedParticipantID = nil
   }

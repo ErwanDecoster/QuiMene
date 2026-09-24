@@ -1,4 +1,5 @@
 import Catalog
+import DesignSystem
 import Domain
 import Foundation
 import Observation
@@ -6,202 +7,282 @@ import Store
 import SwiftData
 import Sync
 
-/// Doc 09 « Fin de partie » (révisé) — pendant de `MatchConnectionCoordinator` côté hôte : porte
-/// la session de partage (`LiveSession`/`SupabaseTransport`/code d'appairage) pour toute la durée
-/// de l'app, plutôt que pour la durée d'un `LiveMatchModel`/`LiveMatchView`, qui se recrée à
-/// chaque nouvelle partie. C'est ce découplage qui permet à une session de survivre à la fin
-/// d'une partie et d'enchaîner sur la suivante — même jeu rejoué ou jeu différent — jusqu'à un
-/// arrêt explicite (« Arrêter le partage »), qui reste la seule façon de la terminer.
+/// Doc 16, phase C — côté créateur d'une session en ligne. La session vit sur le serveur
+/// (`SessionLink`/`OnlineSession`) : le journal de chaque partie partagée y fait foi, la partie
+/// locale (`MatchRecord`) en est le miroir. Le créateur n'arbitre plus rien : chaque appareil,
+/// lui compris, ajoute ses manches au journal serveur, qui garantit l'ordre.
+///
+/// Survit à l'écran de partie (se recrée à chaque nouvelle partie) et au redémarrage de l'app
+/// (`PersistedOnlineSession`, reprise par `resumeIfNeeded`) : seul « Arrêter le partage » termine
+/// la session (doc 16 : créateur uniquement).
 @MainActor
 @Observable
 final class LiveShareCoordinator {
   static let shared = LiveShareCoordinator()
 
   private let catalog = GameCatalog.embedded
+  private let backend = SupabaseSessionBackend()
 
-  private var session: LiveSession?
-  private var transport: SupabaseTransport?
+  private(set) var link: SessionLink?
   private var match: MatchRecord?
   private var repository: MatchRepository?
-  private var sharingTasks: [Task<Void, Never>] = []
 
-  private(set) var pairingCode: String?
-  private(set) var connectedPeers: [LiveSession.ConnectedPeer] = []
-  /// La partie actuellement diffusée aux pairs connectés — `nil` tant qu'aucune session n'est
-  /// active. `LiveMatchModel` compare son propre `match.id` à celui-ci pour savoir s'il est,
-  /// lui, la partie affichée par la session en cours (`isSharing`).
+  /// La partie actuellement diffusée — `nil` tant qu'aucune session n'est active.
   private(set) var attachedMatchID: UUID?
-  /// Doc 09 « Fin de partie » — identifiant stable de la session, indépendant du `matchID`
-  /// courant. `LiveMatchModel` s'en sert pour donner à `MatchLiveActivityController` une clé
-  /// d'Activity qui survit à un changement de partie (voir `MatchLiveActivityController.refresh`).
-  private(set) var sessionID: UUID?
   private(set) var allowsContributors = true
-  var isSharing: Bool { session != nil }
+  var isSharing: Bool { link != nil }
+  var pairingCode: String? { link?.pairingCode }
+  var sessionID: UUID? { link?.sessionID }
+  /// Faux hors ligne : la saisie d'une partie partagée est alors bloquée (doc 16).
+  var isReachable: Bool { link?.isReachable ?? true }
+  /// Les autres appareils présents dans la session.
+  var connectedPeers: [SessionPresence] {
+    (link?.presence ?? []).filter { $0.deviceID != DeviceIdentity.current }
+  }
 
-  /// Doc utilisateur — remontée : ouvrir l'écran d'une partie substituait silencieusement ce
-  /// que voient les pairs connectés dès qu'une session diffusait déjà une *autre* partie encore
-  /// en cours. `LiveMatchModel` s'en sert pour savoir si un tel rattachement doit être proposé
-  /// tel quel (enchaînement voulu, doc 09 « Fin de partie ») ou demander confirmation d'abord
-  /// (deux parties bien distinctes, encore en cours toutes les deux).
   var attachedMatchIsConcluded: Bool {
     guard let match else { return true }
     return match.status == .ended || match.status == .abandoned
   }
 
-  /// Nom du jeu actuellement diffusé — pour le message de confirmation avant de le remplacer.
   var attachedGameName: String? {
     guard let match else { return nil }
     return (try? catalog.definition(for: match.gameID, version: match.rulesVersion))?.name.localized
       ?? match.gameID
   }
 
-  /// Doc utilisateur — un `LiveMatchModel` se recrée à chaque partie ; les flux de `LiveSession`
-  /// sont documentés à usage unique (voir `SharedMatchModel`, bug BLE-era d'un second abonné
-  /// privé du flux), donc ce coordinateur en reste l'unique consommateur pour toute la durée de
-  /// la session et republie ce qu'il faut savoir via ces propriétés `@Observable`, lisibles par
-  /// n'importe quel `LiveMatchModel` actif (`.onChange(of:)`) sans jamais re-souscrire
-  /// directement à `session.events`.
+  /// Republié à chaque événement ajouté par un autre appareil, pour que le `LiveMatchModel`
+  /// affiché se recharge (`refreshFromRemote`) et l'annonce.
   private(set) var remoteEventToken = UUID()
   private(set) var remoteEventMatchID: UUID?
   private(set) var remoteEventDeviceID: String?
   private(set) var remoteEventIsRoundCommit = false
 
+  /// Doc 16, phase C — un autre appareil vient de lancer la partie suivante : sa copie locale
+  /// existe déjà (`newMatchID`). L'écran de la partie précédente (`previousMatchID`) y bascule.
+  private(set) var remoteStartedMatch: (newMatchID: UUID, previousMatchID: UUID?)?
+  private(set) var remoteStartedToken = UUID()
+
   private init() {}
 
-  /// Démarre une toute nouvelle session si aucune n'est active ; sinon équivalent à
-  /// `attach(match:context:)` — permet à `ShareSessionView` d'appeler la même méthode dans les
-  /// deux cas sans avoir à distinguer « première partie partagée » de « partie suivante ».
+  // MARK: - Démarrer, rattacher, reprendre
+
+  /// Ouvre une session (nouveau code, retiré si déjà pris) et y publie cette partie ; si une
+  /// session est déjà ouverte, y rattache simplement la partie.
   func startSharing(
     match: MatchRecord, context: ModelContext, deviceName: String, allowsContributors: Bool
   ) async throws {
-    guard session == nil else {
+    guard link == nil else {
       await attach(match: match, context: context)
       return
     }
 
-    let repository = MatchRepository(context: context)
-    let newSessionID = UUID()
-    let newSession = LiveSession(deviceID: DeviceIdentity.current, catalog: catalog)
-    let code = LiveSession.generatePairingCode()
-    try await newSession.startHosting(
-      log: try repository.currentLog(for: match),
-      sessionID: newSessionID,
-      pairingCode: code,
-      allowsContributors: allowsContributors
-    )
+    let sessionID = UUID()
+    var code = OnlineSession.newPairingCode()
+    for attempt in 1...3 {
+      do {
+        try await backend.open(
+          sessionID: sessionID, pairingCode: code, ownerDeviceID: DeviceIdentity.current,
+          allowsContributors: allowsContributors)
+        break
+      } catch OnlineSessionError.pairingCodeTaken where attempt < 3 {
+        code = OnlineSession.newPairingCode()
+      }
+    }
 
-    let newTransport = SupabaseTransport(deviceID: DeviceIdentity.current, deviceName: deviceName)
-    try await newTransport.advertise(
-      sessionID: newSessionID,
-      matchID: match.id,
-      gameID: match.gameID,
-      participantCount: match.participants.count,
-      pairingCode: code
-    )
-
-    session = newSession
-    transport = newTransport
-    self.repository = repository
-    self.match = match
-    pairingCode = code
     self.allowsContributors = allowsContributors
-    attachedMatchID = match.id
-    sessionID = newSessionID
-    connectedPeers = []
-
-    let acceptTask = Task { [weak self] in
-      for await incoming in newTransport.acceptIncoming() {
-        guard self != nil else { return }
-        await newSession.acceptConnection(incoming)
-      }
-    }
-    let eventsTask = Task { [weak self] in
-      for await stamped in newSession.events {
-        self?.handleRemoteEvent(stamped)
-      }
-    }
-    let peersTask = Task { [weak self] in
-      for await peers in newSession.peerUpdates {
-        self?.connectedPeers = peers
-      }
-    }
-    sharingTasks = [acceptTask, eventsTask, peersTask]
+    PersistedOnlineSession(
+      sessionID: sessionID, pairingCode: code, role: .owner, deviceName: deviceName
+    ).save()
+    await connect(sessionID: sessionID, code: code, deviceName: deviceName)
+    await attach(match: match, context: context)
   }
 
-  /// Doc 09 « Fin de partie » — appelé pour chaque `LiveMatchModel` créé (nouvelle partie ou
-  /// reprise d'une partie en cours) : silencieusement sans effet si aucune session n'est active,
-  /// et sans effet si déjà attaché à cette partie. Sinon pousse son journal complet à la session
-  /// déjà ouverte (`LiveSession.switchMatch`) — sans rouvrir le canal, changer la clé, ni
-  /// déconnecter les pairs déjà présents. C'est ce seul appel, fait depuis l'initialiseur de
-  /// `LiveMatchModel`, qui fait qu'une nouvelle partie rejoint automatiquement une session déjà
-  /// active, sans repasser par « Partager en direct ».
+  /// Rattache une partie à la session ouverte : si le serveur ne la connaît pas encore, publie
+  /// son journal local ; puis la copie locale devient le miroir du journal serveur.
   func attach(match: MatchRecord, context: ModelContext) async {
-    guard let session else { return }
-    guard attachedMatchID != match.id else { return }
-
+    guard let link, attachedMatchID != match.id else { return }
     let repository = MatchRepository(context: context)
-    guard let log = try? repository.currentLog(for: match) else { return }
-    guard (try? await session.switchMatch(log: log)) != nil else { return }
-    try? await transport?.updateActiveMatch(
-      matchID: match.id, gameID: match.gameID, participantCount: match.participants.count)
-
     self.repository = repository
     self.match = match
     attachedMatchID = match.id
+
+    if await link.session.events(forMatch: match.id).isEmpty,
+      let localLog = try? repository.currentLog(for: match)
+    {
+      for stamped in localLog {
+        // Même identifiant qu'en local : celui du `matchCreated` est l'identifiant de la partie
+        // (`MatchEngine`), partagé par tous les appareils.
+        let result = await link.submit(
+          stamped.event, matchID: match.id, eventID: stamped.id, occurredAt: stamped.occurredAt)
+        guard case .accepted = result else { break }
+      }
+    }
+    await mirrorAttachedMatch()
   }
 
-  /// Doc utilisateur — appelé après chaque écriture locale de l'hôte sur la partie actuellement
-  /// attachée (saisie, annulation, fin de partie) : ne fait plus qu'une resynchronisation, ne
-  /// termine plus jamais la session à elle seule (doc 09 « Fin de partie », révisé — l'ancien
-  /// comportement arrêtait automatiquement le partage à la conclusion de la partie).
-  func syncLog(for matchID: UUID) async {
-    guard let session, let match, let repository, attachedMatchID == matchID else { return }
-    guard let log = try? repository.currentLog(for: match) else { return }
-    try? await session.syncHostLog(log)
+  /// Au lancement : reprend la session que ce créateur avait ouverte (l'app a pu être tuée en
+  /// arrière-plan), et sa partie courante.
+  func resumeIfNeeded(context: ModelContext) async {
+    guard link == nil, let persisted = PersistedOnlineSession.load(.owner) else { return }
+    await connect(
+      sessionID: persisted.sessionID, code: persisted.pairingCode,
+      deviceName: persisted.deviceName)
+    guard let link else { return }
+    let repository = MatchRepository(context: context)
+    self.repository = repository
+    if let currentID = await link.session.currentMatchID(),
+      let match = try? repository.match(withID: currentID)
+    {
+      self.match = match
+      attachedMatchID = match.id
+      await mirrorAttachedMatch()
+    }
   }
 
-  /// Doc utilisateur P9 — s'applique aux prochaines connexions, pas aux contributeurs déjà
-  /// connectés (voir `LiveSession.setAllowsContributors`).
+  private func connect(sessionID: UUID, code: String, deviceName: String) async {
+    let session = OnlineSession(
+      sessionID: sessionID, pairingCode: code, deviceID: DeviceIdentity.current, backend: backend)
+    let link = SessionLink(
+      session: session, pairingCode: code,
+      me: SessionPresence(deviceID: DeviceIdentity.current, deviceName: deviceName, isOwner: true))
+    link.onNewRecords = { [weak self] records in
+      Task { @MainActor [weak self] in await self?.handle(records) }
+    }
+    self.link = link
+    await link.start()
+  }
+
+  // MARK: - Saisie
+
+  /// Ajoute un événement à une partie de la session ; en cas de succès, la copie locale est déjà
+  /// à jour quand cette fonction rend la main.
+  func submit(_ event: MatchEvent, matchID: UUID) async -> SessionLink.SubmitResult {
+    guard let link else { return .closed }
+    let result = await link.submit(event, matchID: matchID)
+    await mirrorAttachedMatch()
+    return result
+  }
+
+  /// « Partie suivante » du créateur : nouvelle partie locale avec les mêmes joueurs (mêmes
+  /// fiches, mêmes avatars), publiée dans la session. Mêmes variantes si c'est le même jeu.
+  func startNextMatch(
+    definition: GameDefinition, after previous: MatchRecord, context: ModelContext
+  ) async -> MatchRecord? {
+    guard link != nil else { return nil }
+    let repository = MatchRepository(context: context)
+    let seeds = previous.participants.sorted { $0.seatIndex < $1.seatIndex }.map {
+      MatchRepository.ParticipantSeed(
+        player: $0.player, nickname: $0.nicknameSnapshot, avatarKind: $0.avatarKindSnapshot,
+        avatarValue: $0.avatarValueSnapshot, paletteID: $0.paletteIDSnapshot)
+    }
+    let variants =
+      definition.id == previous.gameID
+      ? (try? JSONDecoder().decode(VariantSelection.self, from: previous.variantsData))
+        ?? VariantSelection()
+      : VariantSelection()
+    guard
+      let match = try? repository.createMatch(
+        gameID: definition.id, rulesVersion: definition.rulesVersion, variants: variants,
+        seeds: seeds, deviceID: DeviceIdentity.current)
+    else { return nil }
+    await attach(match: match, context: context)
+    return match
+  }
+
   func setAllowsContributors(_ allowed: Bool) async {
+    guard let link else { return }
     allowsContributors = allowed
-    await session?.setAllowsContributors(allowed)
+    try? await backend.open(
+      sessionID: link.sessionID, pairingCode: link.pairingCode,
+      ownerDeviceID: DeviceIdentity.current, allowsContributors: allowed)
   }
 
-  /// Seul point d'arrêt d'une session (doc 09 « Fin de partie ») — reprend telle quelle la
-  /// logique de fermeture qui vivait auparavant dans `LiveMatchModel.stopSharing`.
+  /// Seul point d'arrêt d'une session (doc 16 : créateur uniquement). Les participants le
+  /// constatent à leur prochaine saisie ; le journal reste lisible 24 h pour qu'ils rattrapent.
   func stopSharing() async {
-    await session?.stopHosting()
-    for task in sharingTasks { task.cancel() }
-    sharingTasks = []
-    await transport?.stopAdvertising()
-    transport = nil
-    session = nil
+    if let link {
+      try? await backend.close(sessionID: link.sessionID, ownerDeviceID: DeviceIdentity.current)
+      await link.stop()
+    }
+    PersistedOnlineSession.clear(.owner)
+    link = nil
     repository = nil
     match = nil
-    pairingCode = nil
-    connectedPeers = []
     attachedMatchID = nil
-    sessionID = nil
     allowsContributors = true
   }
 
-  /// Persiste une manche acceptée d'un contributeur distant (`LiveSession.events` ne porte
-  /// jamais les écritures locales de l'hôte — voir `LiveSession.hostCommit`, jamais appelé par
-  /// `session.propose` côté hôte) et republie ce qu'il faut savoir pour que le `LiveMatchModel`
-  /// concerné se resynchronise (`refreshFromRemote`).
-  private func handleRemoteEvent(_ stamped: StampedEvent) {
-    guard let match, let repository else { return }
-    guard (try? repository.appendRemoteEvent(stamped, to: match, catalog: catalog)) != nil else {
-      return
-    }
+  // MARK: - Miroir
 
-    remoteEventMatchID = match.id
-    remoteEventDeviceID = stamped.deviceID
-    if case .roundCommitted = stamped.event {
-      remoteEventIsRoundCommit = true
-    } else {
-      remoteEventIsRoundCommit = false
+  private func handle(_ records: [SessionEventRecord]) async {
+    await adoptMatchesStartedElsewhere(records)
+    await mirrorAttachedMatch()
+    let remote = records.filter {
+      $0.matchID == attachedMatchID && $0.event.deviceID != DeviceIdentity.current
+    }
+    guard let last = remote.last else { return }
+    remoteEventMatchID = last.matchID
+    remoteEventDeviceID = last.event.deviceID
+    remoteEventIsRoundCommit = remote.contains {
+      if case .roundCommitted = $0.event.event { true } else { false }
     }
     remoteEventToken = UUID()
+  }
+
+  /// Une partie lancée par un autre appareil (« Partie suivante » d'un participant) : en créer la
+  /// copie locale, avec les fiches et avatars de la partie précédente pour les mêmes joueurs, et
+  /// la rattacher — le créateur la retrouve ainsi dans son historique comme les siennes.
+  private func adoptMatchesStartedElsewhere(_ records: [SessionEventRecord]) async {
+    guard let link, let repository else { return }
+    for record in records where record.event.deviceID != DeviceIdentity.current {
+      guard case .matchCreated = record.event.event,
+        (try? repository.match(withID: record.matchID)) == nil
+      else { continue }
+      let previous = match
+      // Même place, même nom : c'est le même joueur que dans la partie précédente.
+      let previousBySeat = Dictionary(
+        (previous?.participants ?? []).map { ("\($0.seatIndex)|\($0.nicknameSnapshot)", $0) },
+        uniquingKeysWith: { first, _ in first })
+      let events = await link.session.events(forMatch: record.matchID)
+      let created = try? repository.createMirroredMatch(
+        id: record.matchID, events: events, catalog: catalog
+      ) { participant in
+        if let source = previousBySeat["\(participant.seatIndex)|\(participant.displayName)"] {
+          return MatchRepository.ParticipantSeed(
+            player: source.player, nickname: source.nicknameSnapshot,
+            avatarKind: source.avatarKindSnapshot, avatarValue: source.avatarValueSnapshot,
+            paletteID: source.paletteIDSnapshot)
+        }
+        return Self.generatedSeed(for: participant.displayName)
+      }
+      guard let created else { continue }
+      match = created
+      attachedMatchID = created.id
+      remoteStartedMatch = (created.id, previous?.id)
+      remoteStartedToken = UUID()
+    }
+  }
+
+  static func generatedSeed(for nickname: String) -> MatchRepository.ParticipantSeed {
+    let avatar = Avatar.generated(for: nickname)
+    let emoji: String = if case .emoji(let value) = avatar.kind { value } else { "" }
+    return MatchRepository.ParticipantSeed(
+      player: nil, nickname: nickname, avatarKind: "emoji", avatarValue: emoji,
+      paletteID: String(avatar.palette.index))
+  }
+
+  /// Recopie le journal serveur de la partie rattachée dans sa copie locale. Jamais une copie
+  /// incomplète : tant que le serveur n'a pas au moins autant d'événements que la partie locale
+  /// (publication interrompue hors ligne), la copie locale est gardée telle quelle.
+  private func mirrorAttachedMatch() async {
+    guard let link, let match, let repository else { return }
+    let serverLog = await link.session.events(forMatch: match.id)
+    guard !serverLog.isEmpty,
+      let localLog = try? repository.currentLog(for: match),
+      serverLog.count >= localLog.count,
+      serverLog.map(\.id) != localLog.map(\.id)
+    else { return }
+    _ = try? repository.replaceLog(serverLog, in: match, catalog: catalog)
   }
 }

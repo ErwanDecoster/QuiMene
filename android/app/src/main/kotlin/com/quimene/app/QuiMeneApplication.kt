@@ -61,6 +61,14 @@ class QuiMeneApplication :
      * deux, pas de minuteur propre (doc 09/14). */
     override fun onStart(owner: LifecycleOwner) {
         applicationScope.launch { container.sharedProfileSyncCoordinator.sync() }
+        // Doc 16 — reprend la session ouverte par ce créateur, puis rattrape les journaux.
+        applicationScope.launch {
+            runCatching {
+                container.liveShareCoordinator.resumeIfNeeded()
+                container.liveShareCoordinator.onForeground()
+            }
+        }
+        applicationScope.launch { runCatching { container.matchConnectionCoordinator.onForeground() } }
     }
 
     override fun onTerminate() {

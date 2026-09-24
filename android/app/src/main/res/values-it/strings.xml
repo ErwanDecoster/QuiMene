@@ -2,6 +2,7 @@
 <resources>
     <string name="value1_count2">%1$s: %2$d</string>
     <string name="value1_est_deja_ton_ami_sur_la_fiche_value2">%1$s è già tuo amico, sulla scheda «%2$s».</string>
+    <string name="value1_vient_de_valider_une_manche_verifie_avant_de_valider">%1$s ha appena convalidato un turno: controlla prima di convalidare il tuo.</string>
     <string name="value1_manche_count2">%1$s · Manche %2$d</string>
     <string name="value1_value2">%1$s, %2$s</string>
     <string name="value1_value2_count3">%1$s, %2$s : %3$d</string>
@@ -28,7 +29,7 @@
     <string name="abandonner_cette_partie">Abbandonare questa partita?</string>
     <string name="abandonner_la_partie">Abbandona la partita</string>
     <string name="activite">Attività</string>
-    <string name="activite_par_mois">Activité par mois</string>
+    <string name="activite_par_mois">Attività per mese</string>
     <string name="adopter_aussi_son_pseudo_et_son_avatar">Adotta anche il suo nickname e il suo avatar</string>
     <string name="ajouter_un_ami">Aggiungi un amico</string>
     <string name="ajouter_un_joueur">Aggiungi un giocatore</string>
@@ -61,6 +62,7 @@
     <string name="automatique_les_joueurs_les_plus_actifs_nombre_de_parties">Automatico: prima i giocatori più attivi (numero di partite giocate). Manuale: riordinali tu stesso nella scheda Giocatori.</string>
     <string name="autoriser_les_contributeurs">Consenti collaboratori</string>
     <string name="avatar">Avatar</string>
+    <string name="avec_les_memes_joueurs_tous_les_appareils_de_la_session">Con gli stessi giocatori. Tutti i dispositivi della sessione passano alla nuova partita.</string>
     <string name="belote_rebelote">Belote-rebelote</string>
     <string name="bonus">Bonus</string>
     <string name="bouts_count1">Bouts: %1$d</string>
@@ -87,6 +89,7 @@
     <string name="contrat">Contratto</string>
     <string name="contributeur">Collaboratore</string>
     <string name="copier_l_adresse">Copia l\'indirizzo</string>
+    <string name="createur">Creatore</string>
     <string name="creer_la_fiche_value1">Crea la scheda «%1$s»</string>
     <string name="creer_mon_profil">Crea il mio profilo</string>
     <string name="demande_d_ajout_d_un_jeu_qui_mene">Richiesta di aggiunta di un gioco — Qui Mène ?</string>
@@ -110,6 +113,9 @@
     <string name="garde_contre_le_chien">Garde contre le chien</string>
     <string name="garde_sans_le_chien">Garde sans le chien</string>
     <string name="historique">Cronologia</string>
+    <string name="hors_connexion">Offline</string>
+    <string name="hors_connexion_la_saisie_reprendra_au_retour_du_reseau">Offline: l\'inserimento riprenderà al ritorno della rete.</string>
+    <string name="hors_connexion_le_tableau_affiche_est_le_dernier_recu">Offline. Il tabellone mostrato è l\'ultimo ricevuto.</string>
     <string name="hote">Host</string>
     <string name="impossible_de_demarrer_le_partage_verifie_ta_connexion">Impossibile avviare la condivisione. Controlla la tua connessione Internet e riprova.</string>
     <string name="jeu">Gioco</string>
@@ -122,8 +128,11 @@
     <string name="la_partie_est_terminee">La partita è terminata.</string>
     <string name="la_partie_et_ses_manches_seront_definitivement_supprimees_y">La partita e le sue manche verranno eliminate definitivamente, comprese le statistiche dei giocatori coinvolti. Questa azione non può essere annullata.</string>
     <string name="la_partie_sera_classee_comme_abandonnee_dans_l_historique">La partita verrà classificata come abbandonata nella cronologia, con la classifica raggiunta fino a quel momento. Questa azione non può essere annullata.</string>
+    <string name="la_session_partagee_a_ete_arretee">La sessione condivisa è stata interrotta.</string>
     <string name="langue">Lingua</string>
     <string name="le_classement_final_sera_calcule_a_partir_des_manches">La classifica finale verrà calcolata in base alle manche giocate. Questa azione non può essere annullata.</string>
+    <string name="le_createur_a_arrete_la_session">Il creatore ha interrotto la sessione.</string>
+    <string name="le_createur_a_arrete_la_session_le_tableau_affiche_est_le">Il creatore ha interrotto la sessione. Il tabellone mostrato è l\'ultimo ricevuto.</string>
     <string name="le_jeu_que_je_cherche_value1">Il gioco che stavo cercando: %1$s</string>
     <string name="le_jeu_que_je_souhaite_voir_ajoute">Il gioco che vorrei vedere aggiunto:</string>
     <string name="les_personnes_qui_rejoignent_ne_peuvent_qu_observer_quel">Le persone che si uniscono possono solo osservare, qualunque sia la loro scelta — questo non cambia nulla per i collaboratori già connessi.</string>
@@ -165,6 +174,7 @@
     <string name="partenaire_roi_appele">Compagno (re chiamato)</string>
     <string name="partie_partagee_en_cours_reprendre">Partita condivisa in corso · Riprendi</string>
     <string name="partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par">Partita ricevuta dal dispositivo di un amico: il dettaglio manche per manche non è disponibile qui.</string>
+    <string name="partie_suivante">Partita successiva</string>
     <string name="parties">Partite</string>
     <string name="parties_archivees">Partite archiviate</string>
     <string name="parties_archivees_count1">Partite archiviate (%1$d)</string>
@@ -192,10 +202,11 @@
     <string name="rejoindre">Unisciti</string>
     <string name="rejoindre_les_parties_de_tes_amis_et_y_etre_reconnu">Unirti alle partite dei tuoi amici ed esservi riconosciuto.</string>
     <string name="rejoindre_une_partie">Unisciti a una partita</string>
+    <string name="rejouer">Gioca ancora</string>
     <string name="remplacer_la_partie_partagee">Sostituire la partita condivisa?</string>
     <string name="reprendre_la_partie">Riprendi la partita</string>
     <string name="reprendre_la_partie_en_cours">Riprendi la partita in corso</string>
-    <string name="reprendre_la_partie_en_cours_value1">Reprendre la partie en cours, %1$s</string>
+    <string name="reprendre_la_partie_en_cours_value1">Riprendi la partita in corso, %1$s</string>
     <string name="reprise_automatique_en_cours">Ripresa automatica in corso.</string>
     <string name="retirer_des_amis">Rimuovi dagli amici</string>
     <string name="retrouver_vos_parties_jouees_ensemble_dans_ton_historique">Ritrovare nella tua cronologia le partite giocate insieme.</string>
@@ -244,6 +255,8 @@
     <string name="triple">Tripla</string>
     <string name="tu_suis_value1_depuis_le_value2">Segui %1$s dal %2$s</string>
     <string name="un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer">Un nickname e un avatar, niente di più: nessun account da creare.</string>
+    <string name="une_autre_manche_vient_d_etre_validee_verifie_avant_de">È appena stato convalidato un altro turno: controlla prima di convalidare il tuo.</string>
+    <string name="une_partie_vient_d_etre_lancee_sur_un_autre_appareil">È appena stata avviata una partita su un altro dispositivo.</string>
     <string name="une_session_est_en_cours_de_partage_sur_value1_continuer">È in corso una sessione di condivisione su %1$s. Continuare qui la sostituirà: le persone connesse vedranno questa partita al suo posto.</string>
     <string name="valider">Conferma</string>
     <string name="valider_la_donne">Conferma la mano</string>

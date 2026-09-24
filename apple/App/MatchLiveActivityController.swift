@@ -48,8 +48,8 @@ enum MatchLiveActivityController {
   }
 
   /// `sessionID` — fourni par l'appelant quand cette partie est diffusée par une session de
-  /// partage active (hôte : `LiveShareCoordinator.shared.sessionID` ; pair :
-  /// `LiveSession.currentSessionID()`), `nil` sinon (partie solo).
+  /// partage active (créateur : `LiveShareCoordinator.shared.sessionID` ; participant :
+  /// `SessionLink.sessionID`), `nil` sinon (partie solo).
   static func refresh(
     definition: GameDefinition, rules: any GameRules, state: MatchState,
     isAuthoritative: Bool = false, sessionID: UUID? = nil
