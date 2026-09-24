@@ -19,6 +19,8 @@ drop policy if exists "anon can update own cacompte_live_activity_tokens"
     on public.cacompte_live_activity_tokens;
 drop policy if exists "anon can delete own cacompte_live_activity_tokens"
     on public.cacompte_live_activity_tokens;
+-- Policy de test restée en production (créée à la main, absente des migrations).
+drop policy if exists "insert_test" on public.cacompte_live_activity_tokens;
 
 -- Rotation de jeton (`Activity.pushTokenUpdates`) : remplace l'ancien plutôt que d'en accumuler.
 -- `updated_at` rafraîchi aussi, pour que `cacompte-live-activity-sweep` ne clôture pas une
