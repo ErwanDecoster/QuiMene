@@ -21,14 +21,14 @@ propre passage — tests UI, localisation).
 |---|---|---|
 | Concurrence Swift 6 | « Aucune exception, aucun `@unchecked Sendable`, aucun `@preconcurrency import` » ([10](10-tests-et-qualite.md)) | 2× `@unchecked Sendable` (`SupabaseTransport.swift`), 1× `@preconcurrency import AVFoundation` (`QRScannerView.swift`) |
 | Outillage swift-format | « swift-format avec la configuration par défaut d'Apple, appliqué à la validation » ([10](10-tests-et-qualite.md)) | Aucun fichier `.swift-format`, aucun script, aucune étape CI qui l'exécute — seul `Scripts/check-spec-sync.sh` tourne réellement. **Corrigé, voir ci-dessous.** |
-| Tests — pyramide | « ~80 % de l'effort sur Domain/Catalog/Stats », XCUITest sur 3 parcours critiques ([10](10-tests-et-qualite.md)) | `CaCompteKit/Tests` : 1521 lignes / 13 fichiers (Domain/Catalog/Store/Sync/DesignSystem) — cohérent avec la doctrine. `App/Features` (5408 lignes, ~46 % du code, dont `LiveMatchModel`/`MatchSetupModel`/`PlayerEditorModel`) : **0 test**. Cible `CaCompteUITests` : **absente du `.xcodeproj`**, pas même vide |
+| Tests — pyramide | « ~80 % de l'effort sur Domain/Catalog/Stats », XCUITest sur 3 parcours critiques ([10](10-tests-et-qualite.md)) | `QuiMeneKit/Tests` : 1521 lignes / 13 fichiers (Domain/Catalog/Store/Sync/DesignSystem) — cohérent avec la doctrine. `App/Features` (5408 lignes, ~46 % du code, dont `LiveMatchModel`/`MatchSetupModel`/`PlayerEditorModel`) : **0 test**. Cible `QuiMeneUITests` : **absente du `.xcodeproj`**, pas même vide |
 | Logging | (non spécifié explicitement, mais `print()` incompatible avec un produit livré) | 10 `print(...)` dans `Sync/LiveActivityPushClient.swift` et `App/MatchLiveActivityController.swift`, dont un littéral `"BUILD-MARKER-MINIMAL-FIX"` — résidu de debug |
-| Gestion d'erreur | `try!` toléré seulement s'il est un fail-fast volontaire et documenté | 3 `try!` justifiés par commentaire (`GameCatalog+Embedded.swift`) ; 5 non justifiés, côté app (`CaCompteApp.swift:149`, `HistoryDetailView.swift`, `LiveMatchView.swift`, `YamsSheetView.swift`, `BeloteRoundView.swift`) |
+| Gestion d'erreur | `try!` toléré seulement s'il est un fail-fast volontaire et documenté | 3 `try!` justifiés par commentaire (`GameCatalog+Embedded.swift`) ; 5 non justifiés, côté app (`QuiMeneApp.swift:149`, `HistoryDetailView.swift`, `LiveMatchView.swift`, `YamsSheetView.swift`, `BeloteRoundView.swift`) |
 | Documentation | Le README est la porte d'entrée du projet | Non modifié depuis le premier commit substantiel (`3d0d899`, 2026-07-30) alors que 38 commits l'ont suivi, dont le remplacement complet du transport Wi-Fi/BLE par Supabase Realtime — jamais répercuté |
 | Localisation | « Toutes les chaînes sont dans le catalogue, français et anglais » — définition de « terminé » ([10](10-tests-et-qualite.md)) | Aucun `.xcstrings` n'existait ; 68 `Text("...")` en français codé en dur dans `App/Features` (sous-estimé — 184 chaînes au total sur tout le projet), 10 usages de `String(localized:)`/`LocalizedStringResource`. **Corrigé, voir ci-dessous.** |
 | Périmètre de `Domain` | « `Domain` n'importe que `Foundation` » ([02](02-architecture.md), ADR-0002) | `Domain/LiveActivity/MatchActivityAttributes.swift` importe aussi `ActivityKit` — écart mineur, vraisemblablement nécessaire (le protocole `ActivityAttributes` doit être visible du widget), jamais documenté comme exception |
 | Secrets | `.gitignore` exclut `*.p8`, `.env.local` | Vérifié : **jamais commités** (`git log --all -- '*.p8' '.env.local'` vide). Bonne hygiène, rien à corriger |
-| Build | `SWIFT_TREAT_WARNINGS_AS_ERRORS = YES` sur toutes les configs | Vérifié : `swift build` et `xcodebuild` (scheme `CaCompte`) passent à 0 avertissement |
+| Build | `SWIFT_TREAT_WARNINGS_AS_ERRORS = YES` sur toutes les configs | Vérifié : `swift build` et `xcodebuild` (scheme `QuiMene`) passent à 0 avertissement |
 
 ## Corrigé dans cet audit
 
@@ -47,7 +47,7 @@ propre passage — tests UI, localisation).
   relâchement. Documenté formellement dans [10](10-tests-et-qualite.md) comme unique exception
   restante, plutôt que silencieusement en contradiction avec la règle qu'il enfreint.
 - ✅ **`print()` → `os.Logger`** — `LiveActivityPushClient.swift` et
-  `MatchLiveActivityController.swift`, un logger par fichier (`subsystem: "com.cacompte.app"`),
+  `MatchLiveActivityController.swift`, un logger par fichier (`subsystem: "com.quimene.app"`),
   niveaux `.debug`/`.info`/`.error` selon le cas. Le littéral de debug
   `"BUILD-MARKER-MINIMAL-FIX"` a été retiré ; le jeton de push APNs n'est plus loggé en clair
   (amélioration incidente).
@@ -64,7 +64,7 @@ propre passage — tests UI, localisation).
   cas (p1 = 50 en manche 0, p2 = 50 en manche 1 — `tieBreakTrace.bestSingleRound` le documente
   déjà comme `"tie"` côté classement), donc c'est le golden qui était en retard sur le
   comportement, pas le code. Corrigé : `bestRoundScore` retiré de `expected.insights` dans
-  `spec/golden/skyjo-02-egalite-finale.json` (et sa copie `CaCompteKit/Tests/CatalogTests/GoldenResources/`),
+  `spec/golden/skyjo-02-egalite-finale.json` (et sa copie `QuiMeneKit/Tests/CatalogTests/GoldenResources/`),
   avec une phrase ajoutée à `description` pour que ça ne soit pas repris par erreur. Les 195
   tests du package passent de nouveau.
 - ✅ **Les 6 `try!` non justifiés côté app** (le constat initial en recensait 5 par fichier, mais
@@ -85,11 +85,11 @@ propre passage — tests UI, localisation).
     silencieux, avec renvoi explicite à la garantie apportée par `MatchPlayView`.
   - `YamsSheetModel.swift:74` — `try!` conservé et documenté : encode un `YamsCategoryDetail`
     (une seule propriété `String`), `JSONEncoder` ne peut pas échouer dessus en pratique.
-  - `CaCompteApp.swift:149` — troisième palier ajouté : CloudKit (`try?`) → local sur disque
+  - `QuiMeneApp.swift:149` — troisième palier ajouté : CloudKit (`try?`) → local sur disque
     (`try?`, nouveau) → mémoire (`try!`, désormais justifié — un store frais sans migration ne
     peut pas échouer). Un store disque corrompu n'empêche plus l'app de s'ouvrir.
 
-  Vérifié par `xcodebuild` (scheme `CaCompte`, avertissements en erreurs) et les 195 tests du
+  Vérifié par `xcodebuild` (scheme `QuiMene`, avertissements en erreurs) et les 195 tests du
   package, tous verts après ces changements.
 - ✅ **Phase B — Outillage swift-format**, appliqué à la lettre (config par défaut d'Apple, pas
   une config adaptée au style existant — choix explicite : reformater plutôt que dévier de ce
@@ -101,10 +101,10 @@ propre passage — tests UI, localisation).
   commentaires de fin de ligne trop longs déplacés au-dessus). `Scripts/lint.sh` (même style que
   `check-spec-sync.sh`) et branché dans `ci_scripts/ci_post_clone.sh`, juste après le
   spec-sync — Xcode Cloud échoue maintenant sur un fichier mal formaté, pas seulement une
-  relecture humaine. Revérifié : `swift build`, `xcodebuild` (scheme `CaCompte`) et les 195 tests
+  relecture humaine. Revérifié : `swift build`, `xcodebuild` (scheme `QuiMene`) et les 195 tests
   du package tous verts après le reformatage.
 
-Vérification : `swift build` (package) et `xcodebuild` (scheme `CaCompte`, avertissements en
+Vérification : `swift build` (package) et `xcodebuild` (scheme `QuiMene`, avertissements en
 erreurs) passent tous les deux à 0 avertissement après ces changements. Aucun test n'exerce
 `SupabaseTransport` directement aujourd'hui (`SyncTests` teste `LiveSession` via
 `InMemoryTransport`) : la vérification du fix de concurrence repose sur la compilation stricte,
@@ -124,11 +124,11 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
 
   Ajout de la cible `.xcstrings` au projet Xcode : édité `project.pbxproj` à la main (4 sections —
   `PBXBuildFile`, `PBXFileReference`, le groupe `Resources`, la phase `PBXResourcesBuildPhase` du
-  target `CaCompte` — plus `en` ajouté à `knownRegions`), en suivant exactement le schéma déjà
-  utilisé par `Assets.xcassets`. Contrairement à la cible `CaCompteUITests` de la Phase C (un
+  target `QuiMene` — plus `en` ajouté à `knownRegions`), en suivant exactement le schéma déjà
+  utilisé par `Assets.xcassets`. Contrairement à la cible `QuiMeneUITests` de la Phase C (un
   nouveau *target* entier — configs de build, scheme, host application), ajouter un *fichier* à un
   target existant est une opération à 4 insertions bien isolées, vérifiable immédiatement par
-  build. Vérifié : `xcodebuild` (scheme `CaCompte`) réussit, `xcstringstool` compile le catalogue
+  build. Vérifié : `xcodebuild` (scheme `QuiMene`) réussit, `xcstringstool` compile le catalogue
   en `en.lproj/Localizable.strings` et `fr.lproj/Localizable.strings` dans le bundle avec les
   bonnes valeurs (inspecté avec `plutil -p`) ; le fichier source `.xcstrings` reste à 8 clés après
   un build CLI classique — `xcodebuild build` ne le réécrit pas automatiquement avec les chaînes
@@ -142,7 +142,7 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
   calculée automatiquement pour les chaînes interpolées — exactement le calcul que j'aurais dû
   reproduire à la main (et risqué de mal faire) pour des chaînes comme
   `"\(entry.played) partie(s) · \(entry.wins) victoire(s)"`. Reproductible : `xcodebuild
-  -exportLocalizations -project App/CaCompte.xcodeproj -localizationPath <dir> -exportLanguage fr`.
+  -exportLocalizations -project App/QuiMene.xcodeproj -localizationPath <dir> -exportLanguage fr`.
 
   Les 176 clés ont ensuite été traduites en anglais (contexte de chaque chaîne ambiguë vérifié par
   `grep` sur le site d'appel avant traduction, pas deviné), appliquées par script plutôt qu'à la
@@ -152,7 +152,7 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
   coller au style français existant (« partie(s) », « victoire(s) ») plutôt qu'au pluriel anglais
   standard : « match(es) », « win(s) », « round(s) », « player(s) ».
 
-  Vérifié : `xcodebuild` (scheme `CaCompte`) réussit, `en.lproj`/`fr.lproj` compilés contiennent
+  Vérifié : `xcodebuild` (scheme `QuiMene`) réussit, `en.lproj`/`fr.lproj` compilés contiennent
   les 184/179 entrées attendues avec les bonnes valeurs (`plutil -p`, échantillon vérifié), le
   fichier source n'a pas été ré-étendu par le rebuild qui a suivi, aucun autre fichier du projet
   touché par l'export (`git status` — un seul fichier modifié), et les 195 tests du package
@@ -162,9 +162,9 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
 
 ### Phase C — 🔶 Combler le trou de tests côté App, partiellement fait
 
-- ✅ **Cible `CaCompteUITests`** créée (absente du `.xcodeproj` au départ). Édition manuelle de
+- ✅ **Cible `QuiMeneUITests`** créée (absente du `.xcodeproj` au départ). Édition manuelle de
   `project.pbxproj` — plus lourde que celle de la Phase G : un *target* entier (`PBXNativeTarget`,
-  `PBXContainerItemProxy`/`PBXTargetDependency` vers `CaCompte`, `XCBuildConfiguration` Debug/
+  `PBXContainerItemProxy`/`PBXTargetDependency` vers `QuiMene`, `XCBuildConfiguration` Debug/
   Release avec `TEST_TARGET_NAME`, `TargetAttributes.TestTargetID`, entrée dans le `.xcscheme`
   partagé) plutôt qu'un fichier ajouté à un target existant. Validée par étapes : `plutil -lint`
   et `xmllint --noout` sur les fichiers édités, `xcodebuild -list` confirmant les 3 targets,
@@ -172,7 +172,7 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
 - ✅ **Parcours n°1 (créer un joueur)** et **n°3 (reprise après relance)** — le plus important
   des trois, scénario « soirée perdue » de la [vision produit](01-vision-produit.md) — écrits et
   stables sur deux exécutions consécutives de la suite complète.
-- ✅ **Magasin de test isolé** (`CaCompteApp.isUITesting`) — nécessaire dès l'écriture du premier
+- ✅ **Magasin de test isolé** (`QuiMeneApp.isUITesting`) — nécessaire dès l'écriture du premier
   parcours : sans lui, les joueurs créés par un test s'accumulaient d'une exécution à l'autre
   jusqu'à sortir de l'écran visible. `-uitesting-reset` (magasin sur disque dédié, effacé avant
   ouverture) pour le premier lancement d'un test, `-uitesting` (même fichier, non effacé) pour
@@ -194,34 +194,34 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
   sur simulateur et appareil réel, voir README). `testSkyjoMatchReachesResults` passe la mise en
   place puis `throw XCTSkip(...)` avec ce diagnostic complet en commentaire — à reprendre avec
   l'enregistreur de tests d'Xcode (accès UI direct, hors de portée en CLI).
-- ✅ **Cible `CaCompteTests`** créée (aucune cible de tests unitaires hébergée n'existait —
-  `CaCompteUITests` est de l'UI-automation, pas un hôte `@testable import`). Même méthode que
-  `CaCompteUITests` ci-dessus (édition manuelle de `project.pbxproj` : `PBXNativeTarget`,
+- ✅ **Cible `QuiMeneTests`** créée (aucune cible de tests unitaires hébergée n'existait —
+  `QuiMeneUITests` est de l'UI-automation, pas un hôte `@testable import`). Même méthode que
+  `QuiMeneUITests` ci-dessus (édition manuelle de `project.pbxproj` : `PBXNativeTarget`,
   `PBXContainerItemProxy`/`PBXTargetDependency`, `XCBuildConfiguration` Debug/Release, entrée
   `.xcscheme`), avec en plus `TEST_HOST`/`BUNDLE_LOADER` (cible hébergée, pour `@testable import
-  CaCompte`) et ses propres `packageProductDependencies` (Domain/Catalog/Store/DesignSystem —
-  liés séparément de la cible `CaCompte`, un module ne rend pas ses propres dépendances
+  QuiMene`) et ses propres `packageProductDependencies` (Domain/Catalog/Store/DesignSystem —
+  liés séparément de la cible `QuiMene`, un module ne rend pas ses propres dépendances
   visibles à un module qui l'importe en `@testable`). Validée par étapes : `plutil -lint`/
   `xmllint --noout`, `xcodebuild -list` confirmant les 4 cibles, avant tout test réel.
-- ✅ **`LiveMatchModel`/`MatchSetupModel`/`PlayerEditorModel`, 12 tests** (`App/CaCompteTests/`) :
+- ✅ **`LiveMatchModel`/`MatchSetupModel`/`PlayerEditorModel`, 12 tests** (`App/QuiMeneTests/`) :
   `commitRound`/`undoLastRound`/rejet d'une validation invalide/transition à `.ended` pour
   `LiveMatchModel` ; bornes d'effectif, plafond de `toggle()`, complétude des équipes, `start()`
   pour `MatchSetupModel` ; validation du pseudo, régénération d'avatar jusqu'au premier choix
   manuel, `save()`/`archive()`/`delete()` pour `PlayerEditorModel`. Même patron `ModelContainer`
-  en mémoire que `CaCompteKit/Tests/StoreTests`.
+  en mémoire que `QuiMeneKit/Tests/StoreTests`.
 - ✅ **Deux bugs de test réels trouvés et corrigés en écrivant cette cible**, tous deux propres à
-  l'hébergement dans le vrai process `CaCompte.app` (`TEST_HOST`) — invisibles dans
-  `CaCompteKit/Tests`, qui tourne dans un exécutable non entitlé :
-  - `CaCompteApp.loadContainer` tentait un vrai container CloudKit au lancement, indisponible en
+  l'hébergement dans le vrai process `QuiMene.app` (`TEST_HOST`) — invisibles dans
+  `QuiMeneKit/Tests`, qui tourne dans un exécutable non entitlé :
+  - `QuiMeneApp.loadContainer` tentait un vrai container CloudKit au lancement, indisponible en
     simulateur sans compte iCloud — plantait en cascade et détruisait des `ModelContainer` de
     test sans rapport (état SwiftData partagé au niveau du process). Corrigé par
-    `CaCompteApp.isUnitTestHost` (détecte `XCTestConfigurationFilePath`, posé par XCTest sur
+    `QuiMeneApp.isUnitTestHost` (détecte `XCTestConfigurationFilePath`, posé par XCTest sur
     tout process hôte d'un bundle injecté) qui bascule sur un container local en mémoire.
   - Même symptôme persistant après ce premier correctif : `ModelConfiguration(isStoredInMemoryOnly:
     true)` sans `cloudKitDatabase` explicite retombe sur `.automatic`, qui tente quand même
     CloudKit dans un process qui porte l'entitlement iCloud réel — absent d'un exécutable non
     hébergé comme `StoreTests`, où `.automatic` ne tente jamais rien. Corrigé par
-    `cloudKitDatabase: .none` explicite, à la fois dans `CaCompteApp` et dans les trois fichiers
+    `cloudKitDatabase: .none` explicite, à la fois dans `QuiMeneApp` et dans les trois fichiers
     de test.
   - Un troisième symptôme, sans rapport avec CloudKit celui-là (`SwiftData/BackingData.swift:835:
     Fatal error: This model instance was destroyed by calling ModelContext.reset`), venait d'un
@@ -230,12 +230,12 @@ pas sur une exécution — limite à garder en tête, voir Phase C.
     fonction, invalidant le contexte pour le corps du test qui suit. Corrigé en renvoyant (et en
     gardant vivant via `withExtendedLifetime`) le conteneur, même convention que `StoreTests` où
     il reste une variable du corps du test.
-- Reste à faire : câbler les tests `CaCompteKit` dans le schéma `CaCompte` (action manuelle Xcode
+- Reste à faire : câbler les tests `QuiMeneKit` dans le schéma `QuiMene` (action manuelle Xcode
   déjà listée au README — 30 secondes en UI, non fiabilisable en pbxproj à la main, contrairement
   à la création des deux cibles ci-dessus qui l'a été).
 
-Vérification : `xcodebuild test` (scheme `CaCompte`) réussit — 12/12 sur `CaCompteTests`, 3 tests
-(1 skip attendu, parcours n°2 ci-dessus) sur `CaCompteUITests` — et `Scripts/lint.sh` reste vert.
+Vérification : `xcodebuild test` (scheme `QuiMene`) réussit — 12/12 sur `QuiMeneTests`, 3 tests
+(1 skip attendu, parcours n°2 ci-dessus) sur `QuiMeneUITests` — et `Scripts/lint.sh` reste vert.
 
 **Fini quand** : `apple/App/Features` a une couverture de tests non nulle sur ses 3 flux `@Observable`,
 et les 3 parcours XCUITest passent en CI (2 sur 3 le font désormais).
@@ -276,12 +276,12 @@ selon les parts de marché habituelles des 4 marchés européens les plus import
 - ✅ **Contenu des 18 jeux** — clés `es`/`de`/`it` ajoutées aux 82 objets `LocalizedText` de
   `spec/games/*.json`, par substitution texte ciblée (pas de reparse + `json.dump`, qui aurait
   détruit le formatage aligné à la main — colonnes des catégories Yams notamment). Copies
-  synchronisées vers `CaCompteKit/Sources/Catalog/GameDefinitions/`, vérifiées par
+  synchronisées vers `QuiMeneKit/Sources/Catalog/GameDefinitions/`, vérifiées par
   `Scripts/check-spec-sync.sh`.
 - ✅ **`Localizable.xcstrings`** — les 179 chaînes traduisibles (sur 186 clés, 7 étant des
   symboles système) étendues à es/de/it, plus 2 nouvelles clés pour le raccourci de langue.
 - ✅ **`knownRegions`** — `(fr, en, Base)` → `(fr, en, es, de, it, Base)`, condition pour qu'iOS
-  propose ces langues dans son sélecteur par app (Réglages > Ça Compte > Langue).
+  propose ces langues dans son sélecteur par app (Réglages > Qui Mène ? > Langue).
 - ✅ **Raccourci de langue** (`SettingsView.swift`) — iOS ne permet pas à une app tierce de
   changer sa propre langue en direct : seul levier, le sélecteur système par app. Une section
   « Langue » ouvre directement cette page (`UIApplication.openSettingsURLString`) plutôt que de
@@ -302,9 +302,9 @@ selon les parts de marché habituelles des 4 marchés européens les plus import
   AX5), simplement plus visible avec une traduction italienne plus longue — illustre la valeur
   d'une vérification visuelle réelle par-dessus les tests d'existence automatisés.
 
-Vérification finale : `xcodebuild test` (scheme `CaCompteKit-Package`, simulateur iOS — 34 tests
+Vérification finale : `xcodebuild test` (scheme `QuiMeneKit-Package`, simulateur iOS — 34 tests
 dans 5 suites, y compris `ContrastTests` qui nécessite `UIKit`) au vert ; `xcodebuild` (scheme
-`CaCompte`) réussit ; `xcodebuild test` (même scheme, `CaCompteUITests`) 3 tests dont 1 skip
+`QuiMene`) réussit ; `xcodebuild test` (même scheme, `QuiMeneUITests`) 3 tests dont 1 skip
 attendu (parcours n°2, voir Phase C) ; `Scripts/lint.sh` et `Scripts/check-spec-sync.sh` au vert.
 
 ### Écart mineur — `ActivityKit` dans `Domain` — ✅ documenté
@@ -332,7 +332,7 @@ de couleur joueur, malgré la prescription explicite de [07](07-design-system.md
     remplacée par `.linear(duration: Motion.fast.seconds)` quand `accessibilityReduceMotion` est
     actif. Appliqué aux 8 sites d'animation existants (`ScoreBoardView`, `SharedMatchView`,
     `LiveMatchView`, `PrimaryButtonStyle`) — `grep -rn "\.animation(\.default" App
-    CaCompteKit/Sources` ne trouve plus rien hors de ce helper.
+    QuiMeneKit/Sources` ne trouve plus rien hors de ce helper.
   - `AccessibleScoreRow.swift` (`DesignSystem/Components`) — `accessibleScoreRow(name:rank:score:
     delta:)`, un seul arrêt VoiceOver par ligne de tableau de scores (« Alice, deuxième, 44
     points ») plutôt que plusieurs `Text` séparés. Appliqué à 7 écrans : `ScoreBoardView`,
@@ -384,11 +384,11 @@ de couleur joueur, malgré la prescription explicite de [07](07-design-system.md
 **Résultat chiffré** : 20 fichiers sur 42 dans `apple/App/Features` touchent maintenant
 l'accessibilité (2 au départ), contre un dénominateur qui a grandi de 4 (les écrans Tarot/Wizard).
 
-Vérification : `xcodebuild test` (scheme `CaCompteKit-Package`) — 52 tests dans 5 suites, y
-compris les 20 nouveaux cas `ContrastTests` haut-contraste ; `xcodebuild test` (scheme `CaCompte`,
-`CaCompteTests`) — 12/12 ; `xcodebuild` (scheme `CaCompte`) réussit à 0 avertissement ;
+Vérification : `xcodebuild test` (scheme `QuiMeneKit-Package`) — 52 tests dans 5 suites, y
+compris les 20 nouveaux cas `ContrastTests` haut-contraste ; `xcodebuild test` (scheme `QuiMene`,
+`QuiMeneTests`) — 12/12 ; `xcodebuild` (scheme `QuiMene`) réussit à 0 avertissement ;
 `Scripts/lint.sh` et `Scripts/check-spec-sync.sh` verts ; `grep -rn "\.animation(\.default" App
-CaCompteKit/Sources` ne trouve plus rien hors `accessibleAnimation`.
+QuiMeneKit/Sources` ne trouve plus rien hors `accessibleAnimation`.
 
 **Traversée manuelle sur appareil réel** — VoiceOver (créer une partie, saisir plusieurs manches,
 consulter les résultats, sans regarder l'écran) sur les 8 zones et sur le parcours Tarot/Wizard,
@@ -409,8 +409,8 @@ physique les autres finitions P9 restées jusque-là au stade « build + simulat
   usage (classement figé jusqu'au retour de l'app en arrière-plan, contrairement à la Live
   Activity qui suit chaque manche en direct — les deux affichaient la même information, l'une
   en retard sur l'autre). Supprimé plutôt que laissé en l'état : `MatchWidget.swift` retiré du
-  projet (fichier + 4 entrées `project.pbxproj`), `CaCompteWidgetBundle` ne déclare plus que
-  `MatchLiveActivityWidget`, `WidgetCenter.shared.reloadAllTimelines()` retiré de `CaCompteApp`
+  projet (fichier + 4 entrées `project.pbxproj`), `QuiMeneWidgetBundle` ne déclare plus que
+  `MatchLiveActivityWidget`, `WidgetCenter.shared.reloadAllTimelines()` retiré de `QuiMeneApp`
   (n'avait plus de destinataire). `SharedStore`/le conteneur App Group ne sont **pas** retirés
   malgré n'être plus lus par rien après ce changement — y toucher changerait l'emplacement du
   store SwiftData des installations existantes, ce qui ferait apparaître les parties et joueurs
@@ -421,10 +421,10 @@ physique les autres finitions P9 restées jusque-là au stade « build + simulat
 - ⏳ **Siri (`StartMatchIntent`) — ne parvient pas à lancer une partie, mis en pause sans être
   résolu.** Constaté sur appareil réel, en trois temps :
   1. Premier symptôme : l'app ne s'ouvrait pas du tout — signe que `perform()` n'était jamais
-     appelé (le code en aval, identique au chemin déjà éprouvé des liens `cacompte://`/Handoff,
+     appelé (le code en aval, identique au chemin déjà éprouvé des liens `quimene://`/Handoff,
      n'était donc pas en cause).
-  2. Deuxième essai, symptôme différent : « lance une partie de Skyjo sur CaCompte » déclenchait
-     un intent **musique** du système au lieu de l'app. Diagnostiqué : `CaCompteShortcuts` ne
+  2. Deuxième essai, symptôme différent : « lance une partie de Skyjo sur QuiMene » déclenchait
+     un intent **musique** du système au lieu de l'app. Diagnostiqué : `QuiMeneShortcuts` ne
      déclarait qu'**une seule** formulation par intent (« Commence…dans… ») — Siri ne fait pas de
      correspondance sémantique libre sur les App Shortcuts, un verbe (« lance ») ou une
      préposition (« sur ») absents des phrases déclarées laissent le champ libre à un intent
@@ -432,7 +432,7 @@ physique les autres finitions P9 restées jusque-là au stade « build + simulat
      probables : 4 phrases pour `StartMatchIntent` (commence/lance/démarre, dans/sur), 3 pour
      `ResumeMatchIntent` (reprends ×2/continue).
   3. Après réinstallation, troisième symptôme : « Siri ne prend pas en charge cette
-     fonctionnalité sur Ça Compte », reproductible seulement de façon intermittente (~1 essai sur
+     fonctionnalité sur Qui Mène ? », reproductible seulement de façon intermittente (~1 essai sur
      10). La capacité **Siri** (`com.apple.developer.siri`), absente des entitlements, a été
      ajoutée — signature vérifiée sur appareil réel avec le compte payant de l'utilisateur
      (`xcodebuild build`, provisioning automatique, aucune erreur). N'a pas résolu le problème.
@@ -444,8 +444,8 @@ physique les autres finitions P9 restées jusque-là au stade « build + simulat
   continuer à corriger à l'aveugle sans nouvelle piste : les trois correctifs restent en place
   (ils ne peuvent pas nuire), mais Siri lui-même n'est pas considéré fonctionnel.
 
-Vérification : `xcodebuild` (scheme `CaCompte`) réussit à 0 avertissement après le retrait du
-widget et l'ajout de la capacité Siri ; `grep -rn "MatchWidget" apple/App apple/CaCompteKit` ne trouve plus
+Vérification : `xcodebuild` (scheme `QuiMene`) réussit à 0 avertissement après le retrait du
+widget et l'ajout de la capacité Siri ; `grep -rn "MatchWidget" apple/App apple/QuiMeneKit` ne trouve plus
 rien hors de ce journal.
 
 ## Recommandation de pratique — README factuel plutôt que journal

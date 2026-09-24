@@ -1,0 +1,390 @@
+import Foundation
+import Supabase
+
+/// Doc utilisateur P9 — remplace `WifiTransport`/`BLETransport` (voir historique Git : cinq
+/// correctifs BLE distincts, tous réels et vérifiés, sans que la connexion ne s'établisse jamais
+/// entre deux appareils physiques). La fiabilité de connexion/reconnexion est déléguée à un SDK
+/// websocket mature (Supabase Realtime) plutôt qu'à du code réseau/Bluetooth maison.
+///
+/// **Un canal Realtime par session de partage** (`session:<sessionID>`, doc 09 « Fin de partie »
+/// — indépendant de la partie courante, pour qu'un changement de partie n'oblige jamais à rouvrir
+/// le canal), où l'hôte et chaque pair rejoignent le même canal :
+/// - **Presence** identifie qui est là — l'hôte s'annonce toujours sous la clé constante `"host"`
+///   (pas besoin qu'un pair la connaisse à l'avance), chaque pair sous son propre `deviceID`.
+///   Une déconnexion (y compris abrupte : app tuée, réseau perdu) déclenche un événement de
+///   présence côté serveur — remplace toute la détection de déconnexion BLE/Wi-Fi qui a posé tant
+///   de problèmes cette session.
+/// - **Broadcast** transporte chaque message avec un en-tête `from`/`to` (identifiants ci-dessus)
+///   en plus du contenu déjà chiffré (`WireCodec`, inchangé) — `SupabaseTransportSession` filtre
+///   simplement ce flux partagé par ces champs pour se comporter comme une session point-à-point
+///   ordinaire du point de vue de `LiveSession`, qui ne voit aucune différence.
+/// - Pas de fragmentation nécessaire (contrairement au BLE, contraint par la taille d'écriture
+///   d'une caractéristique) : un message tient dans un seul frame JSON.
+///
+/// **Découverte** : `quimene_open_games` (Postgres, migration `supabase/migrations`) résout un code
+/// d'appairage tapé à la main vers le `sessionID` correspondant (et, pour l'affichage seulement,
+/// la partie en cours — `matchID`/`gameID`) — remplace le scan Wi-Fi/BLE, qui n'a jamais eu besoin
+/// d'exister avec Supabase (le code suffit, pas de proximité physique).
+@MainActor
+public final class SupabaseTransport {
+  private let client: SupabaseClient
+  private let deviceID: String
+  private let deviceName: String
+  private let platform: WireMessage.Platform
+
+  // MARK: Hôte
+  private var hostChannel: RealtimeChannelV2?
+  private var hostSessionID: UUID?
+  private var sessionsByPeerID: [String: SupabaseTransportSession] = [:]
+  private let acceptedStream: AsyncStream<any TransportSession>
+  private let acceptedContinuation: AsyncStream<any TransportSession>.Continuation
+  private var hostTasks: [Task<Void, Never>] = []
+  private var hostStatusSubscription: RealtimeSubscription?
+
+  // MARK: Pair
+  private var joinedChannel: RealtimeChannelV2?
+  private var joinedTasks: [Task<Void, Never>] = []
+  private var joinedStatusSubscription: RealtimeSubscription?
+
+  /// Doc utilisateur — clé constante côté hôte, jamais le `deviceID` réel : un pair n'a besoin de
+  /// connaître que ce sentinel, pas un identifiant d'appareil qu'il n'a aucun moyen d'obtenir à
+  /// l'avance (contrairement au `deviceID` d'un pair, qui figure dans son propre `hello`).
+  nonisolated private static let hostPresenceKey = "host"
+
+  public init(deviceID: String, deviceName: String, platform: WireMessage.Platform = .apple) {
+    self.deviceID = deviceID
+    self.deviceName = deviceName
+    self.platform = platform
+    client = SupabaseClient(
+      supabaseURL: SupabaseSyncConfig.projectURL, supabaseKey: SupabaseSyncConfig.anonKey)
+    (acceptedStream, acceptedContinuation) = AsyncStream.makeStream()
+  }
+
+  // MARK: - Hôte
+
+  /// `sessionID` identifie la **session de partage** (doc 09 « Fin de partie ») — adresse le
+  /// canal Realtime et la ligne `quimene_open_games`, stable pour toute la durée de la session.
+  /// `matchID`/`gameID`/`participantCount` décrivent la partie *courante* : à chaque changement
+  /// de partie au sein de la même session, `updateActiveMatch` les met à jour sans jamais
+  /// rappeler `advertise` (qui ouvrirait un nouveau canal et casserait les pairs déjà connectés).
+  public func advertise(
+    sessionID: UUID, matchID: UUID, gameID: String, participantCount: Int, pairingCode: String
+  ) async throws {
+    hostSessionID = sessionID
+    // Doc utilisateur — la table n'est plus accessible directement (migration
+    // `secure_cacompte_open_games`) ; la fonction refuse un code déjà pris par une autre session.
+    try await client.rpc(
+      "quimene_advertise_game",
+      params: AdvertiseParams(
+        pairingCode: pairingCode, sessionID: sessionID, matchID: matchID, gameID: gameID,
+        participantCount: participantCount, deviceName: deviceName, platform: platform.rawValue)
+    ).execute()
+
+    let channel = client.channel("session:\(sessionID.uuidString)") { config in
+      config.presence.key = Self.hostPresenceKey
+    }
+    hostChannel = channel
+
+    // Doc : callbacks enregistrés avant `subscribeWithError()`, comme l'exige le SDK.
+    let presenceTask = Task { [weak self] in
+      for await action in channel.presenceChange() {
+        self?.handleHostPresence(action, channel: channel)
+      }
+    }
+    let broadcastTask = Task { [weak self] in
+      for await payload in channel.broadcastStream(event: "msg") {
+        self?.handleHostBroadcast(payload)
+      }
+    }
+    hostTasks = [presenceTask, broadcastTask]
+
+    // Doc utilisateur P9 — remontée : après une mise en arrière-plan assez longue pour que
+    // l'OS suspende le processus, le socket se ferme ; au retour au premier plan, le SDK le
+    // rouvre et réabonne le canal tout seul (`RealtimeLifecycleManager`), mais ne retrace
+    // jamais la présence pour nous — `track()` est un envoi ponctuel, jamais rejoué
+    // automatiquement lors d'un ré-abonnement. Sans ce ré-enregistrement à chaque passage à
+    // `.subscribed` (le premier compris), l'hôte disparaîtrait silencieusement de la présence
+    // pour les pairs déjà connectés après une reconnexion sous-jacente, même si rien d'autre
+    // n'a changé de son côté.
+    let deviceName = deviceName
+    hostStatusSubscription = channel.onStatusChange { status in
+      guard status == .subscribed else { return }
+      Task { try? await channel.track(["deviceName": deviceName]) }
+    }
+
+    try await channel.subscribeWithError()
+    try await channel.track(["deviceName": deviceName])
+  }
+
+  /// Doc 09 « Fin de partie » — appelé à chaque fois que l'hôte enchaîne une nouvelle partie
+  /// (même jeu rejoué ou jeu différent) au sein de la même session : met à jour la ligne
+  /// existante plutôt que d'en créer une nouvelle, purement pour que quiconque lit
+  /// `quimene_open_games` directement voie une partie courante à jour. Ne touche ni au canal
+  /// Realtime ni aux pairs déjà connectés — c'est `LiveSession.switchMatch` qui les prévient.
+  public func updateActiveMatch(matchID: UUID, gameID: String, participantCount: Int) async throws {
+    guard let hostSessionID else { return }
+    try await client.rpc(
+      "quimene_update_open_game",
+      params: ActiveMatchUpdate(
+        sessionID: hostSessionID, matchID: matchID, gameID: gameID,
+        participantCount: participantCount)
+    ).execute()
+  }
+
+  public func stopAdvertising() async {
+    hostStatusSubscription?.cancel()
+    hostStatusSubscription = nil
+    for task in hostTasks { task.cancel() }
+    hostTasks = []
+    for session in sessionsByPeerID.values { session.markClosed() }
+    sessionsByPeerID = [:]
+    if let channel = hostChannel {
+      await channel.untrack()
+      await channel.unsubscribe()
+    }
+    hostChannel = nil
+    if let hostSessionID {
+      _ = try? await client.rpc(
+        "quimene_close_open_game", params: ["p_session_id": hostSessionID.uuidString]
+      ).execute()
+    }
+    hostSessionID = nil
+  }
+
+  public func acceptIncoming() -> AsyncStream<any TransportSession> {
+    acceptedStream
+  }
+
+  private func handleHostPresence(_ action: any PresenceAction, channel: RealtimeChannelV2) {
+    for peerID in action.joins.keys where peerID != Self.hostPresenceKey {
+      _ = session(forPeer: peerID, channel: channel)
+    }
+    for peerID in action.leaves.keys {
+      sessionsByPeerID[peerID]?.markClosed()
+      sessionsByPeerID[peerID] = nil
+    }
+  }
+
+  private func handleHostBroadcast(_ payload: JSONObject) {
+    guard let envelope = Self.decodeEnvelope(payload),
+      envelope.to == deviceID || envelope.to == Self.hostPresenceKey
+    else { return }
+    guard let channel = hostChannel else { return }
+    session(forPeer: envelope.from, channel: channel).receive(base64: envelope.data)
+  }
+
+  /// Doc utilisateur — remontée : le « hello » d'un pair (broadcast) et son entrée de présence
+  /// (« il vient de rejoindre ») arrivent sur le même socket, dans le bon ordre, mais sont
+  /// consommés par deux tâches Swift indépendantes (une par `AsyncStream`, présence et
+  /// broadcast) : rien ne garantit que la présence soit traitée avant le broadcast. Quand le
+  /// broadcast gagnait la course, `sessionsByPeerID` ne contenait pas encore ce pair — son
+  /// « hello » était silencieusement perdu, et il n'obtenait jamais de `welcome` (« L'hôte n'a
+  /// pas répondu » côté pair, après le délai de `LiveSession.attachToHost`). Créer la session à
+  /// la première occurrence, quel que soit le chemin qui arrive en premier, rend le
+  /// raccordement robuste à cette course au lieu de dépendre d'un ordre non garanti.
+  private func session(forPeer peerID: String, channel: RealtimeChannelV2)
+    -> SupabaseTransportSession
+  {
+    if let existing = sessionsByPeerID[peerID] { return existing }
+    let session = SupabaseTransportSession(
+      channel: channel, selfID: deviceID, peerID: peerID, ownsChannel: false)
+    sessionsByPeerID[peerID] = session
+    acceptedContinuation.yield(session)
+    return session
+  }
+
+  // MARK: - Pair
+
+  /// Doc utilisateur — remplace le scan Wi-Fi/BLE : une simple lecture par code, sans aucune
+  /// notion de proximité physique. Traduit l'erreur PostgREST « aucune ligne » (`.single()` sur
+  /// un code qui ne correspond à rien) en une erreur du domaine `Sync`, plutôt que de laisser
+  /// fuiter un type PostgREST jusqu'à l'app — qui ne dépend pas directement de `supabase-swift`.
+  public func resolveGame(code: String) async throws -> DiscoveredHost {
+    let row: OpenGameRow
+    do {
+      row = try await client.rpc("quimene_resolve_game", params: ["p_pairing_code": code])
+        .single()
+        .execute()
+        .value
+    } catch let error as PostgrestError where error.code == "PGRST116" {
+      throw SupabaseTransportError.gameNotFound
+    }
+    return DiscoveredHost(
+      id: row.sessionID,
+      deviceName: row.deviceName,
+      gameID: row.gameID,
+      participantCount: row.participantCount,
+      platform: WireMessage.Platform(rawValue: row.platform) ?? .apple
+    )
+  }
+
+  public func connect(to host: DiscoveredHost) async throws -> any TransportSession {
+    let channel = client.channel("session:\(host.id.uuidString)") { [deviceID] config in
+      config.presence.key = deviceID
+    }
+    let session = SupabaseTransportSession(
+      channel: channel, selfID: deviceID, peerID: Self.hostPresenceKey, ownsChannel: true)
+    joinedChannel = channel
+
+    let broadcastTask = Task { [weak self, weak session] in
+      for await payload in channel.broadcastStream(event: "msg") {
+        guard let self, let session else { return }
+        if let envelope = Self.decodeEnvelope(payload), envelope.to == self.deviceID {
+          session.receive(base64: envelope.data)
+        }
+      }
+    }
+    // Doc utilisateur — remplace `LiveSession.hostLeft` détecté côté BLE/Wi-Fi : l'hôte quitte
+    // la présence du canal (déconnexion propre ou abrupte, le serveur Realtime la détecte dans
+    // les deux cas) → cette session se ferme, exactement comme une coupure réseau avant.
+    let presenceTask = Task { [weak session] in
+      for await action in channel.presenceChange() {
+        if action.leaves[Self.hostPresenceKey] != nil {
+          session?.markClosed()
+        }
+      }
+    }
+    joinedTasks = [broadcastTask, presenceTask]
+
+    // Doc utilisateur P9 — même remontée que côté hôte (voir `advertise`) : un pair dont le
+    // socket a été rouvert par le SDK après une mise en arrière-plan doit retracer sa présence
+    // lui-même, `track()` n'étant jamais rejoué automatiquement par un ré-abonnement.
+    let deviceName = deviceName
+    joinedStatusSubscription = channel.onStatusChange { status in
+      guard status == .subscribed else { return }
+      Task { try? await channel.track(["deviceName": deviceName]) }
+    }
+
+    try await channel.subscribeWithError()
+    try await channel.track(["deviceName": deviceName])
+    return session
+  }
+
+  private static func decodeEnvelope(_ payload: JSONObject) -> SupabaseEnvelope? {
+    guard let inner = payload["payload"] else { return nil }
+    return try? inner.decode(as: SupabaseEnvelope.self)
+  }
+}
+
+private struct SupabaseEnvelope: Codable {
+  let from: String
+  let to: String
+  let data: String
+}
+
+public enum SupabaseTransportError: Error, Sendable, Equatable {
+  /// Aucune ligne `quimene_open_games` pour ce code — code erroné, périmé (partie déjà arrêtée), ou
+  /// jamais existé.
+  case gameNotFound
+}
+
+struct OpenGameRow: Codable {
+  let pairingCode: String
+  let sessionID: UUID
+  let matchID: UUID
+  let gameID: String
+  let participantCount: Int
+  let deviceName: String
+  let platform: String
+
+  enum CodingKeys: String, CodingKey {
+    case pairingCode = "pairing_code"
+    case sessionID = "session_id"
+    case matchID = "match_id"
+    case gameID = "game_id"
+    case participantCount = "participant_count"
+    case deviceName = "device_name"
+    case platform
+  }
+}
+
+/// Paramètres de `quimene_advertise_game` — clés encodées = noms des paramètres SQL.
+private struct AdvertiseParams: Encodable {
+  let pairingCode: String
+  let sessionID: UUID
+  let matchID: UUID
+  let gameID: String
+  let participantCount: Int
+  let deviceName: String
+  let platform: String
+
+  enum CodingKeys: String, CodingKey {
+    case pairingCode = "p_pairing_code"
+    case sessionID = "p_session_id"
+    case matchID = "p_match_id"
+    case gameID = "p_game_id"
+    case participantCount = "p_participant_count"
+    case deviceName = "p_device_name"
+    case platform = "p_platform"
+  }
+}
+
+/// Paramètres de `quimene_update_open_game` (`updateActiveMatch`) — seules les colonnes qui
+/// décrivent la partie courante changent à un changement de partie, jamais le code ni la session.
+private struct ActiveMatchUpdate: Encodable {
+  let sessionID: UUID
+  let matchID: UUID
+  let gameID: String
+  let participantCount: Int
+
+  enum CodingKeys: String, CodingKey {
+    case sessionID = "p_session_id"
+    case matchID = "p_match_id"
+    case gameID = "p_game_id"
+    case participantCount = "p_participant_count"
+  }
+}
+
+/// Doc utilisateur P9 — clé **anon/publique** Supabase : conçue pour être embarquée dans un client
+/// (l'accès aux tables passe par des fonctions SQL qui exigent un code ou un identifiant, pas par
+/// le secret), à la différence d'une clé
+/// `service_role`. Le contenu réel des manches reste protégé par `SessionCrypto` (chiffrement dérivé
+/// du code d'appairage), pas par cette clé.
+enum SupabaseSyncConfig {
+  static let projectURL = URL(string: "https://hcjehnnvqmkdwirgpcgu.supabase.co")!
+  static let anonKey = "sb_publishable_YhV5A3mH3aUCejLx1QC2OQ_Hc18SA_b"
+}
+
+final class SupabaseTransportSession: TransportSession, Sendable {
+  private let channel: RealtimeChannelV2
+  private let selfID: String
+  private let peerID: String
+  private let ownsChannel: Bool
+  private let stream: AsyncStream<Data>
+  private let continuation: AsyncStream<Data>.Continuation
+
+  init(channel: RealtimeChannelV2, selfID: String, peerID: String, ownsChannel: Bool) {
+    self.channel = channel
+    self.selfID = selfID
+    self.peerID = peerID
+    self.ownsChannel = ownsChannel
+    (stream, continuation) = AsyncStream.makeStream()
+  }
+
+  var incoming: AsyncStream<Data> { stream }
+
+  func send(_ data: Data) async throws {
+    let envelope = SupabaseEnvelope(from: selfID, to: peerID, data: data.base64EncodedString())
+    try await channel.broadcast(event: "msg", message: envelope)
+  }
+
+  func receive(base64: String) {
+    guard let data = Data(base64Encoded: base64) else { return }
+    continuation.yield(data)
+  }
+
+  func markClosed() {
+    continuation.finish()
+  }
+
+  /// Doc utilisateur — une session côté hôte (une par pair) ne possède pas le canal, partagé
+  /// entre tous les pairs de cette partie : la fermer ne doit jamais le désabonner (ça
+  /// couperait tout le monde). Seule la session du pair (`ownsChannel: true`, un canal par
+  /// pair qui rejoint) le fait vraiment.
+  func close() async {
+    continuation.finish()
+    guard ownsChannel else { return }
+    await channel.untrack()
+    await channel.unsubscribe()
+  }
+}

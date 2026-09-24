@@ -79,7 +79,7 @@
     <string name="contrat">Contract</string>
     <string name="contributeur">Contributor</string>
     <string name="copier_l_adresse">Copy the address</string>
-    <string name="demande_d_ajout_d_un_jeu_ca_compte">Request to add a game — Ça Compte</string>
+    <string name="demande_d_ajout_d_un_jeu_qui_mene">Request to add a game — Qui Mène ?</string>
     <string name="demander_ce_jeu">Request this game</string>
     <string name="demander_l_ajout_d_un_jeu">Request a game</string>
     <string name="double_label">Double</string>

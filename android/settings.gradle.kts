@@ -14,6 +14,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CaCompte"
+rootProject.name = "QuiMene"
 
 include(":app", ":domain", ":catalog", ":store", ":sync", ":designsystem")

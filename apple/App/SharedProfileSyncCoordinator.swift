@@ -6,7 +6,7 @@ import Sync
 
 /// Doc 14 « Profils partagés », phase 2 — pousse le résumé d'une partie tout juste conclue vers
 /// chaque participant lié à l'installation d'un ami, et récupère les résumés que d'autres ont
-/// poussés vers l'une de mes propres fiches liées. Déclenché par `CaCompteApp` (lancement et
+/// poussés vers l'une de mes propres fiches liées. Déclenché par `QuiMeneApp` (lancement et
 /// retour au premier plan), pas par un minuteur propre — même discipline que
 /// `MatchConnectionCoordinator`, plutôt qu'un nouveau système de synchronisation.
 @MainActor

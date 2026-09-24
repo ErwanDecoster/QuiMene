@@ -5,7 +5,7 @@ import UIKit
 
 /// Doc 03 : « La sync est désactivable : un utilisateur qui refuse iCloud garde une app
 /// pleinement fonctionnelle. Le basculement recrée le `ModelContainer` ; ce n'est pas une
-/// migration. » — géré par `CaCompteApp`, qui observe `AppSettings.iCloudSyncEnabled`.
+/// migration. » — géré par `QuiMeneApp`, qui observe `AppSettings.iCloudSyncEnabled`.
 struct SettingsView: View {
   @Environment(AppSettings.self) private var settings
   @Environment(\.dismiss) private var dismiss
@@ -37,7 +37,7 @@ struct SettingsView: View {
 
         // Doc utilisateur (audit qualité, 15) — iOS ne permet pas à une app tierce de changer sa
         // propre langue en direct : le seul levier est le sélecteur système par app (Réglages >
-        // Ça Compte > Langue), qui n'existe que parce que le projet déclare plusieurs langues
+        // Qui Mène ? > Langue), qui n'existe que parce que le projet déclare plusieurs langues
         // (`knownRegions`). Ce bouton ouvre directement cette page plutôt que de laisser deviner
         // où chercher dans l'app Réglages.
         Section {

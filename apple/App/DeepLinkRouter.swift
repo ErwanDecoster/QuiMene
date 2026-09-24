@@ -2,7 +2,7 @@ import Foundation
 import Observation
 
 /// Doc utilisateur — pont entre les points d'entrée déclenchés hors de tout écran particulier
-/// (`.onOpenURL` pour un lien `cacompte://`, `.onContinueUserActivity` pour une reprise Handoff) et
+/// (`.onOpenURL` pour un lien `quimene://`, `.onContinueUserActivity` pour une reprise Handoff) et
 /// l'onglet visé (Jeux, Rejoindre ou Historique selon le signal), qui peut être plusieurs onglets
 /// plus loin au moment où l'un ou l'autre arrive. Pas de pattern d'environnement existant dans le
 /// projet pour ça (aucun `@Entry`

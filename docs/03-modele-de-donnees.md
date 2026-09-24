@@ -137,7 +137,7 @@ let config = ModelConfiguration(
     schema: schema,
     isStoredInMemoryOnly: false,
     cloudKitDatabase: settings.iCloudEnabled
-        ? .private("iCloud.fr.cacompte.app")   // ⚠ à remplacer par l'identifiant réel
+        ? .private("iCloud.fr.quimene.app")   // ⚠ à remplacer par l'identifiant réel
         : .none
 )
 ```
@@ -168,13 +168,13 @@ Détail du protocole dans [09 — Partie partagée](09-partie-partagee.md).
 plan de migration après coup coûte bien plus cher que de le poser vide au départ.
 
 ```swift
-enum CaCompteSchemaV1: VersionedSchema {
+enum QuiMeneSchemaV1: VersionedSchema {
     static var versionIdentifier = Schema.Version(1, 0, 0)
     static var models: [any PersistentModel.Type] { [ … ] }
 }
 
-enum CaCompteMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [CaCompteSchemaV1.self] }
+enum QuiMeneMigrationPlan: SchemaMigrationPlan {
+    static var schemas: [any VersionedSchema.Type] { [QuiMeneSchemaV1.self] }
     static var stages: [MigrationStage] { [] }
 }
 ```

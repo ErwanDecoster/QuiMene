@@ -48,7 +48,7 @@ impossible à ignorer — elle fait échouer la suite de tests Android.
 | `struct` / valeur | `data class` (immuable) | Le domaine reste sans mutation |
 | SwiftData | Room + KSP | Voir « Persistance » |
 | CloudKit privé | *(aucun équivalent)* | Voir « Synchronisation » |
-| `supabase-swift` (`RealtimeChannelV2`, Presence, Broadcast) | `supabase-kt` (module Realtime) | Même dépendance des deux côtés, pas une paire d'équivalents natifs — voir [09](09-partie-partagee.md) et [ADR-0016](13-decisions-adr.md). Découverte par `cacompte_open_games` (Postgrest, REST) : rien de spécifique à une plateforme, aucune API de découverte réseau à porter. |
+| `supabase-swift` (`RealtimeChannelV2`, Presence, Broadcast) | `supabase-kt` (module Realtime) | Même dépendance des deux côtés, pas une paire d'équivalents natifs — voir [09](09-partie-partagee.md) et [ADR-0016](13-decisions-adr.md). Découverte par `quimene_open_games` (Postgrest, REST) : rien de spécifique à une plateforme, aucune API de découverte réseau à porter. |
 | Swift Testing | JUnit 5 + Kotest | Tests paramétrés des deux côtés |
 | Swift Charts | Vico | Bibliothèque tierce assumée — Compose n'a pas de graphiques natifs |
 | SF Symbols | Material Symbols Rounded | Voir charte §4 |
@@ -92,7 +92,7 @@ propriétaire**, hors partie en direct :
 | **Partie partagée en direct** | Supabase Realtime — protocole et transport communs | idem, `supabase-kt` |
 | **Sync entre appareils du propriétaire** | CloudKit privé, transparent | **Absent en v1** |
 | **Sauvegarde** | iCloud | Android Auto Backup (quota 25 Mo, suffisant) |
-| **Export / import** | fichier `.cacompte` | fichier `.cacompte` |
+| **Export / import** | fichier `.quimene` | fichier `.quimene` |
 
 Il n'existe pas d'équivalent Android à CloudKit : pas de stockage privé, gratuit, lié au compte
 système et synchronisé sans serveur. Les options seraient Google Drive App Data (API lourde,
@@ -100,7 +100,7 @@ nécessite OAuth) ou un backend maison (contredit « sans serveur »).
 
 **Décision** : la v1 Android n'a pas de synchronisation multi-appareils. Elle propose à la
 place un **export/import de fichier**, qui existe aussi côté Apple et sert de pont entre les
-deux écosystèmes. Le format `.cacompte` est simplement le journal d'événements sérialisé — donc
+deux écosystèmes. Le format `.quimene` est simplement le journal d'événements sérialisé — donc
 déjà spécifié, déjà testé, et fusionnable par la même fonction de rejeu.
 
 ## Charte graphique sur Android
@@ -166,7 +166,7 @@ touche plus au métier.
 
 - `android/` naît à la racine du mono repo, au même niveau que `apple/`, `spec/`, `docs/`,
   `supabase/`, `Licenses/`, `Scripts/`, `ci_scripts/`.
-- Gradle multi-module, miroir des 5 cibles `CaCompteKit` + le module app :
+- Gradle multi-module, miroir des 5 cibles `QuiMeneKit` + le module app :
   - `android/settings.gradle.kts` — `include(":app", ":domain", ":catalog", ":store", ":sync", ":designsystem")`.
   - `android/gradle/libs.versions.toml` — catalogue de versions unique (Kotlin, Compose BOM,
     Room, KSP, `supabase-kt`, Material 3, Navigation Compose, Vico), même rôle qu'une seule
@@ -250,7 +250,7 @@ chose, et aucune étape suivante ne retouche le métier.
 
 ### D — Room, repositories, mapping · 1 semaine
 
-- Trois entités, miroir un-pour-un des modèles SwiftData (`CaCompteSchemaV1`) :
+- Trois entités, miroir un-pour-un des modèles SwiftData (`QuiMeneSchemaV1`) :
   - `PlayerEntity.kt` — mêmes champs que `PlayerRecord.swift` (`id`, `nickname`, `avatarKind`,
     `avatarValue`, `avatarPhoto: ByteArray?`, `paletteID`, `createdAt`, `isArchived`,
     `sortIndex`, `sharedProfileID`, `sharedProfileIsMine`, `sharedProfileLinkedName`,
@@ -327,7 +327,7 @@ reste de l'estimation.
 - `SupabaseTransport.kt` — client `supabase-kt` (modules Realtime + Postgrest), même modèle
   canal/presence/broadcast que `SupabaseTransport.swift` : canal par session, presence
   connexion/déconnexion, broadcast pour `WireMessage` chiffré, requête Postgrest sur
-  `cacompte_open_games` pour la découverte par code.
+  `quimene_open_games` pour la découverte par code.
 - `WireMessage.kt` — `data class` + `sealed interface Kind`, les 8 cas exacts de
   `WireMessage.swift` (`Hello`, `Welcome`, `Events`, `MatchChanged`, `Proposal`, `Rejection`,
   `Heartbeat`, `Goodbye`), sérialisation kotlinx.serialization polymorphe. `WireCodec.kt`,

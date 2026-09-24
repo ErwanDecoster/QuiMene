@@ -631,13 +631,13 @@
     "de": "Adresse kopieren",
     "it": "Copia l'indirizzo"
   },
-  "demande_d_ajout_d_un_jeu_ca_compte": {
-    "key": "Demande d'ajout d'un jeu — Ça Compte",
-    "fr": "Demande d'ajout d'un jeu — Ça Compte",
-    "en": "Request to add a game — Ça Compte",
-    "es": "Solicitud para añadir un juego — Ça Compte",
-    "de": "Anfrage: Spiel hinzufügen — Ça Compte",
-    "it": "Richiesta di aggiunta di un gioco — Ça Compte"
+  "demande_d_ajout_d_un_jeu_qui_mene": {
+    "key": "Demande d'ajout d'un jeu — Qui Mène ?",
+    "fr": "Demande d'ajout d'un jeu — Qui Mène ?",
+    "en": "Request to add a game — Qui Mène ?",
+    "es": "Solicitud para añadir un juego — Qui Mène ?",
+    "de": "Anfrage: Spiel hinzufügen — Qui Mène ?",
+    "it": "Richiesta di aggiunta di un gioco — Qui Mène ?"
   },
   "demander_ce_jeu": {
     "key": "Demander ce jeu",

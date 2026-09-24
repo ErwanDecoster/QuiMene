@@ -164,8 +164,8 @@ struct GamesTabView: View {
 
   // Doc utilisateur — Handoff et « Reprends » (Live Activity) arrivent ici,
   // potentiellement alors qu'on est sur un autre onglet ; `DeepLinkRouter` fait le pont depuis
-  // `.onContinueUserActivity`/`.onOpenURL` (CaCompteApp). Le lien `cacompte://join` est consommé
-  // par `JoinTabView`, pas ici (doc utilisateur — onglet dédié). `CaCompteApp.selectedTab`
+  // `.onContinueUserActivity`/`.onOpenURL` (QuiMeneApp). Le lien `quimene://join` est consommé
+  // par `JoinTabView`, pas ici (doc utilisateur — onglet dédié). `QuiMeneApp.selectedTab`
   // garantit que cet onglet est déjà construit quand l'un de ces événements arrive — reste à le
   // consommer, ici et dans `.onAppear` ci-dessous pour le cas où il était déjà en attente au
   // moment du montage.

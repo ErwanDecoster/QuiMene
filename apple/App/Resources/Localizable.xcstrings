@@ -7,9 +7,6 @@
     "—" : {
 
     },
-    "%@" : {
-
-    },
     "%@ : %lld" : {
       "localizations" : {
         "de" : {
@@ -1847,6 +1844,7 @@
       }
     },
     "Commencer une partie" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -1875,6 +1873,7 @@
       }
     },
     "Commencer une partie de ${game}" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -2070,30 +2069,30 @@
         }
       }
     },
-    "Demande d'ajout d'un jeu — Ça Compte" : {
+    "Demande d'ajout d'un jeu — Qui Mène ?" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Anfrage: Spiel hinzufügen — Ça Compte"
+            "value" : "Anfrage: Spiel hinzufügen — Qui Mène ?"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Request to add a game — Ça Compte"
+            "value" : "Request to add a game — Qui Mène ?"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Solicitud para añadir un juego — Ça Compte"
+            "value" : "Solicitud para añadir un juego — Qui Mène ?"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Richiesta di aggiunta di un gioco — Ça Compte"
+            "value" : "Richiesta di aggiunta di un gioco — Qui Mène ?"
           }
         }
       }
@@ -2807,6 +2806,7 @@
       }
     },
     "Jeu" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -4928,6 +4928,7 @@
       }
     },
     "Reprendre la partie" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {

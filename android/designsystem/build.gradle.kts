@@ -8,7 +8,7 @@ plugins {
 // com.android.library, Compose activé, zéro dépendance vers :domain — miroir de DesignSystem
 // dans Package.swift (docs/11-portage-android.md, étape A).
 android {
-    namespace = "com.cacompte.designsystem"
+    namespace = "com.quimene.designsystem"
     compileSdk = 37
 
     defaultConfig {

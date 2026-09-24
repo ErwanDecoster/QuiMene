@@ -16,13 +16,13 @@ Tout le reste — persistance, réseau, interface — est un **adaptateur** auto
 
 ## Modules
 
-Un unique package Swift local, `CaCompteKit`, contenant plusieurs cibles. Un package plutôt
+Un unique package Swift local, `QuiMeneKit`, contenant plusieurs cibles. Un package plutôt
 qu'un projet monolithique parce que les dépendances entre cibles deviennent alors vérifiées à
 la compilation : `Domain` ne *peut pas* importer SwiftUI, le compilateur le refuse.
 
 ```
                         ┌──────────────────┐
-                        │   CaCompte.app   │  cible Xcode
+                        │   QuiMene.app   │  cible Xcode
                         │  features + DI   │
                         └────────┬─────────┘
              ┌───────────────┬───┴────┬───────────────┐
@@ -46,7 +46,7 @@ la compilation : `Domain` ne *peut pas* importer SwiftUI, le compilateur le refu
 | **Store** | Domain | Modèles `@Model`, `ModelContainer`, repositories, mapping domaine ↔ persistance | Règles de jeu |
 | **Sync** | Domain | `LiveSession`, protocole `Transport` (implémentation `SupabaseTransport`, [ADR-0016](13-decisions-adr.md)), `WireMessage`, horloge de Lamport | UI, persistance |
 | **DesignSystem** | `SwiftUI` | Tokens, composants réutilisables, avatars, pavé de saisie | Domain (délibérément — composants agnostiques) |
-| **CaCompte.app** | tout | Écrans, navigation, `@Observable` de flux, composition des dépendances | Logique de calcul |
+| **QuiMene.app** | tout | Écrans, navigation, `@Observable` de flux, composition des dépendances | Logique de calcul |
 
 ¹ **Exception actée** (audit qualité, [15](15-plan-qualite-code.md)) : `Domain/LiveActivity/MatchActivityAttributes.swift`
 importe aussi `ActivityKit`. Nécessaire — le protocole `ActivityAttributes` doit être visible à la
@@ -109,14 +109,14 @@ Mono repo (doc 11) : `apple/` regroupe tout ce qui est propre à Apple, `android
 `Scripts/`, `ci_scripts/`) est partagé entre les deux plateformes ou transverse au dépôt.
 
 ```
-CaCompte/
+QuiMene/
 ├── docs/                      ce plan
 ├── spec/                      source de vérité inter-plateformes (JSON)
 ├── supabase/                  migrations + edge functions, backend de la partie partagée (doc 09)
 ├── Scripts/                   check-spec-sync.sh, lint.sh — connaissent apple/ (et android/ à venir)
 ├── ci_scripts/                hook Xcode Cloud (post-clone)
 ├── apple/
-│   ├── CaCompteKit/           package Swift local
+│   ├── QuiMeneKit/           package Swift local
 │   │   ├── Package.swift
 │   │   ├── Sources/
 │   │   │   ├── Domain/
@@ -139,15 +139,15 @@ CaCompte/
 │   │       ├── SyncTests/          ← rejoue spec/wire/*.json
 │   │       └── DesignSystemTests/
 │   └── App/
-│       ├── CaCompte.xcodeproj
-│       ├── CaCompteApp.swift
+│       ├── QuiMene.xcodeproj
+│       ├── QuiMeneApp.swift
 │       ├── Features/
 │       │   ├── Players/  MatchSetup/  LiveMatch/  Results/  History/  Leaderboard/  Profile/
 │       │   └── Settings/
 │       ├── Resources/             Assets, Localizable.xcstrings, Info.plist
-│       ├── CaCompteWidget/         Live Activity (widget d'écran d'accueil retiré, doc 15/P9)
-│       ├── CaCompteTests/          tests unitaires hébergés (@testable import CaCompte)
-│       └── CaCompteUITests/
+│       ├── QuiMeneWidget/         Live Activity (widget d'écran d'accueil retiré, doc 15/P9)
+│       ├── QuiMeneTests/          tests unitaires hébergés (@testable import QuiMene)
+│       └── QuiMeneUITests/
 └── android/                    à venir — projet Gradle/Compose, plan détaillé en doc 11
 ```
 
@@ -192,7 +192,7 @@ Voir [04 — Moteur de règles](04-moteur-de-regles.md) pour le détail des type
 ## Injection de dépendances
 
 Pas de conteneur DI, pas de framework. Les dépendances sont passées à l'initialisation depuis
-`CaCompteApp`, et exposées aux vues profondes par `@Environment` avec des clés typées :
+`QuiMeneApp`, et exposées aux vues profondes par `@Environment` avec des clés typées :
 
 ```swift
 extension EnvironmentValues {

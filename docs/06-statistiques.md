@@ -156,7 +156,7 @@ de données le justifie un jour.
 
 Doc roadmap [12](12-roadmap.md), item « Statistiques de groupe » (après la v1) — qui est le/la
 meilleur(e) à un jeu donné, tous joueurs confondus, à travers toutes leurs parties terminées.
-`LeaderboardRepository` (`apple/CaCompteKit/Sources/Store`) agrège toutes les `ParticipantRecord` d'un
+`LeaderboardRepository` (`apple/QuiMeneKit/Sources/Store`) agrège toutes les `ParticipantRecord` d'un
 `gameID`, groupées par joueur : parties jouées, victoires, taux de victoire, rang moyen normalisé
 (même mesure que la fiche de profil, ci-dessus). Tri par taux de victoire, puis rang moyen
 normalisé, puis nombre de parties — jamais par ordre d'itération d'un dictionnaire (doc 03 n°5).

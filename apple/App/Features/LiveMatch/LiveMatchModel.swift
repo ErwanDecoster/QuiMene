@@ -225,7 +225,7 @@ final class LiveMatchModel {
   /// partie via Supabase Realtime (`SupabaseTransport`, remplace Wi-Fi/BLE — voir sa doc),
   /// affecte un code d'appairage à 6 chiffres, arbitre les propositions des contributeurs
   /// distants (`LiveSession`). `deviceName` vient de l'appelant (`UIDevice.current.name`) — ni
-  /// `Sync` ni `CaCompteKit` ne peuvent lire `UIDevice` (la cible compile aussi pour macOS).
+  /// `Sync` ni `QuiMeneKit` ne peuvent lire `UIDevice` (la cible compile aussi pour macOS).
   func startSharing(deviceName: String, allowsContributors: Bool = true) async throws {
     try await shareCoordinator.startSharing(
       match: match, context: context, deviceName: deviceName, allowsContributors: allowsContributors

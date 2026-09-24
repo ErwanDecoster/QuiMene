@@ -1,4 +1,4 @@
-# Ça Compte
+# Qui Mène ?
 
 Application de suivi de scores pour jeux de société, tour par tour, **sans compte** et
 **hors-ligne pour tout ce qui se joue sur un seul appareil**. Seuls le partage en direct, les
@@ -20,7 +20,7 @@ exactement les mêmes scores.
 | **Plateformes v1** | iPhone + iPad, une cible SwiftUI adaptative, iOS 18 minimum |
 | **UI** | SwiftUI, pattern MV avec `@Observable`, Liquid Glass en amélioration progressive iOS 26+ (repli Material iOS 18-25), HIG natives |
 | **Persistance** | SwiftData, modèle compatible CloudKit dès le départ |
-| **Sync** | CloudKit privé (entre les appareils du propriétaire) + Supabase Realtime pour la partie partagée autour de la table (un canal par session, presence + broadcast, découverte par code via `cacompte_open_games`) — remplace le transport Wi-Fi/BLE fait maison d'origine, voir [ADR-0016](docs/13-decisions-adr.md) |
+| **Sync** | CloudKit privé (entre les appareils du propriétaire) + Supabase Realtime pour la partie partagée autour de la table (un canal par session, presence + broadcast, découverte par code via `quimene_open_games`) — remplace le transport Wi-Fi/BLE fait maison d'origine, voir [ADR-0016](docs/13-decisions-adr.md) |
 | **Cœur métier** | Swift pur, `Sendable`, zéro dépendance framework, fonctions pures |
 | **Règles de jeu** | Définition déclarative JSON + moteurs impératifs nommés pour les jeux à calcul non trivial |
 | **Identité** | Tokens uniques bi-plateformes, contrastes WCAG AA vérifiés par calcul |
@@ -83,22 +83,22 @@ Ce qui a été contrôlé par exécution, pas seulement rédigé :
 | Définitions de jeu validées contre le JSON Schema | **2/2 conformes** |
 | JSON bien formé sur tout `spec/` | **5/5** |
 | Liens croisés entre les 13 documents | **tous résolus** |
-| `swift build` / `swift test` sur `CaCompteKit`, avertissements en erreurs | **OK** |
+| `swift build` / `swift test` sur `QuiMeneKit`, avertissements en erreurs | **OK** |
 | `xcodebuild` sur simulateur iOS 26 (iPhone 17e) | **build + lancement OK**, écran blanc conforme au critère de fin de Phase 0 |
-| `xcodebuild test -scheme CaCompteKit-Package` sur simulateur — Domain/Catalog/Store/DesignSystem | **OK**, dont les 39 paires de contraste WCAG rejouées sur le vrai catalogue d'assets |
+| `xcodebuild test -scheme QuiMeneKit-Package` sur simulateur — Domain/Catalog/Store/DesignSystem | **OK**, dont les 39 paires de contraste WCAG rejouées sur le vrai catalogue d'assets |
 | Icône d'app (claire/sombre/teintée) générée depuis `LogoMark` et intégrée à `App/` | **build OK** sur simulateur avec les 3 variantes |
-| Wordmark « Ça Compte » (Outfit SemiBold, Google Fonts, licence SIL OFL dans `Licenses/Outfit-OFL.txt`) vectorisé en SVG, lockups horizontal/vertical | **build + rendu vérifiés par capture d'écran** sur simulateur |
+| Wordmark « Qui Mène ? » (Outfit SemiBold, Google Fonts, licence SIL OFL dans `Licenses/Outfit-OFL.txt`) vectorisé en SVG, lockups horizontal/vertical | **build + rendu vérifiés par capture d'écran** sur simulateur |
 | Phase 2 — `PlayerRecord`/`PlayerRepository`, écrans Joueurs (liste, création, édition, avatars, palette, archivage, réordonnancement) | **build OK**, persistance vérifiée par test (10 joueurs, réouverture du magasin) et par capture d'écran (créés → relancés → toujours là) |
 | Phase 3 — `MatchEngine` (reduce/replay/Lamport), `GameCatalog`, `generic.sum.v1`, `SkyjoRulesV1` | **build OK sur simulateur**, 2/2 golden files conformes |
 | Invariants de propriété (doc 09) — total = Σ entrées, classement = ordre total, monotonie de fin de partie, Codable round-trip, `replay` indépendant de l'ordre et idempotent aux doublons | **7 propriétés, 20 tirages aléatoires chacune (générateur reproductible par seed) — 0 échec** |
 | Phase 4 — `MatchRecord`/`ParticipantRecord`/`MatchRepository`, configuration de partie, écran de partie en direct (pavé numérique, validation, annulation, fin de partie) | **build OK sur simulateur** ; partie complète testée (`MatchRepositoryTests` : classement final écrit, survit à la réouverture du magasin) ; rendu réel vérifié par capture d'écran — reprise après relance opérationnelle, doublement Skyjo affiché correctement à l'écran |
 | Phase 5 — `StatsEngine` (insights, séries, badges), écran de résultats (podium, faits marquants, badges, courbe Swift Charts, image partageable) | **8 indicateurs vérifiés par golden file** (dont l'écart-type exact `10.14`) — étendu aux deux golden files existants ; rendu réel vérifié par capture d'écran : podium, faits marquants, courbe à axe inversé avec ligne de seuil, bouton de partage (rendu `ImageRenderer` sans crash) |
-| Phase 6 — Historique (filtres jeu/joueur, détail manche par manche), fiches de profil (`ProfileRepository`, statistiques agrégées), réglage de consentement iCloud, container CloudKit câblé | **`ProfileRepositoryTests` : 4 tests** (agrégats multi-parties, némésis, sens du jeu sur meilleur/pire score, activité mensuelle zero-fillée) — **19 tests / 8 suites sur `CaCompteKit-Package`, 0 échec** ; rendu réel vérifié par capture d'écran : liste Historique avec filtres, détail d'une partie passée, fiche de profil complète |
+| Phase 6 — Historique (filtres jeu/joueur, détail manche par manche), fiches de profil (`ProfileRepository`, statistiques agrégées), réglage de consentement iCloud, container CloudKit câblé | **`ProfileRepositoryTests` : 4 tests** (agrégats multi-parties, némésis, sens du jeu sur meilleur/pire score, activité mensuelle zero-fillée) — **19 tests / 8 suites sur `QuiMeneKit-Package`, 0 échec** ; rendu réel vérifié par capture d'écran : liste Historique avec filtres, détail d'une partie passée, fiche de profil complète |
 | Correctif crash iCloud — inverse de relation manquant + tableaux CloudKit non optionnels (schéma), dossier `Resources` renommé (bug `codesign` de l'environnement) | **`CloudKitSchemaTests`** : échouait avant le correctif, passe maintenant — **build signé** (vrai Team ID, sans contourner la signature) + scénario réel rejoué sur simulateur (iCloud activé, app fermée/rouverte) : **plus de crash** |
-| Phase 7 — Catalogue élargi : Rami, 6 qui prend, Jeu libre (`generic.sum.v1`), Yams (`yams.v1`, grille structurée), Belote (`belote.v1`, premier jeu par équipes), fin manuelle (`manualStop`), sélecteur de jeu générique | **22 tests / 8 suites sur `CaCompteKit-Package`, 0 échec** (dont départage Yams, capot Belote, fin manuelle, isolés en tests unitaires) ; build **signé** OK ; rendu réel vérifié par capture d'écran : sélecteur à 6 jeux, mise en place Belote avec équipes, saisie Belote, grille Yams |
-| Phase 8 (socle protocolaire) — cible `Sync` : `WireMessage`, protocole `Transport`/`TransportSession` (ADR-0014, transport hybride Wi-Fi/BLE, indépendant de l'implémentation), `LiveSession` (hôte autoritaire — arbitrage, diffusion, appairage/chiffrement AES-GCM dérivé par HKDF) | **10 tests / 3 suites** sur un transport en mémoire (`SyncTests`) : convergence d'une proposition acceptée (même id événement des deux côtés, horloge de l'hôte), rejet transmis au contributeur, observateur bloqué en écriture, chiffrement round-trip et dérivation de clé — **34 tests / 13 suites sur `CaCompteKit-Package`, 0 échec** ; `WifiTransport`/`BLETransport` (implémentations réelles Network.framework/CoreBluetooth) et l'interface d'invitation restent à écrire |
-| Plancher abaissé à iOS 18 ([ADR-0015](docs/13-decisions-adr.md)) — `IPHONEOS_DEPLOYMENT_TARGET` (les deux configs Debug/Release du target `CaCompte`) et `Package.swift` (`.iOS(.v18)`) | **build + lancement réels OK** sur simulateur iOS 18.6 (iPhone 16, créé pour l'occasion), écran Joueurs vérifié par capture d'écran — aucune API iOS 26 n'était encore utilisée dans le code (`glassEffect`/`concentric` restaient à l'état de plan dans les docs 07/08, jamais codés), donc aucun `#available` à ajouter dans l'immédiat ; Liquid Glass et les coins concentriques deviennent une amélioration progressive iOS 26+ pour la suite du design system |
-| Phase 8 — `WifiTransport` réel (`NetService`/`NetServiceBrowser` + `NWListener`/`NWConnection`), `ShareSessionView`/`JoinMatchView`/`SharedMatchModel`/`SharedMatchView`, `DeviceIdentity`, `MatchRepository.appendRemoteEvent` | **Vérifié sur appareils réels (iPhone + iPad)** par l'auteur du projet : partie partagée créée, rejointe en observateur et en contributeur, tableau des scores synchronisé en direct. Deux bugs trouvés en recette et corrigés (pair fantôme après déconnexion, erreur explicite si code erroné/hôte injoignable) — voir doc 09. `WifiTransport` vérifié isolément par un exécutable macOS autonome (hors bac à sable `.xctest`, qui n'a pas les entitlements réseau local d'une vraie app) — découverte + échange de messages tramés dans les deux sens, succès. **34 tests / 13 suites sur `CaCompteKit-Package`, 0 échec.** |
+| Phase 7 — Catalogue élargi : Rami, 6 qui prend, Jeu libre (`generic.sum.v1`), Yams (`yams.v1`, grille structurée), Belote (`belote.v1`, premier jeu par équipes), fin manuelle (`manualStop`), sélecteur de jeu générique | **22 tests / 8 suites sur `QuiMeneKit-Package`, 0 échec** (dont départage Yams, capot Belote, fin manuelle, isolés en tests unitaires) ; build **signé** OK ; rendu réel vérifié par capture d'écran : sélecteur à 6 jeux, mise en place Belote avec équipes, saisie Belote, grille Yams |
+| Phase 8 (socle protocolaire) — cible `Sync` : `WireMessage`, protocole `Transport`/`TransportSession` (ADR-0014, transport hybride Wi-Fi/BLE, indépendant de l'implémentation), `LiveSession` (hôte autoritaire — arbitrage, diffusion, appairage/chiffrement AES-GCM dérivé par HKDF) | **10 tests / 3 suites** sur un transport en mémoire (`SyncTests`) : convergence d'une proposition acceptée (même id événement des deux côtés, horloge de l'hôte), rejet transmis au contributeur, observateur bloqué en écriture, chiffrement round-trip et dérivation de clé — **34 tests / 13 suites sur `QuiMeneKit-Package`, 0 échec** ; `WifiTransport`/`BLETransport` (implémentations réelles Network.framework/CoreBluetooth) et l'interface d'invitation restent à écrire |
+| Plancher abaissé à iOS 18 ([ADR-0015](docs/13-decisions-adr.md)) — `IPHONEOS_DEPLOYMENT_TARGET` (les deux configs Debug/Release du target `QuiMene`) et `Package.swift` (`.iOS(.v18)`) | **build + lancement réels OK** sur simulateur iOS 18.6 (iPhone 16, créé pour l'occasion), écran Joueurs vérifié par capture d'écran — aucune API iOS 26 n'était encore utilisée dans le code (`glassEffect`/`concentric` restaient à l'état de plan dans les docs 07/08, jamais codés), donc aucun `#available` à ajouter dans l'immédiat ; Liquid Glass et les coins concentriques deviennent une amélioration progressive iOS 26+ pour la suite du design system |
+| Phase 8 — `WifiTransport` réel (`NetService`/`NetServiceBrowser` + `NWListener`/`NWConnection`), `ShareSessionView`/`JoinMatchView`/`SharedMatchModel`/`SharedMatchView`, `DeviceIdentity`, `MatchRepository.appendRemoteEvent` | **Vérifié sur appareils réels (iPhone + iPad)** par l'auteur du projet : partie partagée créée, rejointe en observateur et en contributeur, tableau des scores synchronisé en direct. Deux bugs trouvés en recette et corrigés (pair fantôme après déconnexion, erreur explicite si code erroné/hôte injoignable) — voir doc 09. `WifiTransport` vérifié isolément par un exécutable macOS autonome (hors bac à sable `.xctest`, qui n'a pas les entitlements réseau local d'une vraie app) — découverte + échange de messages tramés dans les deux sens, succès. **34 tests / 13 suites sur `QuiMeneKit-Package`, 0 échec.** |
 
 ## Actions manuelles en attente
 
@@ -106,17 +106,17 @@ Ne peuvent pas être faites en CLI — à traiter quand tu as la main :
 
 | Action | Pourquoi | Bloque |
 |---|---|---|
-| ~~Team ID Apple Developer + capability iCloud/CloudKit~~ **fait** (Team ID `U79ZYL8WF3`, container `iCloud.com.cacompte.app`) | Signing réel sur appareil, container CloudKit | — |
-| ~~**Remote git**~~ **fait** — `origin` = `github.com/ErwanDecoster/CaCompte.git` | Xcode Cloud a besoin d'un repo distant lié à App Store Connect | — |
+| ~~Team ID Apple Developer + capability iCloud/CloudKit~~ **fait** (Team ID `U79ZYL8WF3`, container `iCloud.com.quimene.app`) | Signing réel sur appareil, container CloudKit | — |
+| ~~**Remote git**~~ **fait** — `origin` = `github.com/ErwanDecoster/QuiMene.git` | Xcode Cloud a besoin d'un repo distant lié à App Store Connect | — |
 | **Configurer le workflow Xcode Cloud** (Product → Xcode Cloud dans Xcode) | Pas d'API/CLI publique pour ça, uniquement l'UI Xcode/App Store Connect | CI automatique sur push |
 | ~~**Premier commit git**~~ **fait** — 39 commits au dernier audit ([15](docs/15-plan-qualite-code.md)) | — | — |
 | **Valeurs *High Contrast* des tokens couleur** | La charte §14 ne donne que Clair/Sombre ; aucune valeur « contraste augmenté » n'est spécifiée | Rendu en mode contraste augmenté (dégrade proprement sur Any/Dark en attendant) |
 | **Symboles de courbe joueurs #6 et #9** | `BasicChartSymbolShape` (Swift Charts) n'a que 8 formes natives, la charte en demande 10 (étoile, hexagone) — substitués par astérisque et carré dans `PlayerPalette.swift` | Distinction visuelle au-delà de 6 joueurs simultanés sur la courbe (Phase 5) |
 | ~~**Liste curatée d'emoji**~~ **fait** — 60 emoji dans `Avatar.curatedEmoji` (dérivation déterministe du pseudo), la cible ~60 de la charte (§10) est atteinte ; 6 ajoutés sur retour explicite (🤖 🧙 🥷 👾 🏎️ 🌸), écartés parmi les 36 proposés : redondants avec l'existant (🦝🐲 déjà couverts par 🐻🐼🐨🦄, 👻🎃🍄 saisonniers/moins « sûrs », ⚡ proche de 🔥, 🏄 proche de 🏎️/⚽/🏀, 🌷 proche de 🌸) et les 4 cœurs (♥️💚💙🩷), redondants entre eux | — |
 | **Palette joueurs v2 (vive) — daltonisme non revérifié** | Recolorée le 29/07 pour plus d'impact visuel (avatars, courbe) ; le contraste WCAG 3:1 est revérifié par test, mais la distinguabilité en deutéranopie/protanopie des 6 premières teintes ne l'a pas été depuis ce changement (charte §1.5) | À confirmer par simulation dédiée avant un usage graphique dense (courbe à 6+ joueurs) |
-| **Tests `CaCompteKit` non câblés dans le schéma `CaCompte`** | Xcode → Edit Scheme → Test → `+` → ajouter Domain/Catalog/Store/DesignSystemTests (30 secondes en UI, non fiabilisable en pbxproj à la main) | Xcode Cloud doit tester via ce schéma ; en attendant, `xcodebuild test -scheme CaCompteKit-Package` valide tout |
+| **Tests `QuiMeneKit` non câblés dans le schéma `QuiMene`** | Xcode → Edit Scheme → Test → `+` → ajouter Domain/Catalog/Store/DesignSystemTests (30 secondes en UI, non fiabilisable en pbxproj à la main) | Xcode Cloud doit tester via ce schéma ; en attendant, `xcodebuild test -scheme QuiMeneKit-Package` valide tout |
 | **Proportion icône/wordmark dans les déclinaisons** | Le ratio exact entre la hauteur de l'icône et la casse du wordmark n'est pas chiffré dans la charte (§11.2 donne l'espacement, pas la proportion) — hauteurs égales choisies par défaut | Ajustement visuel possible en revue de design, pas un blocage technique |
-| **XCUITest « création joueur »** (doc 10, parcours n°1) | Pas encore écrit — la persistance est validée par `PlayerRepositoryTests` (10 joueurs, réouverture du magasin) et par capture d'écran manuelle sur simulateur, mais pas par un test UI automatisé | Couverture du parcours critique en CI (peut attendre que `CaCompteUITests` soit créé) |
+| **XCUITest « création joueur »** (doc 10, parcours n°1) | Pas encore écrit — la persistance est validée par `PlayerRepositoryTests` (10 joueurs, réouverture du magasin) et par capture d'écran manuelle sur simulateur, mais pas par un test UI automatisé | Couverture du parcours critique en CI (peut attendre que `QuiMeneUITests` soit créé) |
 | **Règles de départage génériques incomplètes** | `mostRoundsWon`, `lowerSecondaryScore`, `higherSecondaryScore`, `headToHead` ne sont pas résolues par le classement générique (`GameRules.standings()`) faute de données modélisées — ignorées silencieusement, passage à la règle suivante | Un futur jeu déclarant l'une d'elles dans son `tieBreak` ne serait pas départagé dessus tant qu'elle n'est pas implémentée |
 | **Taps du pavé numérique non vérifiés par automatisation** | Le simulateur iOS n'expose pas les vues SwiftUI internes à l'accessibilité macOS (testé directement) — seul un vrai XCUITest peut simuler des taps. Vérifié à la place : rendu réel par capture d'écran (le tableau, le focus, le doublement s'affichent juste) + logique de `LiveMatchModel`/`MatchRepository` couverte par tests | Confiance moindre sur le fil `draftText` → `setScore` (simple concaténation de chaînes), spécifiquement en attente d'un XCUITest |
 | **Sélection narrative des insights (score d'intérêt)** | La charte §06 décrit le principe (écart à la normale, unicité, rareté, diversité) sans formule exacte — l'implémentation dans `StatsEngine.select` est une heuristique de première passe, non vérifiée par golden (seuls les *candidats* le sont) | Le choix des 4 à 6 faits affichés peut être retravaillé sans casser les tests |
@@ -147,8 +147,8 @@ Aucune dépendance tierce n'est prévue côté Apple.
 > journal est laissé tel quel pour l'historique plutôt que réécrit rétroactivement ; ne pas le
 > lire comme une description de l'architecture actuelle au-delà de ce point.
 
-**Phase 0 terminée** : `git init`, package `CaCompteKit` (cibles Domain/Catalog/Store/Sync/
-DesignSystem + tests), `App/CaCompte.xcodeproj`, script de synchronisation `spec/` ↔
+**Phase 0 terminée** : `git init`, package `QuiMeneKit` (cibles Domain/Catalog/Store/Sync/
+DesignSystem + tests), `App/QuiMene.xcodeproj`, script de synchronisation `spec/` ↔
 `Catalog/Resources/`, hook `ci_scripts/` pour Xcode Cloud. Vérifié par exécution : voir
 « État de vérification » ci-dessus.
 
@@ -188,7 +188,7 @@ rang moyen et rang moyen normalisé, détail par jeu avec meilleur/pire score, n
 victoires, activité sur 12 mois — calcul à la demande, aucun agrégat persisté). `AppSettings`
 (consentement iCloud, `UserDefaults` — délibérément *hors* du schéma CloudKit qu'il conditionne,
 voir le commentaire dans `AppSettings.swift`) et écran Réglages ; le container CloudKit privé
-(`iCloud.com.cacompte.app`) est câblé dans `ModelConfiguration` (`CaCompteApp.swift`), activé ou
+(`iCloud.com.quimene.app`) est câblé dans `ModelConfiguration` (`QuiMeneApp.swift`), activé ou
 non selon ce consentement — le changement s'applique au prochain lancement plutôt qu'un
 remplacement à chaud du `ModelContainer` en cours de session (source de crashs de durée de vie
 plus subtils que ce qu'un simple réglage justifie). Racine de l'app passée en `TabView`
@@ -216,7 +216,7 @@ deuxième problème, sans rapport avec le code de l'app, bloquait tout build sig
 plante sur un dossier de ressources nommé exactement `Resources` copié tel quel dans un bundle
 (reproduit hors projet avec un bundle minimal fait à la main : un dossier `Resources`, même vide,
 suffit à déclencher *"bundle format unrecognized, invalid, or unsuitable"* sur ce macOS/Xcode).
-Corrigé en renommant `CaCompteKit/Sources/Catalog/Resources/` en `.../GameDefinitions/` (voir
+Corrigé en renommant `QuiMeneKit/Sources/Catalog/Resources/` en `.../GameDefinitions/` (voir
 `Package.swift`, `GameCatalog+Embedded.swift`, `Scripts/check-spec-sync.sh`) — aucun autre dossier
 du projet ne porte ce nom. Scénario complet revérifié sur simulateur avec un build signé :
 réglage iCloud activé, app fermée puis rouverte, plus de crash.
@@ -263,7 +263,7 @@ prend/Jeu libre qui n'en ont qu'un, sans calcul spécifique à couvrir), tests u
 pour les branches non atteignables par un golden (départage Yams, capot Belote, fin manuelle),
 et rendu réel vérifié par capture d'écran sur simulateur (sélecteur de jeu à 6 entrées, mise en
 place Belote avec équipes auto-réparties, saisie Belote, grille Yams). **22 tests / 8 suites sur
-`CaCompteKit-Package`, 0 échec**, build **signé** réussi.
+`QuiMeneKit-Package`, 0 échec**, build **signé** réussi.
 
 **Retouche post-Phase 7 — onglet Jeux.** Démarrer une partie ne se fait plus depuis l'onglet
 Joueurs (bouton « Nouvelle partie » retiré) : un troisième onglet **Jeux** (`GamesTabView`)
@@ -340,7 +340,7 @@ corrigés dans la foulée :
 entitlements réseau local d'une vraie app, `NWListener`/`NetService` y échouent silencieusement.
 Vérifié à la place par un exécutable macOS autonome (hors bac à sable), qui découvre, connecte
 et échange des messages tramés dans les deux sens avec succès. **34 tests / 13 suites sur
-`CaCompteKit-Package` toujours au vert.**
+`QuiMeneKit-Package` toujours au vert.**
 
 **`BLETransport` (secours GATT) — écrit, non vérifié par exécution.** Mêmes rôles que
 `WifiTransport` (hôte = périphérique `CBPeripheralManager`, pair = central `CBCentralManager`),
@@ -360,7 +360,7 @@ self-communication, pas un bug identifié dans le code. Le simulateur iOS n'a de
 aucun support Bluetooth. **Recette prévue sur deux appareils physiques par l'auteur du projet.**
 Pas encore branché dans `ShareSessionView`/`JoinMatchView` : l'orchestration Wi-Fi-puis-BLE
 reste à écrire une fois validé. `Info.plist` : `NSBluetoothAlwaysUsageDescription` ajoutée par
-anticipation. Build vérifié (App + `CaCompteKit-Package`, 34 tests toujours au vert).
+anticipation. Build vérifié (App + `QuiMeneKit-Package`, 34 tests toujours au vert).
 
 **Troisième passage de recette**, trois problèmes trouvés et corrigés :
 - **crash au retour au premier plan** après avoir rejoint une partie et mis l'app en arrière-plan
@@ -391,11 +391,11 @@ Build vérifié, 34 tests toujours au vert.
 - appairage par QR en plus de la saisie manuelle : `QRCodeView` (génère le code via
   `CIFilter.qrCodeGenerator()`, système) côté hôte ; côté pair, un scanner intégré
   (`QRScannerView`, `AVCaptureMetadataOutput`) ou l'appareil photo système via le schéma d'URL
-  personnalisé `cacompte://join?matchID=…&code=…` (`JoinLink`, `DeepLinkRouter` + `.onOpenURL`
-  dans `CaCompteApp`). Schéma personnalisé plutôt qu'un lien universel `https://` : ce dernier
+  personnalisé `quimene://join?matchID=…&code=…` (`JoinLink`, `DeepLinkRouter` + `.onOpenURL`
+  dans `QuiMeneApp`). Schéma personnalisé plutôt qu'un lien universel `https://` : ce dernier
   demanderait un nom de domaine possédé et une vérification hébergée (Associated Domains/App
   Links), hors de portée pour l'instant — arbitrage discuté avec l'auteur du projet avant
-  d'implémenter. `Info.plist` : `NSCameraUsageDescription`, `CFBundleURLTypes` (`cacompte`).
+  d'implémenter. `Info.plist` : `NSCameraUsageDescription`, `CFBundleURLTypes` (`quimene`).
 
 Build vérifié, 34 tests toujours au vert.
 
@@ -403,6 +403,6 @@ Build vérifié, 34 tests toujours au vert.
 charge), puis l'orchestration Wi-Fi-puis-BLE dans l'app, le portage Android et le golden du
 protocole (`spec/wire/`).
 
-Reste en attente (voir « Actions manuelles en attente ») : câblage des tests `CaCompteKit` dans
+Reste en attente (voir « Actions manuelles en attente ») : câblage des tests `QuiMeneKit` dans
 le schéma Xcode, XCUITest « création joueur » et « partie complète », recette CloudKit sur deux
 appareils (nécessite un second appareil physique ou un second compte iCloud de test).

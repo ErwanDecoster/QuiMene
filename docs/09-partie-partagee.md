@@ -25,12 +25,12 @@ tierce côté Apple à la règle « zéro dépendance » (ADR-0012).
 
 | Rôle | Mécanisme |
 |---|---|
-| **Découverte** | Table Postgres `cacompte_open_games` (`supabase/migrations/`) : résout le code d'appairage à 6 chiffres tapé par le pair qui rejoint vers le `sessionID` de l'hôte. Aucune notion de proximité physique — le code seul suffit. |
+| **Découverte** | Table Postgres `quimene_open_games` (`supabase/migrations/`) : résout le code d'appairage à 6 chiffres tapé par le pair qui rejoint vers le `sessionID` de l'hôte. Aucune notion de proximité physique — le code seul suffit. |
 | **Canal** | Un canal Realtime par session de partage, `session:<sessionID>` (indépendant de la partie courante — un hôte peut enchaîner plusieurs parties sans jamais rouvrir le canal, voir « Fin de partie » plus bas). |
 | **Connexion / déconnexion** | **Presence** : l'hôte s'annonce sous une clé constante `"host"` (le pair n'a besoin de connaître aucun identifiant à l'avance) ; chaque pair s'annonce sous son `deviceID`. Une déconnexion, y compris abrupte (app tuée, réseau perdu), déclenche un événement de présence côté serveur. |
 | **Données** | **Broadcast** : chaque `WireMessage` transite chiffré (voir « Appairage et chiffrement » plus bas), adressé par un en-tête `from`/`to` applicatif — `SupabaseTransportSession` filtre ce flux partagé pour se comporter comme une session point-à-point ordinaire du point de vue de `LiveSession`. |
 
-`SupabaseTransport` (`apple/CaCompteKit/Sources/Sync/SupabaseTransport.swift`) est la seule
+`SupabaseTransport` (`apple/QuiMeneKit/Sources/Sync/SupabaseTransport.swift`) est la seule
 implémentation du protocole `Transport` (voir plus bas) — `supabase-swift` côté Apple,
 `supabase-kt` pour l'équivalent Android (doc [11](11-portage-android.md)), sur le même modèle
 canal/presence/broadcast des deux côtés.
@@ -111,13 +111,13 @@ connecter, où que soient les deux appareils.
 ```
 Hôte (Marion)                                          Rejoint (Théo)
  │
- ├─ advertise(sessionID, ...) : cacompte_advertise_game,
+ ├─ advertise(sessionID, ...) : quimene_advertise_game,
  │  souscrit au canal session:<sessionID>
  │  affiche : code d'appairage à 6 chiffres
  │
  │                                                       ├─ saisit ou scanne le code
  │                                                       ├─ resolveGame(code) →
- │                                                       │  cacompte_resolve_game, obtient sessionID
+ │                                                       │  quimene_resolve_game, obtient sessionID
  │                                                       ├─ connect(host) : souscrit au même canal
  │◀──────────────────────────────────────────────────────┤  attachToHost(...) : hello chiffré
  │  welcome(log) ────────────────────────────────────────▶│  (le code ne sert qu'au chiffrement,
@@ -127,11 +127,11 @@ Hôte (Marion)                                          Rejoint (Théo)
 Le code s'affiche aussi en QR (`QRCodeView`, `CIFilter.qrCodeGenerator()` — système, zéro
 dépendance) et se scanne de deux façons : un scanner intégré à l'écran « Rejoindre une partie »
 (`QRScannerView`, `AVCaptureMetadataOutput`), ou l'appareil photo système via le schéma d'URL
-personnalisé `cacompte://join?matchID=…&code=…` (`JoinLink`). Un schéma personnalisé plutôt qu'un
+personnalisé `quimene://join?matchID=…&code=…` (`JoinLink`). Un schéma personnalisé plutôt qu'un
 lien universel `https://` : ce dernier demanderait de posséder un nom de domaine et d'y héberger
 un fichier de vérification (Associated Domains/App Links) — hors de portée pour l'instant. En
 échange, l'ouverture depuis l'appareil photo système n'est garantie que sur iOS (Camera propose
-« Ouvrir dans Ça Compte » pour un schéma personnalisé si l'app est installée) ; le scanner intégré
+« Ouvrir dans Qui Mène ? » pour un schéma personnalisé si l'app est installée) ; le scanner intégré
 reste le chemin fiable sur toutes les plateformes, y compris une future version Android. Dans les
 deux cas, le QR ne remplace que la frappe des 6 chiffres, jamais une découverte physique — il n'y
 en a pas avec Supabase.
@@ -191,7 +191,7 @@ Théo                                     Marion (hôte)
 ```
 
 **Code erroné ou hôte injoignable — deux erreurs distinctes.** `resolveGame(code:)` échoue
-immédiatement (`SupabaseTransportError.gameNotFound`) si aucune ligne `cacompte_open_games` ne
+immédiatement (`SupabaseTransportError.gameNotFound`) si aucune ligne `quimene_open_games` ne
 correspond au code — invalide, expiré, ou partie déjà arrêtée. Si le code résout bien une ligne
 mais que la connexion n'aboutit jamais (l'hôte a arrêté le partage entre la lecture du code et la
 poignée de main, par exemple), `attachToHost` attend la confirmation `welcome` avec un délai
@@ -254,7 +254,7 @@ sur une autre partie sans se réappairer. Seul un geste explicite (« Arrêter l
 
 Techniquement, ceci sépare deux identifiants qui étaient confondus jusqu'ici : `sessionID`
 (`WireMessage.sessionID`, stable pour toute la durée de la session — c'est lui qui adresse le
-canal Realtime `session:<sessionID>` et la ligne `cacompte_open_games`) et `matchID`
+canal Realtime `session:<sessionID>` et la ligne `quimene_open_games`) et `matchID`
 (`MatchState.matchID`, propre à la partie affichée à un instant donné). La clé de chiffrement
 (`SessionCrypto.deriveKey`) est désormais salée par `sessionID`, pas par `matchID` — sans ce
 changement, l'hôte n'aurait pas pu chiffrer le message annonçant une nouvelle partie avec une clé
@@ -348,16 +348,16 @@ présente, mais pour le scanner de QR (`QRScannerView`), sans rapport avec le tr
 - La clé Supabase embarquée dans le client est la clé **anon/publique**, conçue pour être
   distribuée — le contenu des manches reste protégé par le chiffrement de bout en bout ci-dessus,
   pas par cette clé.
-- **Aucun accès direct à `cacompte_open_games`.** La clé de chiffrement dérive du code
+- **Aucun accès direct à `quimene_open_games`.** La clé de chiffrement dérive du code
   d'appairage et du `sessionID`, tous deux dans la ligne : des policies `using (true)` laissaient
   lister tous les codes ouverts, donc lire toutes les parties en cours, et l'`upsert` sur
   `pairing_code` permettait d'écraser la partie d'un autre. La table n'a plus de policy `anon` ;
-  l'app passe par quatre fonctions `security definer` : `cacompte_advertise_game` (refuse un code
-  déjà pris par une autre session valide), `cacompte_resolve_game` (une ligne par code, jamais la
-  liste, rien au-delà de 24 h), `cacompte_update_open_game` et `cacompte_close_open_game`. Purge
+  l'app passe par quatre fonctions `security definer` : `quimene_advertise_game` (refuse un code
+  déjà pris par une autre session valide), `quimene_resolve_game` (une ligne par code, jamais la
+  liste, rien au-delà de 24 h), `quimene_update_open_game` et `quimene_close_open_game`. Purge
   horaire des lignes de plus de 24 h (`pg_cron`).
 - **Limite assumée** : un code à 6 chiffres reste devinable par essais répétés sur
-  `cacompte_resolve_game`. Accepté pour la v1 (durée de vie de 24 h au plus, pas de compte
+  `quimene_resolve_game`. Accepté pour la v1 (durée de vie de 24 h au plus, pas de compte
   utilisateur) ; une limitation de fréquence côté serveur serait la parade suivante.
 
 ## Dégradation
@@ -372,7 +372,7 @@ graphe de dépendances du package : `Store` n'importe pas `Sync`.
 - **Sans réseau** : deux instances de `LiveSession` reliées par un transport en mémoire
   (`InMemoryTransport`, un troisième cas du protocole `Transport`, réservé aux tests). Couvre
   convergence, idempotence, ordre inversé, doublons — indépendant du transport réellement actif.
-  10 tests, `apple/CaCompteKit/Tests/SyncTests`. `SupabaseTransport` lui-même n'est pas exercé
+  10 tests, `apple/QuiMeneKit/Tests/SyncTests`. `SupabaseTransport` lui-même n'est pas exercé
   directement par cette suite (voir [15](15-plan-qualite-code.md)) — la vérification de sa
   logique de concurrence repose sur la compilation Swift 6 stricte, pas sur une exécution testée.
 - **Propriété testée** : pour tout journal `L` et toute permutation `σ`,
@@ -390,7 +390,7 @@ graphe de dépendances du package : `Store` n'importe pas `Sync`.
   avait validé l'ancien transport Wi-Fi, et la recette croisée Apple/Android une fois le portage
   entamé.
 - **Golden du protocole** (`spec/wire/`) : ✅ fait — un fichier par cas de `WireMessage.Kind`,
-  vérifié côté Swift (`WireGoldenTests`, `apple/CaCompteKit/Tests/SyncTests`). Le critère n'est pas une
+  vérifié côté Swift (`WireGoldenTests`, `apple/QuiMeneKit/Tests/SyncTests`). Le critère n'est pas une
   identité d'octets, hors de portée entre deux sérialiseurs JSON différents, mais un round-trip de
   schéma : décoder une fixture sur les deux plateformes doit produire une valeur équivalente. Le
   test Kotlin symétrique reste à écrire une fois le portage Android entamé.

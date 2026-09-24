@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://cacompte.app/spec/schema/game-definition.schema.json",
+  "$id": "https://quimene.app/spec/schema/game-definition.schema.json",
   "title": "GameDefinition",
   "description": "Définition déclarative d'un jeu. Couvre tout ce qui est exprimable en données ; le calcul non trivial est délégué au moteur impératif désigné par 'engine'.",
   "type": "object",

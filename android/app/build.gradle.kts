@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.cacompte.app"
+    namespace = "com.quimene.app"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.cacompte.app"
+        applicationId = "com.quimene.app"
         minSdk = 26
         targetSdk = 37
         versionCode = 1

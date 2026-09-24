@@ -12,7 +12,7 @@ import Foundation
 /// scan) — `avatarKind` reste transporté tel quel, mais l'adoption d'avatar n'est proposée que
 /// si ce n'est pas `"photo"` (voir `PlayerEditorView`).
 enum ProfileShareLink {
-  private static let scheme = "cacompte"
+  private static let scheme = "quimene"
   private static let host = "claim-profile"
 
   struct Payload: Equatable, Identifiable {

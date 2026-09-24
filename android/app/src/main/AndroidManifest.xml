@@ -12,10 +12,10 @@
          premier plan, zone sûre 66/108 dp) demande un travail d'asset qui n'est pas fait dans
          cette étape ; icône système par défaut en attendant. -->
     <application
-        android:name=".CaCompteApplication"
+        android:name=".QuiMeneApplication"
         android:allowBackup="true"
         android:usesCleartextTraffic="false"
-        android:label="Ça Compte"
+        android:label="Qui Mène ?"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/full_backup_content"

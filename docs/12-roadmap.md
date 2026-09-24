@@ -29,7 +29,7 @@ peut glisser sans bloquer une mise en main. P7 et P8 sont ré-ordonnançables se
 ## P0 — Fondations · 1 semaine
 
 - `git init`, structure de dossiers, `.gitignore` Swift
-- Package `CaCompteKit` : cibles `Domain`, `Catalog`, `Store`, `Sync`, `DesignSystem`
+- Package `QuiMeneKit` : cibles `Domain`, `Catalog`, `Store`, `Sync`, `DesignSystem`
 - Projet Xcode, cible iOS 18 minimum (Liquid Glass en amélioration progressive iOS 26+, voir
   [ADR-0015](13-decisions-adr.md)), iPhone + iPad, identifiant de bundle et container CloudKit
 - Mode langage Swift 6 + concurrence stricte + avertissements en erreurs, **dès la première
@@ -127,7 +127,7 @@ Pour chacun : JSON, golden files, moteur si nécessaire, écran de saisie adapt�
 ## P8 — Partie partagée · 3 semaines
 
 - ✅ Protocole `Transport` + `SupabaseTransport` (canal Realtime par session, presence pour la
-  connexion/déconnexion, broadcast pour `WireMessage` chiffré, `cacompte_open_games` pour la
+  connexion/déconnexion, broadcast pour `WireMessage` chiffré, `quimene_open_games` pour la
   découverte par code — voir [ADR-0016](13-decisions-adr.md)), rôles hôte / contributeur /
   observateur
 - ✅ Appairage par code (dérivation HKDF, chiffrement AES-GCM des deux côtés), avec délai
@@ -171,10 +171,10 @@ Apple, recette manuelle réussie sur appareil réel ; Android reste à faire.** 
 - ❌ **Widget d'écran d'accueil retiré** — construit puis testé sur appareil physique par
   l'auteur, jugé sans intérêt réel à l'usage (classement figé jusqu'au retour en arrière-plan,
   contrairement à la Live Activity qui se met à jour en direct). `MatchWidget.swift` supprimé,
-  `CaCompteWidgetBundle` ne déclare plus que `MatchLiveActivityWidget`. `SharedStore`/le
+  `QuiMeneWidgetBundle` ne déclare plus que `MatchLiveActivityWidget`. `SharedStore`/le
   conteneur App Group restent (Live Activity n'en a pas besoin, mais migrer l'emplacement du
   store ferait apparaître les données déjà enregistrées comme perdues sur les installations
-  existantes) — voir le commentaire de `CaCompteApp.loadContainer`
+  existantes) — voir le commentaire de `QuiMeneApp.loadContainer`
 - ✅ Passe d'accessibilité : infrastructure (Reduce Motion, regroupement de lignes VoiceOver,
   contraste augmenté) et rattrapage sur les 8 zones de l'app faits — 20 fichiers sur 42 dans
   `apple/App/Features` touchent maintenant l'accessibilité (2 au départ). Traversée VoiceOver, Dynamic
@@ -206,7 +206,7 @@ Par valeur décroissante, sans engagement de calendrier :
 | 3 | **Saisie assistée** — grille Skyjo 3×4, dés du Yams, calcul du Tarot pas à pas |
 | 4 | **Statistiques de groupe** — face-à-face, évolution sur l'année, records collectifs. Classement par jeu ✅ ([06](06-statistiques.md)) ; face-à-face et évolution sur l'année restent à faire |
 | 5 | **Apple Watch** — saisie au poignet, WatchConnectivity |
-| 6 | **Export/import `.cacompte`** — anticipé pour Android, utile aussi entre utilisateurs Apple |
+| 6 | **Export/import `.quimene`** — anticipé pour Android, utile aussi entre utilisateurs Apple |
 | 7 | **macOS** — la cible SwiftUI existe déjà, coût faible, valeur faible |
 | 8 | **Profils partagés entre appareils** — qu'une partie créée sur mon téléphone apparaisse dans l'historique d'un ami qui y participait. Phases 1 et 2 ✅ (lier deux fiches par QR, la partie apparaît chez l'ami sous forme de résumé) ; copie intégrale rejouable reste à faire si demandée : [14](14-profils-partages.md) |
 

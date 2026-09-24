@@ -23,7 +23,7 @@ réponse à « je veux que Théo suive la partie en cours depuis son canapé ».
 
 ## Pourquoi pas une simple extension de doc 09
 
-Le partage en direct est *éphémère* par construction (`cacompte_open_games` se purge après 24 h,
+Le partage en direct est *éphémère* par construction (`quimene_open_games` se purge après 24 h,
 `LiveShareCoordinator` ne survit pas à l'arrêt du partage). Ce qu'on demande ici est *permanent* :
 que « Marie », une fois liée, reste liée d'une partie à l'autre, des mois plus tard, sans
 ré-appairage. Réutiliser le mécanisme de code d'appairage pour l'identité (plutôt que pour une
@@ -94,7 +94,7 @@ doc 09 (« quiconque connaît le code peut rejoindre ») ; l'option A ne l'abais
 nouvelle section « Profil partagé » :
 
 - **Partager ce profil** — génère un `UUID` s'il n'existe pas encore, l'encode dans un lien
-  `cacompte://claim-profile?id=<uuid>&name=<pseudo>` (même famille que `JoinLink`, un cas de plus
+  `quimene://claim-profile?id=<uuid>&name=<pseudo>` (même famille que `JoinLink`, un cas de plus
   dans son `enum`), affiché en QR (`QRCodeView`, déjà là) et en texte.
 - **Lier un profil reçu** — réutilise le scanner déjà construit pour l'onglet « Rejoindre »
   (`QRScannerView`) : scanner le QR d'un ami enregistre son `sharedProfileID` sur *ma* fiche qui
@@ -109,10 +109,10 @@ sans que la phase 2 existe encore.
 À la fin d'une partie (`.ended` ou `.abandoned` — jamais en cours, pour éviter tout merge
 incrémental dans le stockage SwiftData de quelqu'un d'autre pendant que la partie tourne), pour
 chaque participant dont la fiche porte un `sharedProfileID` : pousser un résumé compact vers la
-table Supabase `cacompte_shared_match_summaries` :
+table Supabase `quimene_shared_match_summaries` :
 
 ```sql
-create table cacompte_shared_match_summaries (
+create table quimene_shared_match_summaries (
     match_id uuid not null,
     shared_profile_id uuid not null,
     payload jsonb not null,      -- jeu, version de règles, date, classement complet (pseudo,
@@ -128,11 +128,11 @@ jamais la ligne, même si le serveur avait bien reçu la première. Connaître l
 avec le seuil de sécurité déjà accepté doc 09), mais *seulement* l'id : la table n'a aucune policy
 `anon` (RLS ne sait pas exiger un filtre, et des policies `using (true)` laissaient lister ou vider
 toute la table), l'app passe par trois fonctions `security definer` qui prennent l'identifiant en
-paramètre — `cacompte_push_shared_match_summaries`, `cacompte_fetch_shared_match_summaries`,
-`cacompte_delete_shared_match_summary`. Purge de sécurité à 30 jours (comme `cacompte_open_games`,
+paramètre — `quimene_push_shared_match_summaries`, `quimene_fetch_shared_match_summaries`,
+`quimene_delete_shared_match_summary`. Purge de sécurité à 30 jours (comme `quimene_open_games`,
 en plus généreux puisqu'un ami peut rester hors ligne des semaines) pour le cas où personne ne
 vient jamais la récupérer : job `pg_cron` quotidien déclaré dans la migration
-`secure_cacompte_shared_match_summaries`, appuyé sur `cacompte_shared_match_summaries_created_at_idx`.
+`secure_cacompte_shared_match_summaries`, appuyé sur `quimene_shared_match_summaries_created_at_idx`.
 
 `MatchRecord.pendingSharedProfileSync` marque une partie conclue avec au moins un participant lié,
 mis à jour à chaque conclusion (`MatchRepository.persist`, jamais figé à la création). Côté ami,
@@ -141,7 +141,7 @@ que `MatchConnectionCoordinator`, pas de minuteur propre) : pousser les parties 
 interroger les résumés en attente pour ses propres fiches liées, les matérialiser en `MatchRecord`
 local (`MatchRepository.materializeSharedSummary`), puis **supprimer** la ligne côté serveur — la
 table ne sert que de boîte aux lettres transitoire, jamais de copie durable. Même discipline que
-`cacompte_open_games` : Supabase est un relais, jamais la source de vérité. `SharedMatchSummaryPayload`
+`quimene_open_games` : Supabase est un relais, jamais la source de vérité. `SharedMatchSummaryPayload`
 vit dans `Domain` (pas `Store` ni `Sync`) : les deux en ont besoin, aucun des deux ne dépend de
 l'autre.
 
@@ -168,7 +168,7 @@ Ce choix — résumé, pas copie intégrale — reste le point du design le plus
 
 L'onglet ajouté aujourd'hui pour rejoindre une partie en direct (caméra prête à scanner) devient
 le point d'entrée naturel pour « lier un profil » aussi — même geste (scanner un QR d'ami),
-distingué par le contenu du lien (`cacompte://join` vs `cacompte://claim-profile`), zéro écran
+distingué par le contenu du lien (`quimene://join` vs `quimene://claim-profile`), zéro écran
 supplémentaire.
 
 ## Économie de ressources et robustesse hors-ligne
@@ -177,7 +177,7 @@ supplémentaire.
 - Phase 2 : une ligne JSON de quelques centaines d'octets par (partie, participant lié) —
   supprimée dès réception, pas accumulée. Un groupe de 6 amis qui joue trois fois par semaine
   produit un trafic négligeable face à la fenêtre de purge de 24 h déjà en place pour
-  `cacompte_open_games`.
+  `quimene_open_games`.
 - Hors ligne à la fin d'une partie : la tentative d'envoi échoue simplement et se met en attente
   (`MatchRecord.pendingSharedProfileSync` reste `true`), rejouée au prochain retour au premier
   plan avec réseau — même patron que `scheduleAutoRetry` (`MatchConnectionCoordinator.swift`), pas
@@ -187,14 +187,14 @@ supplémentaire.
 
 1. **Phase 1** ✅ — champ `sharedProfileID`, UI de partage/liaison, réutilisation de `JoinLink` +
    `QRCodeView`/`QRScannerView`.
-2. **Phase 2** ✅ — table `cacompte_shared_match_summaries`, envoi à la conclusion d'une partie
+2. **Phase 2** ✅ — table `quimene_shared_match_summaries`, envoi à la conclusion d'une partie
    (`SharedProfileSyncCoordinator`), réception au premier plan, matérialisation en `MatchRecord`
    minimal (`isImportedSummary`), écran de détail dédié (`ReceivedMatchDetailView`).
 3. **Plus tard, si demandé** — copie intégrale rejouable (journal d'événements complet plutôt
    qu'un résumé) ; alimente aussi « Statistiques de groupe » ([roadmap](12-roadmap.md), face-à-face
    entre profils liés).
 
-Purge programmée (30 jours) sur `cacompte_shared_match_summaries` : job `pg_cron` de la migration
+Purge programmée (30 jours) sur `quimene_shared_match_summaries` : job `pg_cron` de la migration
 `secure_cacompte_shared_match_summaries`.
 
 ## Limites de confiance — ce que `sharedProfileID` prouve, et ce qu'il ne prouve pas
@@ -275,7 +275,7 @@ pas des données sensibles) face au coût d'ajouter des comptes.
 | 2 | Mémoriser localement un libellé « Lié à *Marie*, le 2 sept. 2026 » sur la fiche ✅ | Limite 2 | Faible — deux champs de plus sur `PlayerRecord` |
 | 3 | Bloquer (avec confirmation explicite pour passer outre) la liaison à un `UUID` déjà utilisé par une *autre* fiche locale ✅ | Limite 4 | Faible — une vérification dans `PlayerRepository` |
 | 4 | Marquer une fiche comme « C'est moi » (une seule par appareil) ✅ — voir plus bas, simplifié | Limite 6 | Modéré — un champ, une action dans `PlayerEditorView`, une mise en avant dans `PlayersListView` |
-| 5 | Registre léger côté serveur : qui a revendiqué mon `UUID`, et quand (nouvelle table, sur le modèle de `cacompte_open_games`) | Limite 2 et 5 (partiellement) | Modéré à élevé — nouvelle table, UI de consultation, ne détecte que les liaisons sur *mon propre* identifiant, jamais une fausse fiche créée sous un `UUID` distinct |
+| 5 | Registre léger côté serveur : qui a revendiqué mon `UUID`, et quand (nouvelle table, sur le modèle de `quimene_open_games`) | Limite 2 et 5 (partiellement) | Modéré à élevé — nouvelle table, UI de consultation, ne détecte que les liaisons sur *mon propre* identifiant, jamais une fausse fiche créée sous un `UUID` distinct |
 
 Le point 5 mérite une précision importante : il ne répond **pas** au scénario initial (une fausse
 fiche « Erwan » créée sous un `UUID` différent du mien reste invisible pour moi, quel que soit le

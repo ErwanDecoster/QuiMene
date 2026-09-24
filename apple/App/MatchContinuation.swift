@@ -8,7 +8,7 @@ import Store
 /// synchronisé via CloudKit, doc 03 ; sinon la reprise échoue silencieusement, comme un lien de
 /// partie qui n'existe plus).
 enum MatchContinuation {
-  static let activityType = "com.cacompte.app.continueMatch"
+  static let activityType = "com.quimene.app.continueMatch"
   private static let matchIDKey = "matchID"
 
   static func configure(_ activity: NSUserActivity, for match: MatchRecord, gameName: String?) {

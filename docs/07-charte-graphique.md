@@ -9,7 +9,7 @@ même côté Android. Aucun des deux ne redéfinit une valeur.
 
 ## 0. Positionnement
 
-**Ça Compte** — application de suivi de scores pour jeux de société, destinée aux groupes
+**Qui Mène ?** — application de suivi de scores pour jeux de société, destinée aux groupes
 d'amis et aux familles qui jouent régulièrement.
 
 > **Sobre et précis pendant la partie, ludique au moment du résultat.**
@@ -29,7 +29,7 @@ avatars, badges.
 
 Trois attributs de marque, dans l'ordre de priorité — en cas de conflit, le premier gagne :
 
-1. **Fiable** — on ne conteste pas un chiffre affiché par Ça Compte.
+1. **Fiable** — on ne conteste pas un chiffre affiché par Qui Mène ?.
 2. **Rapide** — rien ne se met entre l'utilisateur et la saisie.
 3. **Complice** — l'app connaît le groupe, ses joueurs, ses habitudes, et sait s'en amuser.
 
@@ -595,9 +595,9 @@ Construction sur une grille de 24 unités :
 | **Horizontale** | Icône + wordmark à droite, séparés de 2× l'épaisseur de trait | **96 px** écran · 25 mm impression | En-tête, écran d'accueil, pied d'image partagée |
 | **Verticale** | Icône au-dessus du wordmark, centrés, séparés de 3× l'épaisseur | **72 px** écran · 20 mm impression | Écran de lancement, à-propos |
 
-Wordmark « Ça Compte » en **Outfit SemiBold**, vectorisé. La cédille est le détail critique :
-elle doit rester lisible à 96 px de large, ce qui a écarté plusieurs grotesques géométriques
-dont la cédille se referme. Tracking −1 %.
+Wordmark « Qui Mène ? » en **Outfit SemiBold**, vectorisé. Le point d'interrogation, précédé d'une
+espace insécable comme le veut la typographie française, fait partie du nom : il ne se retire
+jamais, ne passe jamais à la ligne seul, et reste lisible à 96 px de large. Tracking −1 %.
 
 ### 11.3 Zone de protection
 
@@ -670,7 +670,9 @@ l'écran de résultats — le seul endroit où l'app a le droit d'avoir une voix
 - Vocabulaire fixe, jamais synonymisé : **partie** (pas « jeu » ni « session »), **manche**
   (pas « tour » ni « round »), **joueur** (pas « participant » dans l'UI), **score** (pas
   « points » ni « résultat »).
-- Le mot **« Ça Compte »** garde toujours sa majuscule et son accent, y compris en anglais.
+- Le nom **« Qui Mène ? »** s'écrit toujours ainsi, dans toutes les langues : deux majuscules, l'accent
+  grave, et le point d'interrogation précédé d'une espace insécable (jamais « Qui mène? »). L'ancien
+  nom, « Ça Compte », ne doit plus apparaître.
 
 ---
 

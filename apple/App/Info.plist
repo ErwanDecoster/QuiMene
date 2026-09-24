@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>fr</string>
 	<key>CFBundleDisplayName</key>
-	<string>Ça Compte</string>
+	<string>Qui Mène ?</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -18,6 +18,17 @@
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.quimene.app.join</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>quimene</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -25,25 +36,14 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Ça Compte utilise l'appareil photo pour scanner un code d'appairage de partie ou de profil partagé.</string>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLName</key>
-			<string>com.cacompte.app.join</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>cacompte</string>
-			</array>
-		</dict>
-	</array>
+	<string>Qui Mène ? utilise l'appareil photo pour scanner un code d'appairage de partie ou de profil partagé.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
 	<true/>
 	<key>NSUserActivityTypes</key>
 	<array>
-		<string>com.cacompte.app.continueMatch</string>
+		<string>com.quimene.app.continueMatch</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

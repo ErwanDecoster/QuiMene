@@ -5,14 +5,14 @@ import Foundation
 /// tout le reste (matchID, jeu, nombre de joueurs, nom de l'appareil) à partir de ce seul code, ce
 /// lien ne fait que remplacer la frappe des 6 chiffres.
 ///
-/// Schéma personnalisé (`cacompte://`) plutôt qu'un lien universel `https://` : ce dernier
+/// Schéma personnalisé (`quimene://`) plutôt qu'un lien universel `https://` : ce dernier
 /// demanderait de posséder un nom de domaine et d'y héberger un fichier de vérification
 /// (Associated Domains/App Links), une dépendance externe hors de portée pour l'instant. En
 /// échange, l'ouverture depuis l'appareil photo système n'est garantie que sur iOS (Camera
-/// propose « Ouvrir dans Ça Compte » pour un schéma personnalisé si l'app est installée) ; le
+/// propose « Ouvrir dans Qui Mène ? » pour un schéma personnalisé si l'app est installée) ; le
 /// scanner intégré (`QRScannerView`) reste le chemin fiable sur toutes les plateformes.
 enum JoinLink {
-  private static let scheme = "cacompte"
+  private static let scheme = "quimene"
   private static let host = "join"
 
   struct Payload: Equatable {

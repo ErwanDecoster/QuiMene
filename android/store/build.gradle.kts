@@ -8,7 +8,7 @@ plugins {
 // com.android.library (pas kotlin("jvm")) : Room a besoin d'un Context Android, contrairement à
 // :domain/:catalog/:sync qui restent Kotlin/JVM pur.
 android {
-    namespace = "com.cacompte.store"
+    namespace = "com.quimene.store"
     compileSdk = 37
 
     defaultConfig {
@@ -42,7 +42,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.core)
 
     // `api`, pas `implementation` : l'API publique de :store expose Room directement
-    // (`CaCompteDatabase` hérite de `RoomDatabase`, les DAOs sont un type Room) — :app en a
+    // (`QuiMeneDatabase` hérite de `RoomDatabase`, les DAOs sont un type Room) — :app en a
     // besoin sur son propre classpath de compilation pour construire/utiliser la base.
     api(libs.androidx.room.runtime)
     api(libs.androidx.room.ktx)

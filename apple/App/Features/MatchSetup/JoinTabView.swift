@@ -117,7 +117,7 @@ struct JoinTabView: View {
     .presentationDetents([.medium])
   }
 
-  /// Doc utilisateur — un lien `cacompte://join` (appareil photo système, Messages…) ou un QR
+  /// Doc utilisateur — un lien `quimene://join` (appareil photo système, Messages…) ou un QR
   /// scanné avant que cet onglet n'existe encore doit être consommé dès qu'il apparaît, comme
   /// les autres signaux de `DeepLinkRouter`.
   private func consumePendingJoin() {

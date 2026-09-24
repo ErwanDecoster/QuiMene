@@ -31,7 +31,7 @@ enum GameRequestMail {
   }
 
   private static func url(searchTerm: String?) -> URL? {
-    let subject: LocalizedStringResource = "Demande d'ajout d'un jeu — Ça Compte"
+    let subject: LocalizedStringResource = "Demande d'ajout d'un jeu — Qui Mène ?"
     var components = URLComponents()
     components.scheme = "mailto"
     components.path = recipient

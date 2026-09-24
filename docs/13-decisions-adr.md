@@ -326,7 +326,7 @@ plateforme.
 **Décision.** Remplacer les deux frameworks propriétaires par deux transports construits sur des
 standards que les deux OS implémentent nativement et de façon interopérable sur le fil :
 
-1. **Wi-Fi, transport principal** — découverte par mDNS/DNS-SD (RFC 6762/6763, `_cacompte._tcp`),
+1. **Wi-Fi, transport principal** — découverte par mDNS/DNS-SD (RFC 6762/6763, `_quimene._tcp`),
    socket TCP pour les données. `Network.framework` (`NWListener`/`NWBrowser`/`NWConnection`) côté
    Apple, `NsdManager` + `Socket`/`ServerSocket` côté Android.
 2. **Bluetooth LE, secours** — service GATT dédié, sans dépendance à un réseau Wi-Fi commun.
@@ -432,7 +432,7 @@ plutôt que d'un bug de code à corriger. Cinq correctifs réels sans connexion 
 d'un rapport coût/bénéfice mauvais, pas d'un dernier bug à trouver.
 
 **Décision.** Remplacer `WifiTransport` et `BLETransport` par `SupabaseTransport`
-(`apple/CaCompteKit/Sources/Sync/SupabaseTransport.swift`), une seule implémentation du protocole
+(`apple/QuiMeneKit/Sources/Sync/SupabaseTransport.swift`), une seule implémentation du protocole
 `Transport` (doc [09](09-partie-partagee.md)) reposant sur Supabase Realtime :
 
 - un canal par session de partage (`session:<sessionID>`, indépendant de la partie courante en
@@ -441,7 +441,7 @@ d'un rapport coût/bénéfice mauvais, pas d'un dernier bug à trouver.
   chaque pair sous son `deviceID` — qui remplace toute la détection de déconnexion Wi-Fi/BLE ;
 - **Broadcast** pour transporter chaque `WireMessage`, toujours chiffré par `SessionCrypto`
   (HKDF + AES-GCM) — cette couche ne dépendait déjà pas du transport, elle est inchangée ;
-- une table Postgres, `cacompte_open_games` (migration
+- une table Postgres, `quimene_open_games` (migration
   `supabase/migrations/20260731123300_create_cacompte_open_games.sql`), qui résout un code
   d'appairage à 6 chiffres vers un `sessionID` — remplace la découverte mDNS/BLE, qui n'a plus
   lieu d'être : Supabase ne demande aucune proximité physique entre les appareils.

@@ -31,7 +31,7 @@ import os
 @MainActor
 enum MatchLiveActivityController {
   private static let logger = Logger(
-    subsystem: "com.cacompte.app", category: "MatchLiveActivityController")
+    subsystem: "com.quimene.app", category: "MatchLiveActivityController")
   private static var activities: [String: Activity<MatchActivityAttributes>] = [:]
   private static var pushTokenTasks: [String: Task<Void, Never>] = [:]
   /// Résout un `matchID` vers la clé d'activité sous laquelle il est actuellement suivi —

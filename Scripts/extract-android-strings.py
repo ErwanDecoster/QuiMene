@@ -17,7 +17,7 @@ Après extraction, le câblage effectif (remplacer chaque littéral Kotlin par
 stringResource(R.string.<nom>)) reste manuel — ce script ne touche jamais
 les fichiers .kt. Une passe de repérage utile :
   grep -rnE '"[^"]*\\$\\{?[a-zA-Z]|"[^"]*[àâäéèêëïîôöùûüçÀÂÉÈ]' \\
-    android/app/src/main/kotlin/com/cacompte/app --include='*.kt' \\
+    android/app/src/main/kotlin/com/quimene/app --include='*.kt' \\
     | grep -v 'stringResource(R\\.string\\.'
 """
 import json
