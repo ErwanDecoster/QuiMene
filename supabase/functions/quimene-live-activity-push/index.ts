@@ -123,13 +123,17 @@ async function providerToken(): Promise<string> {
 
 async function sendToToken(pushToken: string, body: { event: "update" | "end"; contentState: unknown }): Promise<{ ok: boolean; shouldForget: boolean }> {
   const token = await providerToken();
-  const payload: Record<string, unknown> = {
-    aps: {
-      timestamp: Math.floor(Date.now() / 1000),
-      event: body.event,
-      "content-state": body.contentState,
-    },
+  const now = Math.floor(Date.now() / 1000);
+  const aps: Record<string, unknown> = {
+    timestamp: now,
+    event: body.event,
+    "content-state": body.contentState,
   };
+  // Doc utilisateur — remontée « la Live Activity ne disparaît jamais » : sans `dismissal-date`,
+  // iOS garde une activité terminée sur l'écran verrouillé jusqu'à 4 heures. Une date déjà
+  // atteinte la retire immédiatement, comme `dismissalPolicy: .immediate` côté app.
+  if (body.event === "end") aps["dismissal-date"] = now;
+  const payload: Record<string, unknown> = { aps };
   let response: Response | null = null;
   let reason: string | undefined;
   for (const host of APNS_HOSTS) {

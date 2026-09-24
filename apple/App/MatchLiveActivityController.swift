@@ -105,6 +105,13 @@ enum MatchLiveActivityController {
 
       keysByMatchID[matchID] = key
 
+      if activities[key] == nil, let existing = existingActivity(forKey: key) {
+        // Doc utilisateur — remontée « la Live Activity ne disparaît jamais » : une activité
+        // créée avant un redémarrage de l'app restait orpheline, et rouvrir la partie en
+        // demandait une seconde. On reprend celle qui existe déjà pour cette clé.
+        adopt(existing, key: key)
+      }
+
       if let found = activities[key] {
         nonisolated(unsafe) let activity = found
         await activity.update(ActivityContent(state: content, staleDate: nil))
@@ -124,25 +131,69 @@ enum MatchLiveActivityController {
           logger.error("Activity.request FAILED: \(error, privacy: .public)")
           return
         }
-        activities[key] = activity
-        nonisolated(unsafe) let startedActivity = activity
-        pushTokenTasks[key] = Task {
-          let deviceID = DeviceIdentity.current
-          logger.debug(
-            "waiting for pushTokenUpdates key=\(key, privacy: .public) device=\(deviceID, privacy: .public)"
-          )
-          for await tokenData in startedActivity.pushTokenUpdates {
-            let pushToken = tokenData.map { String(format: "%02x", $0) }.joined()
-            logger.debug("got push token for key=\(key, privacy: .public)")
-            await LiveActivityPushClient.registerToken(
-              activityKey: key, deviceID: deviceID, pushToken: pushToken)
-          }
-          logger.debug("pushTokenUpdates stream ended key=\(key, privacy: .public)")
-        }
+        adopt(activity, key: key)
       }
 
       if isAuthoritative {
         await LiveActivityPushClient.push(activityKey: key, event: "update", contentState: content)
+      }
+    }
+  }
+
+  /// Suit une activité (créée à l'instant ou reprise d'un lancement précédent) : l'enregistre sous
+  /// sa clé et inscrit son jeton de push auprès de Supabase à chaque rotation. Le contenu courant
+  /// part avec le jeton, pour que `quimene-live-activity-sweep` ait toujours de quoi envoyer une fin
+  /// valide — un contenu vide est ignoré par iOS, et l'activité ne se terminait alors jamais.
+  private static func adopt(_ activity: Activity<MatchActivityAttributes>, key: String) {
+    activities[key] = activity
+    keysByMatchID[activity.content.state.matchID] = key
+    pushTokenTasks[key]?.cancel()
+    nonisolated(unsafe) let startedActivity = activity
+    pushTokenTasks[key] = Task {
+      let deviceID = DeviceIdentity.current
+      logger.debug(
+        "waiting for pushTokenUpdates key=\(key, privacy: .public) device=\(deviceID, privacy: .public)"
+      )
+      for await tokenData in startedActivity.pushTokenUpdates {
+        let pushToken = tokenData.map { String(format: "%02x", $0) }.joined()
+        logger.debug("got push token for key=\(key, privacy: .public)")
+        await LiveActivityPushClient.registerToken(
+          activityKey: key, deviceID: deviceID, pushToken: pushToken,
+          contentState: startedActivity.content.state)
+      }
+      logger.debug("pushTokenUpdates stream ended key=\(key, privacy: .public)")
+    }
+  }
+
+  private static func existingActivity(forKey key: String) -> Activity<MatchActivityAttributes>? {
+    Activity<MatchActivityAttributes>.activities.first {
+      $0.attributes.activityKey == key && $0.activityState == .active
+    }
+  }
+
+  /// Doc utilisateur — remontée « la Live Activity ne disparaît jamais » : `activities` ne vit
+  /// qu'en mémoire, donc après un redémarrage de l'app, rien ne connaissait plus les activités
+  /// encore affichées. Appelé une fois au lancement : garde (et reprend) l'activité d'une partie
+  /// solo encore en cours, termine immédiatement toutes les autres. Une session de partage ne
+  /// survit pas à un redémarrage côté hôte ; côté pair, la reconnexion automatique
+  /// (`MatchConnectionCoordinator`) en recrée une au premier événement reçu.
+  static func reconcileOnLaunch(isMatchInProgress: @escaping (UUID) -> Bool) {
+    Task { @MainActor in
+      let tracked = Set(activities.values.map(\.id))
+      var kept: Set<String> = []
+      for found in Activity<MatchActivityAttributes>.activities where !tracked.contains(found.id) {
+        nonisolated(unsafe) let activity = found
+        let key = activity.attributes.activityKey
+        let isSoloInProgress =
+          key.hasPrefix("match:") && isMatchInProgress(activity.content.state.matchID)
+        if isSoloInProgress, activity.activityState == .active, !kept.contains(key),
+          activities[key] == nil
+        {
+          kept.insert(key)
+          adopt(activity, key: key)
+        } else {
+          await activity.end(nil, dismissalPolicy: .immediate)
+        }
       }
     }
   }

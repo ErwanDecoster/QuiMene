@@ -17,15 +17,17 @@ public enum LiveActivityPushClient {
     subsystem: "com.quimene.app", category: "LiveActivityPushClient")
 
   /// Paramètres de `quimene_register_live_activity_token` — clés encodées = noms SQL.
-  private struct RegisterParams: Encodable {
+  private struct RegisterParams<Content: Encodable>: Encodable {
     let activityKey: String
     let deviceID: String
     let pushToken: String
+    let contentState: Content
 
     enum CodingKeys: String, CodingKey {
       case activityKey = "p_activity_key"
       case deviceID = "p_device_id"
       case pushToken = "p_push_token"
+      case contentState = "p_content_state"
     }
   }
 
@@ -37,11 +39,18 @@ public enum LiveActivityPushClient {
   /// forcément la seule partie courante — voir `MatchLiveActivityController.activityKey`.
   /// La table elle-même n'est plus accessible à l'anon (migration
   /// `secure_cacompte_live_activity_tokens`).
-  public static func registerToken(activityKey: String, deviceID: String, pushToken: String) async {
+  /// `contentState` : contenu affiché au moment de l'inscription, conservé par le serveur pour que
+  /// le balayage puisse toujours envoyer une fin valide (voir la migration
+  /// `register_live_activity_token_content`).
+  public static func registerToken(
+    activityKey: String, deviceID: String, pushToken: String, contentState: some Encodable
+  ) async {
     do {
       try await client.rpc(
         "quimene_register_live_activity_token",
-        params: RegisterParams(activityKey: activityKey, deviceID: deviceID, pushToken: pushToken)
+        params: RegisterParams(
+          activityKey: activityKey, deviceID: deviceID, pushToken: pushToken,
+          contentState: contentState)
       )
       .execute()
       logger.info(

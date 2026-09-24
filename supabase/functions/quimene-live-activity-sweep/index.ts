@@ -93,13 +93,17 @@ async function providerToken(): Promise<string> {
 
 async function sendToToken(pushToken: string, body: { event: "update" | "end"; contentState: unknown }): Promise<{ ok: boolean; shouldForget: boolean }> {
   const token = await providerToken();
-  const payload: Record<string, unknown> = {
-    aps: {
-      timestamp: Math.floor(Date.now() / 1000),
-      event: body.event,
-      "content-state": body.contentState,
-    },
+  const now = Math.floor(Date.now() / 1000);
+  const aps: Record<string, unknown> = {
+    timestamp: now,
+    event: body.event,
+    "content-state": body.contentState,
   };
+  // Doc utilisateur — remontée « la Live Activity ne disparaît jamais » : sans `dismissal-date`,
+  // iOS garde une activité terminée sur l'écran verrouillé jusqu'à 4 heures. Une date déjà
+  // atteinte la retire immédiatement, comme `dismissalPolicy: .immediate` côté app.
+  if (body.event === "end") aps["dismissal-date"] = now;
+  const payload: Record<string, unknown> = { aps };
   let response: Response | null = null;
   let reason: string | undefined;
   for (const host of APNS_HOSTS) {
@@ -161,7 +165,12 @@ Deno.serve(async (request) => {
       // Best-effort : que le push APNs réussisse ou non, ce jeton n'a plus de raison de rester en
       // base une fois jugé inactif — un jeton révoqué serait de toute façon nettoyé par
       // `quimene-live-activity-push` au prochain essai, autant le faire tout de suite ici.
-      await sendToToken(row.push_token, { event: "end", contentState: row.last_content_state ?? {} });
+      // Un contenu vide n'est pas décodable par iOS, qui ignorerait la fin : sans contenu connu
+      // (jeton inscrit par un build antérieur), l'app termine l'activité à son prochain lancement
+      // (`MatchLiveActivityController.reconcileOnLaunch`).
+      if (row.last_content_state) {
+        await sendToToken(row.push_token, { event: "end", contentState: row.last_content_state });
+      }
       await supabase
         .from("quimene_live_activity_tokens")
         .delete()

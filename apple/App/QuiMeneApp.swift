@@ -53,6 +53,11 @@ struct QuiMeneApp: App {
           // plan (voir `.onChange(of: scenePhase)` plus bas) : même déclencheur que
           // `MatchConnectionCoordinator`, pas de minuteur propre à inventer.
           .task {
+            let repository = MatchRepository(context: container.mainContext)
+            MatchLiveActivityController.reconcileOnLaunch { matchID in
+              guard let match = try? repository.match(withID: matchID) else { return false }
+              return match.statusRaw == "inProgress" || match.statusRaw == "finalRound"
+            }
             await SharedProfileSyncCoordinator.shared.sync(context: container.mainContext)
           }
         } else {
