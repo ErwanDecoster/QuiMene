@@ -1,0 +1,21 @@
+{
+  "events" : [
+    {
+      "ciphertext" : "CkAoMrvyqjmlzngxLbGslLaDHdkCLRzZ+11jcW9gfsS8ClqrFGs2CO3PuQ3DaX9xtDoOm0wzCyUb5kcS2Lq4gXzl0ZzFnWiLLGq7DwJe2pssaW3fcHhhRU5sDMxFAKkgflb566CLqLWjmBGq7hjakgbfJc1a7mrDqvK822KjaWTss856cLXNp+8kLRF9ixRgUxx6R65JE/VqLy3n92qXXAiXZphob5MO+PARGtCilwSm2ZLb3C7/sGUTu8Fu8AEoJ9lTVeHhQsQkgTpswntypLk6rN3QZvvhzZqbF9CLIU+6wvxs7DZgd3ONACtGm3jV7Z+jzefuFelCMP+cQUNnFhnR5f+N+Xv6lq66j/3+QbLG21zyl4DpX8LuZ4uMGyHKxrwux5FkyNyI+MnugcttUmj4wcvkm2UpTvfSKBa1za4i6g==",
+      "plaintext" : "{\"identity\":{\"deviceID\":\"ios-device\",\"kind\":\"claim\",\"seat\":{\"displayName\":\"Théo\",\"seatIndex\":1},\"profile\":{\"id\":\"33333333-3333-4333-8333-333333333333\",\"avatarValue\":\"🦊\",\"avatarKind\":\"emoji\",\"paletteID\":\"4\",\"name\":\"Théo\"},\"occurredAt\":800000000,\"id\":\"BBBBBBBB-0000-4000-8000-000000000001\"}}",
+      "seq" : 3
+    },
+    {
+      "ciphertext" : "lkFWJGDpjYKa0YmumyK008PZyMe3/IeFnJGDecBk45Ftb3vuTP+K5vilz01fTuEAQkxYnvXgtAAcj7Vh8N4NEHzQtIX8w7kZ2XaumpjxI6xCpU89w8TDfdy6Y5z1U43UHyoroIbSeR5jQouYd90iiLQchPKSmxLVgFLBvAUSqxguKTq7Vbl0hq5MEx4NYkPSMwLnbIcBQ2EUUz0Ti/+NPUxnaHq49DOu9jSxZPiQu17XNQYcF8FpEPGWq6I94K627wH6TZ9COF/w5LI55zLJvA25oEz0LIo4tKpjNBZeVjFJGpIqr+WhaRwjPkjlW3oh2OEFHuxJ8uhSv04KUgTX6LSuchjHyosMX6syLTtCTkUmmQAbA6rHg4rAKNurID4IMMYPiODPpBvnRInyI7XP6kqjiIO1dqWg1OmHWYM8n3I2YsSHnctr1cOXTl+SnKrLw6QrdHzEVV0XlyhmNp67q36wrIhnS9wxLYSbPdlgfJZiHdt/Urr3M8LW8nY7sa67l8/kfQiCDSg=",
+      "plaintext" : "{\"identity\":{\"profile\":{\"id\":\"44444444-4444-4444-8444-444444444444\",\"name\":\"Erwan\",\"avatarKind\":\"emoji\",\"paletteID\":\"1\",\"avatarValue\":\"🐻\"},\"linkedSeats\":[{\"seat\":{\"displayName\":\"Erwan\",\"seatIndex\":0},\"profileID\":\"44444444-4444-4444-8444-444444444444\"}],\"id\":\"BBBBBBBB-0000-4000-8000-000000000002\",\"occurredAt\":800000030,\"deviceID\":\"ios-device\",\"kind\":\"roster\"}}",
+      "seq" : 4
+    },
+    {
+      "ciphertext" : "04ZVPfiYNLuSujshu2DAVrfFUsRkxIjgOqbnzmT97Xp55mmnQQYHuLOHzADyQKwS/2Q1F+HtdQqSw5FwyuR9/obU0xeTIUptUP1j22L5D4dP8aod7IZ5CA43OvOQUYXnUp7Gb3Ep+y2p2TnnsxlsrACm1T9RkCPgjnNAuv96UVVSKwNxXyZqvWSl5buaVzal+0pFWx/prNVD+uFje9tBlURUlnt1IpznrbuKizQeYH5ihzDW5Netd1y2tz+Z4+7LXOP28hFM419pLnQt6A==",
+      "plaintext" : "{\"identity\":{\"occurredAt\":800000060,\"id\":\"BBBBBBBB-0000-4000-8000-000000000003\",\"kind\":\"revoke\",\"revokedClaimID\":\"BBBBBBBB-0000-4000-8000-000000000001\",\"deviceID\":\"ios-device\"}}",
+      "seq" : 5
+    }
+  ],
+  "pairingCode" : "042817",
+  "sessionID" : "5A1E2B3C-4D5E-4F60-8172-8394A5B6C7D8"
+}

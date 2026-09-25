@@ -11,6 +11,8 @@ import SwiftUI
 struct RoundHistoryView: View {
   let state: MatchState
   let definition: GameDefinition
+  /// Doc 16 — ma place, marquée « Moi ».
+  var myParticipantID: Participant.ID? = nil
   @Environment(\.dismiss) private var dismiss
 
   private var participants: [Participant] {
@@ -34,9 +36,12 @@ struct RoundHistoryView: View {
                   GridRow {
                     Text("").frame(width: 24, alignment: .leading)
                     ForEach(participants) { participant in
-                      Text(participant.displayName)
-                        .font(.label)
-                        .foregroundStyle(.textSecondary)
+                      HStack(spacing: Space.xxs) {
+                        Text(participant.displayName)
+                          .font(.label)
+                          .foregroundStyle(.textSecondary)
+                        if participant.id == myParticipantID { MeBadge() }
+                      }
                     }
                   }
                   ForEach(rounds, id: \.index) { round in

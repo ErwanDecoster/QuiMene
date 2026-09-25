@@ -27,7 +27,8 @@ final class MatchConnectionCoordinator {
     if let persisted = PersistedOnlineSession.load(.participant) {
       Task { [weak self] in
         _ = try? await self?.connect(
-          code: persisted.pairingCode, deviceName: persisted.deviceName)
+          code: persisted.pairingCode, deviceName: persisted.deviceName,
+          profile: persisted.profile, isSpectator: persisted.isSpectator ?? false)
       }
     }
   }
@@ -35,10 +36,12 @@ final class MatchConnectionCoordinator {
   /// Point d'entrée unique pour rejoindre une partie (`JoinTabView`). Renvoie le rôle accordé :
   /// contributeur, ou observateur si le créateur n'autorise pas les contributeurs.
   @discardableResult
-  func join(code: String, deviceName: String, requestedRole: Role, appVersion: String) async throws
-    -> Role
-  {
-    try await connect(code: code, deviceName: deviceName)
+  /// `profile` : mon profil, publié quand je dis qui je suis (« Qui es-tu ? », doc 16 phase D).
+  func join(
+    code: String, deviceName: String, profile: ProfileCard?, requestedRole: Role,
+    appVersion: String
+  ) async throws -> Role {
+    try await connect(code: code, deviceName: deviceName, profile: profile, isSpectator: false)
   }
 
   /// « Réessayer maintenant » : un rattrapage immédiat, sans attendre le réseau ou le premier plan.
@@ -49,7 +52,9 @@ final class MatchConnectionCoordinator {
     return link.isReachable
   }
 
-  private func connect(code: String, deviceName: String) async throws -> Role {
+  private func connect(
+    code: String, deviceName: String, profile: ProfileCard?, isSpectator: Bool
+  ) async throws -> Role {
     guard let info = try await backend.resolve(pairingCode: code) else {
       throw OnlineSessionError.sessionNotFound
     }
@@ -61,13 +66,20 @@ final class MatchConnectionCoordinator {
     let link = SessionLink(
       session: session, pairingCode: code,
       me: SessionPresence(
-        deviceID: DeviceIdentity.current, deviceName: deviceName, isOwner: false))
+        deviceID: DeviceIdentity.current, deviceName: deviceName, isOwner: false),
+      ownerDeviceID: info.ownerDeviceID)
     let role: Role = info.allowsContributors ? .contributor : .observer
-    let model = SharedMatchModel(link: link, role: role, catalog: catalog)
+    var persisted = PersistedOnlineSession(
+      sessionID: info.sessionID, pairingCode: code, role: .participant, deviceName: deviceName,
+      profile: profile, isSpectator: isSpectator)
+    persisted.save()
+    let model = SharedMatchModel(
+      link: link, role: role, catalog: catalog, me: profile, isSpectator: isSpectator
+    ) { spectator in
+      persisted.isSpectator = spectator
+      persisted.save()
+    }
     sharedModel = model
-    PersistedOnlineSession(
-      sessionID: info.sessionID, pairingCode: code, role: .participant, deviceName: deviceName
-    ).save()
     await link.start()
     return role
   }

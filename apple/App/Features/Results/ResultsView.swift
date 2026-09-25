@@ -11,6 +11,9 @@ struct ResultsView: View {
   let definition: GameDefinition
   let standings: [Standing]
   let participantRecords: [ParticipantRecord]
+  /// Doc 16 — ma place, quand les fiches ne le disent pas (partie suivie depuis un autre
+  /// appareil : fiches en mémoire, sans lien vers mon profil).
+  var myParticipantID: Participant.ID? = nil
   /// Doc utilisateur — date réelle de la partie pour la carte partagée, quand elle est connue
   /// (`HistoryDetailView`, rejouant une partie ancienne). `nil` juste après la fin d'une partie
   /// (`LiveMatchView` et consorts) : la carte retombe alors sur la date du jour, qui est déjà la
@@ -18,6 +21,10 @@ struct ResultsView: View {
   var playedAt: Date? = nil
 
   private let statsEngine = StatsEngine()
+
+  private func isMe(_ id: Participant.ID) -> Bool {
+    id == myParticipantID || recordByID[id]?.player?.sharedProfileIsMine == true
+  }
 
   private var recordByID: [Participant.ID: ParticipantRecord] {
     Dictionary(uniqueKeysWithValues: participantRecords.map { ($0.id, $0) })
@@ -90,7 +97,10 @@ struct ResultsView: View {
               .frame(width: 32)
             AvatarView(avatar: record.avatar, size: .medium)
             VStack(alignment: .leading, spacing: Space.xxs) {
-              Text(record.nicknameSnapshot).font(.h5).foregroundStyle(.textPrimary)
+              HStack(spacing: Space.sm) {
+                Text(record.nicknameSnapshot).font(.h5).foregroundStyle(.textPrimary)
+                if isMe(standing.participantID) { MeBadge() }
+              }
               if let badge = badgeByParticipant[standing.participantID] {
                 Text(badge.kind.label).font(.label).foregroundStyle(.brandBrass)
               }
@@ -208,9 +218,12 @@ struct ResultsView: View {
                 Text("").frame(width: 24, alignment: .leading)
                 ForEach(sortedStandings, id: \.participantID) { standing in
                   if let record = recordByID[standing.participantID] {
-                    Text(record.nicknameSnapshot)
-                      .font(.label)
-                      .foregroundStyle(.textSecondary)
+                    HStack(spacing: Space.xxs) {
+                      Text(record.nicknameSnapshot)
+                        .font(.label)
+                        .foregroundStyle(.textSecondary)
+                      if isMe(standing.participantID) { MeBadge() }
+                    }
                   }
                 }
               }

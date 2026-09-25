@@ -20,7 +20,11 @@ struct TarotRoundView: View {
   init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
     _model = State(
       initialValue: try! TarotRoundModel(match: match, context: context, catalog: catalog))
+    myParticipantID = match.myParticipantID
   }
+
+  /// Doc 16 — ma place, marquée « Moi ».
+  private let myParticipantID: UUID?
 
   var body: some View {
     Group {
@@ -61,7 +65,8 @@ struct TarotRoundView: View {
       }
     }
     .sheet(isPresented: $isPresentingRoundHistory) {
-      RoundHistoryView(state: model.state, definition: model.definition)
+      RoundHistoryView(
+        state: model.state, definition: model.definition, myParticipantID: myParticipantID)
     }
     .alert(
       "Saisie invalide",
@@ -94,6 +99,7 @@ struct TarotRoundView: View {
         let rank = model.finalStandings.first { $0.participantID == participant.id }?.rank
         HStack {
           Text(participant.displayName).font(.h6).foregroundStyle(.textPrimary)
+          if participant.id == myParticipantID { MeBadge() }
           Spacer()
           Text(total.formatted()).font(.scoreL).foregroundStyle(.textPrimary)
         }

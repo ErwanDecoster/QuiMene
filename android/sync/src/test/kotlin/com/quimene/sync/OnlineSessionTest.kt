@@ -36,7 +36,7 @@ import java.util.UUID
 
 /** Mêmes règles que les fonctions SQL de `create_quimene_sessions` — miroir de
  * `InMemorySessionBackend` (Swift). */
-private class InMemorySessionBackend : OnlineSessionBackend {
+internal class InMemorySessionBackend : OnlineSessionBackend {
     private val mutex = Mutex()
     private val events = mutableMapOf<UUID, MutableList<RawSessionEvent>>()
 

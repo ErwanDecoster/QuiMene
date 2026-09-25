@@ -17,6 +17,8 @@ import androidx.compose.ui.res.stringResource
 import com.quimene.app.R
 import com.quimene.app.di.rememberViewModel
 import com.quimene.app.features.livematch.LiveRoundEntryState
+import com.quimene.app.features.livematch.ProfileBadge
+import com.quimene.app.features.livematch.ProfileBadgeView
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
 import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.CardGutter
@@ -48,7 +50,11 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
                 )
             }
             items(liveMatch.participants, key = { it.id }) { participant ->
-                ParticipantTotalRow(participant, liveMatch.totals[participant.id] ?: 0)
+                ParticipantTotalRow(
+                    participant,
+                    liveMatch.totals[participant.id] ?: 0,
+                    liveMatch.profileBadges[participant.id],
+                )
             }
             item {
                 Text(
@@ -225,11 +231,18 @@ internal fun SteppedValue(
 private fun ParticipantTotalRow(
     participant: Participant,
     total: Int,
+    badge: ProfileBadge?,
 ) {
     val colors = LocalAppColors.current
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(participant.displayName, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Space.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(participant.displayName, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
+                ProfileBadgeView(badge)
+            }
             Text(total.toString(), style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
         }
     }

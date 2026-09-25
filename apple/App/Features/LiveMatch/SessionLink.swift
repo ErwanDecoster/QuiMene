@@ -1,3 +1,4 @@
+import DesignSystem
 import Domain
 import Foundation
 import Network
@@ -35,15 +36,24 @@ final class SessionLink {
   private(set) var isClosed = false
   /// Nouveaux événements lisibles, dans l'ordre — publiés à chaque rattrapage.
   var onNewRecords: (([SessionEventRecord]) -> Void)?
+  /// Doc 16, phase D — qui est qui, recalculé à chaque nouvel événement d'identité.
+  private(set) var identities: SessionIdentities
+  /// Nouveaux événements d'identité, dans l'ordre (après `identities` mis à jour).
+  var onNewIdentities: (([SessionIdentityRecord]) -> Void)?
+  /// L'appareil du créateur : seul son registre (`roster`) fait foi.
+  let ownerDeviceID: String
+  private var knownIdentityCount = 0
 
   private let channel: SessionChannel
   private var tasks: [Task<Void, Never>] = []
   private var foregroundObserver: (any NSObjectProtocol)?
   private let pathMonitor = NWPathMonitor()
 
-  init(session: OnlineSession, pairingCode: String, me: SessionPresence) {
+  init(session: OnlineSession, pairingCode: String, me: SessionPresence, ownerDeviceID: String) {
     self.session = session
     self.pairingCode = pairingCode
+    self.ownerDeviceID = ownerDeviceID
+    identities = SessionIdentities(records: [], ownerDeviceID: ownerDeviceID)
     channel = SessionChannel(sessionID: session.sessionID, me: me)
   }
 
@@ -99,6 +109,7 @@ final class SessionLink {
       let fresh = try await session.sync()
       isReachable = true
       if !fresh.isEmpty { onNewRecords?(fresh) }
+      await publishIdentityChanges()
     } catch {
       isReachable = false
     }
@@ -117,11 +128,13 @@ final class SessionLink {
       isReachable = true
       let fresh = await session.records.filter { $0.seq > before }
       onNewRecords?(fresh)
+      await publishIdentityChanges()
       return .accepted(record)
     } catch OnlineSessionError.staleSequence {
       isReachable = true
       let fresh = await session.records.filter { $0.seq > before }
       if !fresh.isEmpty { onNewRecords?(fresh) }
+      await publishIdentityChanges()
       let author = fresh.last { $0.event.deviceID != session.deviceID }?.event.deviceID
       return .overtaken(byDeviceName: author.flatMap(deviceName(for:)))
     } catch OnlineSessionError.sessionClosed {
@@ -131,6 +144,41 @@ final class SessionLink {
       isReachable = false
       return .offline
     }
+  }
+
+  /// Doc 16, phase D — publie un événement d'identité dans la partie `matchID`. Contrairement à
+  /// une manche, nouvel essai automatique si un autre appareil a devancé : une revendication ne
+  /// dépend pas de l'état de la partie (les règles de `SessionIdentities` départagent ensuite).
+  @discardableResult
+  func submitIdentity(_ event: SessionIdentityEvent, matchID: UUID) async -> Bool {
+    guard !isClosed else { return false }
+    for _ in 0..<3 {
+      do {
+        try await session.appendIdentity(event, matchID: matchID)
+        isReachable = true
+        await publishIdentityChanges()
+        return true
+      } catch OnlineSessionError.staleSequence {
+        await publishIdentityChanges()
+        continue
+      } catch OnlineSessionError.sessionClosed {
+        isClosed = true
+        return false
+      } catch {
+        isReachable = false
+        return false
+      }
+    }
+    return false
+  }
+
+  private func publishIdentityChanges() async {
+    let all = await session.identities
+    guard all.count != knownIdentityCount else { return }
+    let fresh = Array(all.dropFirst(knownIdentityCount))
+    knownIdentityCount = all.count
+    identities = SessionIdentities(records: all, ownerDeviceID: ownerDeviceID)
+    onNewIdentities?(fresh)
   }
 
   func deviceName(for deviceID: String) -> String? {
@@ -156,6 +204,9 @@ struct PersistedOnlineSession: Codable, Equatable {
   let role: Role
   /// Nom affiché aux autres appareils (présence), retenu pour la reprise au lancement.
   let deviceName: String
+  /// Doc 16, phase D — côté participant : mon profil tel que publié, et « Je regarde seulement ».
+  var profile: ProfileCard?
+  var isSpectator: Bool?
 
   private static func key(_ role: Role) -> String { "onlineSession.\(role.rawValue)" }
 
@@ -190,5 +241,77 @@ enum SessionDisplayName {
     let nickname = (try? PlayerRepository(context: context).myOwnSharedPlayer())?.nickname ?? ""
     let trimmed = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
     return trimmed.isEmpty ? UIDevice.current.name : trimmed
+  }
+}
+
+extension ProfileCard {
+  /// Doc 16, phase D — la carte de mon profil, publiée dans une session (« Qui es-tu ? », registre
+  /// du créateur). `nil` sans profil. Un avatar photo ne voyage pas : repli sur l'emoji dérivé
+  /// du pseudo, comme pour le QR de profil.
+  @MainActor
+  static func mine(in context: ModelContext) -> ProfileCard? {
+    let repository = PlayerRepository(context: context)
+    guard let me = try? repository.myOwnSharedPlayer(),
+      let id = try? repository.sharedProfileID(for: me)
+    else { return nil }
+    return ProfileCard(player: me, id: id)
+  }
+
+  init(player: PlayerRecord, id: UUID) {
+    let emoji: String
+    if player.avatarKind == "emoji", !player.avatarValue.isEmpty {
+      emoji = player.avatarValue
+    } else if case .emoji(let value) = Avatar.generated(for: player.nickname).kind {
+      emoji = value
+    } else {
+      emoji = ""
+    }
+    self.init(
+      id: id, name: player.nickname, avatarKind: "emoji", avatarValue: emoji,
+      paletteID: player.paletteID)
+  }
+
+  /// L'avatar à montrer pour cette carte.
+  var avatar: Avatar {
+    let emoji: String
+    if avatarKind == "emoji", !avatarValue.isEmpty {
+      emoji = avatarValue
+    } else if case .emoji(let value) = Avatar.generated(for: name).kind {
+      emoji = value
+    } else {
+      emoji = Avatar.curatedEmoji.first ?? "🙂"
+    }
+    return Avatar(kind: .emoji(emoji), palette: PlayerPalette(index: Int(paletteID) ?? 1))
+  }
+}
+
+/// Doc 16, phase D — la liaison « Qui es-tu ? » vaut dans les deux sens : côté participant, le
+/// créateur devient un ami lié (doc 14), comme après un scan de son QR de profil.
+@MainActor
+enum FriendLinking {
+  /// Une fiche déjà liée à ce profil : rien à faire. Sinon, une fiche active non liée qui porte
+  /// exactement ce pseudo (et une seule) est liée ; à défaut, une fiche est créée.
+  static func ensureFriend(_ card: ProfileCard, in context: ModelContext) {
+    let repository = PlayerRepository(context: context)
+    guard (try? repository.player(withSharedProfileID: card.id)) == nil else { return }
+    let name = card.name.trimmingCharacters(in: .whitespacesAndNewlines)
+    let unlinked =
+      (try? context.fetch(
+        FetchDescriptor<PlayerRecord>(
+          predicate: #Predicate { !$0.isArchived && $0.sharedProfileID == nil }))) ?? []
+    let sameName = unlinked.filter {
+      $0.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+        .localizedCaseInsensitiveCompare(name) == .orderedSame
+    }
+    let fiche: PlayerRecord?
+    if sameName.count == 1 {
+      fiche = sameName.first
+    } else {
+      guard case .emoji(let emoji) = card.avatar.kind else { return }
+      fiche = try? repository.create(
+        nickname: name, avatarKind: "emoji", avatarValue: emoji, paletteID: card.paletteID)
+    }
+    guard let fiche else { return }
+    try? repository.linkSharedProfile(card.id, name: card.name, for: fiche)
   }
 }

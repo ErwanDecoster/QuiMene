@@ -78,6 +78,9 @@ class LiveMatchViewModel(
         private set
 
     val matchID: UUID get() = match.id
+
+    override var profileBadges by mutableStateOf<Map<UUID, ProfileBadge>>(emptyMap())
+        private set
     val gameID: String get() = match.gameID
 
     val isSharing: Boolean get() = shareCoordinator?.attachedMatchID == match.id
@@ -96,7 +99,13 @@ class LiveMatchViewModel(
         }
 
     init {
-        viewModelScope.launch { stateInternal = repository.loadState(match, catalog) }
+        viewModelScope.launch {
+            stateInternal = repository.loadState(match, catalog)
+            profileBadges =
+                repository.linkedParticipants(match.id).mapValues { (_, isMine) ->
+                    if (isMine) ProfileBadge.Me else ProfileBadge.Friend
+                }
+        }
         shareCoordinator?.let { coordinator ->
             viewModelScope.launch {
                 coordinator.remoteMatchUpdates.collect { update ->

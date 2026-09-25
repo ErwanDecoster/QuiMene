@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="value1_count2">%1$s: %2$d</string>
+    <string name="value1_a_ferme_la_manche">%1$s cerró la ronda</string>
     <string name="value1_est_deja_ton_ami_sur_la_fiche_value2">%1$s ya es tu amigo, en la ficha «%2$s».</string>
+    <string name="value1_s_est_associe_a_la_fiche_value2">%1$s se ha asociado a la ficha «%2$s».</string>
     <string name="value1_vient_de_valider_une_manche_verifie_avant_de_valider">%1$s acaba de validar una ronda: revisa antes de validar la tuya.</string>
     <string name="value1_manche_count2">%1$s · Manga %2$d</string>
     <string name="value1_value2">%1$s, %2$s</string>
@@ -72,6 +74,9 @@
     <string name="cette_donne">Esta mano</string>
     <string name="cette_fiche_suit_actuellement_value1_continuer_la_fera">Esta ficha sigue actualmente a %1$s. Continuar hará que siga a %2$s en su lugar: %3$s ya no recibirá las partidas jugadas con esta ficha.</string>
     <string name="cette_partie_n_est_plus_disponible_les_regles_de_ce_jeu_ont">Esta partida ya no está disponible — las reglas de este juego han cambiado desde entonces.</string>
+    <string name="cette_place_vient_d_etre_prise_par_quelqu_un_d_autre">Alguien acaba de ocupar este puesto.</string>
+    <string name="changer">Cambiar</string>
+    <string name="changer_le_signe">Cambiar el signo</string>
     <string name="chaque_equipe_doit_compter_exactement_count1_joueurs">Cada equipo debe tener exactamente %1$d jugadores.</string>
     <string name="chelem_annonce">Chelem anunciado</string>
     <string name="chelem_realise">Chelem logrado</string>
@@ -96,6 +101,7 @@
     <string name="demander_ce_jeu">Solicitar este juego</string>
     <string name="demander_l_ajout_d_un_jeu">Solicitar un juego</string>
     <string name="double_label">Doble</string>
+    <string name="deja_prise">Ocupado</string>
     <string name="deja_un_profil_sur_un_autre_appareil_avec_icloud_il_arrive">¿Ya tienes un perfil en otro dispositivo? Con iCloud, llega solo en unos instantes.</string>
     <string name="demarrage_du_partage">Iniciando el uso compartido…</string>
     <string name="derive_automatiquement_du_pseudo_modifiable_ci_dessous">Derivado automáticamente del apodo — modificable a continuación.</string>
@@ -108,6 +114,7 @@
     <string name="fais_scanner_ce_code_par_l_ami_avec_qui_tu_veux_partager">Haz que el amigo con quien quieres compartir tu historial escanee este código, desde su propia ficha «Seguir un perfil recibido».</string>
     <string name="fais_scanner_ce_code_par_un_ami_depuis_ajouter_un_ami_dans">Pide a un amigo que escanee este código desde «Añadir un amigo» en su pestaña Perfil. Las partidas que juguéis juntos aparecerán en vuestros dos historiales.</string>
     <string name="faits_marquants">Momentos destacados</string>
+    <string name="ferme">Cierra</string>
     <string name="fermer">Cerrar</string>
     <string name="garde">Garde</string>
     <string name="garde_contre_le_chien">Garde contre le chien</string>
@@ -118,6 +125,8 @@
     <string name="hors_connexion_le_tableau_affiche_est_le_dernier_recu">Sin conexión. El marcador mostrado es el último recibido.</string>
     <string name="hote">Anfitrión</string>
     <string name="impossible_de_demarrer_le_partage_verifie_ta_connexion">No se pudo iniciar el uso compartido. Comprueba tu conexión a Internet e inténtalo de nuevo.</string>
+    <string name="je_joue_aussi">Yo también juego</string>
+    <string name="je_regarde_seulement">Solo miro</string>
     <string name="jeu">Juego</string>
     <string name="jeux">Juegos</string>
     <string name="joueur">Jugador</string>
@@ -131,6 +140,7 @@
     <string name="la_session_partagee_a_ete_arretee">La sesión compartida se ha detenido.</string>
     <string name="langue">Idioma</string>
     <string name="le_classement_final_sera_calcule_a_partir_des_manches">La clasificación final se calculará a partir de las mangas jugadas. Esta acción no se puede deshacer.</string>
+    <string name="le_createur_a_annule_ton_association_a_cette_place">El creador ha anulado tu asociación a este puesto.</string>
     <string name="le_createur_a_arrete_la_session">El creador detuvo la sesión.</string>
     <string name="le_createur_a_arrete_la_session_le_tableau_affiche_est_le">El creador detuvo la sesión. El marcador mostrado es el último recibido.</string>
     <string name="le_jeu_que_je_cherche_value1">El juego que buscaba: %1$s</string>
@@ -152,6 +162,7 @@
     <string name="modifier">Editar</string>
     <string name="modifier_le_joueur">Editar el jugador</string>
     <string name="modifier_le_profil">Editar perfil</string>
+    <string name="moi">Yo</string>
     <string name="mois">Mes</string>
     <string name="mon_profil">Mi perfil</string>
     <string name="ne_plus_partager">Dejar de compartir</string>
@@ -192,6 +203,7 @@
     <string name="profil">Perfil</string>
     <string name="profil_partage">Perfil compartido</string>
     <string name="pseudo">Apodo</string>
+    <string name="qui_es_tu_dans_cette_partie">¿Quién eres en esta partida?</string>
     <string name="quitter">Salir</string>
     <string name="quitter_la_partie">Salir de la partida</string>
     <string name="rang_moyen">Rango medio</string>
@@ -247,13 +259,19 @@
     <string name="terminer_la_partie_2">¿Terminar la partida?</string>
     <string name="termine">Hecho</string>
     <string name="tes_amis_ne_recevront_plus_les_parties_jouees_avec_toi_ta">Tus amigos ya no recibirán las partidas jugadas contigo. Tu ficha y su historial se conservan, y después crearás un nuevo perfil.</string>
+    <string name="ton_profil_est_lie_a_cette_place_chez_le_createur_qui_en">Tu perfil queda vinculado a este puesto en el dispositivo del creador, que recibe un aviso y puede anularlo.</string>
     <string name="total">Total</string>
     <string name="toujours_pas_de_connexion_nouvelle_tentative_automatique_en">Sigue sin haber conexión — nuevo intento automático en curso.</string>
     <string name="tous_les_jeux">Todos los juegos</string>
     <string name="tous_les_joueurs">Todos los jugadores</string>
     <string name="tri_des_joueurs">Orden de los jugadores</string>
     <string name="triple">Triple</string>
+    <string name="tu_joues_value1">Juegas: %1$s</string>
+    <string name="tu_observes_cette_partie_seul_le_createur_saisit_les_scores">Observas esta partida: solo el creador introduce las puntuaciones.</string>
+    <string name="tu_regardes_la_partie_la_saisie_se_fait_sur_les_appareils">Estás mirando la partida: las puntuaciones se introducen en los dispositivos de los jugadores.</string>
+    <string name="tu_regardes_la_partie">Estás mirando la partida.</string>
     <string name="tu_suis_value1_depuis_le_value2">Sigues a %1$s desde el %2$s</string>
+    <string name="tu_suis_la_partie_sans_saisir_de_score">Sigues la partida sin introducir puntuaciones.</string>
     <string name="un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer">Un apodo y un avatar, nada más: ninguna cuenta que crear.</string>
     <string name="une_autre_manche_vient_d_etre_validee_verifie_avant_de">Se acaba de validar otra ronda: revisa antes de validar la tuya.</string>
     <string name="une_partie_vient_d_etre_lancee_sur_un_autre_appareil">Se acaba de iniciar una partida en otro dispositivo.</string>

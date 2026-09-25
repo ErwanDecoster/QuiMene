@@ -15,6 +15,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -62,12 +63,22 @@ fun RoundHistoryDialog(
                         Row(horizontalArrangement = Arrangement.spacedBy(Space.lg)) {
                             Text("", modifier = Modifier.width(24.dp))
                             for (participant in participants) {
-                                Text(
-                                    participant.displayName,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = colors.textSecondary,
+                                Row(
                                     modifier = Modifier.width(96.dp),
-                                )
+                                    horizontalArrangement = Arrangement.spacedBy(Space.xs),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        participant.displayName,
+                                        style = MaterialTheme.typography.labelLarge,
+                                        color = colors.textSecondary,
+                                        maxLines = 1,
+                                        modifier = Modifier.weight(1f, fill = false),
+                                    )
+                                    ProfileBadgeView(
+                                        source.profileBadges[participant.id].takeIf { it == ProfileBadge.Me },
+                                    )
+                                }
                             }
                         }
                         for (round in rounds) {

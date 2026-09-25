@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.quimene.app.R
 import com.quimene.app.di.rememberViewModel
 import com.quimene.app.features.livematch.LiveRoundEntryState
+import com.quimene.app.features.livematch.ProfileBadge
+import com.quimene.app.features.livematch.ProfileBadgeView
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
 import com.quimene.designsystem.components.Chip
 import com.quimene.designsystem.components.PrimaryButton
@@ -40,6 +42,7 @@ import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.model.Participant
 import com.quimene.domain.rules.Category
+import java.util.UUID
 
 private val LabelColumnWidth = 132.dp
 private val ParticipantColumnWidth = 96.dp
@@ -71,7 +74,7 @@ fun YamsRoundScreen(liveMatch: LiveRoundEntryState) {
                 .horizontalScroll(rememberScrollState())
                 .verticalScroll(rememberScrollState()),
     ) {
-        HeaderRow(participants)
+        HeaderRow(participants, liveMatch.profileBadges)
         for (category in upperCategories) {
             CategoryRow(category, participants, viewModel) { participant ->
                 pending =
@@ -109,17 +112,22 @@ private data class PendingEntry(
 )
 
 @Composable
-private fun HeaderRow(participants: List<Participant>) {
+private fun HeaderRow(
+    participants: List<Participant>,
+    badges: Map<UUID, ProfileBadge>,
+) {
     val colors = LocalAppColors.current
     Row {
         Text("", modifier = Modifier.width(LabelColumnWidth))
         for (participant in participants) {
-            Text(
-                text = participant.displayName,
-                style = MaterialTheme.typography.labelMedium,
-                color = colors.textSecondary,
-                modifier = Modifier.width(ParticipantColumnWidth),
-            )
+            Column(modifier = Modifier.width(ParticipantColumnWidth)) {
+                Text(
+                    text = participant.displayName,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = colors.textSecondary,
+                )
+                ProfileBadgeView(badges[participant.id].takeIf { it == ProfileBadge.Me })
+            }
         }
     }
 }

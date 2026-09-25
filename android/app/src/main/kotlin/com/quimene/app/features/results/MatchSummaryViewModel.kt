@@ -42,6 +42,8 @@ class MatchSummaryViewModel(
         val rounds: List<Round> = emptyList(),
         val direction: Direction = Direction.HighestWins,
         val scoreThreshold: Int? = null,
+        /** Doc 16 — ma place, marquée « Moi ». */
+        val myParticipantID: UUID? = null,
         val isLoading: Boolean = true,
     )
 
@@ -55,7 +57,13 @@ class MatchSummaryViewModel(
             val rules = catalog.rules(match.gameID, match.rulesVersion)
             val state = repository.loadState(match, catalog)
             val participants = repository.participants(matchID).associateBy { it.id }
-            uiState = matchSummaryState(state, definition, rules, participants)
+            val mine =
+                repository
+                    .linkedParticipants(matchID)
+                    .entries
+                    .firstOrNull { it.value }
+                    ?.key
+            uiState = matchSummaryState(state, definition, rules, participants, mine)
         }
     }
 }
@@ -68,6 +76,7 @@ fun matchSummaryState(
     definition: GameDefinition,
     rules: GameRules,
     participants: Map<UUID, ParticipantEntity>,
+    myParticipantID: UUID? = null,
 ): MatchSummaryViewModel.UiState {
     val statsEngine = StatsEngine()
     val threshold =
@@ -84,6 +93,7 @@ fun matchSummaryState(
         rounds = state.rounds.sortedBy { it.index },
         direction = definition.scoring.direction,
         scoreThreshold = threshold,
+        myParticipantID = myParticipantID,
         isLoading = false,
     )
 }

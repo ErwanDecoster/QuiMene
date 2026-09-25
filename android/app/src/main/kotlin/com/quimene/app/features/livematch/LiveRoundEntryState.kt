@@ -28,6 +28,9 @@ interface LiveRoundEntryState {
      * tête de chaque ligne de saisie (doc utilisateur), pas seulement à l'écran de résultats. */
     val currentStandings: List<Standing>
 
+    /** Doc 16 — « Moi » sur ma place, un lien sur celles de mes amis. */
+    val profileBadges: Map<UUID, ProfileBadge> get() = emptyMap()
+
     val pendingScores: Map<UUID, Int>
     var closedParticipantID: UUID?
 

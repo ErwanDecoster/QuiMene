@@ -187,7 +187,10 @@ struct HistoryListView: View {
       VStack(alignment: .trailing, spacing: Space.xxs) {
         participantAvatars(for: match)
         if let winner = model.winner(for: match) {
-          Text(winner.nicknameSnapshot).font(.bodySmall).foregroundStyle(.textSecondary)
+          HStack(spacing: Space.xxs) {
+            if winner.player?.sharedProfileIsMine == true { MeBadge() }
+            Text(winner.nicknameSnapshot).font(.bodySmall).foregroundStyle(.textSecondary)
+          }
         }
       }
     }

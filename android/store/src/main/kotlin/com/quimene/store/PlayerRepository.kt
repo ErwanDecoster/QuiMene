@@ -119,6 +119,9 @@ class PlayerRepository(
 
     suspend fun player(sharedProfileID: UUID): PlayerEntity? = dao.bySharedProfileID(sharedProfileID)
 
+    /** Toutes les fiches, archivées comprises. */
+    suspend fun allPlayers(): List<PlayerEntity> = dao.getAll()
+
     /** Ordre manuel de la liste des joueurs (`sortIndex`) — Room ne préserve pas non plus
      * l'ordre d'une collection sans tri explicite. */
     suspend fun reorder(players: List<PlayerEntity>) {

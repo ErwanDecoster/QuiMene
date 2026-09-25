@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import com.quimene.domain.rules.GameCatalog
 import com.quimene.sync.OnlineSession
 import com.quimene.sync.OnlineSessionError
+import com.quimene.sync.ProfileCard
 import com.quimene.sync.Role
 import com.quimene.sync.SessionPresence
 import com.quimene.sync.SupabaseSessionBackend
@@ -33,7 +34,11 @@ class MatchConnectionCoordinator(
 
     init {
         PersistedOnlineSession.load(context, PersistedOnlineSession.Role.Participant)?.let { persisted ->
-            scope.launch { runCatching { connect(persisted.pairingCode, persisted.deviceName) } }
+            scope.launch {
+                runCatching {
+                    connect(persisted.pairingCode, persisted.deviceName, persisted.profile, persisted.isSpectator)
+                }
+            }
         }
     }
 
@@ -43,8 +48,9 @@ class MatchConnectionCoordinator(
     suspend fun join(
         code: String,
         deviceName: String,
+        profile: ProfileCard?,
         appVersion: String,
-    ): Role = connect(code, deviceName)
+    ): Role = connect(code, deviceName, profile, isSpectator = false)
 
     /** « Réessayer » : un rattrapage immédiat. */
     suspend fun reconnectNow(): Boolean {
@@ -61,20 +67,50 @@ class MatchConnectionCoordinator(
     private suspend fun connect(
         code: String,
         deviceName: String,
+        profile: ProfileCard?,
+        isSpectator: Boolean,
     ): Role {
         val info = backend.resolve(code) ?: throw OnlineSessionError.SessionNotFound
         sharedMatch?.link?.stop()
 
         val deviceID = resolveDeviceID()
         val session = OnlineSession(info.sessionID, code, deviceID, backend)
-        val link = SessionLink(session, code, SessionPresence(deviceID, deviceName, isOwner = false), context, scope)
+        val link =
+            SessionLink(
+                session,
+                code,
+                SessionPresence(deviceID, deviceName, isOwner = false),
+                context,
+                scope,
+                ownerDeviceID = info.ownerDeviceID,
+            )
         val role = if (info.allowsContributors) Role.Contributor else Role.Observer
+        var persisted =
+            PersistedOnlineSession(
+                info.sessionID,
+                code,
+                PersistedOnlineSession.Role.Participant,
+                deviceName,
+                profile,
+                isSpectator,
+            )
+        persisted.save(context)
         sharedMatch =
-            SharedMatchViewModel(link, role, catalog, scope) {
+            SharedMatchViewModel(
+                link = link,
+                role = role,
+                catalog = catalog,
+                scope = scope,
+                me = profile,
+                isSpectator = isSpectator,
+                onSpectatorChange = { spectator ->
+                    persisted = persisted.copy(isSpectator = spectator)
+                    persisted.save(context)
+                },
+            ) {
                 sharedMatch = null
                 PersistedOnlineSession.clear(context, PersistedOnlineSession.Role.Participant)
             }
-        PersistedOnlineSession(info.sessionID, code, PersistedOnlineSession.Role.Participant, deviceName).save(context)
         link.start()
         return role
     }

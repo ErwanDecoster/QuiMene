@@ -108,5 +108,10 @@ de session), puis en base64. `sealed-events.json` est **généré par le code Sw
 retrouver exactement l'événement décrit par `plaintext`. Le nonce étant aléatoire, l'inverse
 (identité d'octets chiffrés) n'est ni atteignable ni pertinent.
 
+`identity-events.json` (doc 16, phase D) suit le même principe pour les événements d'identité :
+`plaintext` est l'enveloppe `{"identity": …}` produite par `JSONEncoder`, régénérée par
+`QUIMENE_WRITE_SPEC=1` sur `SessionIdentityTests` (via `TEST_RUNNER_QUIMENE_WRITE_SPEC=1` avec
+`xcodebuild test`).
+
 Remplace les fixtures `wire/` de l'ancien protocole hôte/pair (doc 09), supprimé des deux
 plateformes par la phase C de la doc 16.

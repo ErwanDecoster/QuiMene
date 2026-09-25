@@ -1,5 +1,7 @@
 import DesignSystem
 import Domain
+import Store
+import SwiftData
 import SwiftUI
 
 /// Doc 09 — l'écran d'un pair non-hôte. Observateur : lecture seule, le tableau se met à jour
@@ -28,11 +30,17 @@ struct SharedMatchView: View {
   /// combine ce contrôle local et un rejet distant tardif dans le même message.
   @State private var validationErrorMessage: String?
   @State private var isPickingNextMatch = false
+  @Environment(\.modelContext) private var modelContext
+  /// Mes amis liés (doc 14) : leur place porte un lien.
+  @Query(filter: #Predicate<PlayerRecord> { $0.sharedProfileID != nil && !$0.sharedProfileIsMine })
+  private var friends: [PlayerRecord]
 
   var body: some View {
     Group {
       if let definition = model.definition, let state = model.state {
-        if model.isConcluded {
+        if model.needsIdentity {
+          WhoAreYouView(model: model)
+        } else if model.isConcluded {
           resultsView(definition: definition, state: state)
         } else {
           liveView(definition: definition, state: state)
@@ -44,6 +52,12 @@ struct SharedMatchView: View {
     }
     .navigationTitle(navigationTitle)
     .navigationBarTitleDisplayMode(.inline)
+    // Doc 16, phase D — ma place retenue : le créateur devient mon ami (liaison dans les deux sens).
+    .task(id: model.ownerToBefriend?.id) {
+      if let owner = model.ownerToBefriend {
+        FriendLinking.ensureFriend(owner, in: modelContext)
+      }
+    }
   }
 
   /// Doc 16, phase C — même écran de résultats que le créateur, puis « Partie suivante » : un
@@ -53,7 +67,8 @@ struct SharedMatchView: View {
       state: state,
       definition: definition,
       standings: model.currentStandings,
-      participantRecords: model.transientRecords
+      participantRecords: model.transientRecords,
+      myParticipantID: model.myParticipantID
     )
     .safeAreaInset(edge: .bottom) {
       if model.canPropose {
@@ -114,6 +129,8 @@ struct SharedMatchView: View {
         }
       }
 
+      identitySection
+
       ScoreBoardView(
         participants: model.participants,
         totals: model.totals,
@@ -124,7 +141,10 @@ struct SharedMatchView: View {
         validationMessage: validationErrorMessage ?? model.latestRejectionReason,
         readOnlyMessage: model.canPropose
           ? nil
-          : "Tu observes cette partie : la saisie se fait sur l'appareil de l'hôte ou d'un contributeur.",
+          : model.isSpectator
+            ? String(localized: "Tu regardes la partie : la saisie se fait sur les appareils des joueurs.")
+            : String(localized: "Tu observes cette partie : seul le créateur saisit les scores."),
+        profileBadges: model.profileBadges(friendProfileIDs: Set(friends.compactMap(\.sharedProfileID))),
         closedParticipantID: $closedParticipantID,
         draftTexts: $draftTexts,
         focusedParticipantID: $focusedParticipantID
@@ -170,7 +190,8 @@ struct SharedMatchView: View {
     }
     .accessibleAnimation(.default, value: keyboardObserver.isVisible)
     .sheet(isPresented: $isPresentingRoundHistory) {
-      RoundHistoryView(state: state, definition: definition)
+      RoundHistoryView(
+        state: state, definition: definition, myParticipantID: model.myParticipantID)
     }
     .overlay(alignment: .top) {
       if let message = model.roundExplanationMessage {
@@ -185,6 +206,30 @@ struct SharedMatchView: View {
     // Doc 08 « Accessibilité » — voir la même remontée dans `LiveMatchView.swift`.
     .onChange(of: model.roundExplanationMessage) { _, newValue in
       if let newValue { Banner.announce(LocalizedStringResource(stringLiteral: newValue)) }
+    }
+  }
+
+  /// Doc 16, phase D — qui je suis dans cette partie, et comment en changer.
+  @ViewBuilder
+  private var identitySection: some View {
+    if model.isSpectator {
+      Section {
+        HStack {
+          Text("Tu regardes la partie.").font(.bodyText).foregroundStyle(.textSecondary)
+          Spacer(minLength: Space.sm)
+          Button("Je joue aussi") { Task { await model.chooseAgain() } }
+        }
+      }
+    } else if let seat = model.mySeat {
+      Section {
+        HStack {
+          Text("Tu joues : \(seat.displayName)").font(.bodyText).foregroundStyle(.textSecondary)
+          Spacer(minLength: Space.sm)
+          if model.canChangeSeat {
+            Button("Changer") { Task { await model.chooseAgain() } }
+          }
+        }
+      }
     }
   }
 
@@ -222,5 +267,55 @@ struct SharedMatchView: View {
     guard await model.propose(inputs) else { return }
     draftTexts = [:]
     closedParticipantID = nil
+  }
+}
+
+/// Doc 16, phase D — « Qui es-tu dans cette partie ? », à l'arrivée dans une session : toucher sa
+/// place la revendique (premier arrivé, premier servi), ou « Je regarde seulement ». Un ami déjà
+/// lié par le créateur n'y passe jamais : sa place est reconnue d'office.
+private struct WhoAreYouView: View {
+  let model: SharedMatchModel
+
+  var body: some View {
+    List {
+      Section {
+        ForEach(model.participants) { participant in
+          let status = model.seatStatus(of: participant)
+          Button {
+            Task { await model.claim(participant) }
+          } label: {
+            HStack(spacing: Space.md) {
+              AvatarView(avatar: Avatar.generated(for: participant.displayName), size: .medium)
+              Text(participant.displayName)
+                .font(.bodyText)
+                .foregroundStyle(status == .taken ? .textTertiary : .textPrimary)
+              Spacer(minLength: 0)
+              if status == .taken {
+                Text("Déjà prise").font(.label).foregroundStyle(.textTertiary)
+              }
+            }
+          }
+          .disabled(status == .taken || model.me == nil || model.isClaiming)
+        }
+      } header: {
+        Text("Qui es-tu dans cette partie ?")
+      } footer: {
+        Text(
+          "Ton profil est lié à cette place chez le créateur, qui en est averti et peut annuler."
+        )
+      }
+
+      if let message = model.identityMessage {
+        Section {
+          Text(message).font(.label).foregroundStyle(.semanticError)
+        }
+      }
+
+      Section {
+        Button("Je regarde seulement") { model.watchOnly() }
+      } footer: {
+        Text("Tu suis la partie sans saisir de score.")
+      }
+    }
   }
 }

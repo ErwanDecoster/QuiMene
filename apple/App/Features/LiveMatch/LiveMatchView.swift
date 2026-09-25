@@ -41,6 +41,29 @@ struct LiveMatchView: View {
         else { return }
         deepLinkRouter.pendingContinuedMatchID = started.newMatchID
       }
+      // Doc 16, phase D — « Théo s'est associé à la fiche Théo », avec annulation. Disparaît
+      // seul après quelques secondes : l'association reste, rien à confirmer.
+      .overlay(alignment: .bottom) {
+        if let notice = LiveShareCoordinator.shared.claimNotices.first {
+          Banner(
+            "\(notice.profile.name) s'est associé à la fiche « \(notice.ficheName) ».",
+            actionTitle: "Annuler"
+          ) {
+            Task { await LiveShareCoordinator.shared.revoke(notice) }
+          }
+          .padding(.horizontal, Space.lg)
+          .padding(.bottom, Space.xxl * 2)
+          .transition(.move(edge: .bottom).combined(with: .opacity))
+          .task(id: notice.id) {
+            Banner.announce(
+              "\(notice.profile.name) s'est associé à la fiche « \(notice.ficheName) ».")
+            try? await Task.sleep(for: .seconds(12))
+            guard !Task.isCancelled else { return }
+            LiveShareCoordinator.shared.dismiss(notice)
+          }
+        }
+      }
+      .accessibleAnimation(.default, value: LiveShareCoordinator.shared.claimNotices.first?.id)
   }
 
   private var content: some View {
@@ -90,6 +113,7 @@ struct LiveMatchView: View {
         canEdit: true,
         validationMessage: model.validationErrorMessage,
         readOnlyMessage: nil,
+        profileBadges: model.profileBadges,
         closedParticipantID: $model.closedParticipantID,
         draftTexts: $draftTexts,
         focusedParticipantID: $focusedParticipantID
@@ -138,21 +162,24 @@ struct LiveMatchView: View {
           Image(systemName: "ellipsis.circle")
         }
       }
-      ScoreBoardView.keyboardAccessory(
-        allowsNegative: model.definition.scoring.entry.allowsNegative,
-        currentParticipantID: focusedParticipantID,
-        submitLabel: submitLabel,
-        onToggleSign: toggleSign,
-        onSubmit: finishRound
-      )
     }
     // Doc utilisateur — posé au niveau de l'écran, pas dans `ScoreBoardView` : un enfant de
     // liste qui porte lui-même `.safeAreaInset` faisait dupliquer tout le rendu (voir la note
-    // en tête de `ScoreBoardView.swift`).
+    // en tête de `ScoreBoardView.swift`). Même barre que l'écran d'une partie rejointe
+    // (`SharedMatchView`) plutôt que la barre native du clavier : boutons en verre flottant
+    // au-dessus du clavier, identiques des deux côtés.
     .safeAreaInset(edge: .bottom) {
-      ScoreBoardView.submitBar(
-        isKeyboardVisible: keyboardObserver.isVisible, submitLabel: submitLabel, onSubmit: finishRound
-      )
+      if keyboardObserver.isVisible {
+        ScoreBoardView.keyboardBar(
+          allowsNegative: model.definition.scoring.entry.allowsNegative,
+          currentParticipantID: focusedParticipantID,
+          submitLabel: submitLabel,
+          onToggleSign: toggleSign,
+          onSubmit: finishRound)
+      } else {
+        ScoreBoardView.submitBar(
+          isKeyboardVisible: false, submitLabel: submitLabel, onSubmit: finishRound)
+      }
     }
     .accessibleAnimation(.default, value: keyboardObserver.isVisible)
     .onAppear {
@@ -225,7 +252,8 @@ struct LiveMatchView: View {
       }
     }
     .sheet(isPresented: $isPresentingRoundHistory) {
-      RoundHistoryView(state: model.state, definition: model.definition)
+      RoundHistoryView(
+        state: model.state, definition: model.definition, myParticipantID: model.myParticipantID)
     }
     // Doc utilisateur — sans ça, la manche d'un contributeur distant se contente de faire
     // monter les totaux (déjà animés juste au-dessus) sans qu'on comprenne pourquoi. Le

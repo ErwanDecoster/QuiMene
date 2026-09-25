@@ -10,11 +10,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.quimene.app.R
 import com.quimene.app.di.rememberViewModel
 import com.quimene.app.features.livematch.LiveRoundEntryState
+import com.quimene.app.features.livematch.ProfileBadge
+import com.quimene.app.features.livematch.ProfileBadgeView
 import com.quimene.app.features.livematch.tarot.SteppedValue
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
 import com.quimene.designsystem.components.Card
@@ -63,7 +66,7 @@ fun WizardRoundScreen(liveMatch: LiveRoundEntryState) {
                 )
             }
             items(liveMatch.participants, key = { it.id }) { participant ->
-                ParticipantBidRow(participant, viewModel)
+                ParticipantBidRow(participant, viewModel, liveMatch.profileBadges[participant.id])
             }
         }
         PrimaryButton(
@@ -78,11 +81,18 @@ fun WizardRoundScreen(liveMatch: LiveRoundEntryState) {
 private fun ParticipantBidRow(
     participant: Participant,
     viewModel: WizardRoundViewModel,
+    badge: ProfileBadge?,
 ) {
     val colors = LocalAppColors.current
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(verticalArrangement = Arrangement.spacedBy(Space.sm)) {
-            Text(participant.displayName, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Space.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(participant.displayName, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
+                ProfileBadgeView(badge)
+            }
             SteppedValue(
                 label = "Annonce",
                 value = viewModel.bid(participant.id),

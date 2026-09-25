@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="value1_count2">%1$s: %2$d</string>
+    <string name="value1_a_ferme_la_manche">%1$s hat die Runde beendet</string>
     <string name="value1_est_deja_ton_ami_sur_la_fiche_value2">%1$s ist bereits dein Freund, auf der Karte „%2$s“.</string>
+    <string name="value1_s_est_associe_a_la_fiche_value2">%1$s hat sich mit dem Spieler „%2$s“ verknüpft.</string>
     <string name="value1_vient_de_valider_une_manche_verifie_avant_de_valider">%1$s hat gerade eine Runde bestätigt: prüfe, bevor du deine bestätigst.</string>
     <string name="value1_manche_count2">%1$s · Runde %2$d</string>
     <string name="value1_value2">%1$s, %2$s</string>
@@ -72,6 +74,9 @@
     <string name="cette_donne">Diese Hand</string>
     <string name="cette_fiche_suit_actuellement_value1_continuer_la_fera">Diese Karte folgt derzeit %1$s. Fortfahren lässt sie stattdessen %2$s folgen: %3$s erhält die mit dieser Karte gespielten Partien nicht mehr.</string>
     <string name="cette_partie_n_est_plus_disponible_les_regles_de_ce_jeu_ont">Diese Partie ist nicht mehr verfügbar — die Regeln dieses Spiels haben sich seitdem geändert.</string>
+    <string name="cette_place_vient_d_etre_prise_par_quelqu_un_d_autre">Dieser Platz wurde gerade von jemand anderem belegt.</string>
+    <string name="changer">Ändern</string>
+    <string name="changer_le_signe">Vorzeichen ändern</string>
     <string name="chaque_equipe_doit_compter_exactement_count1_joueurs">Jedes Team muss aus genau %1$d Spielern bestehen.</string>
     <string name="chelem_annonce">Angesagter Chelem</string>
     <string name="chelem_realise">Erzielter Chelem</string>
@@ -96,6 +101,7 @@
     <string name="demander_ce_jeu">Dieses Spiel anfragen</string>
     <string name="demander_l_ajout_d_un_jeu">Ein Spiel anfragen</string>
     <string name="double_label">Doppelt</string>
+    <string name="deja_prise">Vergeben</string>
     <string name="deja_un_profil_sur_un_autre_appareil_avec_icloud_il_arrive">Schon ein Profil auf einem anderen Gerät? Mit iCloud kommt es in wenigen Augenblicken von selbst.</string>
     <string name="demarrage_du_partage">Freigabe wird gestartet…</string>
     <string name="derive_automatiquement_du_pseudo_modifiable_ci_dessous">Automatisch vom Spitznamen abgeleitet — unten änderbar.</string>
@@ -108,6 +114,7 @@
     <string name="fais_scanner_ce_code_par_l_ami_avec_qui_tu_veux_partager">Lass diesen Code von dem Freund scannen, mit dem du deinen Verlauf teilen möchtest, über dessen eigene Karte „Empfangenes Profil folgen“.</string>
     <string name="fais_scanner_ce_code_par_un_ami_depuis_ajouter_un_ami_dans">Lass einen Freund diesen Code über „Freund hinzufügen“ in seinem Profil-Tab scannen. Eure gemeinsamen Partien erscheinen in euren beiden Verläufen.</string>
     <string name="faits_marquants">Highlights</string>
+    <string name="ferme">Schließt</string>
     <string name="fermer">Schließen</string>
     <string name="garde">Garde</string>
     <string name="garde_contre_le_chien">Garde contre le chien</string>
@@ -118,6 +125,8 @@
     <string name="hors_connexion_le_tableau_affiche_est_le_dernier_recu">Offline. Die angezeigte Tabelle ist die zuletzt empfangene.</string>
     <string name="hote">Gastgeber</string>
     <string name="impossible_de_demarrer_le_partage_verifie_ta_connexion">Freigabe konnte nicht gestartet werden. Überprüfe deine Internetverbindung und versuche es erneut.</string>
+    <string name="je_joue_aussi">Ich spiele mit</string>
+    <string name="je_regarde_seulement">Ich schaue nur zu</string>
     <string name="jeu">Spiel</string>
     <string name="jeux">Spiele</string>
     <string name="joueur">Spieler</string>
@@ -131,6 +140,7 @@
     <string name="la_session_partagee_a_ete_arretee">Die geteilte Sitzung wurde beendet.</string>
     <string name="langue">Sprache</string>
     <string name="le_classement_final_sera_calcule_a_partir_des_manches">Die Endwertung wird anhand der gespielten Runden berechnet. Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="le_createur_a_annule_ton_association_a_cette_place">Der Ersteller hat deine Zuordnung zu diesem Platz aufgehoben.</string>
     <string name="le_createur_a_arrete_la_session">Der Ersteller hat die Sitzung beendet.</string>
     <string name="le_createur_a_arrete_la_session_le_tableau_affiche_est_le">Der Ersteller hat die Sitzung beendet. Die angezeigte Tabelle ist die zuletzt empfangene.</string>
     <string name="le_jeu_que_je_cherche_value1">Das Spiel, das ich gesucht habe: %1$s</string>
@@ -152,6 +162,7 @@
     <string name="modifier">Bearbeiten</string>
     <string name="modifier_le_joueur">Spieler bearbeiten</string>
     <string name="modifier_le_profil">Profil bearbeiten</string>
+    <string name="moi">Ich</string>
     <string name="mois">Monat</string>
     <string name="mon_profil">Mein Profil</string>
     <string name="ne_plus_partager">Nicht mehr teilen</string>
@@ -192,6 +203,7 @@
     <string name="profil">Profil</string>
     <string name="profil_partage">Geteiltes Profil</string>
     <string name="pseudo">Spitzname</string>
+    <string name="qui_es_tu_dans_cette_partie">Wer bist du in dieser Partie?</string>
     <string name="quitter">Verlassen</string>
     <string name="quitter_la_partie">Partie verlassen</string>
     <string name="rang_moyen">Durchschnittlicher Rang</string>
@@ -247,13 +259,19 @@
     <string name="terminer_la_partie_2">Partie beenden?</string>
     <string name="termine">Fertig</string>
     <string name="tes_amis_ne_recevront_plus_les_parties_jouees_avec_toi_ta">Deine Freunde erhalten die mit dir gespielten Partien nicht mehr. Deine Karte und ihr Verlauf bleiben erhalten, danach erstellst du ein neues Profil.</string>
+    <string name="ton_profil_est_lie_a_cette_place_chez_le_createur_qui_en">Dein Profil wird beim Ersteller mit diesem Platz verknüpft; er wird benachrichtigt und kann es rückgängig machen.</string>
     <string name="total">Gesamt</string>
     <string name="toujours_pas_de_connexion_nouvelle_tentative_automatique_en">Immer noch keine Verbindung — automatischer neuer Versuch läuft.</string>
     <string name="tous_les_jeux">Alle Spiele</string>
     <string name="tous_les_joueurs">Alle Spieler</string>
     <string name="tri_des_joueurs">Spielersortierung</string>
     <string name="triple">Dreifach</string>
+    <string name="tu_joues_value1">Du spielst: %1$s</string>
+    <string name="tu_observes_cette_partie_seul_le_createur_saisit_les_scores">Du beobachtest diese Partie: Nur der Ersteller gibt die Punkte ein.</string>
+    <string name="tu_regardes_la_partie_la_saisie_se_fait_sur_les_appareils">Du schaust zu: Die Punkte werden auf den Geräten der Spieler eingegeben.</string>
+    <string name="tu_regardes_la_partie">Du schaust bei der Partie zu.</string>
     <string name="tu_suis_value1_depuis_le_value2">Du folgst %1$s seit dem %2$s</string>
+    <string name="tu_suis_la_partie_sans_saisir_de_score">Du verfolgst die Partie, ohne Punkte einzugeben.</string>
     <string name="un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer">Ein Spitzname und ein Avatar, mehr nicht: kein Konto nötig.</string>
     <string name="une_autre_manche_vient_d_etre_validee_verifie_avant_de">Gerade wurde eine andere Runde bestätigt: prüfe, bevor du deine bestätigst.</string>
     <string name="une_partie_vient_d_etre_lancee_sur_un_autre_appareil">Auf einem anderen Gerät wurde gerade eine Partie gestartet.</string>

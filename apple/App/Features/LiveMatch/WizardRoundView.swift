@@ -15,7 +15,11 @@ struct WizardRoundView: View {
   init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
     _model = State(
       initialValue: try! WizardRoundModel(match: match, context: context, catalog: catalog))
+    myParticipantID = match.myParticipantID
   }
+
+  /// Doc 16 — ma place, marquée « Moi ».
+  private let myParticipantID: UUID?
 
   var body: some View {
     Group {
@@ -62,7 +66,8 @@ struct WizardRoundView: View {
       }
     }
     .sheet(isPresented: $isPresentingRoundHistory) {
-      RoundHistoryView(state: model.state, definition: model.definition)
+      RoundHistoryView(
+        state: model.state, definition: model.definition, myParticipantID: myParticipantID)
     }
     .alert(
       "Saisie invalide",
@@ -109,7 +114,10 @@ struct WizardRoundView: View {
 
   private func participantRow(_ participant: Participant) -> some View {
     VStack(alignment: .leading, spacing: Space.xs) {
-      Text(participant.displayName).font(.h6).foregroundStyle(.textPrimary)
+      HStack(spacing: Space.sm) {
+        Text(participant.displayName).font(.h6).foregroundStyle(.textPrimary)
+        if participant.id == myParticipantID { MeBadge() }
+      }
       Stepper(
         "Annonce : \(model.bid(for: participant.id))",
         value: Binding(

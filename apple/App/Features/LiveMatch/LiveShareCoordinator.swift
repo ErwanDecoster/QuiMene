@@ -26,6 +26,16 @@ final class LiveShareCoordinator {
   private(set) var link: SessionLink?
   private var match: MatchRecord?
   private var repository: MatchRepository?
+  private var modelContext: ModelContext?
+
+  /// Doc 16, phase D — « Théo s'est associé à la fiche Théo », avec annulation.
+  struct ClaimNotice: Identifiable, Equatable {
+    let id: UUID
+    let profile: ProfileCard
+    let ficheName: String
+  }
+
+  private(set) var claimNotices: [ClaimNotice] = []
 
   /// La partie actuellement diffusée — `nil` tant qu'aucune session n'est active.
   private(set) var attachedMatchID: UUID?
@@ -98,33 +108,52 @@ final class LiveShareCoordinator {
     await attach(match: match, context: context)
   }
 
-  /// Rattache une partie à la session ouverte : si le serveur ne la connaît pas encore, publie
-  /// son journal local ; puis la copie locale devient le miroir du journal serveur.
+  /// Rattache une partie à la session ouverte : publie ce que le serveur n'a pas encore de son
+  /// journal local ; puis la copie locale devient le miroir du journal serveur.
   func attach(match: MatchRecord, context: ModelContext) async {
-    guard let link, attachedMatchID != match.id else { return }
+    guard link != nil else { return }
     let repository = MatchRepository(context: context)
     self.repository = repository
+    modelContext = context
     self.match = match
     attachedMatchID = match.id
-
-    if await link.session.events(forMatch: match.id).isEmpty,
-      let localLog = try? repository.currentLog(for: match)
-    {
-      for stamped in localLog {
-        // Même identifiant qu'en local : celui du `matchCreated` est l'identifiant de la partie
-        // (`MatchEngine`), partagé par tous les appareils.
-        let result = await link.submit(
-          stamped.event, matchID: match.id, eventID: stamped.id, occurredAt: stamped.occurredAt)
-        guard case .accepted = result else { break }
-      }
-    }
+    await publishPendingEvents()
     await mirrorAttachedMatch()
+    await handleClaims()
+  }
+
+  /// Publie la fin du journal local que le serveur n'a pas encore. Même identifiant qu'en local :
+  /// celui du `matchCreated` est l'identifiant de la partie (`MatchEngine`), partagé par tous les
+  /// appareils ; l'ajout est idempotent par identifiant. Reprend une publication interrompue
+  /// (réseau coupé, écran fermé) au prochain rattrapage. Rien si le journal serveur n'est pas un
+  /// début du journal local : il a alors avancé ailleurs, et c'est lui qui fait foi.
+  private func publishPendingEvents() async {
+    guard let link, let match, let repository,
+      let localLog = try? repository.currentLog(for: match)
+    else { return }
+    let serverIDs = await link.session.events(forMatch: match.id).map(\.id)
+    guard serverIDs.count < localLog.count,
+      Array(localLog.prefix(serverIDs.count).map(\.id)) == serverIDs
+    else { return }
+    for stamped in localLog.dropFirst(serverIDs.count) {
+      let result = await link.submit(
+        stamped.event, matchID: match.id, eventID: stamped.id, occurredAt: stamped.occurredAt)
+      guard case .accepted = result else { break }
+    }
+  }
+
+  /// Retour au premier plan : reprend une publication interrompue.
+  func onForeground() async {
+    await link?.refresh()
+    await publishPendingEvents()
+    await handleClaims()
   }
 
   /// Au lancement : reprend la session que ce créateur avait ouverte (l'app a pu être tuée en
   /// arrière-plan), et sa partie courante.
   func resumeIfNeeded(context: ModelContext) async {
     guard link == nil, let persisted = PersistedOnlineSession.load(.owner) else { return }
+    modelContext = context
     await connect(
       sessionID: persisted.sessionID, code: persisted.pairingCode,
       deviceName: persisted.deviceName)
@@ -137,6 +166,7 @@ final class LiveShareCoordinator {
       self.match = match
       attachedMatchID = match.id
       await mirrorAttachedMatch()
+      await handleClaims()
     }
   }
 
@@ -145,9 +175,13 @@ final class LiveShareCoordinator {
       sessionID: sessionID, pairingCode: code, deviceID: DeviceIdentity.current, backend: backend)
     let link = SessionLink(
       session: session, pairingCode: code,
-      me: SessionPresence(deviceID: DeviceIdentity.current, deviceName: deviceName, isOwner: true))
+      me: SessionPresence(deviceID: DeviceIdentity.current, deviceName: deviceName, isOwner: true),
+      ownerDeviceID: DeviceIdentity.current)
     link.onNewRecords = { [weak self] records in
       Task { @MainActor [weak self] in await self?.handle(records) }
+    }
+    link.onNewIdentities = { [weak self] _ in
+      Task { @MainActor [weak self] in await self?.handleClaims() }
     }
     self.link = link
     await link.start()
@@ -206,11 +240,87 @@ final class LiveShareCoordinator {
       await link.stop()
     }
     PersistedOnlineSession.clear(.owner)
+    if let sessionID = link?.sessionID { HandledClaims.clear(sessionID: sessionID) }
     link = nil
     repository = nil
+    modelContext = nil
     match = nil
     attachedMatchID = nil
     allowsContributors = true
+    claimNotices = []
+  }
+
+  // MARK: - Qui es-tu ? (doc 16, phase D)
+
+  /// Publie le registre du créateur — son profil, et les places que ses fiches relient déjà à un
+  /// profil — s'il a changé depuis le dernier publié. Un ami déjà lié est ainsi reconnu à son
+  /// arrivée sans qu'on lui demande qui il est, et sa place ne peut pas être prise par un autre.
+  private func publishRosterIfNeeded() async {
+    guard let link, let match, let modelContext else { return }
+    let owner = ProfileCard.mine(in: modelContext)
+    var linkedSeats: [LinkedSeat] = []
+    for participant in match.participants.sorted(by: { $0.seatIndex < $1.seatIndex }) {
+      guard let profileID = participant.player?.sharedProfileID else { continue }
+      linkedSeats.append(
+        LinkedSeat(
+          seat: SeatRef(seatIndex: participant.seatIndex, displayName: participant.nicknameSnapshot),
+          profileID: profileID))
+    }
+    let current = link.identities
+    guard current.owner != owner || current.linkedSeats != Self.dictionary(linkedSeats) else {
+      return
+    }
+    await link.submitIdentity(
+      .roster(owner: owner, linkedSeats: linkedSeats, deviceID: DeviceIdentity.current),
+      matchID: match.id)
+  }
+
+  private static func dictionary(_ seats: [LinkedSeat]) -> [SeatRef: UUID] {
+    Dictionary(seats.map { ($0.seat, $0.profileID) }, uniquingKeysWith: { first, _ in first })
+  }
+
+  /// Chaque revendication retenue, une seule fois (même si elle date d'avant un redémarrage, ou
+  /// d'un moment où le créateur était hors ligne) : la fiche de cette place, si elle ne représente
+  /// encore personne, est liée au profil — durablement, comme après un scan de QR de profil
+  /// (doc 14) — et le créateur en est averti. Puis le registre est republié.
+  private func handleClaims() async {
+    guard let link, let match, let modelContext else { return }
+    let players = PlayerRepository(context: modelContext)
+    var handled = HandledClaims.load(sessionID: link.sessionID)
+    for claim in link.identities.activeClaims
+    where claim.deviceID != DeviceIdentity.current && !handled.contains(claim.claimID) {
+      guard
+        let fiche = match.participants.first(where: {
+          $0.seatIndex == claim.seat.seatIndex && $0.nicknameSnapshot == claim.seat.displayName
+        })?.player
+      else { continue }
+      handled.insert(claim.claimID)
+      guard fiche.sharedProfileID == nil else { continue }
+      try? players.linkSharedProfile(claim.profile.id, name: claim.profile.name, for: fiche)
+      claimNotices.append(
+        ClaimNotice(id: claim.claimID, profile: claim.profile, ficheName: fiche.nickname))
+    }
+    HandledClaims.save(handled, sessionID: link.sessionID)
+    await publishRosterIfNeeded()
+  }
+
+  /// « Annuler » : la revendication est retirée pour tous, et la fiche déliée.
+  func revoke(_ notice: ClaimNotice) async {
+    claimNotices.removeAll { $0.id == notice.id }
+    guard let link, let match, let modelContext else { return }
+    await link.submitIdentity(
+      .revoke(notice.id, deviceID: DeviceIdentity.current), matchID: match.id)
+    let players = PlayerRepository(context: modelContext)
+    if let fiche = try? players.player(withSharedProfileID: notice.profile.id),
+      !fiche.sharedProfileIsMine
+    {
+      try? players.unlinkSharedProfile(for: fiche)
+    }
+    await publishRosterIfNeeded()
+  }
+
+  func dismiss(_ notice: ClaimNotice) {
+    claimNotices.removeAll { $0.id == notice.id }
   }
 
   // MARK: - Miroir
@@ -284,5 +394,24 @@ final class LiveShareCoordinator {
       serverLog.map(\.id) != localLog.map(\.id)
     else { return }
     _ = try? repository.replaceLog(serverLog, in: match, catalog: catalog)
+  }
+}
+
+/// Doc 16, phase D — les revendications déjà traitées par le créateur, par session : une fiche
+/// n'est liée, et le créateur averti, qu'une fois, même après un redémarrage.
+private enum HandledClaims {
+  private static func key(_ sessionID: UUID) -> String { "handledClaims.\(sessionID.uuidString)" }
+
+  static func load(sessionID: UUID) -> Set<UUID> {
+    let strings = UserDefaults.standard.stringArray(forKey: key(sessionID)) ?? []
+    return Set(strings.compactMap(UUID.init(uuidString:)))
+  }
+
+  static func save(_ claims: Set<UUID>, sessionID: UUID) {
+    UserDefaults.standard.set(claims.map(\.uuidString), forKey: key(sessionID))
+  }
+
+  static func clear(sessionID: UUID) {
+    UserDefaults.standard.removeObject(forKey: key(sessionID))
   }
 }

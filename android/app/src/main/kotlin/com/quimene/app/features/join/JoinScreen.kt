@@ -36,6 +36,7 @@ import com.quimene.app.BuildConfig
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.livesync.JoinLink
+import com.quimene.app.livesync.myProfileCard
 import com.quimene.app.livesync.sessionDisplayName
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
 import com.quimene.designsystem.components.Banner
@@ -87,6 +88,7 @@ fun JoinScreen(onBack: () -> Unit) {
                 coordinator.join(
                     code = code,
                     deviceName = sessionDisplayName(context, container.playerRepository),
+                    profile = runCatching { myProfileCard(container.playerRepository) }.getOrNull(),
                     appVersion = BuildConfig.VERSION_NAME,
                 )
             } catch (cancellation: CancellationException) {

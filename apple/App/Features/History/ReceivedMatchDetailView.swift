@@ -40,6 +40,7 @@ struct ReceivedMatchDetailView: View {
                 .frame(width: 32)
               AvatarView(avatar: participant.avatar, size: .medium)
               Text(participant.nicknameSnapshot).font(.h5).foregroundStyle(.textPrimary)
+              if participant.player?.sharedProfileIsMine == true { MeBadge() }
               Spacer()
               Text((participant.finalScore ?? 0).formatted())
                 .font(.scoreXL)

@@ -146,6 +146,7 @@ struct JoinTabView: View {
       try await coordinator.join(
         code: pairingCode,
         deviceName: SessionDisplayName.current(in: modelContext),
+        profile: ProfileCard.mine(in: modelContext),
         requestedRole: .contributor,
         appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
       )

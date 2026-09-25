@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
+import com.quimene.app.features.livematch.MeBadge
 import com.quimene.app.features.livematch.NextMatchBar
 import com.quimene.app.features.livematch.NextMatchPicker
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
@@ -164,7 +165,7 @@ internal fun MatchSummaryContent(
         verticalArrangement = Arrangement.spacedBy(Space.xxl),
     ) {
         item {
-            PodiumSection(sortedStandings, state.participants, state.badgeByParticipant)
+            PodiumSection(sortedStandings, state.participants, state.badgeByParticipant, state.myParticipantID)
         }
         if (state.insights.isNotEmpty()) {
             item { InsightsSection(state.insights) }
@@ -175,7 +176,7 @@ internal fun MatchSummaryContent(
             }
         }
         if (state.rounds.isNotEmpty()) {
-            item { RoundByRoundSection(state.rounds, sortedStandings, state.participants) }
+            item { RoundByRoundSection(state.rounds, sortedStandings, state.participants, state.myParticipantID) }
         }
     }
 }
@@ -185,11 +186,17 @@ private fun PodiumSection(
     sortedStandings: List<Standing>,
     participants: Map<UUID, ParticipantEntity>,
     badgeByParticipant: Map<UUID, Badge>,
+    myParticipantID: UUID?,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(Space.sm)) {
         for (standing in sortedStandings) {
             val participant = participants[standing.participantID] ?: continue
-            PodiumRow(standing, participant, badgeByParticipant[standing.participantID])
+            PodiumRow(
+                standing,
+                participant,
+                badgeByParticipant[standing.participantID],
+                isMe = standing.participantID == myParticipantID,
+            )
         }
     }
 }
@@ -199,6 +206,7 @@ private fun PodiumRow(
     standing: Standing,
     participant: ParticipantEntity,
     badge: Badge?,
+    isMe: Boolean,
 ) {
     val colors = LocalAppColors.current
     val isDark = LocalIsDarkTheme.current
@@ -230,11 +238,17 @@ private fun PodiumRow(
             )
             AvatarView(participant.toAvatar(), size = AvatarSize.Medium)
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    participant.nicknameSnapshot,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colors.textPrimary,
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Space.sm),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        participant.nicknameSnapshot,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colors.textPrimary,
+                    )
+                    if (isMe) MeBadge()
+                }
                 badge?.let {
                     Text(it.kind.label, style = MaterialTheme.typography.labelMedium, color = colors.brandBrass)
                 }
@@ -418,6 +432,7 @@ private fun RoundByRoundSection(
     rounds: List<Round>,
     sortedStandings: List<Standing>,
     participants: Map<UUID, ParticipantEntity>,
+    myParticipantID: UUID?,
 ) {
     val colors = LocalAppColors.current
     Column(verticalArrangement = Arrangement.spacedBy(Space.md)) {
@@ -432,14 +447,16 @@ private fun RoundByRoundSection(
                     Row {
                         Box(modifier = Modifier.width(RoundColumnWidth))
                         for (standing in sortedStandings) {
-                            Text(
-                                text = participants[standing.participantID]?.nicknameSnapshot ?: "",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = colors.textSecondary,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.width(ParticipantColumnWidth).padding(bottom = Space.xs),
-                            )
+                            Column(modifier = Modifier.width(ParticipantColumnWidth).padding(bottom = Space.xs)) {
+                                Text(
+                                    text = participants[standing.participantID]?.nicknameSnapshot ?: "",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = colors.textSecondary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                                if (standing.participantID == myParticipantID) MeBadge()
+                            }
                         }
                     }
                     for (round in rounds) {

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.edit
 import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarKind
 import com.quimene.domain.engine.MatchEvent
@@ -13,9 +14,14 @@ import com.quimene.domain.rules.GameDefinition
 import com.quimene.store.MatchEntity
 import com.quimene.store.MatchRepository
 import com.quimene.store.PlayerEntity
+import com.quimene.store.PlayerRepository
+import com.quimene.sync.LinkedSeat
 import com.quimene.sync.OnlineSession
 import com.quimene.sync.OnlineSessionError
+import com.quimene.sync.ProfileCard
+import com.quimene.sync.SeatRef
 import com.quimene.sync.SessionEventRecord
+import com.quimene.sync.SessionIdentityEvent
 import com.quimene.sync.SessionPresence
 import com.quimene.sync.SupabaseSessionBackend
 import kotlinx.coroutines.CoroutineScope
@@ -51,6 +57,7 @@ class LiveShareCoordinator(
     private val catalog: GameCatalog,
     private val matchRepository: MatchRepository,
     private val resolvePlayer: suspend (UUID) -> PlayerEntity?,
+    private val playerRepository: PlayerRepository,
     val context: Context,
     private val resolveDeviceID: suspend () -> String,
     private val scope: CoroutineScope,
@@ -64,6 +71,16 @@ class LiveShareCoordinator(
     var attachedMatchID: UUID? by mutableStateOf(null)
         private set
     var allowsContributors: Boolean by mutableStateOf(true)
+        private set
+
+    /** Doc 16, phase D — « Théo s'est associé à la fiche Théo », avec annulation. */
+    data class ClaimNotice(
+        val id: UUID,
+        val profile: ProfileCard,
+        val ficheName: String,
+    )
+
+    var claimNotices: List<ClaimNotice> by mutableStateOf(emptyList())
         private set
 
     val pairingCode: String? get() = link?.pairingCode
@@ -126,6 +143,7 @@ class LiveShareCoordinator(
         attachedMatchID = match.id
         publishPendingEvents()
         mirrorAttachedMatch()
+        handleClaims()
     }
 
     /** Publie la fin du journal local que le serveur n'a pas encore (mêmes identifiants : celui du
@@ -155,11 +173,13 @@ class LiveShareCoordinator(
         attachedMatch = matchRepository.match(currentID) ?: return
         attachedMatchID = currentID
         mirrorAttachedMatch()
+        handleClaims()
     }
 
     suspend fun onForeground() {
         link?.refresh()
         publishPendingEvents()
+        handleClaims()
     }
 
     private suspend fun connect(
@@ -169,8 +189,17 @@ class LiveShareCoordinator(
     ) {
         val deviceID = deviceID ?: resolveDeviceID().also { this.deviceID = it }
         val session = OnlineSession(sessionID, code, deviceID, backend)
-        val link = SessionLink(session, code, SessionPresence(deviceID, deviceName, isOwner = true), context, scope)
+        val link =
+            SessionLink(
+                session,
+                code,
+                SessionPresence(deviceID, deviceName, isOwner = true),
+                context,
+                scope,
+                ownerDeviceID = deviceID,
+            )
         link.onNewRecords = { handle(it) }
+        link.onNewIdentities = { handleClaims() }
         this.link = link
         link.start()
     }
@@ -237,10 +266,74 @@ class LiveShareCoordinator(
             link.stop()
         }
         PersistedOnlineSession.clear(context, PersistedOnlineSession.Role.Owner)
+        link?.let { HandledClaims.clear(context, it.sessionID) }
         link = null
         attachedMatch = null
         attachedMatchID = null
         allowsContributors = true
+        claimNotices = emptyList()
+    }
+
+    // Qui es-tu ? (doc 16, phase D)
+
+    /** Publie le registre du créateur — son profil, et les places que ses fiches relient déjà à un
+     * profil — s'il a changé depuis le dernier publié. Un ami déjà lié est ainsi reconnu à son
+     * arrivée sans qu'on lui demande qui il est, et sa place ne peut pas être prise. */
+    private suspend fun publishRosterIfNeeded() {
+        val link = link ?: return
+        val match = attachedMatch ?: return
+        val owner = runCatching { myProfileCard(playerRepository) }.getOrNull()
+        val linkedSeats =
+            matchRepository.participants(match.id).sortedBy { it.seatIndex }.mapNotNull { participant ->
+                val profileID =
+                    participant.playerId?.let { resolvePlayer(it) }?.sharedProfileID ?: return@mapNotNull null
+                LinkedSeat(SeatRef(participant.seatIndex, participant.nicknameSnapshot), profileID)
+            }
+        val current = link.identities
+        if (current.owner == owner && current.linkedSeats == linkedSeats.associate { it.seat to it.profileID }) return
+        link.submitIdentity(SessionIdentityEvent.roster(owner, linkedSeats, deviceID ?: resolveDeviceID()), match.id)
+    }
+
+    /** Chaque revendication retenue, une seule fois (même si elle date d'avant un redémarrage, ou
+     * d'un moment où le créateur était hors ligne) : la fiche de cette place, si elle ne
+     * représente encore personne, est liée au profil — durablement, comme après un scan de QR de
+     * profil (doc 14) — et le créateur en est averti. Puis le registre est republié. */
+    private suspend fun handleClaims() {
+        val link = link ?: return
+        val match = attachedMatch ?: return
+        val me = deviceID ?: resolveDeviceID()
+        val handled = HandledClaims.load(context, link.sessionID).toMutableSet()
+        val participants = matchRepository.participants(match.id)
+        for (claim in link.identities.activeClaims) {
+            if (claim.deviceID == me || claim.claimID in handled) continue
+            val participant =
+                participants.firstOrNull {
+                    it.seatIndex == claim.seat.seatIndex && it.nicknameSnapshot == claim.seat.displayName
+                } ?: continue
+            val fiche = participant.playerId?.let { resolvePlayer(it) } ?: continue
+            handled += claim.claimID
+            if (fiche.sharedProfileID != null) continue
+            playerRepository.linkSharedProfile(claim.profile.id, claim.profile.name, fiche)
+            claimNotices = claimNotices + ClaimNotice(claim.claimID, claim.profile, fiche.nickname)
+        }
+        HandledClaims.save(context, link.sessionID, handled)
+        publishRosterIfNeeded()
+    }
+
+    /** « Annuler » : la revendication est retirée pour tous, et la fiche déliée. */
+    suspend fun revoke(notice: ClaimNotice) {
+        claimNotices = claimNotices - notice
+        val link = link ?: return
+        val match = attachedMatch ?: return
+        link.submitIdentity(SessionIdentityEvent.revoke(notice.id, deviceID ?: resolveDeviceID()), match.id)
+        playerRepository.player(notice.profile.id)?.takeIf { !it.sharedProfileIsMine }?.let {
+            playerRepository.unlinkSharedProfile(it)
+        }
+        publishRosterIfNeeded()
+    }
+
+    fun dismiss(notice: ClaimNotice) {
+        claimNotices = claimNotices - notice
     }
 
     private suspend fun handle(records: List<SessionEventRecord>) {
@@ -325,5 +418,38 @@ class LiveShareCoordinator(
                 paletteID = avatar.palette.index.toString(),
             )
         }
+    }
+}
+
+/** Doc 16, phase D — les revendications déjà traitées par le créateur, par session : une fiche
+ * n'est liée, et le créateur averti, qu'une fois, même après un redémarrage. */
+private object HandledClaims {
+    private fun prefs(context: Context) = context.getSharedPreferences("online_session", Context.MODE_PRIVATE)
+
+    private fun key(sessionID: UUID) = "handledClaims.$sessionID"
+
+    fun load(
+        context: Context,
+        sessionID: UUID,
+    ): Set<UUID> =
+        prefs(context)
+            .getStringSet(key(sessionID), emptySet())
+            .orEmpty()
+            .mapNotNull { runCatching { UUID.fromString(it) }.getOrNull() }
+            .toSet()
+
+    fun save(
+        context: Context,
+        sessionID: UUID,
+        claims: Set<UUID>,
+    ) {
+        prefs(context).edit { putStringSet(key(sessionID), claims.map { it.toString() }.toSet()) }
+    }
+
+    fun clear(
+        context: Context,
+        sessionID: UUID,
+    ) {
+        prefs(context).edit { remove(key(sessionID)) }
     }
 }

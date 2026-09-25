@@ -18,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -92,6 +94,7 @@ fun GenericRoundEntry(source: LiveRoundEntryState) {
                     pendingValue = source.pendingScores[participant.id],
                     requiresCloserSelection = source.requiresCloserSelection,
                     isCloser = source.closedParticipantID == participant.id,
+                    badge = source.profileBadges[participant.id],
                     onScoreChange = { raw ->
                         val value = raw.toIntOrNull()
                         if (raw.isEmpty()) {
@@ -129,6 +132,7 @@ private fun ParticipantScoreRow(
     pendingValue: Int?,
     requiresCloserSelection: Boolean,
     isCloser: Boolean,
+    badge: ProfileBadge?,
     onScoreChange: (String) -> Unit,
     onToggleCloser: () -> Unit,
     onFocus: () -> Unit,
@@ -142,17 +146,30 @@ private fun ParticipantScoreRow(
                 color = colors.textSecondary,
                 modifier = Modifier.width(20.dp),
             )
-            Text(
-                text = participant.displayName,
-                style = MaterialTheme.typography.bodyLarge,
-                color = colors.textPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
+            Row(
                 modifier = Modifier.weight(1f),
-            )
+                horizontalArrangement = Arrangement.spacedBy(Space.xs),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = participant.displayName,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = colors.textPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+                ProfileBadgeView(badge)
+            }
             Text(text = total.toString(), style = ScoreTypography.scoreL, color = colors.textSecondary)
             if (requiresCloserSelection) {
-                Chip(title = "Ferme", isSelected = isCloser, onClick = onToggleCloser)
+                val closerDescription = stringResource(R.string.value1_a_ferme_la_manche, participant.displayName)
+                Chip(
+                    title = stringResource(R.string.ferme),
+                    isSelected = isCloser,
+                    onClick = onToggleCloser,
+                    modifier = Modifier.semantics { contentDescription = closerDescription },
+                )
             }
             OutlinedTextField(
                 value = pendingValue?.toString() ?: "",

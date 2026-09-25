@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +41,8 @@ import com.quimene.domain.rules.GameDefinition
 import com.quimene.domain.rules.GameRules
 import com.quimene.store.DeviceIdentity
 import com.quimene.store.MatchEntity
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.UUID
 
 /**
@@ -216,6 +219,27 @@ private fun LiveMatchScaffold(
                 Banner(
                     message = stringResource(R.string.hors_connexion_la_saisie_reprendra_au_retour_du_reseau),
                     modifier = Modifier.padding(Space.lg),
+                )
+            }
+            // Doc 16, phase D — « Théo s'est associé à la fiche Théo », avec annulation. Disparaît
+            // seul après quelques secondes : l'association reste, rien à confirmer.
+            viewModel.shareCoordinator?.claimNotices?.firstOrNull()?.let { notice ->
+                val coordinator = viewModel.shareCoordinator
+                val scope = rememberCoroutineScope()
+                LaunchedEffect(notice.id) {
+                    delay(12_000)
+                    coordinator.dismiss(notice)
+                }
+                Banner(
+                    message =
+                        stringResource(
+                            R.string.value1_s_est_associe_a_la_fiche_value2,
+                            notice.profile.name,
+                            notice.ficheName,
+                        ),
+                    modifier = Modifier.padding(Space.lg),
+                    actionTitle = stringResource(R.string.annuler),
+                    onAction = { scope.launch { coordinator.revoke(notice) } },
                 )
             }
             viewModel.remoteActivityMessage?.let { Banner(message = it, modifier = Modifier.padding(Space.lg)) }

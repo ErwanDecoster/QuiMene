@@ -104,6 +104,7 @@ struct QuiMeneApp: App {
         if newPhase == .active, let container {
           try? PlayerRepository(context: container.mainContext).resolveDuplicateOwnProfiles()
           Task { await SharedProfileSyncCoordinator.shared.sync(context: container.mainContext) }
+          Task { await LiveShareCoordinator.shared.onForeground() }
         }
       }
       // Doc utilisateur « Handoff » (P9) — reprise sur un autre appareil connecté au même

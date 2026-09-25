@@ -4,174 +4,6 @@
     "" : {
 
     },
-    "%@ vient de valider une manche : vérifie avant de valider la tienne." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ just confirmed a round: check before confirming yours."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ acaba de validar una ronda: revisa antes de validar la tuya."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ hat gerade eine Runde bestätigt: prüfe, bevor du deine bestätigst."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%@ ha appena convalidato un turno: controlla prima di convalidare il tuo."
-          }
-        }
-      }
-    },
-    "Hors connexion : la saisie reprendra au retour du réseau." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline: entry will resume when the network is back."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin conexión: la introducción se reanudará cuando vuelva la red."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline: Die Eingabe geht weiter, sobald das Netz zurück ist."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline: l'inserimento riprenderà al ritorno della rete."
-          }
-        }
-      }
-    },
-    "La session partagée a été arrêtée." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The shared session was stopped."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La sesión compartida se ha detenido."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Die geteilte Sitzung wurde beendet."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La sessione condivisa è stata interrotta."
-          }
-        }
-      }
-    },
-    "Le créateur a arrêté la session." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The creator stopped the session."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El creador detuvo la sesión."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Ersteller hat die Sitzung beendet."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il creatore ha interrotto la sessione."
-          }
-        }
-      }
-    },
-    "Une autre manche vient d'être validée : vérifie avant de valider la tienne." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Another round was just confirmed: check before confirming yours."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se acaba de validar otra ronda: revisa antes de validar la tuya."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gerade wurde eine andere Runde bestätigt: prüfe, bevor du deine bestätigst."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "È appena stato convalidato un altro turno: controlla prima di convalidare il tuo."
-          }
-        }
-      }
-    },
-    "Une partie vient d'être lancée sur un autre appareil." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A match was just started on another device."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se acaba de iniciar una partida en otro dispositivo."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auf einem anderen Gerät wurde gerade eine Partie gestartet."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "È appena stata avviata una partita su un altro dispositivo."
-          }
-        }
-      }
-    },
     "—" : {
 
     },
@@ -243,6 +75,34 @@
         }
       }
     },
+    "%@ a fermé la manche" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ hat die Runde beendet"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ closed the round"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ cerró la ronda"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ha chiuso il turno"
+          }
+        }
+      }
+    },
     "%@ est déjà ton ami, sur la fiche « %@ »." : {
       "localizations" : {
         "de" : {
@@ -273,6 +133,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ è già tuo amico, sulla scheda «%2$@»."
+          }
+        }
+      }
+    },
+    "%@ s'est associé à la fiche « %@ »." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ hat sich mit dem Spieler „%2$@“ verknüpft."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ linked themselves to the player “%2$@”."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ se ha asociado a la ficha «%2$@»."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ si è associato alla scheda «%2$@»."
+          }
+        }
+      }
+    },
+    "%@ vient de valider une manche : vérifie avant de valider la tienne." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ hat gerade eine Runde bestätigt: prüfe, bevor du deine bestätigst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ just confirmed a round: check before confirming yours."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ acaba de validar una ronda: revisa antes de validar la tuya."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ ha appena convalidato un turno: controlla prima di convalidare il tuo."
           }
         }
       }
@@ -691,6 +607,7 @@
       }
     },
     "A fermé la manche" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -860,6 +777,12 @@
     },
     "Activité par mois" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktivität pro Monat"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -870,12 +793,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Actividad por mes"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aktivität pro Monat"
           }
         },
         "it" : {
@@ -1787,6 +1704,12 @@
     },
     "Avec les mêmes joueurs. Tous les appareils de la session passent à la nouvelle partie." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit denselben Spielern. Alle Geräte der Sitzung wechseln zur neuen Partie."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1797,12 +1720,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Con los mismos jugadores. Todos los dispositivos de la sesión pasan a la nueva partida."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mit denselben Spielern. Alle Geräte der Sitzung wechseln zur neuen Partie."
           }
         },
         "it" : {
@@ -2069,6 +1986,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Questa partita non è più disponibile — le regole di questo gioco sono cambiate da allora."
+          }
+        }
+      }
+    },
+    "Cette place vient d'être prise par quelqu'un d'autre." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieser Platz wurde gerade von jemand anderem belegt."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This seat was just taken by someone else."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alguien acaba de ocupar este puesto."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Questo posto è appena stato preso da qualcun altro."
+          }
+        }
+      }
+    },
+    "Changer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ändern"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Change"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambiar"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cambia"
           }
         }
       }
@@ -2583,6 +2556,12 @@
     },
     "Créateur" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ersteller"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -2593,12 +2572,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Creador"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ersteller"
           }
         },
         "it" : {
@@ -2661,6 +2634,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Crea il mio profilo"
+          }
+        }
+      }
+    },
+    "Déjà prise" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vergeben"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Taken"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ocupado"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Già preso"
           }
         }
       }
@@ -3283,6 +3284,34 @@
         }
       }
     },
+    "Ferme" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schließt"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Closed"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cierra"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chiude"
+          }
+        }
+      }
+    },
     "Fermer" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3429,6 +3458,12 @@
     },
     "Hors connexion" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3441,12 +3476,6 @@
             "value" : "Sin conexión"
           }
         },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline"
-          }
-        },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3455,8 +3484,42 @@
         }
       }
     },
+    "Hors connexion : la saisie reprendra au retour du réseau." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline: Die Eingabe geht weiter, sobald das Netz zurück ist."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline: entry will resume when the network is back."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión: la introducción se reanudará cuando vuelva la red."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline: l'inserimento riprenderà al ritorno della rete."
+          }
+        }
+      }
+    },
     "Hors connexion. Le tableau affiché est le dernier reçu." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline. Die angezeigte Tabelle ist die zuletzt empfangene."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3467,12 +3530,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sin conexión. El marcador mostrado es el último recibido."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline. Die angezeigte Tabelle ist die zuletzt empfangene."
           }
         },
         "it" : {
@@ -3536,6 +3593,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossibile avviare la condivisione. Controlla la tua connessione Internet e riprova."
+          }
+        }
+      }
+    },
+    "Je joue aussi" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich spiele mit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I'm Playing Too"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yo también juego"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gioco anch'io"
+          }
+        }
+      }
+    },
+    "Je regarde seulement" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich schaue nur zu"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I'm Just Watching"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo miro"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guardo soltanto"
           }
         }
       }
@@ -3822,6 +3935,34 @@
         }
       }
     },
+    "La session partagée a été arrêtée." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die geteilte Sitzung wurde beendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shared session was stopped."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sesión compartida se ha detenido."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sessione condivisa è stata interrotta."
+          }
+        }
+      }
+    },
     "Langue" : {
       "localizations" : {
         "de" : {
@@ -3878,8 +4019,70 @@
         }
       }
     },
+    "Le créateur a annulé ton association à cette place." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ersteller hat deine Zuordnung zu diesem Platz aufgehoben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The creator cancelled your link to this seat."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El creador ha anulado tu asociación a este puesto."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il creatore ha annullato la tua associazione a questo posto."
+          }
+        }
+      }
+    },
+    "Le créateur a arrêté la session." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ersteller hat die Sitzung beendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The creator stopped the session."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El creador detuvo la sesión."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il creatore ha interrotto la sessione."
+          }
+        }
+      }
+    },
     "Le créateur a arrêté la session. Le tableau affiché est le dernier reçu." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Der Ersteller hat die Sitzung beendet. Die angezeigte Tabelle ist die zuletzt empfangene."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -3890,12 +4093,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "El creador detuvo la sesión. El marcador mostrado es el último recibido."
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Ersteller hat die Sitzung beendet. Die angezeigte Tabelle ist die zuletzt empfangene."
           }
         },
         "it" : {
@@ -4447,6 +4644,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifica profilo"
+          }
+        }
+      }
+    },
+    "Moi" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ich"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Me"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yo"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Io"
           }
         }
       }
@@ -5073,6 +5298,12 @@
     },
     "Partie suivante" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nächste Partie"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -5083,12 +5314,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Siguiente partida"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nächste Partie"
           }
         },
         "it" : {
@@ -5589,6 +5814,34 @@
         }
       }
     },
+    "Qui es-tu dans cette partie ?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wer bist du in dieser Partie?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Who are you in this match?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Quién eres en esta partida?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chi sei in questa partita?"
+          }
+        }
+      }
+    },
     "Quitter" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -6069,6 +6322,12 @@
     },
     "Rejouer" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nochmal spielen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6079,12 +6338,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Volver a jugar"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nochmal spielen"
           }
         },
         "it" : {
@@ -6182,6 +6435,12 @@
     },
     "Reprendre la partie en cours, %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laufende Partie fortsetzen, %@"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
@@ -6192,12 +6451,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reanudar la partida en curso, %@"
-          }
-        },
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Laufende Partie fortsetzen, %@"
           }
         },
         "it" : {
@@ -7139,6 +7392,34 @@
         }
       }
     },
+    "Ton profil est lié à cette place chez le créateur, qui en est averti et peut annuler." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dein Profil wird beim Ersteller mit diesem Platz verknüpft; er wird benachrichtigt und kann es rückgängig machen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your profile is linked to this seat on the creator's device; they're notified and can cancel."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu perfil queda vinculado a este puesto en el dispositivo del creador, que recibe un aviso y puede anularlo."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il tuo profilo viene collegato a questo posto sul dispositivo del creatore, che viene avvisato e può annullare."
+          }
+        }
+      }
+    },
     "Total" : {
       "localizations" : {
         "de" : {
@@ -7309,6 +7590,118 @@
         }
       }
     },
+    "Tu joues : %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du spielst: %@"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're playing: %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Juegas: %@"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Giochi: %@"
+          }
+        }
+      }
+    },
+    "Tu observes cette partie : seul le créateur saisit les scores." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du beobachtest diese Partie: Nur der Ersteller gibt die Punkte ein."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're observing this match: only the creator enters scores."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Observas esta partida: solo el creador introduce las puntuaciones."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stai osservando questa partita: solo il creatore inserisce i punteggi."
+          }
+        }
+      }
+    },
+    "Tu regardes la partie : la saisie se fait sur les appareils des joueurs." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du schaust zu: Die Punkte werden auf den Geräten der Spieler eingegeben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're watching the match: scores are entered on the players' devices."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estás mirando la partida: las puntuaciones se introducen en los dispositivos de los jugadores."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stai guardando la partita: i punteggi si inseriscono sui dispositivi dei giocatori."
+          }
+        }
+      }
+    },
+    "Tu regardes la partie." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du schaust bei der Partie zu."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You're watching the match."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estás mirando la partida."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stai guardando la partita."
+          }
+        }
+      }
+    },
     "Tu suis **%@**, depuis le %@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7344,6 +7737,34 @@
         }
       }
     },
+    "Tu suis la partie sans saisir de score." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du verfolgst die Partie, ohne Punkte einzugeben."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You follow the match without entering scores."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sigues la partida sin introducir puntuaciones."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Segui la partita senza inserire punteggi."
+          }
+        }
+      }
+    },
     "Un pseudo et un avatar, rien de plus : aucun compte à créer." : {
       "localizations" : {
         "de" : {
@@ -7368,6 +7789,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un nickname e un avatar, niente di più: nessun account da creare."
+          }
+        }
+      }
+    },
+    "Une autre manche vient d'être validée : vérifie avant de valider la tienne." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerade wurde eine andere Runde bestätigt: prüfe, bevor du deine bestätigst."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Another round was just confirmed: check before confirming yours."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se acaba de validar otra ronda: revisa antes de validar la tuya."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È appena stato convalidato un altro turno: controlla prima di convalidare il tuo."
+          }
+        }
+      }
+    },
+    "Une partie vient d'être lancée sur un autre appareil." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf einem anderen Gerät wurde gerade eine Partie gestartet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A match was just started on another device."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se acaba de iniciar una partida en otro dispositivo."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "È appena stata avviata una partita su un altro dispositivo."
           }
         }
       }

@@ -16,7 +16,11 @@ struct BeloteRoundView: View {
   init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
     _model = State(
       initialValue: try! BeloteRoundModel(match: match, context: context, catalog: catalog))
+    myParticipantID = match.myParticipantID
   }
+
+  /// Doc 16 — ma place, marquée « Moi ».
+  private let myParticipantID: UUID?
 
   var body: some View {
     Group {
@@ -95,7 +99,8 @@ struct BeloteRoundView: View {
       }
     }
     .sheet(isPresented: $isPresentingRoundHistory) {
-      RoundHistoryView(state: model.state, definition: model.definition)
+      RoundHistoryView(
+        state: model.state, definition: model.definition, myParticipantID: myParticipantID)
     }
     .alert(
       "Saisie invalide",

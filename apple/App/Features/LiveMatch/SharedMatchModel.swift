@@ -48,15 +48,157 @@ final class SharedMatchModel {
 
   var isConcluded: Bool { state?.status == .ended || state?.status == .abandoned }
 
-  /// Seul un contributeur peut saisir, et seulement tant que la session est ouverte.
-  var canPropose: Bool { role == .contributor && !link.isClosed }
+  /// Seul un contributeur peut saisir, et seulement tant que la session est ouverte et qu'il a
+  /// dit qui il est dans la partie (doc 16, phase D) : un spectateur regarde.
+  var canPropose: Bool { role == .contributor && !link.isClosed && mySeat != nil }
 
-  init(link: SessionLink, role: Role, catalog: GameCatalog) {
+  // MARK: Qui es-tu ? (doc 16, phase D)
+
+  /// Mon profil, tel que publié dans la session. `nil` sans profil : seul « Je regarde
+  /// seulement » est alors possible.
+  let me: ProfileCard?
+  /// « Je regarde seulement » : choix local, retenu avec la session.
+  private(set) var isSpectator: Bool
+  private let onSpectatorChange: (Bool) -> Void
+  /// Pourquoi il faut de nouveau dire qui on est (place prise, association annulée).
+  private(set) var identityMessage: String?
+  private(set) var isClaiming = false
+
+  enum SeatStatus: Equatable {
+    case free, mine, taken
+  }
+
+  /// Ma place dans la partie courante : reliée à mon profil par le créateur (ami déjà lié,
+  /// reconnu sans question), ou revendiquée.
+  var mySeat: SeatRef? {
+    guard let me, let seat = link.identities.seat(of: me.id),
+      participants.contains(where: { Self.seat(of: $0) == seat })
+    else { return nil }
+    return seat
+  }
+
+  /// « Qui es-tu ? » à afficher : la partie est chargée, et je n'ai ni place ni choisi de
+  /// seulement regarder.
+  var needsIdentity: Bool { state != nil && !isSpectator && mySeat == nil }
+
+  func seatStatus(of participant: Participant) -> SeatStatus {
+    let seat = Self.seat(of: participant)
+    if seat == mySeat { return .mine }
+    return link.identities.occupant(of: seat) == nil ? .free : .taken
+  }
+
+  /// Ma place revendiquée (pas reliée par le créateur) : elle seule peut être rendue.
+  var canChangeSeat: Bool {
+    guard let me else { return false }
+    return link.identities.activeClaim(of: me.id) != nil
+  }
+
+  /// Le créateur, à ajouter à mes amis une fois ma place retenue : la liaison est durable dans
+  /// les deux sens (doc 16).
+  var ownerToBefriend: ProfileCard? {
+    guard mySeat != nil, let owner = link.identities.owner, owner.id != me?.id else { return nil }
+    return owner
+  }
+
+  /// Doc 16 — « Moi » sur ma place ; un lien sur les places occupées par un profil que je
+  /// compte parmi mes amis (`friendProfileIDs`, lus par l'écran dans mes fiches).
+  func profileBadges(friendProfileIDs: Set<UUID>) -> [Participant.ID: ScoreBoardView.ProfileBadge] {
+    var badges: [Participant.ID: ScoreBoardView.ProfileBadge] = [:]
+    let mine = mySeat
+    for participant in participants {
+      let seat = Self.seat(of: participant)
+      if seat == mine {
+        badges[participant.id] = .me
+      } else if let occupant = link.identities.occupant(of: seat),
+        friendProfileIDs.contains(occupant)
+      {
+        badges[participant.id] = .friend
+      }
+    }
+    return badges
+  }
+
+  /// Ma place dans la partie courante (« Moi »).
+  var myParticipantID: Participant.ID? {
+    guard let mine = mySeat else { return nil }
+    return participants.first { Self.seat(of: $0) == mine }?.id
+  }
+
+  static func seat(of participant: Participant) -> SeatRef {
+    SeatRef(seatIndex: participant.seatIndex, displayName: participant.displayName)
+  }
+
+  /// « C'est moi » : revendique cette place. Premier arrivé, premier servi — si un autre appareil
+  /// l'a prise juste avant, on le dit et la liste reste affichée.
+  func claim(_ participant: Participant) async {
+    guard let me, let matchID = currentMatchID, !isClaiming else { return }
+    isClaiming = true
+    defer { isClaiming = false }
+    identityMessage = nil
+    let seat = Self.seat(of: participant)
+    let sent = await link.submitIdentity(
+      .claim(seat, profile: me, deviceID: link.session.deviceID), matchID: matchID)
+    if !sent {
+      identityMessage =
+        link.isClosed
+        ? String(localized: "Le créateur a arrêté la session.")
+        : String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
+    } else if mySeat != seat {
+      identityMessage = String(localized: "Cette place vient d'être prise par quelqu'un d'autre.")
+    }
+  }
+
+  func watchOnly() {
+    identityMessage = nil
+    isSpectator = true
+    onSpectatorChange(true)
+  }
+
+  /// Revenir à « Qui es-tu ? » : depuis « Je regarde seulement », ou pour changer de place (la
+  /// revendication précédente est retirée).
+  func chooseAgain() async {
+    identityMessage = nil
+    if isSpectator {
+      isSpectator = false
+      onSpectatorChange(false)
+      return
+    }
+    guard let me, let claim = link.identities.activeClaim(of: me.id), let matchID = currentMatchID
+    else { return }
+    await link.submitIdentity(
+      .revoke(claim.claimID, deviceID: link.session.deviceID), matchID: matchID)
+  }
+
+  init(
+    link: SessionLink, role: Role, catalog: GameCatalog, me: ProfileCard?, isSpectator: Bool,
+    onSpectatorChange: @escaping (Bool) -> Void
+  ) {
     self.link = link
     self.role = role
     self.catalog = catalog
+    self.me = me
+    self.isSpectator = isSpectator
+    self.onSpectatorChange = onSpectatorChange
     link.onNewRecords = { [weak self] records in
       Task { @MainActor [weak self] in await self?.reload(fresh: records) }
+    }
+    link.onNewIdentities = { [weak self] records in
+      Task { @MainActor [weak self] in await self?.noticeRevocation(in: records) }
+    }
+  }
+
+  /// Le créateur a annulé mon association : « Qui es-tu ? » réapparaît, avec l'explication.
+  private func noticeRevocation(in records: [SessionIdentityRecord]) async {
+    guard let me else { return }
+    let all = await link.session.identities
+    let revokedMine = records.contains { record in
+      record.event.kind == .revoke && record.event.deviceID != link.session.deviceID
+        && all.contains {
+          $0.event.id == record.event.revokedClaimID && $0.event.profile?.id == me.id
+        }
+    }
+    if revokedMine, mySeat == nil {
+      identityMessage = String(localized: "Le créateur a annulé ton association à cette place.")
     }
   }
 

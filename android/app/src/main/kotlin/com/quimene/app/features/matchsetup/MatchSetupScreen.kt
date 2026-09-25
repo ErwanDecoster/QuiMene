@@ -26,6 +26,7 @@ import androidx.compose.ui.res.stringResource
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
+import com.quimene.app.features.livematch.MeBadge
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
 import com.quimene.app.ui.toAvatar
 import com.quimene.designsystem.components.AvatarSize
@@ -150,12 +151,14 @@ private fun PlayerSelectionRow(
             horizontalArrangement = Arrangement.spacedBy(Space.md),
         ) {
             AvatarView(player.toAvatar(), size = AvatarSize.Small)
-            Text(
-                text = player.nickname,
-                style = MaterialTheme.typography.bodyLarge,
-                color = colors.textPrimary,
+            Row(
                 modifier = Modifier.weight(1f),
-            )
+                horizontalArrangement = Arrangement.spacedBy(Space.sm),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(text = player.nickname, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
+                if (player.sharedProfileIsMine) MeBadge()
+            }
             if (showTeam && team != null) {
                 Chip(title = stringResource(R.string.equipe_value1, team), isSelected = true, onClick = onCycleTeam)
             }

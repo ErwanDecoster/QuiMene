@@ -1,5 +1,6 @@
 import DesignSystem
 import Domain
+import Store
 import SwiftUI
 
 /// Doc utilisateur — remontée : `LiveMatchView` (hôte) et `SharedMatchView` (pair) affichaient la
@@ -28,6 +29,12 @@ struct ScoreBoardView: View {
   /// Doc utilisateur — « Tu observes cette partie… » : n'a de sens que côté pair, `nil` pour
   /// l'hôte.
   let readOnlyMessage: String?
+  /// Doc 16 — « Moi » sur la place qui correspond à mon profil, et un lien sur celles de mes amis.
+  var profileBadges: [Participant.ID: ProfileBadge] = [:]
+
+  enum ProfileBadge {
+    case me, friend
+  }
 
   @Binding var closedParticipantID: Participant.ID?
   @Binding var draftTexts: [Participant.ID: String]
@@ -48,24 +55,6 @@ struct ScoreBoardView: View {
   }
 
   var body: some View {
-    if canEdit, requiresCloserSelection {
-      Section {
-        Text("A fermé la manche").font(.label).foregroundStyle(.textSecondary)
-        ScrollView(.horizontal, showsIndicators: false) {
-          HStack(spacing: Space.sm) {
-            ForEach(participants) { participant in
-              Chip(
-                LocalizedStringResource(stringLiteral: participant.displayName),
-                isSelected: closedParticipantID == participant.id
-              ) {
-                closedParticipantID = participant.id
-              }
-            }
-          }
-        }
-      }
-    }
-
     Section {
       ForEach(rankedParticipants) { participant in
         HStack(spacing: Space.md) {
@@ -83,6 +72,19 @@ struct ScoreBoardView: View {
             Text(participant.displayName)
               .font(participant.id == focusedParticipantID.wrappedValue ? .h6 : .bodyText)
               .foregroundStyle(.textPrimary)
+              .lineLimit(1)
+            switch profileBadges[participant.id] {
+            case .me:
+              MeBadge()
+            case .friend:
+              // Même signe que dans la liste des joueurs : une fiche liée à un ami.
+              Image(systemName: "link")
+                .font(.label)
+                .foregroundStyle(.textTertiary)
+                .accessibilityLabel("Ami lié")
+            case nil:
+              EmptyView()
+            }
             Spacer()
             Text((totals[participant.id] ?? 0).formatted())
               .font(.scoreL)
@@ -93,6 +95,9 @@ struct ScoreBoardView: View {
           .accessibleScoreRow(
             name: participant.displayName, rank: ranks[participant.id],
             score: totals[participant.id] ?? 0)
+          if canEdit, requiresCloserSelection {
+            closerChip(for: participant)
+          }
           if canEdit {
             scoreField(for: participant)
           }
@@ -117,9 +122,19 @@ struct ScoreBoardView: View {
     }
   }
 
+  /// « Ferme » sur la ligne de chaque joueur, juste avant son score (même présentation
+  /// qu'Android) : on désigne qui a fermé la manche au moment où l'on saisit son score, sans
+  /// remonter jusqu'à une rangée séparée. Un second toucher désélectionne.
+  private func closerChip(for participant: Participant) -> some View {
+    Chip("Ferme", isSelected: closedParticipantID == participant.id) {
+      closedParticipantID = closedParticipantID == participant.id ? nil : participant.id
+    }
+    .accessibilityLabel(Text("\(participant.displayName) a fermé la manche"))
+  }
+
   /// Charte §5.4 — jamais vide en apparence (placeholder `0`), bordure au focus uniquement.
   /// Clavier système (`.numberPad`) : pas de touche « − », d'où le bouton de signe posé par
-  /// l'écran appelant (`keyboardAccessory` ci-dessous) pour les jeux qui acceptent les valeurs
+  /// l'écran appelant (`keyboardBar` ci-dessous) pour les jeux qui acceptent les valeurs
   /// négatives.
   private func scoreField(for participant: Participant) -> some View {
     TextField("0", text: textBinding(for: participant.id))
@@ -156,35 +171,11 @@ struct ScoreBoardView: View {
 }
 
 extension ScoreBoardView {
-  /// Doc utilisateur — posée par l'écran appelant sur son propre `.toolbar`, jamais par
-  /// `ScoreBoardView` elle-même (voir la note en tête de fichier). Même bouton de signe et même
-  /// bouton de validation pour l'hôte et le pair — seul le libellé change (« Terminé »/« Envoyer »).
-  @ToolbarContentBuilder
-  static func keyboardAccessory(
-    allowsNegative: Bool,
-    currentParticipantID: Participant.ID?,
-    submitLabel: LocalizedStringResource,
-    onToggleSign: @escaping (Participant.ID) -> Void,
-    onSubmit: @escaping () -> Void
-  ) -> some ToolbarContent {
-    ToolbarItemGroup(placement: .keyboard) {
-      if allowsNegative, let currentParticipantID {
-        Button {
-          onToggleSign(currentParticipantID)
-        } label: {
-          Image(systemName: "plusminus")
-        }
-      }
-      Spacer()
-      Button(submitLabel) { onSubmit() }
-    }
-  }
-
-  /// Même contenu que `keyboardAccessory`, en barre ordinaire posée par l'écran appelant dans son
-  /// `.safeAreaInset(edge: .bottom)` tant que le clavier est visible — pour les écrans où la
-  /// barre d'accessoires native n'apparaît pas (plein écran « Rejoindre », `SharedMatchView`).
-  /// Depuis iOS 26, même apparence que la barre native : boutons en verre flottant au-dessus du
-  /// clavier, sans bandeau ; avant, le bandeau `.bar` des versions précédentes.
+  /// Bouton de signe et bouton de validation, au-dessus du clavier tant qu'il est visible : posée
+  /// par l'écran appelant dans son `.safeAreaInset(edge: .bottom)`, jamais par `ScoreBoardView`.
+  /// Même barre pour le créateur (`LiveMatchView`) et le participant (`SharedMatchView`), plutôt
+  /// que la barre native du clavier, absente du plein écran « Rejoindre ». Depuis iOS 26, boutons
+  /// en verre flottant sans bandeau ; avant, le bandeau `.bar`.
   @ViewBuilder
   static func keyboardBar(
     allowsNegative: Bool,
@@ -258,5 +249,27 @@ extension ScoreBoardView {
         .padding(.vertical, Space.sm)
         .background(.bar)
     }
+  }
+}
+
+/// Doc 16 — « Moi » accolé au pseudo de la place qui correspond à mon profil, partout où une
+/// partie liste ses joueurs (saisie, historique des manches, résultats, historique).
+struct MeBadge: View {
+  var body: some View {
+    Text("Moi")
+      .font(.label)
+      .foregroundStyle(.brandInk)
+      .lineLimit(1)
+      .fixedSize()
+      .padding(.horizontal, Space.xs)
+      .padding(.vertical, 2)
+      .background(Color.brandInk.opacity(0.12), in: .capsule)
+  }
+}
+
+extension MatchRecord {
+  /// Ma place dans cette partie : celle dont la fiche est mon profil.
+  var myParticipantID: UUID? {
+    participants.first { $0.player?.sharedProfileIsMine == true }?.id
   }
 }

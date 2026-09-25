@@ -93,6 +93,8 @@ public actor OnlineSession {
   private let key: SymmetricKey
   private let backend: any OnlineSessionBackend
   public private(set) var records: [SessionEventRecord] = []
+  /// Doc 16, phase D — qui est qui (`SessionIdentity`), dans l'ordre du journal.
+  public private(set) var identities: [SessionIdentityRecord] = []
   /// Dernier numéro vu, lisible ou non : un événement indéchiffrable (autre version, données
   /// corrompues) est sauté, mais il occupe bien sa place dans la numérotation.
   public private(set) var lastSeq: Int64 = 0
@@ -117,6 +119,8 @@ public actor OnlineSession {
         if let record = Self.open(raw, key: key) {
           records.append(record)
           fresh.append(record)
+        } else if let identity = Self.openIdentity(raw, key: key) {
+          identities.append(identity)
         }
       }
       if batch.count < Self.pageSize { break }
@@ -164,6 +168,37 @@ public actor OnlineSession {
     return record
   }
 
+  /// Doc 16, phase D — ajoute un événement d'identité. `matchID` : la partie courante (colonne
+  /// obligatoire côté serveur), sans effet sur le rejeu. Devancé : rattrape puis lève
+  /// `staleSequence`, comme `append`.
+  @discardableResult
+  public func appendIdentity(_ event: SessionIdentityEvent, matchID: UUID) async throws
+    -> SessionIdentityRecord
+  {
+    let expected = lastSeq + 1
+    let ciphertext = try Self.seal(event, key: key)
+    let seq: Int64
+    do {
+      seq = try await backend.append(
+        sessionID: sessionID, expectedSeq: expected, eventID: event.id, matchID: matchID,
+        deviceID: deviceID, ciphertext: ciphertext)
+    } catch OnlineSessionError.staleSequence {
+      try await sync()
+      throw OnlineSessionError.staleSequence
+    }
+    guard seq == expected, seq == lastSeq + 1 else {
+      try await sync()
+      guard let record = identities.first(where: { $0.event.id == event.id }) else {
+        throw OnlineSessionError.staleSequence
+      }
+      return record
+    }
+    lastSeq = seq
+    let record = SessionIdentityRecord(seq: seq, event: event)
+    identities.append(record)
+    return record
+  }
+
   /// Journal d'une partie de la session, prêt pour `MatchEngine.replay`.
   public func events(forMatch matchID: UUID) -> [StampedEvent] {
     records.filter { $0.matchID == matchID }.map(\.event)
@@ -187,6 +222,19 @@ public actor OnlineSession {
       let stamped = try? JSONDecoder().decode(StampedEvent.self, from: json)
     else { return nil }
     return SessionEventRecord(seq: raw.seq, matchID: raw.matchID, event: stamped)
+  }
+
+  static func seal(_ identity: SessionIdentityEvent, key: SymmetricKey) throws -> String {
+    let json = try JSONEncoder().encode(SessionIdentityEnvelope(identity: identity))
+    return try SessionCrypto.encrypt(json, key: key).base64EncodedString()
+  }
+
+  static func openIdentity(_ raw: RawSessionEvent, key: SymmetricKey) -> SessionIdentityRecord? {
+    guard let data = Data(base64Encoded: raw.ciphertext),
+      let json = try? SessionCrypto.decrypt(data, key: key),
+      let envelope = try? JSONDecoder().decode(SessionIdentityEnvelope.self, from: json)
+    else { return nil }
+    return SessionIdentityRecord(seq: raw.seq, event: envelope.identity)
   }
 }
 

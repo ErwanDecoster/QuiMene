@@ -17,7 +17,11 @@ struct YamsSheetView: View {
   init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
     _model = State(
       initialValue: try! YamsSheetModel(match: match, context: context, catalog: catalog))
+    myParticipantID = match.myParticipantID
   }
+
+  /// Doc 16 — ma place, marquée « Moi ».
+  private let myParticipantID: UUID?
 
   private struct PendingEntry: Identifiable {
     let participant: Participant
@@ -63,7 +67,8 @@ struct YamsSheetView: View {
       }
     }
     .sheet(isPresented: $isPresentingRoundHistory) {
-      RoundHistoryView(state: model.state, definition: model.definition)
+      RoundHistoryView(
+        state: model.state, definition: model.definition, myParticipantID: myParticipantID)
     }
     .sheet(item: $pendingEntry) { pending in
       YamsCategoryEntrySheet(participant: pending.participant, category: pending.category) {
@@ -103,10 +108,13 @@ struct YamsSheetView: View {
         GridRow {
           Text("").frame(width: 130, alignment: .leading)
           ForEach(model.participants) { participant in
-            Text(participant.displayName)
-              .font(.label)
-              .foregroundStyle(.textSecondary)
-              .frame(width: 72)
+            VStack(spacing: Space.xxs) {
+              Text(participant.displayName)
+                .font(.label)
+                .foregroundStyle(.textSecondary)
+              if participant.id == myParticipantID { MeBadge() }
+            }
+            .frame(width: 72)
           }
         }
         ForEach(upperCategories, id: \.id) { category in

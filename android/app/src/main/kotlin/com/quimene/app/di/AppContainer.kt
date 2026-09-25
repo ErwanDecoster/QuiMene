@@ -44,6 +44,7 @@ class AppContainer(
             catalog = catalog,
             matchRepository = matchRepository,
             resolvePlayer = { database.playerDao().get(it) },
+            playerRepository = playerRepository,
             context = context,
             resolveDeviceID = { DeviceIdentity.current(context) },
             scope = applicationScope,

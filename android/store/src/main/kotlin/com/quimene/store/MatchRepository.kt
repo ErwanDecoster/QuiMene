@@ -178,6 +178,16 @@ class MatchRepository(
      * [com.quimene.domain.model.Participant] du domaine n'en porte pas, lui). */
     suspend fun participants(matchID: UUID): List<ParticipantEntity> = participantDao.forMatch(matchID)
 
+    /** Doc 16 — les participants dont la fiche est liée à un profil : `true` pour mon profil,
+     * `false` pour un ami. */
+    suspend fun linkedParticipants(matchID: UUID): Map<UUID, Boolean> =
+        participantDao
+            .forMatch(matchID)
+            .mapNotNull { participant ->
+                val player = participant.playerId?.let { playerDao.get(it) } ?: return@mapNotNull null
+                if (player.sharedProfileID == null) null else participant.id to player.sharedProfileIsMine
+            }.toMap()
+
     suspend fun hasAnyMatch(): Boolean = matchDao.count() > 0
 
     suspend fun finishedMatches(): List<MatchEntity> =

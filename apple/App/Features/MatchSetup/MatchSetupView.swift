@@ -32,6 +32,7 @@ struct MatchSetupView: View {
               HStack(spacing: Space.md) {
                 AvatarView(avatar: player.avatar, size: .small)
                 Text(player.nickname).foregroundStyle(.textPrimary)
+                if player.sharedProfileIsMine { MeBadge() }
                 Spacer()
                 if model.isSelected(player) {
                   Image(systemName: "checkmark").foregroundStyle(.brandInk)
@@ -91,6 +92,7 @@ struct MatchSetupView: View {
   private func teamRow(for player: PlayerRecord) -> some View {
     HStack {
       Text(player.nickname).foregroundStyle(.textPrimary)
+      if player.sharedProfileIsMine { MeBadge() }
       Spacer()
       Picker(
         "Équipe",

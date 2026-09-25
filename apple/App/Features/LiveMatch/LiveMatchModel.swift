@@ -182,6 +182,19 @@ final class LiveMatchModel {
 
   var matchID: UUID { match.id }
 
+  /// Doc 16 — ma place (« Moi »).
+  var myParticipantID: UUID? { match.myParticipantID }
+
+  /// Doc 16 — la place de mon profil, et celles des fiches liées à un ami.
+  var profileBadges: [Participant.ID: ScoreBoardView.ProfileBadge] {
+    var badges: [Participant.ID: ScoreBoardView.ProfileBadge] = [:]
+    for record in match.participants {
+      guard let player = record.player, player.sharedProfileID != nil else { continue }
+      badges[record.id] = player.sharedProfileIsMine ? .me : .friend
+    }
+    return badges
+  }
+
   /// Doc 16, phase C — « Partie suivante » du créateur, avec les mêmes joueurs ; renvoie la
   /// nouvelle partie, à ouvrir.
   func startNextMatch(definition next: GameDefinition) async -> UUID? {

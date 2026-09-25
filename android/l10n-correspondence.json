@@ -7,6 +7,14 @@
     "de": "%1$@: %2$lld",
     "it": "%1$@: %2$lld"
   },
+  "value1_a_ferme_la_manche": {
+    "key": "%@ a fermé la manche",
+    "fr": "%@ a fermé la manche",
+    "en": "%@ closed the round",
+    "es": "%@ cerró la ronda",
+    "de": "%@ hat die Runde beendet",
+    "it": "%@ ha chiuso il turno"
+  },
   "value1_est_deja_ton_ami_sur_la_fiche_value2": {
     "key": "%@ est déjà ton ami, sur la fiche « %@ ».",
     "fr": "%1$@ est déjà ton ami, sur la fiche « %2$@ ».",
@@ -14,6 +22,14 @@
     "es": "%1$@ ya es tu amigo, en la ficha «%2$@».",
     "de": "%1$@ ist bereits dein Freund, auf der Karte „%2$@“.",
     "it": "%1$@ è già tuo amico, sulla scheda «%2$@»."
+  },
+  "value1_s_est_associe_a_la_fiche_value2": {
+    "key": "%@ s'est associé à la fiche « %@ ».",
+    "fr": "%@ s'est associé à la fiche « %@ ».",
+    "en": "%1$@ linked themselves to the player “%2$@”.",
+    "es": "%1$@ se ha asociado a la ficha «%2$@».",
+    "de": "%1$@ hat sich mit dem Spieler „%2$@“ verknüpft.",
+    "it": "%1$@ si è associato alla scheda «%2$@»."
   },
   "value1_vient_de_valider_une_manche_verifie_avant_de_valider": {
     "key": "%@ vient de valider une manche : vérifie avant de valider la tienne.",
@@ -575,6 +591,30 @@
     "de": "Diese Partie ist nicht mehr verfügbar — die Regeln dieses Spiels haben sich seitdem geändert.",
     "it": "Questa partita non è più disponibile — le regole di questo gioco sono cambiate da allora."
   },
+  "cette_place_vient_d_etre_prise_par_quelqu_un_d_autre": {
+    "key": "Cette place vient d'être prise par quelqu'un d'autre.",
+    "fr": "Cette place vient d'être prise par quelqu'un d'autre.",
+    "en": "This seat was just taken by someone else.",
+    "es": "Alguien acaba de ocupar este puesto.",
+    "de": "Dieser Platz wurde gerade von jemand anderem belegt.",
+    "it": "Questo posto è appena stato preso da qualcun altro."
+  },
+  "changer": {
+    "key": "Changer",
+    "fr": "Changer",
+    "en": "Change",
+    "es": "Cambiar",
+    "de": "Ändern",
+    "it": "Cambia"
+  },
+  "changer_le_signe": {
+    "key": "Changer le signe",
+    "fr": "Changer le signe",
+    "en": "Change sign",
+    "es": "Cambiar el signo",
+    "de": "Vorzeichen ändern",
+    "it": "Cambia segno"
+  },
   "chaque_equipe_doit_compter_exactement_count1_joueurs": {
     "key": "Chaque équipe doit compter exactement %lld joueurs.",
     "fr": "Chaque équipe doit compter exactement %lld joueurs.",
@@ -767,6 +807,14 @@
     "de": "Doppelt",
     "it": "Doppia"
   },
+  "deja_prise": {
+    "key": "Déjà prise",
+    "fr": "Déjà prise",
+    "en": "Taken",
+    "es": "Ocupado",
+    "de": "Vergeben",
+    "it": "Già preso"
+  },
   "deja_un_profil_sur_un_autre_appareil_avec_icloud_il_arrive": {
     "key": "Déjà un profil sur un autre appareil ? Avec iCloud, il arrive tout seul d'ici quelques instants.",
     "fr": "Déjà un profil sur un autre appareil ? Avec iCloud, il arrive tout seul d'ici quelques instants.",
@@ -863,6 +911,14 @@
     "de": "Highlights",
     "it": "Momenti salienti"
   },
+  "ferme": {
+    "key": "Ferme",
+    "fr": "Ferme",
+    "en": "Closed",
+    "es": "Cierra",
+    "de": "Schließt",
+    "it": "Chiude"
+  },
   "fermer": {
     "key": "Fermer",
     "fr": "Fermer",
@@ -942,6 +998,22 @@
     "es": "No se pudo iniciar el uso compartido. Comprueba tu conexión a Internet e inténtalo de nuevo.",
     "de": "Freigabe konnte nicht gestartet werden. Überprüfe deine Internetverbindung und versuche es erneut.",
     "it": "Impossibile avviare la condivisione. Controlla la tua connessione Internet e riprova."
+  },
+  "je_joue_aussi": {
+    "key": "Je joue aussi",
+    "fr": "Je joue aussi",
+    "en": "I'm Playing Too",
+    "es": "Yo también juego",
+    "de": "Ich spiele mit",
+    "it": "Gioco anch'io"
+  },
+  "je_regarde_seulement": {
+    "key": "Je regarde seulement",
+    "fr": "Je regarde seulement",
+    "en": "I'm Just Watching",
+    "es": "Solo miro",
+    "de": "Ich schaue nur zu",
+    "it": "Guardo soltanto"
   },
   "jeu": {
     "key": "Jeu",
@@ -1046,6 +1118,14 @@
     "es": "La clasificación final se calculará a partir de las mangas jugadas. Esta acción no se puede deshacer.",
     "de": "Die Endwertung wird anhand der gespielten Runden berechnet. Diese Aktion kann nicht rückgängig gemacht werden.",
     "it": "La classifica finale verrà calcolata in base alle manche giocate. Questa azione non può essere annullata."
+  },
+  "le_createur_a_annule_ton_association_a_cette_place": {
+    "key": "Le créateur a annulé ton association à cette place.",
+    "fr": "Le créateur a annulé ton association à cette place.",
+    "en": "The creator cancelled your link to this seat.",
+    "es": "El creador ha anulado tu asociación a este puesto.",
+    "de": "Der Ersteller hat deine Zuordnung zu diesem Platz aufgehoben.",
+    "it": "Il creatore ha annullato la tua associazione a questo posto."
   },
   "le_createur_a_arrete_la_session": {
     "key": "Le créateur a arrêté la session.",
@@ -1214,6 +1294,14 @@
     "es": "Editar perfil",
     "de": "Profil bearbeiten",
     "it": "Modifica profilo"
+  },
+  "moi": {
+    "key": "Moi",
+    "fr": "Moi",
+    "en": "Me",
+    "es": "Yo",
+    "de": "Ich",
+    "it": "Io"
   },
   "mois": {
     "key": "Mois",
@@ -1534,6 +1622,14 @@
     "es": "Apodo",
     "de": "Spitzname",
     "it": "Nickname"
+  },
+  "qui_es_tu_dans_cette_partie": {
+    "key": "Qui es-tu dans cette partie ?",
+    "fr": "Qui es-tu dans cette partie ?",
+    "en": "Who are you in this match?",
+    "es": "¿Quién eres en esta partida?",
+    "de": "Wer bist du in dieser Partie?",
+    "it": "Chi sei in questa partita?"
   },
   "quitter": {
     "key": "Quitter",
@@ -1975,6 +2071,14 @@
     "de": "Deine Freunde erhalten die mit dir gespielten Partien nicht mehr. Deine Karte und ihr Verlauf bleiben erhalten, danach erstellst du ein neues Profil.",
     "it": "I tuoi amici non riceveranno più le partite giocate con te. La tua scheda e la sua cronologia vengono conservate, poi creerai un nuovo profilo."
   },
+  "ton_profil_est_lie_a_cette_place_chez_le_createur_qui_en": {
+    "key": "Ton profil est lié à cette place chez le créateur, qui en est averti et peut annuler.",
+    "fr": "Ton profil est lié à cette place chez le créateur, qui en est averti et peut annuler.",
+    "en": "Your profile is linked to this seat on the creator's device; they're notified and can cancel.",
+    "es": "Tu perfil queda vinculado a este puesto en el dispositivo del creador, que recibe un aviso y puede anularlo.",
+    "de": "Dein Profil wird beim Ersteller mit diesem Platz verknüpft; er wird benachrichtigt und kann es rückgängig machen.",
+    "it": "Il tuo profilo viene collegato a questo posto sul dispositivo del creatore, che viene avvisato e può annullare."
+  },
   "total": {
     "key": "Total",
     "fr": "Total",
@@ -2023,6 +2127,38 @@
     "de": "Dreifach",
     "it": "Tripla"
   },
+  "tu_joues_value1": {
+    "key": "Tu joues : %@",
+    "fr": "Tu joues : %@",
+    "en": "You're playing: %@",
+    "es": "Juegas: %@",
+    "de": "Du spielst: %@",
+    "it": "Giochi: %@"
+  },
+  "tu_observes_cette_partie_seul_le_createur_saisit_les_scores": {
+    "key": "Tu observes cette partie : seul le créateur saisit les scores.",
+    "fr": "Tu observes cette partie : seul le créateur saisit les scores.",
+    "en": "You're observing this match: only the creator enters scores.",
+    "es": "Observas esta partida: solo el creador introduce las puntuaciones.",
+    "de": "Du beobachtest diese Partie: Nur der Ersteller gibt die Punkte ein.",
+    "it": "Stai osservando questa partita: solo il creatore inserisce i punteggi."
+  },
+  "tu_regardes_la_partie_la_saisie_se_fait_sur_les_appareils": {
+    "key": "Tu regardes la partie : la saisie se fait sur les appareils des joueurs.",
+    "fr": "Tu regardes la partie : la saisie se fait sur les appareils des joueurs.",
+    "en": "You're watching the match: scores are entered on the players' devices.",
+    "es": "Estás mirando la partida: las puntuaciones se introducen en los dispositivos de los jugadores.",
+    "de": "Du schaust zu: Die Punkte werden auf den Geräten der Spieler eingegeben.",
+    "it": "Stai guardando la partita: i punteggi si inseriscono sui dispositivi dei giocatori."
+  },
+  "tu_regardes_la_partie": {
+    "key": "Tu regardes la partie.",
+    "fr": "Tu regardes la partie.",
+    "en": "You're watching the match.",
+    "es": "Estás mirando la partida.",
+    "de": "Du schaust bei der Partie zu.",
+    "it": "Stai guardando la partita."
+  },
   "tu_suis_value1_depuis_le_value2": {
     "key": "Tu suis **%@**, depuis le %@",
     "fr": "Tu suis **%1$@**, depuis le %2$@",
@@ -2030,6 +2166,14 @@
     "es": "Sigues a **%1$@** desde el %2$@",
     "de": "Du folgst **%1$@** seit dem %2$@",
     "it": "Segui **%1$@** dal %2$@"
+  },
+  "tu_suis_la_partie_sans_saisir_de_score": {
+    "key": "Tu suis la partie sans saisir de score.",
+    "fr": "Tu suis la partie sans saisir de score.",
+    "en": "You follow the match without entering scores.",
+    "es": "Sigues la partida sin introducir puntuaciones.",
+    "de": "Du verfolgst die Partie, ohne Punkte einzugeben.",
+    "it": "Segui la partita senza inserire punteggi."
   },
   "un_pseudo_et_un_avatar_rien_de_plus_aucun_compte_a_creer": {
     "key": "Un pseudo et un avatar, rien de plus : aucun compte à créer.",

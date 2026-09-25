@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.quimene.app.R
 import com.quimene.app.features.livematch.LiveRoundEntryState
+import com.quimene.app.features.livematch.ProfileBadge
 import com.quimene.app.features.results.MatchSummaryViewModel
 import com.quimene.app.features.results.matchSummaryState
 import com.quimene.designsystem.components.Avatar
@@ -26,8 +27,12 @@ import com.quimene.domain.rules.GameCatalog
 import com.quimene.domain.rules.GameDefinition
 import com.quimene.domain.rules.Standing
 import com.quimene.store.ParticipantEntity
+import com.quimene.sync.ProfileCard
 import com.quimene.sync.Role
+import com.quimene.sync.SeatRef
 import com.quimene.sync.SessionEventRecord
+import com.quimene.sync.SessionIdentityEvent
+import com.quimene.sync.SessionIdentityRecord
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -44,6 +49,11 @@ class SharedMatchViewModel(
     val role: Role,
     private val catalog: GameCatalog,
     private val scope: CoroutineScope,
+    /** Mon profil, tel que publié dans la session. `null` sans profil : seul « Je regarde
+     * seulement » est alors possible (doc 16, phase D). */
+    val me: ProfileCard?,
+    isSpectator: Boolean,
+    private val onSpectatorChange: (Boolean) -> Unit,
     private val onStopped: () -> Unit,
 ) : LiveRoundEntryState {
     private var stateInternal by mutableStateOf<MatchState?>(null)
@@ -51,8 +61,144 @@ class SharedMatchViewModel(
     private val state: MatchState get() = requireNotNull(stateInternal) { "Partie pas encore reçue" }
     private var currentMatchID: UUID? = null
 
-    /** Seul un contributeur saisit, et seulement tant que la session est ouverte. */
-    val canPropose: Boolean get() = role == Role.Contributor && !link.isClosed
+    /** Seul un contributeur saisit, tant que la session est ouverte et qu'il a dit qui il est
+     * dans la partie (doc 16, phase D) : un spectateur regarde. */
+    val canPropose: Boolean get() = role == Role.Contributor && !link.isClosed && mySeat != null
+
+    // Qui es-tu ? (doc 16, phase D)
+
+    /** « Je regarde seulement » : choix local, retenu avec la session. */
+    var isSpectator by mutableStateOf(isSpectator)
+        private set
+
+    /** Pourquoi il faut de nouveau dire qui on est (place prise, association annulée). */
+    var identityMessage by mutableStateOf<String?>(null)
+        private set
+    var isClaiming by mutableStateOf(false)
+        private set
+
+    enum class SeatStatus { Free, Mine, Taken }
+
+    /** Ma place dans la partie courante : reliée à mon profil par le créateur (ami déjà lié,
+     * reconnu sans question), ou revendiquée. */
+    val mySeat: SeatRef?
+        get() {
+            val me = me ?: return null
+            val seat = link.identities.seatOf(me.id) ?: return null
+            val current = stateInternal ?: return null
+            return seat.takeIf { current.participants.any { seatOf(it) == seat } }
+        }
+
+    val myParticipantID: UUID?
+        get() {
+            val seat = mySeat ?: return null
+            return stateInternal?.participants?.firstOrNull { seatOf(it) == seat }?.id
+        }
+
+    /** « Qui es-tu ? » à afficher : la partie est chargée, et je n'ai ni place ni choisi de
+     * seulement regarder. */
+    val needsIdentity: Boolean get() = stateInternal != null && !isSpectator && mySeat == null
+
+    fun seatStatus(participant: Participant): SeatStatus {
+        val seat = seatOf(participant)
+        if (seat == mySeat) return SeatStatus.Mine
+        return if (link.identities.occupant(seat) == null) SeatStatus.Free else SeatStatus.Taken
+    }
+
+    /** Ma place revendiquée (pas reliée par le créateur) : elle seule peut être rendue. */
+    val canChangeSeat: Boolean get() = me?.let { link.identities.activeClaimOf(it.id) } != null
+
+    /** Le créateur, à ajouter à mes amis une fois ma place retenue (liaison dans les deux sens). */
+    val ownerToBefriend: ProfileCard?
+        get() {
+            if (mySeat == null) return null
+            return link.identities.owner?.takeIf { it.id != me?.id }
+        }
+
+    /** Mes amis liés, lus par l'écran dans mes fiches. */
+    var friendProfileIDs by mutableStateOf<Set<UUID>>(emptySet())
+
+    override val profileBadges: Map<UUID, ProfileBadge> get() = profileBadges(friendProfileIDs)
+
+    /** « Moi » sur ma place ; un lien sur les places occupées par un profil que je compte parmi
+     * mes amis ([friendProfileIDs], lus par l'écran dans mes fiches). */
+    fun profileBadges(friendProfileIDs: Set<UUID>): Map<UUID, ProfileBadge> {
+        val current = stateInternal ?: return emptyMap()
+        val mine = mySeat
+        val badges = mutableMapOf<UUID, ProfileBadge>()
+        for (participant in current.participants) {
+            val seat = seatOf(participant)
+            if (seat == mine) {
+                badges[participant.id] = ProfileBadge.Me
+            } else if (link.identities.occupant(seat)?.let { it in friendProfileIDs } == true) {
+                badges[participant.id] = ProfileBadge.Friend
+            }
+        }
+        return badges
+    }
+
+    /** « C'est moi » : revendique cette place. Premier arrivé, premier servi. */
+    fun claim(participant: Participant) {
+        val me = me ?: return
+        val matchID = currentMatchID ?: return
+        if (isClaiming) return
+        scope.launch {
+            isClaiming = true
+            identityMessage = null
+            try {
+                val seat = seatOf(participant)
+                val sent = link.submitIdentity(SessionIdentityEvent.claim(seat, me, link.session.deviceID), matchID)
+                identityMessage =
+                    when {
+                        !sent && link.isClosed -> link.context.getString(R.string.le_createur_a_arrete_la_session)
+                        !sent -> link.context.getString(R.string.hors_connexion_la_saisie_reprendra_au_retour_du_reseau)
+                        mySeat != seat ->
+                            link.context.getString(
+                                R.string.cette_place_vient_d_etre_prise_par_quelqu_un_d_autre,
+                            )
+                        else -> null
+                    }
+            } finally {
+                isClaiming = false
+            }
+        }
+    }
+
+    fun watchOnly() {
+        identityMessage = null
+        isSpectator = true
+        onSpectatorChange(true)
+    }
+
+    /** Revenir à « Qui es-tu ? » : depuis « Je regarde seulement », ou pour changer de place (la
+     * revendication précédente est retirée). */
+    fun chooseAgain() {
+        identityMessage = null
+        if (isSpectator) {
+            isSpectator = false
+            onSpectatorChange(false)
+            return
+        }
+        val me = me ?: return
+        val claim = link.identities.activeClaimOf(me.id) ?: return
+        val matchID = currentMatchID ?: return
+        scope.launch { link.submitIdentity(SessionIdentityEvent.revoke(claim.claimID, link.session.deviceID), matchID) }
+    }
+
+    /** Le créateur a annulé mon association : « Qui es-tu ? » réapparaît, avec l'explication. */
+    private suspend fun noticeRevocation(records: List<SessionIdentityRecord>) {
+        val me = me ?: return
+        val all = link.session.identities()
+        val revokedMine =
+            records.any { record ->
+                record.event.kind == SessionIdentityEvent.Kind.Revoke &&
+                    record.event.deviceID != link.session.deviceID &&
+                    all.any { it.event.id == record.event.revokedClaimID && it.event.profile?.id == me.id }
+            }
+        if (revokedMine && mySeat == null) {
+            identityMessage = link.context.getString(R.string.le_createur_a_annule_ton_association_a_cette_place)
+        }
+    }
 
     /** Joignable et session ouverte ; hors ligne, le tableau reste le dernier reçu (doc 16). */
     val isHostConnected: Boolean get() = link.isReachable && !link.isClosed
@@ -84,6 +230,7 @@ class SharedMatchViewModel(
 
     init {
         link.onNewRecords = { reload(it) }
+        link.onNewIdentities = { noticeRevocation(it) }
     }
 
     /** Écran de résultats, avec des fiches en mémoire (avatar dérivé du pseudo). */
@@ -106,7 +253,13 @@ class SharedMatchViewModel(
                         matchId = current.matchID,
                     )
             }
-        return matchSummaryState(current, definition, catalog.rules(current.gameID, current.rulesVersion), entities)
+        return matchSummaryState(
+            current,
+            definition,
+            catalog.rules(current.gameID, current.rulesVersion),
+            entities,
+            myParticipantID,
+        )
     }
 
     override fun setScore(
@@ -254,6 +407,8 @@ class SharedMatchViewModel(
     }
 
     companion object {
+        fun seatOf(participant: Participant) = SeatRef(participant.seatIndex, participant.displayName)
+
         fun overtakenMessage(
             context: Context,
             deviceName: String?,

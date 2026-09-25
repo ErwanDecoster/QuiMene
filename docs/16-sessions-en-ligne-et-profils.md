@@ -85,12 +85,29 @@ et avatar par place et pseudo. Format commun vérifié par `spec/session/sealed-
 remplace `spec/wire`. Anciennes fonctions `quimene_open_games` inutilisées : à supprimer dans une
 migration ultérieure.
 
+Phase D livrée (iOS puis Android) : « qui est qui » voyage dans le même journal chiffré,
+sous une enveloppe distincte (`{"identity": …}`, `SessionIdentity`) qu'une version antérieure
+saute sans casser le rejeu. Trois événements : **revendication** (place = siège + pseudo, stable
+d'une partie à l'autre, et carte de profil), **annulation** (par le créateur ou l'auteur) et
+**registre** du créateur (son profil, et les places que ses fiches relient déjà à un profil).
+`SessionIdentities` en déduit, sur chaque appareil, qui occupe quelle place : premier arrivé,
+premier servi ; une place reliée à un autre profil ne peut pas être revendiquée (pas de demande
+d'accord pour l'instant : le créateur peut délier la fiche) ; un ami déjà lié est reconnu sans
+question. Le créateur lie la fiche de la place à la première revendication retenue et affiche
+« X s'est associé à la fiche Y » avec « Annuler » ; le participant ajoute le créateur à ses amis
+(fiche existante au même pseudo, sinon créée). « Je regarde seulement » ne permet pas de saisir.
+Format commun : `spec/session/identity-events.json`.
+Avec elle : badge « Moi » sur ma place partout où une partie liste ses joueurs (saisie, manches,
+résultats, historique, choix des joueurs) et lien sur celles de mes amis pendant la saisie ;
+« Ferme » (Skyjo…) sur la ligne de chaque joueur, et même barre au-dessus du clavier pour le
+créateur et le participant (iOS).
+
 | Phase | Contenu | Dépend de |
 |---|---|---|
 | **A. Profil local** ✅ iOS + Android | Page Profil, création au premier lancement, onglets réorganisés, profil explicite (plus « la fiche partagée »), amis liés, profil sauvegardé via iCloud. | — |
 | **B. Sessions serveur** ✅ (migration `create_quimene_sessions`) | Tables session / parties / événements chiffrés, fonctions SQL (créer, ajouter avec numéro attendu, lire depuis un numéro, fermer), notification des appareils, expiration 14 jours. | — |
 | **C. Mode en ligne dans l'app** ✅ iOS + Android | L'écran de partie lit et écrit la session ; écrans créateur/participant unifiés ; rattrapage par numéro ; saisie bloquée hors ligne ; partie suivante par n'importe quel participant. | B |
-| **D. « Qui es-tu ? »** | Association à l'arrivée, liaison durable dans les deux sens, notification du créateur avec annulation, « Je regarde seulement ». | A, C |
+| **D. « Qui es-tu ? »** ✅ iOS + Android | Association à l'arrivée, liaison durable dans les deux sens, notification du créateur avec annulation, « Je regarde seulement ». | A, C |
 | **E. Historique partagé** | Enregistrement de la partie complète chez chaque participant connecté ; boîte aux lettres chiffrée par profil pour les absents, qui remplace les résumés. | A, C |
 | **F. Écran verrouillé** | Push envoyé par l'appareil qui saisit, indépendant du créateur. | C |
 | **G. Android** | Même protocole, tests de compatibilité croisés. | A–F |

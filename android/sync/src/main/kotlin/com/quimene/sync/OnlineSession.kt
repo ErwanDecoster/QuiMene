@@ -112,6 +112,7 @@ class OnlineSession(
     private val mutex = Mutex()
     private val key = SessionCrypto.deriveKey(pairingCode, sessionID)
     private val recordsInternal = mutableListOf<SessionEventRecord>()
+    private val identitiesInternal = mutableListOf<SessionIdentityRecord>()
 
     /** Dernier numéro vu, lisible ou non (un événement indéchiffrable compte dans la
      * numérotation). */
@@ -119,6 +120,9 @@ class OnlineSession(
         private set
 
     suspend fun records(): List<SessionEventRecord> = mutex.withLock { recordsInternal.toList() }
+
+    /** Doc 16, phase D — qui est qui ([SessionIdentityEvent]), dans l'ordre du journal. */
+    suspend fun identities(): List<SessionIdentityRecord> = mutex.withLock { identitiesInternal.toList() }
 
     /** Rattrape tout ce qui suit le dernier numéro connu, par lots ; renvoie le nouveau lisible. */
     suspend fun sync(): List<SessionEventRecord> = mutex.withLock { syncLocked() }
@@ -130,9 +134,12 @@ class OnlineSession(
             for (raw in batch) {
                 if (raw.seq <= lastSeq) continue
                 lastSeq = raw.seq
-                open(raw, key)?.let {
-                    recordsInternal += it
-                    fresh += it
+                val record = open(raw, key)
+                if (record != null) {
+                    recordsInternal += record
+                    fresh += record
+                } else {
+                    openIdentity(raw, key)?.let { identitiesInternal += it }
                 }
             }
             if (batch.size < PAGE_SIZE) break
@@ -180,6 +187,34 @@ class OnlineSession(
             SessionEventRecord(seq, matchID, published).also { recordsInternal += it }
         }
 
+    /** Doc 16, phase D — ajoute un événement d'identité. [matchID] : la partie courante (colonne
+     * obligatoire côté serveur), sans effet sur le rejeu. Devancé : rattrape puis lève
+     * [OnlineSessionError.StaleSequence], comme [append]. */
+    suspend fun appendIdentity(
+        event: SessionIdentityEvent,
+        matchID: UUID,
+    ): SessionIdentityRecord =
+        mutex.withLock {
+            val expected = lastSeq + 1
+            val ciphertext = seal(event, key)
+            val seq =
+                try {
+                    backend.append(sessionID, expected, event.id, matchID, deviceID, ciphertext)
+                } catch (stale: OnlineSessionError.StaleSequence) {
+                    syncLocked()
+                    throw stale
+                }
+            if (seq != expected || seq != lastSeq + 1) {
+                syncLocked()
+                return@withLock identitiesInternal.firstOrNull { it.event.id == event.id }
+                    ?: throw OnlineSessionError.StaleSequence
+            }
+            lastSeq = seq
+            // Tel que le relisent les autres appareils (dates arrondies par la sérialisation).
+            val published = openIdentity(RawSessionEvent(seq, event.id, matchID, deviceID, ciphertext), key)
+            (published ?: SessionIdentityRecord(seq, event)).also { identitiesInternal += it }
+        }
+
     /** Journal d'une partie, prêt pour `MatchEngine.replay`. */
     suspend fun eventsForMatch(matchID: UUID): List<StampedEvent> =
         mutex.withLock { recordsInternal.filter { it.matchID == matchID }.map { it.event } }
@@ -196,6 +231,8 @@ class OnlineSession(
             Json {
                 encodeDefaults = true
                 explicitNulls = false
+                // Comme `JSONDecoder` : une clé ajoutée par une version plus récente est ignorée.
+                ignoreUnknownKeys = true
             }
 
         fun newPairingCode(): String = "%06d".format(Random.nextInt(0, 1_000_000))
@@ -207,6 +244,29 @@ class OnlineSession(
             val plaintext = json.encodeToString(StampedEvent.serializer(), stamped).encodeToByteArray()
             return Base64.getEncoder().encodeToString(SessionCrypto.encrypt(plaintext, key))
         }
+
+        fun seal(
+            identity: SessionIdentityEvent,
+            key: ByteArray,
+        ): String {
+            val plaintext =
+                json
+                    .encodeToString(
+                        SessionIdentityEnvelope.serializer(),
+                        SessionIdentityEnvelope(identity),
+                    ).encodeToByteArray()
+            return Base64.getEncoder().encodeToString(SessionCrypto.encrypt(plaintext, key))
+        }
+
+        fun openIdentity(
+            raw: RawSessionEvent,
+            key: ByteArray,
+        ): SessionIdentityRecord? =
+            runCatching {
+                val plaintext = SessionCrypto.decrypt(Base64.getDecoder().decode(raw.ciphertext), key)
+                val envelope = json.decodeFromString(SessionIdentityEnvelope.serializer(), plaintext.decodeToString())
+                SessionIdentityRecord(raw.seq, envelope.identity)
+            }.getOrNull()
 
         fun open(
             raw: RawSessionEvent,
