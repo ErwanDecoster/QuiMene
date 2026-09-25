@@ -118,7 +118,9 @@ data class ActiveClaim(
  * - une revendication annulée ne compte plus (annulation par le créateur ou par son auteur) ;
  * - premier arrivé, premier servi : une place déjà revendiquée par un autre profil, ou reliée à
  *   un autre profil par le créateur, ne peut pas l'être ;
- * - un profil n'occupe qu'une place : une nouvelle revendication remplace la précédente.
+ * - un profil n'occupe qu'une place : une nouvelle revendication remplace la précédente, y compris
+ *   sa place reliée par le créateur, qui devient alors libre (reconnu d'office sur la mauvaise
+ *   fiche, on peut toujours changer de place).
  */
 class SessionIdentities(
     records: List<SessionIdentityRecord>,
@@ -156,7 +158,12 @@ class SessionIdentities(
             val seat = record.event.seat ?: continue
             val profile = record.event.profile ?: continue
             val linkedProfile = linked[seat]
-            if (linkedProfile != null && linkedProfile != profile.id) continue
+            if (linkedProfile != null &&
+                linkedProfile != profile.id &&
+                claims.none { it.profile.id == linkedProfile && it.seat != seat }
+            ) {
+                continue
+            }
             if (claims.any { it.seat == seat && it.profile.id != profile.id }) continue
             claims.removeAll { it.profile.id == profile.id }
             claims += ActiveClaim(record.event.id, seat, profile, record.event.deviceID, record.seq)
@@ -165,12 +172,16 @@ class SessionIdentities(
     }
 
     /** Le profil qui occupe cette place, s'il y en a un. */
-    fun occupant(seat: SeatRef): UUID? = linkedSeats[seat] ?: activeClaims.firstOrNull { it.seat == seat }?.profile?.id
+    fun occupant(seat: SeatRef): UUID? {
+        activeClaims.firstOrNull { it.seat == seat }?.let { return it.profile.id }
+        val linked = linkedSeats[seat] ?: return null
+        return linked.takeIf { activeClaims.none { it.profile.id == linked } }
+    }
 
-    /** La place de ce profil : reliée par le créateur, ou revendiquée. */
+    /** La place de ce profil : revendiquée, sinon reliée par le créateur. */
     fun seatOf(profileID: UUID): SeatRef? =
-        linkedSeats.entries.firstOrNull { it.value == profileID }?.key
-            ?: activeClaims.firstOrNull { it.profile.id == profileID }?.seat
+        activeClaims.firstOrNull { it.profile.id == profileID }?.seat
+            ?: linkedSeats.entries.firstOrNull { it.value == profileID }?.key
 
     fun activeClaimOf(profileID: UUID): ActiveClaim? = activeClaims.firstOrNull { it.profile.id == profileID }
 

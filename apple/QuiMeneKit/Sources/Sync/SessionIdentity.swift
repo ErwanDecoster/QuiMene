@@ -138,7 +138,9 @@ public struct ActiveClaim: Sendable, Equatable {
 /// - une revendication annulée ne compte plus (annulation par le créateur ou par son auteur) ;
 /// - premier arrivé, premier servi : une place déjà revendiquée par un autre profil, ou reliée à
 ///   un autre profil par le créateur, ne peut pas l'être (doc 16, « sans accord ») ;
-/// - un profil n'occupe qu'une place : une nouvelle revendication remplace la précédente.
+/// - un profil n'occupe qu'une place : une nouvelle revendication remplace la précédente, **y
+///   compris sa place reliée par le créateur**, qui devient alors libre (reconnu d'office sur la
+///   mauvaise fiche, on peut toujours changer de place).
 public struct SessionIdentities: Sendable, Equatable {
   public private(set) var owner: ProfileCard?
   public private(set) var linkedSeats: [SeatRef: UUID] = [:]
@@ -163,7 +165,11 @@ public struct SessionIdentities: Sendable, Equatable {
     }
     for record in records where record.event.kind == .claim && !revoked.contains(record.event.id) {
       guard let seat = record.event.seat, let profile = record.event.profile else { continue }
-      if let linked = linkedSeats[seat], linked != profile.id { continue }
+      if let linked = linkedSeats[seat], linked != profile.id,
+        !activeClaims.contains(where: { $0.profile.id == linked && $0.seat != seat })
+      {
+        continue
+      }
       if activeClaims.contains(where: { $0.seat == seat && $0.profile.id != profile.id }) {
         continue
       }
@@ -177,13 +183,17 @@ public struct SessionIdentities: Sendable, Equatable {
 
   /// Le profil qui occupe cette place, s'il y en a un.
   public func occupant(of seat: SeatRef) -> UUID? {
-    linkedSeats[seat] ?? activeClaims.first { $0.seat == seat }?.profile.id
+    if let claimed = activeClaims.first(where: { $0.seat == seat }) { return claimed.profile.id }
+    guard let linked = linkedSeats[seat],
+      !activeClaims.contains(where: { $0.profile.id == linked })
+    else { return nil }
+    return linked
   }
 
-  /// La place de ce profil : reliée par le créateur, ou revendiquée.
+  /// La place de ce profil : revendiquée, sinon reliée par le créateur.
   public func seat(of profileID: UUID) -> SeatRef? {
-    linkedSeats.first { $0.value == profileID }?.key
-      ?? activeClaims.first { $0.profile.id == profileID }?.seat
+    activeClaims.first { $0.profile.id == profileID }?.seat
+      ?? linkedSeats.first { $0.value == profileID }?.key
   }
 
   public func activeClaim(of profileID: UUID) -> ActiveClaim? {

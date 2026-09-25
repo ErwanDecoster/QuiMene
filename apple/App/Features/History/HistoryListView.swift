@@ -159,11 +159,28 @@ struct HistoryListView: View {
     }
   }
 
-  /// Doc 14 « Profils partagés », phase 2 — distingue une partie reçue de l'appareil d'un ami
-  /// (`MatchRecord.isImportedSummary`) de celles jouées ici, sans écran ni icône séparés.
-  private func dateLabel(for match: MatchRecord) -> String {
+  /// Doc 16, phase E — distingue une partie jouée sur un autre appareil (suivie dans une session,
+  /// reçue d'un ami : `MatchRecord.isReceived`) de celles jouées ici.
+  private func dateText(for match: MatchRecord) -> String {
     let date = match.startedAt.formatted(date: .abbreviated, time: .omitted)
-    return match.isImportedSummary ? "\(date) · Reçue" : date
+    return match.isReceived
+      ? String(localized: "\(date), partie reçue d'un autre appareil") : date
+  }
+
+  @ViewBuilder
+  private func dateLabel(for match: MatchRecord) -> some View {
+    let date = match.startedAt.formatted(date: .abbreviated, time: .omitted)
+    if match.isReceived {
+      HStack(spacing: Space.xxs) {
+        Text(date)
+        Text("·")
+        Label("Reçue", systemImage: "arrow.down.circle")
+          .labelStyle(.titleAndIcon)
+          .foregroundStyle(.brandInk)
+      }
+    } else {
+      Text(date)
+    }
   }
 
   private func filterLabel(_ text: String) -> some View {
@@ -183,7 +200,7 @@ struct HistoryListView: View {
         .frame(width: 32)
       VStack(alignment: .leading, spacing: Space.xxs) {
         Text(model.gameName(for: match)).font(.h6).foregroundStyle(.textPrimary)
-        Text(dateLabel(for: match))
+        dateLabel(for: match)
           .font(.bodySmall)
           .foregroundStyle(.textSecondary)
       }
@@ -204,7 +221,7 @@ struct HistoryListView: View {
     .accessibilityElement(children: .combine)
     .accessibilityLabel(
       [
-        model.gameName(for: match), dateLabel(for: match),
+        model.gameName(for: match), dateText(for: match),
         model.winner(for: match)?.nicknameSnapshot,
       ]
       .compactMap { $0 }

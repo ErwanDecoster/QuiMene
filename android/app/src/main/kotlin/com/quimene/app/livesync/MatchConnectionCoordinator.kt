@@ -159,7 +159,7 @@ class MatchConnectionCoordinator(
                     }
             }
         val kept =
-            matchRepository.createMirroredMatch(matchID, events, catalog) { participant ->
+            matchRepository.createMirroredMatch(matchID, events, catalog, isReceived = true) { participant ->
                 val fiche = fiches[participant.id]
                 if (fiche == null) {
                     LiveShareCoordinator.generatedSeed(participant.displayName)

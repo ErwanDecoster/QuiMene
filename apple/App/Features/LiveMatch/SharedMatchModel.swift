@@ -63,6 +63,9 @@ final class SharedMatchModel {
   /// Pourquoi il faut de nouveau dire qui on est (place prise, association annulée).
   private(set) var identityMessage: String?
   private(set) var isClaiming = false
+  /// « Changer » : « Qui es-tu ? » réaffiché alors que j'ai déjà une place ; la nouvelle
+  /// revendication remplace l'ancienne.
+  private(set) var isChoosingSeat = false
 
   enum SeatStatus: Equatable {
     case free, mine, taken
@@ -77,9 +80,12 @@ final class SharedMatchModel {
     return seat
   }
 
-  /// « Qui es-tu ? » à afficher : la partie est chargée, et je n'ai ni place ni choisi de
-  /// seulement regarder.
-  var needsIdentity: Bool { state != nil && !isSpectator && mySeat == nil }
+  /// « Qui es-tu ? » à afficher : la partie est chargée et en cours, et je n'ai ni place ni choisi
+  /// de seulement regarder — ou je change de place. Jamais pour une partie terminée ou abandonnée :
+  /// ses résultats s'affichent (plus de place à choisir dans une partie qui n'existe plus).
+  var needsIdentity: Bool {
+    state != nil && !isConcluded && !isSpectator && (mySeat == nil || isChoosingSeat)
+  }
 
   func seatStatus(of participant: Participant) -> SeatStatus {
     let seat = Self.seat(of: participant)
@@ -87,11 +93,6 @@ final class SharedMatchModel {
     return link.identities.occupant(of: seat) == nil ? .free : .taken
   }
 
-  /// Ma place revendiquée (pas reliée par le créateur) : elle seule peut être rendue.
-  var canChangeSeat: Bool {
-    guard let me else { return false }
-    return link.identities.activeClaim(of: me.id) != nil
-  }
 
   /// Le créateur, à ajouter à mes amis une fois ma place retenue : la liaison est durable dans
   /// les deux sens (doc 16).
@@ -138,6 +139,7 @@ final class SharedMatchModel {
     let seat = Self.seat(of: participant)
     let sent = await link.submitIdentity(
       .claim(seat, profile: me, deviceID: link.session.deviceID), matchID: matchID)
+    if sent, mySeat == seat { isChoosingSeat = false }
     if !sent {
       identityMessage =
         link.isClosed
@@ -148,25 +150,36 @@ final class SharedMatchModel {
     }
   }
 
-  func watchOnly() {
+  /// « Je regarde seulement » : une place revendiquée est rendue, pour qu'un autre puisse la
+  /// prendre.
+  func watchOnly() async {
     identityMessage = nil
+    isChoosingSeat = false
     isSpectator = true
     onSpectatorChange(true)
+    guard let me, let claim = link.identities.activeClaim(of: me.id), let matchID = currentMatchID
+    else { return }
+    await link.submitIdentity(
+      .revoke(claim.claimID, deviceID: link.session.deviceID), matchID: matchID)
   }
 
-  /// Revenir à « Qui es-tu ? » : depuis « Je regarde seulement », ou pour changer de place (la
-  /// revendication précédente est retirée).
-  func chooseAgain() async {
+  /// « Garder ma place » : ferme « Qui es-tu ? » ouvert par « Changer ».
+  func keepSeat() {
+    identityMessage = nil
+    isChoosingSeat = false
+  }
+
+  /// Revenir à « Qui es-tu ? » : depuis « Je regarde seulement », ou pour changer de place — même
+  /// reconnu d'office par le créateur (sur la mauvaise fiche, par exemple). La place actuelle est
+  /// gardée tant qu'une autre n'est pas choisie.
+  func chooseAgain() {
     identityMessage = nil
     if isSpectator {
       isSpectator = false
       onSpectatorChange(false)
       return
     }
-    guard let me, let claim = link.identities.activeClaim(of: me.id), let matchID = currentMatchID
-    else { return }
-    await link.submitIdentity(
-      .revoke(claim.claimID, deviceID: link.session.deviceID), matchID: matchID)
+    isChoosingSeat = true
   }
 
   init(

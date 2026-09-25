@@ -9,11 +9,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -43,6 +45,7 @@ import com.quimene.designsystem.components.Chip
 import com.quimene.designsystem.components.EmptyState
 import com.quimene.designsystem.components.ListContainer
 import com.quimene.designsystem.components.ListRowDivider
+import com.quimene.designsystem.tokens.IconSize
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.rules.GameDefinition
@@ -302,11 +305,31 @@ private fun HistoryRow(
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(row.gameName, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
-            Text(
-                text = dateFormatter.format(row.match.startedAt.atZone(ZoneId.systemDefault())),
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.textSecondary,
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Space.xs),
+            ) {
+                Text(
+                    text = dateFormatter.format(row.match.startedAt.atZone(ZoneId.systemDefault())),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.textSecondary,
+                )
+                // Doc 16, phase E — jouée sur un autre appareil et reçue ici.
+                if (row.match.isReceived) {
+                    Text("·", style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
+                    Icon(
+                        Icons.Filled.Download,
+                        contentDescription = null,
+                        tint = colors.brandInk,
+                        modifier = Modifier.size(IconSize.sm),
+                    )
+                    Text(
+                        stringResource(R.string.recue),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.brandInk,
+                    )
+                }
+            }
         }
         IconButton(onClick = onArchive) {
             Icon(Icons.Filled.Archive, contentDescription = "Archiver cette partie")

@@ -18,7 +18,9 @@ public final class MatchRecord {
   /// Masque la partie de l'onglet Historique sans y toucher — les statistiques de profil
   /// continuent de l'inclure, au même titre que l'archivage d'un `PlayerRecord`.
   public var isArchived: Bool = false
-  /// Identifiant d'appareil créateur — utile en sync (Phase 8), placeholder en attendant.
+  /// Identifiant d'appareil créateur — utile en sync (Phase 8), placeholder en attendant. Doc 16,
+  /// phase E — `MatchRecord.receivedOrigin` pour une partie jouée sur un autre appareil et
+  /// enregistrée ici ensuite (suivie dans une session, ou reçue d'un ami) : voir `isReceived`.
   public var deviceOrigin: String = "local"
   public var eventLogData: Data = Data()
   /// Doc 14 « Profils partagés », phase 2 — `true` dès la conclusion si au moins un participant
@@ -71,4 +73,11 @@ public final class MatchRecord {
   public var status: MatchStatus {
     MatchStatus(rawValue: statusRaw) ?? .inProgress
   }
+
+  /// Doc 16, phase E — valeur de `deviceOrigin` d'une partie qui ne vient pas de cet appareil.
+  public static let receivedOrigin = "received"
+
+  /// Jouée sur un autre appareil, puis enregistrée ici (copie de participant, boîte aux lettres,
+  /// ou ancien résumé du doc 14) : l'Historique le signale.
+  public var isReceived: Bool { deviceOrigin == Self.receivedOrigin || isImportedSummary }
 }

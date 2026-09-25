@@ -118,7 +118,7 @@ final class MatchConnectionCoordinator {
     let players = PlayerRepository(context: modelContext)
     let myFiche = try? players.myOwnSharedPlayer()
     let created = try? repository.createMirroredMatch(
-      id: matchID, events: events, catalog: catalog
+      id: matchID, events: events, catalog: catalog, isReceived: true
     ) { participant in
       let seat = SharedMatchModel.seat(of: participant)
       let fiche: PlayerRecord? =

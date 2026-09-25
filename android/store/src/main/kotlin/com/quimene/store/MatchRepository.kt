@@ -301,7 +301,7 @@ class MatchRepository(
                     it,
                 )
             }
-        return createMirroredMatch(pkg.matchID, pkg.events, catalog) { participant ->
+        return createMirroredMatch(pkg.matchID, pkg.events, catalog, isReceived = true) { participant ->
             val entry = byID[participant.id]
             ParticipantSeed(
                 player = entry?.sharedProfileID?.let { players[it] },
@@ -333,6 +333,7 @@ class MatchRepository(
         id: UUID,
         events: List<StampedEvent>,
         catalog: GameCatalog,
+        isReceived: Boolean = false,
         seed: (Participant) -> ParticipantSeed,
     ): MatchEntity? {
         val first = events.firstOrNull() ?: return null
@@ -359,7 +360,7 @@ class MatchRepository(
                 rulesVersion = created.rulesVersion,
                 variantsData = encodeJson(VariantSelection.serializer(), created.variants),
                 startedAt = first.occurredAt,
-                deviceOrigin = first.deviceID,
+                deviceOrigin = if (isReceived) MatchEntity.RECEIVED_ORIGIN else first.deviceID,
                 eventLogData = encodeEvents(events),
             )
         matchDao.insert(match)

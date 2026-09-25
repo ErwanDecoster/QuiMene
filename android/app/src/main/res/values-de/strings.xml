@@ -12,6 +12,7 @@
     <string name="value1_annonce">%1$s, Ansage</string>
     <string name="value1_manche_count2_count3">%1$s, manche %2$d : %3$d</string>
     <string name="value1_manche_count2_sans_saisie">%1$s, manche %2$d, sans saisie</string>
+    <string name="value1_partie_recue_d_un_autre_appareil">%1$s, Partie von einem anderen Gerät empfangen</string>
     <string name="value1_plis_realises">%1$s, gewonnene Stiche</string>
     <string name="value1_rang_count2_count3_partie_s_count4_victoire_s_value5">%1$s, rang %2$d, %3$d partie(s), %4$d victoire(s), %5$s de victoires</string>
     <string name="value1_score">%1$s, score</string>
@@ -119,6 +120,7 @@
     <string name="garde">Garde</string>
     <string name="garde_contre_le_chien">Garde contre le chien</string>
     <string name="garde_sans_le_chien">Garde sans le chien</string>
+    <string name="garder_ma_place">Meinen Platz behalten</string>
     <string name="historique">Verlauf</string>
     <string name="hors_connexion">Offline</string>
     <string name="hors_connexion_la_saisie_reprendra_au_retour_du_reseau">Offline: Die Eingabe geht weiter, sobald das Netz zurück ist.</string>
@@ -183,6 +185,7 @@
     <string name="partager_la_partie">Partie teilen</string>
     <string name="partager_le_resume">Zusammenfassung teilen</string>
     <string name="partenaire_roi_appele">Partner (gerufener König)</string>
+    <string name="partie_jouee_sur_un_autre_appareil_et_recue_ici">Auf einem anderen Gerät gespielte Partie, hier empfangen.</string>
     <string name="partie_partagee_en_cours_reprendre">Geteilte Partie läuft · Fortsetzen</string>
     <string name="partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par">Partie vom Gerät eines Freundes empfangen: die Runde-für-Runde-Details sind hier nicht verfügbar.</string>
     <string name="partie_suivante">Nächste Partie</string>
@@ -222,6 +225,7 @@
     <string name="reprise_automatique_en_cours">Automatische Fortsetzung läuft.</string>
     <string name="retirer_des_amis">Aus Freunden entfernen</string>
     <string name="retrouver_vos_parties_jouees_ensemble_dans_ton_historique">Eure gemeinsamen Partien in deinem Verlauf wiederfinden.</string>
+    <string name="recue">Empfangen</string>
     <string name="regles_ou_lien_vers_les_regles_facultatif">Regeln oder ein Link zu den Regeln (optional):</string>
     <string name="reactiver">Reaktivieren</string>
     <string name="realise_count1">Ergebnis: %1$d</string>

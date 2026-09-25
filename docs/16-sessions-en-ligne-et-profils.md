@@ -95,7 +95,10 @@ premier servi ; une place reliée à un autre profil ne peut pas être revendiqu
 d'accord pour l'instant : le créateur peut délier la fiche) ; un ami déjà lié est reconnu sans
 question. Le créateur lie la fiche de la place à la première revendication retenue et affiche
 « X s'est associé à la fiche Y » avec « Annuler » ; le participant ajoute le créateur à ses amis
-(fiche existante au même pseudo, sinon créée). « Je regarde seulement » ne permet pas de saisir.
+(fiche existante au même pseudo, sinon créée). « Je regarde seulement » ne permet pas de saisir
+(et rend une place revendiquée). « Changer » est toujours possible, même reconnu d'office : une
+revendication remplace la place reliée par le créateur, qui devient libre, et le créateur déplace
+la liaison de fiche. « Qui es-tu ? » ne s'affiche jamais pour une partie terminée ou abandonnée.
 Format commun : `spec/session/identity-events.json`.
 Avec elle : badge « Moi » sur ma place partout où une partie liste ses joueurs (saisie, manches,
 résultats, historique, choix des joueurs) et lien sur celles de mes amis pendant la saisie ;
@@ -115,7 +118,8 @@ Remplace les résumés du doc 14 (table et fonctions retirées en phase H, une f
 la boîte). Les dates d'une copie sont celles de la partie (premier et dernier événement), plus
 celles de l'enregistrement. Format commun : `spec/session/mailbox-package.json`. Dépôt immédiat
 dès l'écran de résultats ; relève au lancement, au retour au premier plan, à l'ouverture de
-l'Historique et en tirant la liste vers le bas.
+l'Historique et en tirant la liste vers le bas. Une partie jouée sur un autre appareil
+(`deviceOrigin = "received"`) est signalée « Reçue » dans l'Historique et dans son détail.
 
 Phase F : l'appareil qui enregistre un événement dans la session (créateur ou participant) met à
 jour l'écran verrouillé de tous les iPhone de la session via `quimene-live-activity-push`

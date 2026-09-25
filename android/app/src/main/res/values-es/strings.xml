@@ -12,6 +12,7 @@
     <string name="value1_annonce">%1$s, apuesta</string>
     <string name="value1_manche_count2_count3">%1$s, manche %2$d : %3$d</string>
     <string name="value1_manche_count2_sans_saisie">%1$s, manche %2$d, sans saisie</string>
+    <string name="value1_partie_recue_d_un_autre_appareil">%1$s, partida recibida de otro dispositivo</string>
     <string name="value1_plis_realises">%1$s, bazas ganadas</string>
     <string name="value1_rang_count2_count3_partie_s_count4_victoire_s_value5">%1$s, rang %2$d, %3$d partie(s), %4$d victoire(s), %5$s de victoires</string>
     <string name="value1_score">%1$s, score</string>
@@ -119,6 +120,7 @@
     <string name="garde">Garde</string>
     <string name="garde_contre_le_chien">Garde contre le chien</string>
     <string name="garde_sans_le_chien">Garde sans le chien</string>
+    <string name="garder_ma_place">Mantener mi puesto</string>
     <string name="historique">Historial</string>
     <string name="hors_connexion">Sin conexión</string>
     <string name="hors_connexion_la_saisie_reprendra_au_retour_du_reseau">Sin conexión: la introducción se reanudará cuando vuelva la red.</string>
@@ -183,6 +185,7 @@
     <string name="partager_la_partie">Compartir la partida</string>
     <string name="partager_le_resume">Compartir el resumen</string>
     <string name="partenaire_roi_appele">Compañero (rey llamado)</string>
+    <string name="partie_jouee_sur_un_autre_appareil_et_recue_ici">Partida jugada en otro dispositivo y recibida aquí.</string>
     <string name="partie_partagee_en_cours_reprendre">Partida compartida en curso · Reanudar</string>
     <string name="partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par">Partida recibida del dispositivo de un amigo: el detalle manga por manga no está disponible aquí.</string>
     <string name="partie_suivante">Siguiente partida</string>
@@ -222,6 +225,7 @@
     <string name="reprise_automatique_en_cours">Reanudación automática en curso.</string>
     <string name="retirer_des_amis">Quitar de amigos</string>
     <string name="retrouver_vos_parties_jouees_ensemble_dans_ton_historique">Encontrar en tu historial las partidas jugadas juntos.</string>
+    <string name="recue">Recibida</string>
     <string name="regles_ou_lien_vers_les_regles_facultatif">Reglas o un enlace a las reglas (opcional):</string>
     <string name="reactiver">Reactivar</string>
     <string name="realise_count1">Resultado: %1$d</string>

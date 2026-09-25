@@ -52,4 +52,13 @@ data class MatchEntity(
             isImportedSummary == other.isImportedSummary
 
     override fun hashCode(): Int = id.hashCode()
+
+    /** Doc 16, phase E — jouée sur un autre appareil, puis enregistrée ici (copie de participant,
+     * boîte aux lettres, ou ancien résumé du doc 14) : l'Historique le signale. */
+    val isReceived: Boolean get() = deviceOrigin == RECEIVED_ORIGIN || isImportedSummary
+
+    companion object {
+        /** Valeur de [deviceOrigin] d'une partie qui ne vient pas de cet appareil. */
+        const val RECEIVED_ORIGIN = "received"
+    }
 }

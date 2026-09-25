@@ -296,6 +296,14 @@ final class LiveShareCoordinator {
       else { continue }
       handled.insert(claim.claimID)
       guard fiche.sharedProfileID == nil else { continue }
+      // Changement de place : la fiche de son ancienne place dans cette partie (reconnu d'office
+      // sur la mauvaise fiche) ne le représente plus.
+      for other in match.participants {
+        guard let previous = other.player, previous.id != fiche.id, !previous.sharedProfileIsMine,
+          previous.sharedProfileID == claim.profile.id
+        else { continue }
+        try? players.unlinkSharedProfile(for: previous)
+      }
       try? players.linkSharedProfile(claim.profile.id, name: claim.profile.name, for: fiche)
       claimNotices.append(
         ClaimNotice(id: claim.claimID, profile: claim.profile, ficheName: fiche.nickname))

@@ -69,6 +69,14 @@ struct HistoryDetailView: View {
         participantRecords: participantRecords,
         playedAt: playedAt
       )
+      // Doc 16, phase E — une partie jouée sur un autre appareil le dit, comme dans la liste.
+      .safeAreaInset(edge: .top) {
+        if match.isReceived {
+          Banner("Partie jouée sur un autre appareil et reçue ici.")
+            .padding(.horizontal, Space.lg)
+            .padding(.top, Space.sm)
+        }
+      }
     } else {
       EmptyState(
         icon: "exclamationmark.triangle",

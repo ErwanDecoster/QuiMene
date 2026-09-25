@@ -12,6 +12,7 @@
     <string name="value1_annonce">%1$s, annonce</string>
     <string name="value1_manche_count2_count3">%1$s, manche %2$d : %3$d</string>
     <string name="value1_manche_count2_sans_saisie">%1$s, manche %2$d, sans saisie</string>
+    <string name="value1_partie_recue_d_un_autre_appareil">%1$s, partie reçue d\'un autre appareil</string>
     <string name="value1_plis_realises">%1$s, plis réalisés</string>
     <string name="value1_rang_count2_count3_partie_s_count4_victoire_s_value5">%1$s, rang %2$d, %3$d partie(s), %4$d victoire(s), %5$s de victoires</string>
     <string name="value1_score">%1$s, score</string>
@@ -119,6 +120,7 @@
     <string name="garde">Garde</string>
     <string name="garde_contre_le_chien">Garde contre le chien</string>
     <string name="garde_sans_le_chien">Garde sans le chien</string>
+    <string name="garder_ma_place">Garder ma place</string>
     <string name="historique">Historique</string>
     <string name="hors_connexion">Hors connexion</string>
     <string name="hors_connexion_la_saisie_reprendra_au_retour_du_reseau">Hors connexion : la saisie reprendra au retour du réseau.</string>
@@ -183,6 +185,7 @@
     <string name="partager_la_partie">Partager la partie</string>
     <string name="partager_le_resume">Partager le résumé</string>
     <string name="partenaire_roi_appele">Partenaire (roi appelé)</string>
+    <string name="partie_jouee_sur_un_autre_appareil_et_recue_ici">Partie jouée sur un autre appareil et reçue ici.</string>
     <string name="partie_partagee_en_cours_reprendre">Partie partagée en cours · Reprendre</string>
     <string name="partie_recue_de_l_appareil_d_un_ami_le_detail_manche_par">Partie reçue de l\'appareil d\'un ami : le détail manche par manche n\'est pas disponible ici.</string>
     <string name="partie_suivante">Partie suivante</string>
@@ -222,6 +225,7 @@
     <string name="reprise_automatique_en_cours">Reprise automatique en cours.</string>
     <string name="retirer_des_amis">Retirer des amis</string>
     <string name="retrouver_vos_parties_jouees_ensemble_dans_ton_historique">Retrouver vos parties jouées ensemble dans ton historique.</string>
+    <string name="recue">Reçue</string>
     <string name="regles_ou_lien_vers_les_regles_facultatif">Règles ou lien vers les règles (facultatif) :</string>
     <string name="reactiver">Réactiver</string>
     <string name="realise_count1">Réalisé : %1$d</string>

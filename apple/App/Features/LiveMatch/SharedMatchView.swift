@@ -217,7 +217,7 @@ struct SharedMatchView: View {
         HStack {
           Text("Tu regardes la partie.").font(.bodyText).foregroundStyle(.textSecondary)
           Spacer(minLength: Space.sm)
-          Button("Je joue aussi") { Task { await model.chooseAgain() } }
+          Button("Je joue aussi") { model.chooseAgain() }
         }
       }
     } else if let seat = model.mySeat {
@@ -225,9 +225,7 @@ struct SharedMatchView: View {
         HStack {
           Text("Tu joues : \(seat.displayName)").font(.bodyText).foregroundStyle(.textSecondary)
           Spacer(minLength: Space.sm)
-          if model.canChangeSeat {
-            Button("Changer") { Task { await model.chooseAgain() } }
-          }
+          Button("Changer") { model.chooseAgain() }
         }
       }
     }
@@ -282,7 +280,11 @@ private struct WhoAreYouView: View {
         ForEach(model.participants) { participant in
           let status = model.seatStatus(of: participant)
           Button {
-            Task { await model.claim(participant) }
+            if status == .mine {
+              model.keepSeat()
+            } else {
+              Task { await model.claim(participant) }
+            }
           } label: {
             HStack(spacing: Space.md) {
               AvatarView(avatar: Avatar.generated(for: participant.displayName), size: .medium)
@@ -292,6 +294,8 @@ private struct WhoAreYouView: View {
               Spacer(minLength: 0)
               if status == .taken {
                 Text("Déjà prise").font(.label).foregroundStyle(.textTertiary)
+              } else if status == .mine {
+                MeBadge()
               }
             }
           }
@@ -311,8 +315,14 @@ private struct WhoAreYouView: View {
         }
       }
 
+      if model.isChoosingSeat {
+        Section {
+          Button("Garder ma place") { model.keepSeat() }
+        }
+      }
+
       Section {
-        Button("Je regarde seulement") { model.watchOnly() }
+        Button("Je regarde seulement") { Task { await model.watchOnly() } }
       } footer: {
         Text("Tu suis la partie sans saisir de score.")
       }

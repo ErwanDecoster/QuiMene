@@ -95,6 +95,14 @@
     "de": "%1$@, manche %2$lld, sans saisie",
     "it": "%1$@, manche %2$lld, sans saisie"
   },
+  "value1_partie_recue_d_un_autre_appareil": {
+    "key": "%@, partie reçue d'un autre appareil",
+    "fr": "%@, partie reçue d'un autre appareil",
+    "en": "%@, match received from another device",
+    "es": "%@, partida recibida de otro dispositivo",
+    "de": "%@, Partie von einem anderen Gerät empfangen",
+    "it": "%@, partita ricevuta da un altro dispositivo"
+  },
   "value1_plis_realises": {
     "key": "%@, plis réalisés",
     "fr": "%@, plis réalisés",
@@ -951,6 +959,14 @@
     "de": "Garde sans le chien",
     "it": "Garde sans le chien"
   },
+  "garder_ma_place": {
+    "key": "Garder ma place",
+    "fr": "Garder ma place",
+    "en": "Keep My Seat",
+    "es": "Mantener mi puesto",
+    "de": "Meinen Platz behalten",
+    "it": "Tieni il mio posto"
+  },
   "historique": {
     "key": "Historique",
     "fr": "Historique",
@@ -1463,6 +1479,14 @@
     "de": "Partner (gerufener König)",
     "it": "Compagno (re chiamato)"
   },
+  "partie_jouee_sur_un_autre_appareil_et_recue_ici": {
+    "key": "Partie jouée sur un autre appareil et reçue ici.",
+    "fr": "Partie jouée sur un autre appareil et reçue ici.",
+    "en": "Match played on another device and received here.",
+    "es": "Partida jugada en otro dispositivo y recibida aquí.",
+    "de": "Auf einem anderen Gerät gespielte Partie, hier empfangen.",
+    "it": "Partita giocata su un altro dispositivo e ricevuta qui."
+  },
   "partie_partagee_en_cours_reprendre": {
     "key": "Partie partagée en cours · Reprendre",
     "fr": "Partie partagée en cours · Reprendre",
@@ -1774,6 +1798,14 @@
     "es": "Encontrar en tu historial las partidas jugadas juntos.",
     "de": "Eure gemeinsamen Partien in deinem Verlauf wiederfinden.",
     "it": "Ritrovare nella tua cronologia le partite giocate insieme."
+  },
+  "recue": {
+    "key": "Reçue",
+    "fr": "Reçue",
+    "en": "Received",
+    "es": "Recibida",
+    "de": "Empfangen",
+    "it": "Ricevuta"
   },
   "regles_ou_lien_vers_les_regles_facultatif": {
     "key": "Règles ou lien vers les règles (facultatif) :",

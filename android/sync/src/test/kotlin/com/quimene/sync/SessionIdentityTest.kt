@@ -58,6 +58,24 @@ class SessionIdentityTest {
     }
 
     @Test
+    fun `recognized on a seat, one can move and the old seat becomes free`() {
+        val erwanCard = card("Erwan")
+        val identities =
+            SessionIdentities(
+                records(
+                    SessionIdentityEvent.roster(card("Hôte"), listOf(LinkedSeat(marion, erwanCard.id)), owner),
+                    SessionIdentityEvent.claim(theo, erwanCard, "erwan-phone"),
+                    SessionIdentityEvent.claim(marion, card("Marion"), "marion-phone"),
+                ),
+                owner,
+            )
+        identities.seatOf(erwanCard.id) shouldBe theo
+        identities.occupant(theo) shouldBe erwanCard.id
+        (identities.occupant(marion) != erwanCard.id) shouldBe true
+        (identities.occupant(marion) != null) shouldBe true
+    }
+
+    @Test
     fun `a roster from a participant is ignored`() {
         val identities =
             SessionIdentities(

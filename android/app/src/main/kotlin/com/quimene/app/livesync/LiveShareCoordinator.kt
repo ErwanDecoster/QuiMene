@@ -313,6 +313,14 @@ class LiveShareCoordinator(
             val fiche = participant.playerId?.let { resolvePlayer(it) } ?: continue
             handled += claim.claimID
             if (fiche.sharedProfileID != null) continue
+            // Changement de place : la fiche de son ancienne place dans cette partie (reconnu
+            // d'office sur la mauvaise fiche) ne le représente plus.
+            for (other in participants) {
+                val previous = other.playerId?.takeIf { it != fiche.id }?.let { resolvePlayer(it) } ?: continue
+                if (!previous.sharedProfileIsMine && previous.sharedProfileID == claim.profile.id) {
+                    playerRepository.unlinkSharedProfile(previous)
+                }
+            }
             playerRepository.linkSharedProfile(claim.profile.id, claim.profile.name, fiche)
             claimNotices = claimNotices + ClaimNotice(claim.claimID, claim.profile, fiche.nickname)
         }

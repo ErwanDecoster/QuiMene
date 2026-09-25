@@ -48,6 +48,24 @@ struct SessionIdentityTests {
     #expect(identities.activeClaims.isEmpty)
   }
 
+  @Test("Reconnu d'office sur une place, on peut en changer : l'ancienne devient libre")
+  func linkedProfileCanMove() {
+    let erwanCard = card("Erwan")
+    let identities = SessionIdentities(
+      records: records([
+        .roster(
+          owner: card("Hôte"), linkedSeats: [LinkedSeat(seat: marion, profileID: erwanCard.id)],
+          deviceID: owner),
+        .claim(theo, profile: erwanCard, deviceID: "erwan-phone"),
+        .claim(marion, profile: card("Marion"), deviceID: "marion-phone"),
+      ]),
+      ownerDeviceID: owner)
+    #expect(identities.seat(of: erwanCard.id) == theo)
+    #expect(identities.occupant(of: theo) == erwanCard.id)
+    #expect(identities.occupant(of: marion) != erwanCard.id)
+    #expect(identities.occupant(of: marion) != nil)
+  }
+
   @Test("Un registre publié par un autre appareil que le créateur est ignoré")
   func rosterFromParticipantIgnored() {
     let identities = SessionIdentities(

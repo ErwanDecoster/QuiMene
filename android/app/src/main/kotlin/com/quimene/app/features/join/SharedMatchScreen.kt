@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
+import com.quimene.app.features.livematch.MeBadge
 import com.quimene.app.features.livematch.NextMatchBar
 import com.quimene.app.features.livematch.NextMatchPicker
 import com.quimene.app.features.livematch.ProfileBadgeView
@@ -42,6 +43,7 @@ import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
 import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.components.Card
+import com.quimene.designsystem.components.PrimaryButton
 import com.quimene.designsystem.components.SecondaryButton
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
@@ -148,7 +150,9 @@ fun SharedMatchScreen(
             }
 
             IdentityRow(viewModel)
-            StandingsSection(viewModel)
+            // Le contributeur voit déjà les scores dans sa saisie : le classement seul ne sert
+            // qu'à celui qui regarde, sinon les scores s'affichaient deux fois.
+            if (!viewModel.canPropose) StandingsSection(viewModel)
 
             if (viewModel.canPropose) {
                 RoundEntryDispatch(viewModel) { gameName ->
@@ -201,7 +205,7 @@ private fun IdentityRow(viewModel: SharedMatchViewModel) {
                     stringResource(R.string.je_joue_aussi)
             seat != null ->
                 stringResource(R.string.tu_joues_value1, seat.displayName) to
-                    (if (viewModel.canChangeSeat) stringResource(R.string.changer) else null)
+                    stringResource(R.string.changer)
             else -> return
         }
     Row(
@@ -214,7 +218,7 @@ private fun IdentityRow(viewModel: SharedMatchViewModel) {
             color = colors.textSecondary,
             modifier = Modifier.weight(1f),
         )
-        action?.let { TextButton(onClick = { viewModel.chooseAgain() }) { Text(it) } }
+        TextButton(onClick = { viewModel.chooseAgain() }) { Text(action) }
     }
 }
 
@@ -238,9 +242,21 @@ private fun WhoAreYou(viewModel: SharedMatchViewModel) {
             )
         }
         items(viewModel.participants, key = { it.id }) { participant ->
-            val taken = viewModel.seatStatus(participant) == SharedMatchViewModel.SeatStatus.Taken
+            val status = viewModel.seatStatus(participant)
+            val taken = status == SharedMatchViewModel.SeatStatus.Taken
             val enabled = !taken && viewModel.me != null && !viewModel.isClaiming
-            Card(modifier = Modifier.fillMaxWidth().clickable(enabled = enabled) { viewModel.claim(participant) }) {
+            Card(
+                modifier =
+                    Modifier.fillMaxWidth().clickable(enabled = enabled) {
+                        if (status ==
+                            SharedMatchViewModel.SeatStatus.Mine
+                        ) {
+                            viewModel.keepSeat()
+                        } else {
+                            viewModel.claim(participant)
+                        }
+                    },
+            ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(Space.md),
@@ -258,6 +274,8 @@ private fun WhoAreYou(viewModel: SharedMatchViewModel) {
                             style = MaterialTheme.typography.labelMedium,
                             color = colors.textTertiary,
                         )
+                    } else if (status == SharedMatchViewModel.SeatStatus.Mine) {
+                        MeBadge()
                     }
                 }
             }
@@ -271,6 +289,15 @@ private fun WhoAreYou(viewModel: SharedMatchViewModel) {
         }
         viewModel.identityMessage?.let { message ->
             item { Banner(message = message) }
+        }
+        if (viewModel.isChoosingSeat) {
+            item {
+                PrimaryButton(
+                    text = stringResource(R.string.garder_ma_place),
+                    onClick = { viewModel.keepSeat() },
+                    modifier = Modifier.fillMaxWidth().padding(top = Space.md),
+                )
+            }
         }
         item {
             SecondaryButton(

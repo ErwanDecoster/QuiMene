@@ -78,6 +78,11 @@ class SharedMatchViewModel(
     var isClaiming by mutableStateOf(false)
         private set
 
+    /** « Changer » : « Qui es-tu ? » réaffiché alors que j'ai déjà une place ; la nouvelle
+     * revendication remplace l'ancienne. */
+    var isChoosingSeat by mutableStateOf(false)
+        private set
+
     enum class SeatStatus { Free, Mine, Taken }
 
     /** Ma place dans la partie courante : reliée à mon profil par le créateur (ami déjà lié,
@@ -96,18 +101,17 @@ class SharedMatchViewModel(
             return stateInternal?.participants?.firstOrNull { seatOf(it) == seat }?.id
         }
 
-    /** « Qui es-tu ? » à afficher : la partie est chargée, et je n'ai ni place ni choisi de
-     * seulement regarder. */
-    val needsIdentity: Boolean get() = stateInternal != null && !isSpectator && mySeat == null
+    /** « Qui es-tu ? » à afficher : la partie est chargée et en cours, et je n'ai ni place ni
+     * choisi de seulement regarder — ou je change de place. Jamais pour une partie terminée ou
+     * abandonnée : ses résultats s'affichent. */
+    val needsIdentity: Boolean
+        get() = stateInternal != null && !isConcluded && !isSpectator && (mySeat == null || isChoosingSeat)
 
     fun seatStatus(participant: Participant): SeatStatus {
         val seat = seatOf(participant)
         if (seat == mySeat) return SeatStatus.Mine
         return if (link.identities.occupant(seat) == null) SeatStatus.Free else SeatStatus.Taken
     }
-
-    /** Ma place revendiquée (pas reliée par le créateur) : elle seule peut être rendue. */
-    val canChangeSeat: Boolean get() = me?.let { link.identities.activeClaimOf(it.id) } != null
 
     /** Le créateur, à ajouter à mes amis une fois ma place retenue (liaison dans les deux sens). */
     val ownerToBefriend: ProfileCard?
@@ -149,6 +153,7 @@ class SharedMatchViewModel(
             try {
                 val seat = seatOf(participant)
                 val sent = link.submitIdentity(SessionIdentityEvent.claim(seat, me, link.session.deviceID), matchID)
+                if (sent && mySeat == seat) isChoosingSeat = false
                 identityMessage =
                     when {
                         !sent && link.isClosed -> link.context.getString(R.string.le_createur_a_arrete_la_session)
@@ -165,14 +170,28 @@ class SharedMatchViewModel(
         }
     }
 
+    /** « Je regarde seulement » : une place revendiquée est rendue, pour qu'un autre puisse la
+     * prendre. */
     fun watchOnly() {
         identityMessage = null
+        isChoosingSeat = false
         isSpectator = true
         onSpectatorChange(true)
+        val me = me ?: return
+        val claim = link.identities.activeClaimOf(me.id) ?: return
+        val matchID = currentMatchID ?: return
+        scope.launch { link.submitIdentity(SessionIdentityEvent.revoke(claim.claimID, link.session.deviceID), matchID) }
     }
 
-    /** Revenir à « Qui es-tu ? » : depuis « Je regarde seulement », ou pour changer de place (la
-     * revendication précédente est retirée). */
+    /** « Garder ma place » : ferme « Qui es-tu ? » ouvert par « Changer ». */
+    fun keepSeat() {
+        identityMessage = null
+        isChoosingSeat = false
+    }
+
+    /** Revenir à « Qui es-tu ? » : depuis « Je regarde seulement », ou pour changer de place — même
+     * reconnu d'office par le créateur. La place actuelle est gardée tant qu'une autre n'est pas
+     * choisie. */
     fun chooseAgain() {
         identityMessage = null
         if (isSpectator) {
@@ -180,10 +199,7 @@ class SharedMatchViewModel(
             onSpectatorChange(false)
             return
         }
-        val me = me ?: return
-        val claim = link.identities.activeClaimOf(me.id) ?: return
-        val matchID = currentMatchID ?: return
-        scope.launch { link.submitIdentity(SessionIdentityEvent.revoke(claim.claimID, link.session.deviceID), matchID) }
+        isChoosingSeat = true
     }
 
     // Historique partagé (doc 16, phase E)

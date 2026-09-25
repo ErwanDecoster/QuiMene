@@ -312,7 +312,9 @@ public struct MatchRepository {
     let players = PlayerRepository(context: context)
     let byID = Dictionary(
       package.participants.map { ($0.participantID, $0) }, uniquingKeysWith: { first, _ in first })
-    return try createMirroredMatch(id: package.matchID, events: package.events, catalog: catalog) {
+    return try createMirroredMatch(
+      id: package.matchID, events: package.events, catalog: catalog, isReceived: true
+    ) {
       participant in
       let entry = byID[participant.id]
       let player = entry?.sharedProfileID.flatMap { try? players.player(withSharedProfileID: $0) }
@@ -338,7 +340,7 @@ public struct MatchRepository {
   /// journal ne commence pas par un `matchCreated`.
   @discardableResult
   public func createMirroredMatch(
-    id: UUID, events: [StampedEvent], catalog: GameCatalog,
+    id: UUID, events: [StampedEvent], catalog: GameCatalog, isReceived: Bool = false,
     seed: (Participant) -> ParticipantSeed
   ) throws -> MatchRecord? {
     guard let first = events.first,
@@ -363,7 +365,7 @@ public struct MatchRepository {
       rulesVersion: rulesVersion,
       variantsData: try JSONEncoder().encode(variants),
       startedAt: first.occurredAt,
-      deviceOrigin: first.deviceID,
+      deviceOrigin: isReceived ? MatchRecord.receivedOrigin : first.deviceID,
       eventLogData: try JSONEncoder().encode(events),
       participants: records
     )

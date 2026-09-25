@@ -44,6 +44,8 @@ class MatchSummaryViewModel(
         val scoreThreshold: Int? = null,
         /** Doc 16 — ma place, marquée « Moi ». */
         val myParticipantID: UUID? = null,
+        /** Doc 16, phase E — jouée sur un autre appareil et reçue ici. */
+        val isReceived: Boolean = false,
         val isLoading: Boolean = true,
     )
 
@@ -63,7 +65,8 @@ class MatchSummaryViewModel(
                     .entries
                     .firstOrNull { it.value }
                     ?.key
-            uiState = matchSummaryState(state, definition, rules, participants, mine)
+            uiState =
+                matchSummaryState(state, definition, rules, participants, mine).copy(isReceived = match.isReceived)
         }
     }
 }
