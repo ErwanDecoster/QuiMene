@@ -128,6 +128,10 @@ envoie désormais la même mise à jour (`LiveActivityPushClient.kt`, même `Con
 `session:<UUID en majuscules>`) quand il saisit une manche, et, côté créateur, pour toute action
 enregistrée (manche, annulation, fin, abandon). Android n'a pas encore d'écran verrouillé à lui.
 
+Phase G : Android a suivi chaque phase au fil de l'eau ; la compatibilité croisée est vérifiée
+dans les deux sens par des fichiers de référence produits par le code réel de chaque plateforme,
+et une liste de scénarios à dérouler sur appareils avant publication ([doc 17](17-recette-croisee.md)).
+
 | Phase | Contenu | Dépend de |
 |---|---|---|
 | **A. Profil local** ✅ iOS + Android | Page Profil, création au premier lancement, onglets réorganisés, profil explicite (plus « la fiche partagée »), amis liés, profil sauvegardé via iCloud. | — |
@@ -136,5 +140,5 @@ enregistrée (manche, annulation, fin, abandon). Android n'a pas encore d'écran
 | **D. « Qui es-tu ? »** ✅ iOS + Android | Association à l'arrivée, liaison durable dans les deux sens, notification du créateur avec annulation, « Je regarde seulement ». | A, C |
 | **E. Historique partagé** ✅ iOS + Android | Enregistrement de la partie complète chez chaque participant connecté ; boîte aux lettres chiffrée par profil pour les absents, qui remplace les résumés. | A, C |
 | **F. Écran verrouillé** ✅ iOS + Android | Push envoyé par l'appareil qui saisit, indépendant du créateur. | C |
-| **G. Android** | Même protocole, tests de compatibilité croisés. | A–F |
+| **G. Android** ✅ ([doc 17](17-recette-croisee.md)) | Même protocole, tests de compatibilité croisés. | A–F |
 | **H. Docs, site, recette** | Docs 09 et 14 réécrites, ADR, politique de confidentialité (14 jours, parties complètes chiffrées), scénarios « créateur éteint » et « ami absent ». | toutes |

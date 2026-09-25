@@ -45,10 +45,7 @@ struct SharedMatchMailboxTests {
     #expect(key == MailboxCrypto.lookupKey(for: Self.profileID))
   }
 
-  private static let fixtureURL = URL(fileURLWithPath: #filePath)
-    .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-    .deletingLastPathComponent().deletingLastPathComponent()
-    .appendingPathComponent("spec/session/mailbox-package.json")
+  private static let fixtureURL = SessionFixture.specURL("mailbox-package.json")
 
   /// `spec/session/mailbox-package.json` : produit par ce code (`QUIMENE_WRITE_SPEC=1`), relu ici
   /// et par le test Android, qui doit retrouver la même adresse et le même paquet.
@@ -65,8 +62,7 @@ struct SharedMatchMailboxTests {
         withJSONObject: document, options: [.prettyPrinted, .sortedKeys, .withoutEscapingSlashes])
       try data.write(to: Self.fixtureURL)
     }
-    let document = try #require(
-      JSONSerialization.jsonObject(with: Data(contentsOf: Self.fixtureURL)) as? [String: Any])
+    let document = try SessionFixture.load("mailbox-package.json")
     #expect(document["mailboxKey"] as? String == MailboxCrypto.lookupKey(for: Self.profileID))
     let opened = MailboxCrypto.open(document["ciphertext"] as? String ?? "", for: Self.profileID)
     #expect(opened == Self.package)

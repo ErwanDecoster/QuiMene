@@ -1,0 +1,48 @@
+{
+    "pairingCode": "042817",
+    "sessionID": "5A1E2B3C-4D5E-4F60-8172-8394A5B6C7D8",
+    "events": [
+        {
+            "seq": 1,
+            "matchID": "DDDDDDDD-0000-4000-8000-000000000001",
+            "plaintext": "{\"id\":\"dddddddd-0000-4000-8000-000000000001\",\"lamport\":1,\"deviceID\":\"android-device\",\"occurredAt\":8.0E8,\"event\":{\"matchCreated\":{\"gameID\":\"skyjo\",\"rulesVersion\":1,\"variants\":{\"threshold\":100,\"doublePenalty\":true,\"mode\":\"classic\"},\"participants\":[{\"id\":\"11111111-1111-4111-8111-111111111111\",\"displayName\":\"Marion\",\"seatIndex\":0,\"teamID\":\"A\"},{\"id\":\"22222222-2222-4222-8222-222222222222\",\"displayName\":\"Théo\",\"seatIndex\":1}]}}}",
+            "ciphertext": "4sWDs63RJSIHCo/BDYRkqKxrbCVR+XwVJhPrb1lsTAh+zwn6BujzcMKmxz+XKSg8J/6GT01ARZCt1J+XW9NyW+IwydqCiQvtYTMHhc2v2Zr6DYov/7LJHmplDhy7VAAsfRC2qWDN/Gx7KtE617qzr8vFvMGgQ0eOzLUvsF7HPBb/TqwpIq3EkiKmnUB8V9sDc7wvKNN2B887UByMtpKRzgrInFIZHSrMVxxn7VKc0A8qfYP091BoR+wysgooD3nnY/PQ2lwJN/rcLrqY48GvrkCGwRvZ/J94pCtV95vh99akVUF9yYwyW4qrbnnd1s0syOZnxHSUwHXW+qc+8VT4TJMqyfZInPR5gQ9XtprLv/fiXoNia15xYdW9LuZKBuoEHk4N2Wg7qvVHd0YL2qYbB8FaGIYhfdhG1OQ4SiO8OFPUM9frH/WN3diWlA0ZgcWvUDD3jZpznvWG/xfYCMTcarsmCsIdvtT6KGZM12Z/A9zWr59F02sVZOCdy6RRFyeompH2F2x2Z01NzDnmSImRGgB9gctcHlRim8VWPbCKJV/l7I7kxCL5mceeS2HK8tAWnP21TSSWiPPO+4iY1+191cUaJ58ns9w="
+        },
+        {
+            "seq": 2,
+            "matchID": "DDDDDDDD-0000-4000-8000-000000000001",
+            "plaintext": "{\"id\":\"dddddddd-0000-4000-8000-000000000002\",\"lamport\":2,\"deviceID\":\"android-device\",\"occurredAt\":8.0000006E8,\"event\":{\"roundCommitted\":{\"_0\":{\"index\":0,\"inputs\":[{\"participantID\":\"11111111-1111-4111-8111-111111111111\",\"rawValue\":12,\"modifiers\":[\"closedRound\"]},{\"participantID\":\"22222222-2222-4222-8222-222222222222\",\"rawValue\":-3,\"detail\":{\"payload\":\"AQID\"},\"modifiers\":[]}],\"note\":\"Première manche\"}}}}",
+            "ciphertext": "TXJyg4569WTvNnmGow6MEhgrNCprK/9kWjuynJViX7CtivyTFywDGIgQB8jeItLOMvG1jpNYq8PPmT6iars3ELAb7fbRjLUvMeFQVEUySU3kIiCYG4eP4L91bgwT7oaORSAHOL5jBL+yd0qFamHFveZI6UzlCNy9zV5al2WLC1Sx8UuJ5//80XJ0o6sWsZ132a6K1C88q66Qpk2Z7TKCcjd2jed6STjenlAV8SQmn0+gaZpSfqm5gmilKaqmp57HRQ/TQRcFzqtY32VswefzY9YUgYJCSLguBdaZ/F0wioOzesYYxNlpXh6RuQQT62YsVsOePrWiHq2xVb4u3w17oSmWEe7ZyHrbO2CRdD2gwirQ5cL3OJVo9EzzjzQgdlb1rUJDNqDWbKAn401Ge6YHSV2mOHEXckXqBw6Ooiw8uipwQF4EIRenbUmV7DTwFnoVA2MmfayolSKo2NGurrGkURFaAL0hooMc97aOP/F5AWYzJRu+BURU2rLM46LSGKh298ArYaPO97oF3AkI/QEAumBY592Sezm3NnGcCodza7FO2tYu2miUOzZDqkdE418adPk="
+        },
+        {
+            "seq": 3,
+            "matchID": "DDDDDDDD-0000-4000-8000-000000000001",
+            "plaintext": "{\"id\":\"dddddddd-0000-4000-8000-000000000003\",\"lamport\":3,\"deviceID\":\"android-device\",\"occurredAt\":8.0000012E8,\"event\":{\"roundAmended\":{\"index\":0,\"draft\":{\"index\":0,\"inputs\":[{\"participantID\":\"11111111-1111-4111-8111-111111111111\",\"rawValue\":12,\"modifiers\":[\"closedRound\"]},{\"participantID\":\"22222222-2222-4222-8222-222222222222\",\"rawValue\":-3,\"detail\":{\"payload\":\"AQID\"},\"modifiers\":[]}]}}}}",
+            "ciphertext": "yzMKARz1CD4OyGF/uWGhLFTjG/sJNFtL2zF4KPsI9ldt10BTamyRxNk6vUo8uykHhTmdqhsKNSNxx4b6Tq2XoXmx7xmJDxUAcvv1aujcb4nCdUzjtgZ6DyqhtXAcY6/KAS4HZR+hSLd8LtDyjCy6enEyGMuONqBrgvzswLWSPIHCVfBCpiSlOZU+4SgIlCPbRQposmHTOwhqmaxhZT/j0L2c4WiqX0TnDNHg33jsmti3IWBYFGIOJOWCxLYKMlgop8P8XryS5DAI7EYsPoSV+HIOcT9J3lbs4HAnVGJv4ZoFNaE45YFMLDzgsCi892QeetCGeVz8GgFiecPZIa7qydMv7zjOqCHeWEIoswMQ3tvkkc3qmvlAreVx9P/D0SqC2MDF6RkIaFtHph+4sf/BnRuEonJ04gAsejiFuuUZbhCj2K179NGg2PteSuQ9cU/iXUDHGae3uX7TTybj0yHu2SYZaFAMgI/ZR0RTdWTfjcFDSJxnarOpC3Bj8XR95wy2dmqbrHUdddGqvk/GZG0ODXHUwiQhGlwIAKaq27tgHrnR9r0="
+        },
+        {
+            "seq": 4,
+            "matchID": "DDDDDDDD-0000-4000-8000-000000000001",
+            "plaintext": "{\"id\":\"dddddddd-0000-4000-8000-000000000004\",\"lamport\":4,\"deviceID\":\"android-device\",\"occurredAt\":8.0000018E8,\"event\":{\"noteAdded\":{\"roundIndex\":0,\"text\":\"Belle manche\"}}}",
+            "ciphertext": "tfMffhEu6vi1LeSpp0sQ3NnUa3E2rMEN/6VzLk0Ec/V0El2QkZOAoS1bSk+sj3zmNeuJ9pW+8Aakh8oUmYS0jw9elZJixdlXPwwK9pbV7faHrlPUunwkDU8Cb8OVjo3A86vyvQuCKnQF1s6sJsAMT2i2uKMccxF1t5gi1qPRIObXBD/4Z01eYHmgR7qoezHCbsxfVXD09V9NGSN58bWdEfXEFnYI7zNubWttTlVZBIFCoB8vWzQxJJcJZNDYSILZUi5yJ1ZiiQ=="
+        },
+        {
+            "seq": 5,
+            "matchID": "DDDDDDDD-0000-4000-8000-000000000001",
+            "plaintext": "{\"id\":\"dddddddd-0000-4000-8000-000000000005\",\"lamport\":5,\"deviceID\":\"android-device\",\"occurredAt\":8.0000024E8,\"event\":{\"roundRemoved\":{\"index\":0}}}",
+            "ciphertext": "kWHUbyPieamrKIb/cQPACgq4YqhQ4lEn8l8G7BKfkZpBfjiqBj7Uo1YLxz+ccA5VUez49SU/jg7l1xQbrtcqksoO1uqqH8Gomc/PuaRSL4KVA9L68Qxk0WJx4tc/hSch9oqXNC9TEs9umCc8ecrwm5RB/gzm6LSvryYzwFXI0hpInwxXAoWXDUMrlOhWoPXf5swDNmbiYKgI/nz/hUUAtHye3D3MnaOX/u2datt9+w=="
+        },
+        {
+            "seq": 6,
+            "matchID": "DDDDDDDD-0000-4000-8000-000000000001",
+            "plaintext": "{\"id\":\"dddddddd-0000-4000-8000-000000000006\",\"lamport\":6,\"deviceID\":\"android-device\",\"occurredAt\":8.000003E8,\"event\":{\"matchEndedManually\":{}}}",
+            "ciphertext": "mzscQFDDden1nD4rPoSdmxuA/iENmu4iqFQUJZ5QaJkI35xikR6A80VBzC45rpAe9be9rwYQHRh/5F9wq3V4QkdHjfnGMJBZDmWHhuOJM8qsYDK5svebTq/Qofs/cqygHLnSvcQsjAaWjVlAGicK7YtPNagd/mwCGByWiwoc+JdDnEsF5L88zzipdldnD7MuGfX5pu3N68dqh0QmHmjqwYR0OYkRaJbdeqb+"
+        },
+        {
+            "seq": 7,
+            "matchID": "DDDDDDDD-0000-4000-8000-000000000001",
+            "plaintext": "{\"id\":\"dddddddd-0000-4000-8000-000000000007\",\"lamport\":7,\"deviceID\":\"android-device\",\"occurredAt\":8.0000036E8,\"event\":{\"matchAbandoned\":{\"at\":8.000004E8}}}",
+            "ciphertext": "3McoBwpL9WograhEXWugUgH3QuhVR8fRqCdR8KMjb9vB5z9NEdJdKVTPRBzL56bc1p3XxdlC/f/fc93DXHEueN4l8JYHKoQkmOlGJXj9pQt7lcMAtOp0smmbmAave0SmdNLuFe/sDmBAj+yLnrdXSKhnJcOodIBapbDYmAHhPL97zeqbCBBWVF+zHqA4sFXsemCRYsEL0dtstJJ75Fczmujxv98jrvXYMlA+7QKOl4RsqsJFzdGc"
+        }
+    ]
+}

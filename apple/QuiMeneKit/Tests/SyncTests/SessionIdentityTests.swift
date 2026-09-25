@@ -132,10 +132,7 @@ struct SessionIdentityTests {
 
   // MARK: - Fixture multiplateforme
 
-  private static let fixtureURL = URL(fileURLWithPath: #filePath)
-    .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
-    .deletingLastPathComponent().deletingLastPathComponent()
-    .appendingPathComponent("spec/session/identity-events.json")
+  private static let fixtureURL = SessionFixture.specURL("identity-events.json")
 
   private static let fixtureSessionID = UUID(uuidString: "5A1E2B3C-4D5E-4F60-8172-8394A5B6C7D8")!
 
@@ -189,8 +186,7 @@ struct SessionIdentityTests {
       try data.write(to: Self.fixtureURL)
     }
 
-    let document = try #require(
-      JSONSerialization.jsonObject(with: Data(contentsOf: Self.fixtureURL)) as? [String: Any])
+    let document = try SessionFixture.load("identity-events.json")
     let events = try #require(document["events"] as? [[String: Any]])
     #expect(events.count == Self.fixtureEvents.count)
     for (raw, expected) in zip(events, Self.fixtureEvents) {

@@ -117,5 +117,12 @@ retrouver exactement l'événement décrit par `plaintext`. Le nonce étant alé
 pour un profil (`MailboxCrypto`), avec l'adresse de sa boîte (`mailboxKey`, empreinte de
 l'identifiant) : Android doit retrouver la même adresse et le même paquet.
 
+Dans l'autre sens (doc 16, phase G), `android-*.json` sont produits par le code Kotlin réel
+(`AndroidFixturesTest`) et relus par `AndroidFixtureTests` (Swift), qui reconstruit les mêmes
+valeurs indépendamment : événements de partie de toutes les sortes, identités, boîte aux lettres,
+mise à jour d'écran verrouillé. Côté Apple, ces fichiers sont lus depuis leur copie
+`Tests/SyncTests/SessionResources/` (vérifiée par `Scripts/check-spec-sync.sh`). Procédure de
+régénération : doc [17](../docs/17-recette-croisee.md).
+
 Remplace les fixtures `wire/` de l'ancien protocole hôte/pair (doc 09), supprimé des deux
 plateformes par la phase C de la doc 16.

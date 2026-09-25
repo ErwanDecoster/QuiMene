@@ -72,6 +72,7 @@ let package = Package(
         .testTarget(
             name: "SyncTests",
             dependencies: ["Sync", "Domain"],
+            resources: [.copy("SessionResources")],
             swiftSettings: [.swiftLanguageMode(.v6)]
         ),
         .testTarget(
