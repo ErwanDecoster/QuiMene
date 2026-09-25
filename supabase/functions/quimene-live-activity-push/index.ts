@@ -1,8 +1,9 @@
 // Doc utilisateur P9 — seul moyen fourni par Apple de mettre à jour une Live Activity (écran
 // verrouillé / Dynamic Island) pendant que l'app est suspendue en arrière-plan : un push APNs
 // dédié (`apns-push-type: liveactivity`), envoyé ici depuis un serveur plutôt que depuis l'app
-// elle-même (qui ne tourne justement plus). Appelée par l'hôte (le seul appareil qui fait foi sur
-// le journal) juste après chaque `syncHostLog`, jamais par les pairs.
+// elle-même (qui ne tourne justement plus). Doc 16, phase F — appelée par l'appareil qui vient
+// d'enregistrer une manche dans la session (créateur ou participant, iOS ou Android), jamais par
+// ceux qui la reçoivent : les écrans verrouillés suivent même quand le créateur est éteint.
 //
 // Doc 09 « Fin de partie » — routée par `activityKey` (session de partage si active, sinon
 // partie), pas par `matchID` : c'est ce qui permet à un changement de partie au sein d'une même

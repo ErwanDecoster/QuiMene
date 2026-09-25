@@ -117,6 +117,13 @@ celles de l'enregistrement. Format commun : `spec/session/mailbox-package.json`.
 dès l'écran de résultats ; relève au lancement, au retour au premier plan, à l'ouverture de
 l'Historique et en tirant la liste vers le bas.
 
+Phase F : l'appareil qui enregistre un événement dans la session (créateur ou participant) met à
+jour l'écran verrouillé de tous les iPhone de la session via `quimene-live-activity-push`
+(`isAuthoritative`), jamais ceux qui le reçoivent. Déjà vrai sur iOS depuis la phase C ; Android
+envoie désormais la même mise à jour (`LiveActivityPushClient.kt`, même `ContentState` et même clé
+`session:<UUID en majuscules>`) quand il saisit une manche, et, côté créateur, pour toute action
+enregistrée (manche, annulation, fin, abandon). Android n'a pas encore d'écran verrouillé à lui.
+
 | Phase | Contenu | Dépend de |
 |---|---|---|
 | **A. Profil local** ✅ iOS + Android | Page Profil, création au premier lancement, onglets réorganisés, profil explicite (plus « la fiche partagée »), amis liés, profil sauvegardé via iCloud. | — |
@@ -124,6 +131,6 @@ l'Historique et en tirant la liste vers le bas.
 | **C. Mode en ligne dans l'app** ✅ iOS + Android | L'écran de partie lit et écrit la session ; écrans créateur/participant unifiés ; rattrapage par numéro ; saisie bloquée hors ligne ; partie suivante par n'importe quel participant. | B |
 | **D. « Qui es-tu ? »** ✅ iOS + Android | Association à l'arrivée, liaison durable dans les deux sens, notification du créateur avec annulation, « Je regarde seulement ». | A, C |
 | **E. Historique partagé** ✅ iOS + Android | Enregistrement de la partie complète chez chaque participant connecté ; boîte aux lettres chiffrée par profil pour les absents, qui remplace les résumés. | A, C |
-| **F. Écran verrouillé** | Push envoyé par l'appareil qui saisit, indépendant du créateur. | C |
+| **F. Écran verrouillé** ✅ iOS + Android | Push envoyé par l'appareil qui saisit, indépendant du créateur. | C |
 | **G. Android** | Même protocole, tests de compatibilité croisés. | A–F |
 | **H. Docs, site, recette** | Docs 09 et 14 réécrites, ADR, politique de confidentialité (14 jours, parties complètes chiffrées), scénarios « créateur éteint » et « ami absent ». | toutes |

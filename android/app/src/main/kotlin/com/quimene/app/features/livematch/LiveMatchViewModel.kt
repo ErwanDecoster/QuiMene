@@ -316,6 +316,9 @@ class LiveMatchViewModel(
                 match = it
                 stateInternal = repository.loadState(it, catalog)
             }
+            if (result is SessionLink.SubmitResult.Accepted) {
+                stateInternal?.let { state -> coordinator.link?.announceToLockScreens(state, definition, rules) }
+            }
             val context = coordinator.context
             validationErrorMessage =
                 when (result) {

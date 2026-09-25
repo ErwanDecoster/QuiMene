@@ -68,12 +68,13 @@ public enum LiveActivityPushClient {
     let contentState: Content
   }
 
-  /// Doc utilisateur — n'appeler que côté hôte (seul appareil qui fait foi sur le journal,
-  /// `LiveMatchModel`) : un pair qui pousserait aussi créerait des mises à jour concurrentes et
-  /// redondantes pour la même partie. Best-effort : une fonction Edge indisponible ou un jeton
-  /// périmé ne doit jamais faire échouer la validation d'une manche, seulement priver le pair
-  /// concerné d'une mise à jour en arrière-plan (son prochain retour au premier plan
-  /// resynchronise de toute façon tout via `MatchConnectionCoordinator`).
+  /// Doc 16, phase F — appelé par l'appareil qui vient d'enregistrer un événement dans la session
+  /// (créateur ou participant, `isAuthoritative`), jamais par ceux qui le reçoivent : une seule
+  /// mise à jour par manche, et les écrans verrouillés suivent même quand le créateur est éteint.
+  /// Android fait de même (`LiveActivityPushClient.kt`) pour les iPhone de la session.
+  /// Best-effort : une fonction Edge indisponible ou un jeton périmé ne doit jamais faire échouer
+  /// la validation d'une manche, seulement priver un appareil suspendu d'une mise à jour (son
+  /// prochain retour au premier plan rattrape le journal de toute façon).
   public static func push(activityKey: String, event: String, contentState: some Encodable) async {
     guard
       let url = URL(

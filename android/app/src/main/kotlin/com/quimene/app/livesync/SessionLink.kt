@@ -11,9 +11,15 @@ import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarKind
 import com.quimene.designsystem.components.PlayerPalette
 import com.quimene.domain.engine.MatchEvent
+import com.quimene.domain.model.MatchState
+import com.quimene.domain.model.MatchStatus
+import com.quimene.domain.rules.GameDefinition
+import com.quimene.domain.rules.GameRules
 import com.quimene.store.DeviceIdentity
 import com.quimene.store.PlayerEntity
 import com.quimene.store.PlayerRepository
+import com.quimene.sync.LiveActivityContent
+import com.quimene.sync.LiveActivityPushClient
 import com.quimene.sync.OnlineSession
 import com.quimene.sync.OnlineSessionError
 import com.quimene.sync.ProfileCard
@@ -204,6 +210,34 @@ class SessionLink(
         knownIdentityCount = all.size
         identities = SessionIdentities(all, ownerDeviceID)
         onNewIdentities?.invoke(fresh)
+    }
+
+    /** Doc 16, phase F — cet appareil vient d'enregistrer un événement dans la session : c'est lui
+     * qui met à jour l'écran verrouillé des iPhone de la session (Live Activity), même si le
+     * créateur est éteint. Jamais pour un événement reçu d'un autre appareil. Miroir de
+     * `MatchLiveActivityController.refresh(isAuthoritative: true)`. */
+    fun announceToLockScreens(
+        state: MatchState,
+        definition: GameDefinition,
+        rules: GameRules,
+    ) {
+        val names = state.participants.associate { it.id to it.displayName }
+        val standings =
+            rules
+                .standings(state, definition)
+                .sortedBy { it.rank }
+                .take(4)
+                .map { LiveActivityContent.Standing(it.participantID, names[it.participantID].orEmpty(), it.score) }
+        val content =
+            LiveActivityContent(
+                matchID = state.matchID,
+                gameName = definition.name.localized,
+                gameSymbol = definition.symbol,
+                roundNumber = state.rounds.size,
+                standings = standings,
+            )
+        val ended = state.status == MatchStatus.Ended || state.status == MatchStatus.Abandoned
+        scope.launch { LiveActivityPushClient.push(LiveActivityPushClient.sessionKey(sessionID), ended, content) }
     }
 
     fun deviceName(deviceID: String): String? = presence.firstOrNull { it.deviceID == deviceID }?.deviceName

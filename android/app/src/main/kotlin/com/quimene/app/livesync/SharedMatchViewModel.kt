@@ -340,7 +340,16 @@ class SharedMatchViewModel(
         validationErrorMessage = null
         latestRejectionReason = null
         scope.launch {
-            if (submit(MatchEvent.RoundCommitted(draft), matchID)) onCommitted()
+            if (submit(MatchEvent.RoundCommitted(draft), matchID)) {
+                onCommitted()
+                stateInternal?.let {
+                    link.announceToLockScreens(
+                        it,
+                        definition,
+                        catalog.rules(it.gameID, it.rulesVersion),
+                    )
+                }
+            }
         }
     }
 
