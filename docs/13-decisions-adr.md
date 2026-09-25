@@ -163,7 +163,7 @@ parade est que toute la logique de calcul est ailleurs, dans `Domain`.
 
 ## ADR-0008 — Partie partagée avec hôte autoritaire
 
-**Statut** : Acceptée · **Date** : 2026-07-29
+**Statut** : Remplacée par [ADR-0017](#adr-0017--sessions-stockées-côté-serveur-plutôt-quun-hôte-autoritaire) · **Date** : 2026-07-29
 
 **Contexte.** Plusieurs appareils suivent la même partie autour d'une table, en local.
 
@@ -419,7 +419,8 @@ iOS 18.6 (iPhone 16) en plus d'iOS 26, sans avertissement de disponibilité.
 
 ## ADR-0016 — Remplacer le transport Wi-Fi et Bluetooth LE par Supabase Realtime
 
-**Statut** : Acceptée · **Date** : 2026-07-31
+**Statut** : Remplacée par [ADR-0017](#adr-0017--sessions-stockées-côté-serveur-plutôt-quun-hôte-autoritaire) (Supabase reste ; `SupabaseTransport` et
+`quimene_open_games` ont disparu) · **Date** : 2026-07-31
 
 **Contexte.** ADR-0014 actait un transport hybride Wi-Fi (mDNS/DNS-SD + socket TCP) puis
 Bluetooth LE en secours, construit sur des frameworks système des deux plateformes. Le Wi-Fi a
@@ -473,3 +474,51 @@ transport se simplifie : un client `supabase-kt` plutôt que deux mécanismes ba
 (`NsdManager` + `BluetoothGatt*`) à construire et vérifier sur le parc d'appareils cible.
 ADR-0008 (hôte autoritaire) n'est pas remis en cause, comme pour ADR-0014 : cette décision porte
 uniquement sur le transport, pas sur le modèle de synchronisation.
+
+---
+
+## ADR-0017 — Sessions stockées côté serveur plutôt qu'un hôte autoritaire
+
+**Statut** : Acceptée · **Date** : 2026-09-24
+
+**Contexte.** Avec ADR-0008 et ADR-0016, l'hôte validait, enregistrait et redistribuait chaque
+manche ; le serveur ne faisait que relayer des messages sans rien garder. Téléphone de l'hôte
+éteint ou en veille : plus rien n'avançait, et les écrans verrouillés des autres se figeaient. En
+parallèle, l'historique commun (doc 14 d'origine) se limitait à des résumés de classement poussés
+en clair, après un échange de QR fait à part.
+
+**Décision.** Le journal d'événements de chaque session est **stocké sur le serveur** (Supabase :
+`quimene_sessions`, `quimene_session_events`, doc [09](09-partie-partagee.md)) et fait foi pour
+tous les appareils, créateur compris :
+
+- numérotation par le serveur ; un ajout annonce le numéro attendu et est refusé s'il a été
+  devancé (`stale_seq`) — l'écrasement d'une manche devient impossible par construction ;
+- chaque appareil valide sa saisie avec le même moteur de règles, écrit directement dans le
+  journal et met à jour les écrans verrouillés ;
+- saisie bloquée hors ligne (pas de file d'attente) ; seul le créateur arrête la session ;
+  n'importe quel participant lance la partie suivante ;
+- événements scellés (AES-GCM, clé dérivée du code d'appairage) ; identités (« Qui es-tu ? ») dans
+  le même journal ;
+- historique partagé par **boîte aux lettres chiffrée par profil** (parties complètes), à la place
+  des résumés en clair (doc [14](14-profils-partages.md)) ;
+- conservation : 14 jours d'inactivité pour une session, 24 h après sa fermeture ; 14 jours pour
+  une livraison en attente.
+
+**Alternatives.**
+- *Garder l'hôte autoritaire et le rendre plus robuste* (reconnexions, élection d'un nouvel hôte)
+  — écartée : l'élection distribuée est coûteuse et fragile, et ne règle pas un hôte simplement
+  éteint.
+- *Synchronisation sans serveur de référence (CRDT)* — écartée : les règles de score (annulation,
+  fin de partie, validations) s'accommodent mal d'une fusion automatique ; un ordre unique donné
+  par le serveur est plus simple et plus sûr.
+- *File d'attente hors ligne* — écartée : deux saisies de la même manche faites hors ligne
+  créeraient un doublon silencieux au retour du réseau.
+
+**Conséquences.** Le mode en ligne exige une connexion Internet sur chaque appareil qui saisit ;
+le mode local reste inchangé. Des données de partie transitent et séjournent (chiffrées, au plus
+14 jours) sur le serveur : politique de confidentialité mise à jour. **Limite assumée** : la clé
+d'une session dérive d'un code à 6 chiffres que la base conserve pour la résolution — ce n'est
+pas du bout en bout vis-à-vis de l'opérateur du serveur (doc 09, « Sécurité et vie privée ») ;
+la boîte aux lettres, elle, l'est tant que l'identifiant de profil n'a pas transité par une
+session. Le format commun aux deux plateformes est verrouillé par des fichiers de référence dans
+les deux sens (doc [17](17-recette-croisee.md)).

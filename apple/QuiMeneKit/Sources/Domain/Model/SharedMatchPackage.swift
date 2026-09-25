@@ -2,7 +2,7 @@ import Foundation
 
 /// Doc 16, phase E — une partie terminée, **complète** (journal d'événements et fiches de ses
 /// joueurs), telle que déposée dans la boîte aux lettres d'un ami lié qui y a joué
-/// (`MailboxCrypto`, Sync). Remplace `SharedMatchSummaryPayload` (classement final seulement).
+/// (`MailboxCrypto`, Sync). Remplace les résumés du doc 14 (classement final seulement).
 public struct SharedMatchPackage: Codable, Sendable, Equatable {
   public struct Participant: Codable, Sendable, Equatable {
     public let participantID: UUID

@@ -254,51 +254,6 @@ public struct MatchRepository {
     try context.save()
   }
 
-  /// Doc 14, phase 2 — matérialise le résumé reçu de l'installation d'un ami en une partie
-  /// locale minimale : un journal d'événements vide (jamais rejoué, voir
-  /// `MatchRecord.isImportedSummary`), seuls `finalRank`/`finalScore` portent le résultat, comme
-  /// ce que `LeaderboardRepository`/`ProfileRepository` lisent déjà pour toute autre partie.
-  /// Sans effet si cette partie est déjà connue localement (c'est cet appareil qui l'a jouée et
-  /// poussée — l'appelant doit alors seulement nettoyer la boîte aux lettres distante).
-  public func materializeSharedSummary(_ payload: SharedMatchSummaryPayload, matchID: UUID) throws {
-    guard try match(withID: matchID) == nil else { return }
-
-    let playerRepository = PlayerRepository(context: context)
-    var participants: [ParticipantRecord] = []
-    for (index, entry) in payload.standings.enumerated() {
-      let linkedPlayer = try entry.sharedProfileID.flatMap {
-        try playerRepository.player(withSharedProfileID: $0)
-      }
-      participants.append(
-        ParticipantRecord(
-          player: linkedPlayer,
-          nicknameSnapshot: entry.nickname,
-          avatarKindSnapshot: entry.avatarKind,
-          avatarValueSnapshot: entry.avatarValue,
-          paletteIDSnapshot: entry.paletteID,
-          seatIndex: index,
-          finalRank: entry.rank,
-          finalScore: entry.score
-        ))
-    }
-
-    let match = MatchRecord(
-      id: matchID,
-      gameID: payload.gameID,
-      rulesVersion: payload.rulesVersion,
-      variantsData: Data(),
-      startedAt: payload.playedAt,
-      endedAt: payload.playedAt,
-      status: .ended,
-      deviceOrigin: "shared-profile-import",
-      eventLogData: try JSONEncoder().encode([StampedEvent]()),
-      participants: participants
-    )
-    match.isImportedSummary = true
-    context.insert(match)
-    try context.save()
-  }
-
   /// Doc 16, phase E — enregistre une partie reçue d'un ami (boîte aux lettres), complète : même
   /// journal, mêmes participants, rejouée comme une partie jouée ici. Chaque joueur lié à un
   /// profil connu de cet appareil (le mien, ou un ami) est relié à sa fiche ; les autres gardent

@@ -6,7 +6,7 @@ import java.util.UUID
 
 /** Doc 16, phase E — miroir de `SharedMatchPackage.swift` : une partie terminée, **complète**
  * (journal d'événements et fiches de ses joueurs), telle que déposée dans la boîte aux lettres
- * d'un ami lié qui y a joué (`MailboxCrypto`, :sync). Remplace [SharedMatchSummaryPayload]. */
+ * d'un ami lié qui y a joué (`MailboxCrypto`, :sync). Remplace les résumés du doc 14. */
 @Serializable
 data class SharedMatchPackage(
     @Serializable(with = UUIDSerializer::class) val matchID: UUID,

@@ -10,7 +10,7 @@ export const site = {
   /** Région d'hébergement du projet Supabase (`eu-west-1`), affichée par la politique de confidentialité. */
   supabaseRegion: { fr: 'Union européenne (Irlande)', en: 'European Union (Ireland)' },
   /** Date de dernière mise à jour de la politique de confidentialité. */
-  privacyUpdated: { fr: '23 septembre 2026', en: 'September 23, 2026' },
+  privacyUpdated: { fr: '25 septembre 2026', en: 'September 25, 2026' },
 };
 
 /** Les 20 jeux du catalogue (`spec/games`), dans l'ordre alphabétique. */

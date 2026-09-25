@@ -27,7 +27,8 @@ public final class MatchRecord {
   /// est lié à l'installation d'un ami, jusqu'à ce que le résumé lui soit poussé avec succès.
   public var pendingSharedProfileSync: Bool = false
   /// Doc 14 — cette partie n'a pas été jouée sur cet appareil : c'est un résumé reçu de
-  /// l'installation d'un ami (`MatchRepository.materializeSharedSummary`). Pas de journal
+  /// l'installation d'un ami (ancien mécanisme du doc 14, retiré en doc 16 phase H : les parties
+  /// déjà reçues ainsi restent affichées). Pas de journal
   /// d'événements exploitable (`eventLogData` est un tableau vide valide, jamais rejoué) —
   /// seuls `ParticipantRecord.finalRank`/`finalScore` portent le résultat.
   public var isImportedSummary: Bool = false

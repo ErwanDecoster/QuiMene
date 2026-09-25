@@ -19,8 +19,8 @@ import { site } from '../../site';
         <li>No account, no ads, no analytics, no tracking.</li>
         <li>Games, players and history stay on your device and in your iCloud.</li>
         <li>
-          Three optional features go through a server, only for as long as needed: live sharing,
-          the score on the Lock Screen, and shared profiles.
+          Three optional features go through a server, for a limited time: games shared online, the
+          score on the Lock Screen, and the history shared with your friends.
         </li>
         <li>No data is sold or used for advertising.</li>
       </ul>
@@ -39,7 +39,7 @@ import { site } from '../../site';
       devices. The publisher has no access to it.
     </p>
     <p>
-      The camera is only used to scan a QR code (to join a game or link a profile). No image is
+      The camera is only used to scan a QR code (to join a game or add a friend). No image is
       saved or sent.
     </p>
 
@@ -49,17 +49,21 @@ import { site } from '../../site';
       {site.supabaseRegion.en}). They only run if you use them.
     </p>
 
-    <h3>Live game sharing</h3>
+    <h3>Games shared online</h3>
     <p>
-      While a game is shared, the server keeps: the six-digit pairing code, a random session
-      identifier, the game identifier, which game is played, the number of players, the generic
-      device name (for example “iPhone”) and its platform. This lets other devices find the game
-      from the code.
+      When you share a game, a session is created on the server, so that every device can follow
+      and enter the game even if the one that started it is switched off. The server keeps: the
+      six-digit code, a random session identifier, a random device identifier created by the app
+      (for the creator and the author of each action), and the session log: every round and
+      action, and the seat each person picked (“Who are you?”: nickname, simple avatar and profile
+      identifier).
     </p>
     <p>
-      The game content (nicknames, scores, rounds) travels between devices
-      <strong>end-to-end encrypted</strong>, with a key derived from the pairing code. It is not
-      stored, and the server cannot read it.
+      This log is <strong>encrypted</strong> with a key derived from the six-digit code: it cannot
+      be read without the code. Since the server keeps that code so people can join, this
+      encryption does not protect against the publisher, who has access to the database. The
+      publisher does not look at this data. During the game, connected devices see each other’s
+      profile nicknames.
     </p>
 
     <h3>Score on the Lock Screen (Live Activity)</h3>
@@ -71,11 +75,13 @@ import { site } from '../../site';
       Live Activities.
     </p>
 
-    <h3>Shared profiles</h3>
+    <h3>History shared with your friends</h3>
     <p>
-      When you link a player’s profile with a friend (by QR code), a summary of each finished game
-      they took part in (nickname, simple avatar, rank and score of each player) is left on the
-      server for their device, which picks it up the next time they open the app.
+      When a linked friend (through their QR code, or by picking their seat in a shared game) played
+      a game with you without being connected, the full game (nicknames, simple avatars, rounds,
+      scores) is left for them on the server, and they pick it up the next time they open the app.
+      It is encrypted with a key that only devices knowing their profile identifier can compute; the
+      server only sees a fingerprint of that identifier.
     </p>
 
     <h2>Retention</h2>
@@ -86,16 +92,16 @@ import { site } from '../../site';
         </thead>
         <tbody>
           <tr>
-            <td>Live shared game</td>
-            <td>When sharing stops, and at most 24 hours after it started</td>
+            <td>Game shared online</td>
+            <td>24 hours after sharing stops, and at most 14 days after the last activity</td>
           </tr>
           <tr>
             <td>Lock Screen</td>
             <td>At most 30 minutes after the last round</td>
           </tr>
           <tr>
-            <td>Shared profile summary</td>
-            <td>As soon as it is picked up, and at most after 30 days</td>
+            <td>Game left for a friend</td>
+            <td>As soon as it is picked up, and at most after 14 days</td>
           </tr>
           <tr>
             <td>Data on the device and in iCloud</td>

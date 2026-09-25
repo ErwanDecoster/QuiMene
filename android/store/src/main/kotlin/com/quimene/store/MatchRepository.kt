@@ -8,7 +8,6 @@ import com.quimene.domain.model.MatchStatus
 import com.quimene.domain.model.Participant
 import com.quimene.domain.model.RoundDraft
 import com.quimene.domain.model.SharedMatchPackage
-import com.quimene.domain.model.SharedMatchSummaryPayload
 import com.quimene.domain.model.VariantSelection
 import com.quimene.domain.rules.GameCatalog
 import kotlinx.coroutines.flow.Flow
@@ -241,48 +240,6 @@ class MatchRepository(
 
     suspend fun markSharedProfileSyncComplete(match: MatchEntity) {
         matchDao.update(match.copy(pendingSharedProfileSync = false))
-    }
-
-    /** Doc 14, phase 2 — matérialise le résumé reçu de l'installation d'un ami en une partie
-     * locale minimale : un journal d'événements vide (jamais rejoué, voir
-     * [MatchEntity.isImportedSummary]), seuls `finalRank`/`finalScore` portent le résultat. */
-    suspend fun materializeSharedSummary(
-        payload: SharedMatchSummaryPayload,
-        matchID: UUID,
-    ) {
-        if (matchDao.get(matchID) != null) return
-
-        val participants =
-            payload.standings.mapIndexed { index, entry ->
-                val linkedPlayer = entry.sharedProfileID?.let { playerDao.bySharedProfileID(it) }
-                ParticipantEntity(
-                    playerId = linkedPlayer?.id,
-                    nicknameSnapshot = entry.nickname,
-                    avatarKindSnapshot = entry.avatarKind,
-                    avatarValueSnapshot = entry.avatarValue,
-                    paletteIDSnapshot = entry.paletteID,
-                    seatIndex = index,
-                    finalRank = entry.rank,
-                    finalScore = entry.score,
-                    matchId = matchID,
-                )
-            }
-
-        val match =
-            MatchEntity(
-                id = matchID,
-                gameID = payload.gameID,
-                rulesVersion = payload.rulesVersion,
-                variantsData = ByteArray(0),
-                startedAt = payload.playedAt,
-                endedAt = payload.playedAt,
-                status = MatchStatus.Ended,
-                deviceOrigin = "shared-profile-import",
-                eventLogData = encodeEvents(emptyList()),
-                isImportedSummary = true,
-            )
-        matchDao.insert(match)
-        participantDao.insertAll(participants)
     }
 
     /** Doc 16, phase E — enregistre une partie reçue d'un ami (boîte aux lettres), complète : même

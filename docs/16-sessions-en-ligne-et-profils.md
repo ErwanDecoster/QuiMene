@@ -1,6 +1,6 @@
 # 16 — Sessions en ligne et profils
 
-Statut : **plan validé le 24 septembre 2026**, implémentation à venir phase par phase. Ce document
+Statut : **livré le 25 septembre 2026** (plan validé le 24), phases A à H sur iOS et Android. Ce document
 remplace, une fois livré, le modèle « hôte autoritaire » de [09](09-partie-partagee.md) et le
 mécanisme de résumés de [14](14-profils-partages.md).
 
@@ -31,7 +31,7 @@ Deux limites remontées à l'usage :
 
 | Sujet | Décision |
 |---|---|
-| Chiffrement | **De bout en bout**. Le serveur ne lit ni pseudos ni scores ; la validation des règles se fait sur l'appareil qui saisit (même moteur partout, garanti par les golden files). |
+| Chiffrement | **De bout en bout pour l'historique partagé** (boîte aux lettres : clé tirée de l'identifiant de profil, que le serveur ne voit pas). **Sessions : chiffrées, mais pas de bout en bout vis-à-vis de l'opérateur** — la clé dérive du code à 6 chiffres que la base conserve (constat de la phase H, doc 09). La validation des règles se fait sur l'appareil qui saisit (même moteur partout, garanti par les golden files). |
 | Ordre des manches | Numéro de séquence attribué par le serveur ; un ajout annonce le numéro attendu, refusé si quelqu'un l'a devancé (l'appareil rattrape, revalide, réessaie). L'écrasement d'une manche devient impossible par construction. |
 | Conservation | **14 jours** après la dernière activité de la session. |
 | Saisie hors ligne en mode en ligne | **Bloquée** : bouton grisé « Hors connexion », l'écran rattrape au retour du réseau. Pas de file d'attente (conflits). Une partie entièrement hors réseau se joue en mode local. |
@@ -132,6 +132,14 @@ Phase G : Android a suivi chaque phase au fil de l'eau ; la compatibilité crois
 dans les deux sens par des fichiers de référence produits par le code réel de chaque plateforme,
 et une liste de scénarios à dérouler sur appareils avant publication ([doc 17](17-recette-croisee.md)).
 
+Phase H : docs [09](09-partie-partagee.md) et [14](14-profils-partages.md) réécrites,
+ADR-0017 (remplace ADR-0008 et, pour sa partie transport, ADR-0016), politique de confidentialité
+et FAQ du site mises à jour, ancien partage retiré du code et du serveur (migration
+`drop_legacy_sharing` : `quimene_open_games`, résumés du doc 14 et leurs purges). Les scénarios
+« créateur éteint » et « ami absent » sont dans la recette (doc 17, n° 7 et 11). Constat : les
+sessions ne sont pas chiffrées de bout en bout vis-à-vis de l'opérateur du serveur (doc 09) —
+documenté partout, amélioration possible proposée à part.
+
 | Phase | Contenu | Dépend de |
 |---|---|---|
 | **A. Profil local** ✅ iOS + Android | Page Profil, création au premier lancement, onglets réorganisés, profil explicite (plus « la fiche partagée »), amis liés, profil sauvegardé via iCloud. | — |
@@ -141,4 +149,4 @@ et une liste de scénarios à dérouler sur appareils avant publication ([doc 17
 | **E. Historique partagé** ✅ iOS + Android | Enregistrement de la partie complète chez chaque participant connecté ; boîte aux lettres chiffrée par profil pour les absents, qui remplace les résumés. | A, C |
 | **F. Écran verrouillé** ✅ iOS + Android | Push envoyé par l'appareil qui saisit, indépendant du créateur. | C |
 | **G. Android** ✅ ([doc 17](17-recette-croisee.md)) | Même protocole, tests de compatibilité croisés. | A–F |
-| **H. Docs, site, recette** | Docs 09 et 14 réécrites, ADR, politique de confidentialité (14 jours, parties complètes chiffrées), scénarios « créateur éteint » et « ami absent ». | toutes |
+| **H. Docs, site, recette** ✅ | Docs 09 et 14 réécrites, ADR, politique de confidentialité (14 jours, parties complètes chiffrées), scénarios « créateur éteint » et « ami absent ». | toutes |

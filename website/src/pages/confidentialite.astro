@@ -18,8 +18,8 @@ import { site } from '../site';
         <li>Aucun compte à créer, aucune publicité, aucune mesure d’audience, aucun pistage.</li>
         <li>Les parties, les joueurs et l’historique restent sur l’appareil et dans votre iCloud.</li>
         <li>
-          Trois fonctions facultatives passent par un serveur, uniquement le temps nécessaire : le
-          partage en direct, le score sur l’écran verrouillé et les profils partagés.
+          Trois fonctions facultatives passent par un serveur, pour une durée limitée : les parties
+          partagées en ligne, le score sur l’écran verrouillé et l’historique partagé avec vos amis.
         </li>
         <li>Aucune donnée n’est vendue ni utilisée à des fins publicitaires.</li>
       </ul>
@@ -38,7 +38,7 @@ import { site } from '../site';
       gérée par Apple, entre vos propres appareils. L’éditeur n’y a aucun accès.
     </p>
     <p>
-      L’appareil photo sert uniquement à scanner un QR code (rejoindre une partie, lier un profil).
+      L’appareil photo sert uniquement à scanner un QR code (rejoindre une partie, ajouter un ami).
       Aucune image n’est enregistrée ni envoyée.
     </p>
 
@@ -49,17 +49,21 @@ import { site } from '../site';
       les utilisez.
     </p>
 
-    <h3>Partage d’une partie en direct</h3>
+    <h3>Parties partagées en ligne</h3>
     <p>
-      Pendant qu’une partie est partagée, le serveur conserve : le code d’appairage à six chiffres,
-      un identifiant de session aléatoire, l’identifiant de la partie, le jeu, le nombre de joueurs,
-      le nom générique de l’appareil (par exemple « iPhone ») et sa plateforme. Ces informations
-      permettent aux autres appareils de retrouver la partie avec le code.
+      Quand vous partagez une partie, une session est créée sur le serveur, pour que chaque
+      appareil puisse suivre et saisir la partie même si celui qui l’a lancée est éteint. Le
+      serveur conserve : le code à six chiffres, un identifiant de session aléatoire, un
+      identifiant d’appareil aléatoire créé par l’app (pour le créateur et l’auteur de chaque
+      action), et le journal de la session : chaque manche et action, ainsi que la place choisie par
+      chacun (« Qui es-tu ? » : pseudo, avatar simple et identifiant de profil).
     </p>
     <p>
-      Le contenu de la partie (pseudos, scores, manches) transite entre les appareils
-      <strong>chiffré de bout en bout</strong>, avec une clé dérivée du code d’appairage. Il n’est
-      pas stocké, et le serveur ne peut pas le lire.
+      Ce journal est <strong>chiffré</strong> avec une clé dérivée du code à six chiffres : il est
+      illisible pour qui n’a pas le code. Comme le serveur conserve ce code pour permettre de
+      rejoindre la partie, ce chiffrement ne protège pas contre l’éditeur, qui a accès à la base.
+      L’éditeur ne consulte pas ces données. Pendant la partie, les appareils connectés voient le
+      pseudo de profil de chacun.
     </p>
 
     <h3>Score sur l’écran verrouillé (Activité en direct)</h3>
@@ -71,11 +75,13 @@ import { site } from '../site';
       fonction se désactive dans Réglages › {site.name} › Activités en direct.
     </p>
 
-    <h3>Profils partagés</h3>
+    <h3>Historique partagé avec vos amis</h3>
     <p>
-      Quand vous liez la fiche d’un joueur avec un ami (par QR code), le résumé de chaque partie
-      terminée à laquelle il a participé (pseudo, avatar simple, rang et score de chaque joueur) est
-      déposé sur le serveur pour son appareil, qui le récupère à sa prochaine ouverture de l’app.
+      Quand un ami lié (par son QR code, ou en choisissant sa place dans une partie partagée) a joué
+      une partie avec vous sans être connecté, la partie complète (pseudos, avatars simples, manches,
+      scores) est déposée pour lui sur le serveur, qu’il récupère à sa prochaine ouverture de l’app.
+      Elle est chiffrée avec une clé que seuls les appareils qui connaissent son identifiant de
+      profil peuvent calculer ; le serveur ne voit qu’une empreinte de cet identifiant.
     </p>
 
     <h2>Durées de conservation</h2>
@@ -86,16 +92,16 @@ import { site } from '../site';
         </thead>
         <tbody>
           <tr>
-            <td>Partie partagée en direct</td>
-            <td>À l’arrêt du partage, et au plus tard 24 heures après son début</td>
+            <td>Partie partagée en ligne</td>
+            <td>24 heures après l’arrêt du partage, et au plus tard 14 jours après la dernière activité</td>
           </tr>
           <tr>
             <td>Écran verrouillé</td>
             <td>Au plus tard 30 minutes après la dernière manche</td>
           </tr>
           <tr>
-            <td>Résumé pour un profil partagé</td>
-            <td>Dès sa récupération, et au plus tard après 30 jours</td>
+            <td>Partie déposée pour un ami</td>
+            <td>Dès sa récupération, et au plus tard après 14 jours</td>
           </tr>
           <tr>
             <td>Données sur l’appareil et dans iCloud</td>
