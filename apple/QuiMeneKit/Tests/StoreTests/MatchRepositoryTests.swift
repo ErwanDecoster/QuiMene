@@ -310,4 +310,59 @@ struct MatchRepositoryTests {
     let afterSecond = try repository.mostRecentParticipants(forGameID: "dummy")
     #expect(afterSecond.map(\.nickname) == ["Chloé", "Bob"])
   }
+
+  @Test("Une partie reçue d'un ami est enregistrée complète, reliée à ma fiche, une seule fois")
+  func importSharedMatch() throws {
+    let schema = Schema(QuiMeneSchemaV1.models)
+    let container = try ModelContainer(
+      for: schema, configurations: [ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)])
+    let context = container.mainContext
+    let catalog = makeCatalog(roundLimit: 2)
+    let players = PlayerRepository(context: context)
+    let me = try players.create(nickname: "Théo", avatarKind: "emoji", avatarValue: "🦊")
+    let myProfileID = try players.sharedProfileID(for: me)
+
+    let theo = Participant(displayName: "Théo", seatIndex: 0)
+    let erwan = Participant(displayName: "Erwan", seatIndex: 1)
+    let matchID = UUID()
+    let start = Date(timeIntervalSinceReferenceDate: 800_000_000)
+    func round(_ index: Int) -> MatchEvent {
+      .roundCommitted(
+        RoundDraft(index: index, inputs: [theo, erwan].map { ScoreInput(participantID: $0.id, rawValue: 3) }))
+    }
+    let events = [
+      StampedEvent(
+        id: matchID, lamport: 1, deviceID: "erwan", occurredAt: start,
+        event: .matchCreated(
+          gameID: "dummy", rulesVersion: 1, variants: VariantSelection(), participants: [theo, erwan])),
+      StampedEvent(lamport: 2, deviceID: "erwan", occurredAt: start + 60, event: round(0)),
+      StampedEvent(lamport: 3, deviceID: "erwan", occurredAt: start + 120, event: round(1)),
+    ]
+    let package = SharedMatchPackage(
+      matchID: matchID,
+      participants: [
+        .init(
+          participantID: theo.id, sharedProfileID: myProfileID, nickname: "Théo",
+          avatarKind: "emoji", avatarValue: "🦊", paletteID: "4"),
+        .init(
+          participantID: erwan.id, sharedProfileID: UUID(), nickname: "Erwan",
+          avatarKind: "emoji", avatarValue: "🐻", paletteID: "1"),
+      ],
+      events: events)
+
+    let repository = MatchRepository(context: context)
+    let match = try #require(try repository.importSharedMatch(package, catalog: catalog))
+    #expect(match.status == .ended)
+    #expect(!match.isImportedSummary)
+    #expect(match.startedAt == start)
+    #expect(match.endedAt == start + 120)
+    #expect(try repository.currentLog(for: match).count == 3)
+    let myRecord = try #require(match.participants.first { $0.id == theo.id })
+    #expect(myRecord.player?.id == me.id)
+    #expect(myRecord.finalScore == 6)
+    #expect(match.participants.first { $0.id == erwan.id }?.player == nil)
+
+    _ = try repository.importSharedMatch(package, catalog: catalog)
+    #expect(try context.fetch(FetchDescriptor<MatchRecord>()).count == 1)
+  }
 }

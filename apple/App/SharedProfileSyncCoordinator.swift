@@ -4,115 +4,111 @@ import Store
 import SwiftData
 import Sync
 
-/// Doc 14 « Profils partagés », phase 2 — pousse le résumé d'une partie tout juste conclue vers
-/// chaque participant lié à l'installation d'un ami, et récupère les résumés que d'autres ont
-/// poussés vers l'une de mes propres fiches liées. Déclenché par `QuiMeneApp` (lancement et
-/// retour au premier plan), pas par un minuteur propre — même discipline que
-/// `MatchConnectionCoordinator`, plutôt qu'un nouveau système de synchronisation.
+/// Doc 16, phase E — historique partagé : chaque partie terminée avec un ami lié lui est déposée,
+/// **complète** et chiffrée, dans sa boîte aux lettres (`MatchMailboxTransport`) ; les parties que
+/// d'autres m'ont déposées sont enregistrées ici comme si je les avais jouées. Remplace les
+/// résumés du doc 14. Déclenché au lancement et au retour au premier plan (`QuiMeneApp`), dès
+/// qu'une partie se termine (`ResultsView`, dépôt immédiat), et à l'ouverture de l'Historique (avec
+/// « tirer pour actualiser ») pour relever sa boîte sans relancer l'app.
 @MainActor
+@Observable
 final class SharedProfileSyncCoordinator {
   static let shared = SharedProfileSyncCoordinator()
 
-  private let transport = SharedProfileTransport()
-  private var isSyncing = false
+  /// Change à chaque partie reçue : l'Historique affiché se recharge.
+  private(set) var receivedToken = UUID()
+
+  @ObservationIgnored private let transport = MatchMailboxTransport()
+  @ObservationIgnored private var isSyncing = false
+  @ObservationIgnored private var needsAnotherPass = false
 
   private init() {}
 
+  /// Une demande pendant un passage en cours n'est pas perdue : un passage de plus suit.
   func sync(context: ModelContext) async {
-    guard !isSyncing else { return }
+    guard !isSyncing else {
+      needsAnotherPass = true
+      return
+    }
     isSyncing = true
     defer { isSyncing = false }
-    await push(context: context)
-    await pull(context: context)
+    repeat {
+      needsAnotherPass = false
+      await deposit(context: context)
+      await collect(context: context)
+    } while needsAnotherPass
   }
 
-  /// Un résumé par partie conclue avec au moins un participant lié — jamais retenté
-  /// indéfiniment pour une partie qui n'en a plus (fiche déliée entre-temps, par exemple).
-  private func push(context: ModelContext) async {
+  /// Une partie terminée avec au moins un ami lié (pas moi) : déposée chez chacun, une fois.
+  /// Jamais retentée indéfiniment pour une partie qui n'en a plus (fiche déliée entre-temps).
+  private func deposit(context: ModelContext) async {
     let repository = MatchRepository(context: context)
-    guard let pendingMatches = try? repository.matchesPendingSharedProfileSync(),
-      !pendingMatches.isEmpty
+    guard let pending = try? repository.matchesPendingSharedProfileSync(), !pending.isEmpty
     else { return }
+    let myID = (try? PlayerRepository(context: context).myOwnSharedPlayer())?.sharedProfileID
 
-    for match in pendingMatches {
-      let linkedIDs = Array(Set(match.participants.compactMap { $0.player?.sharedProfileID }))
-      let standings = match.participants.compactMap {
-        participant -> SharedMatchSummaryPayload.Entry? in
-        guard let rank = participant.finalRank, let score = participant.finalScore else {
-          return nil
-        }
-        return SharedMatchSummaryPayload.Entry(
-          sharedProfileID: participant.player?.sharedProfileID,
-          nickname: participant.nicknameSnapshot,
-          avatarKind: participant.avatarKindSnapshot,
-          avatarValue: participant.avatarValueSnapshot,
-          paletteID: participant.paletteIDSnapshot,
-          rank: rank,
-          score: score
-        )
-      }
-
-      guard !linkedIDs.isEmpty, !standings.isEmpty else {
+    for match in pending {
+      let recipients = Set(match.participants.compactMap { $0.player?.sharedProfileID })
+        .subtracting([myID].compactMap { $0 })
+      guard !match.isImportedSummary, !recipients.isEmpty,
+        let events = try? repository.currentLog(for: match), !events.isEmpty
+      else {
         try? repository.markSharedProfileSyncComplete(match)
         continue
       }
-
-      let payload = SharedMatchSummaryPayload(
-        gameID: match.gameID,
-        rulesVersion: match.rulesVersion,
-        playedAt: match.endedAt ?? match.startedAt,
-        standings: standings
-      )
-      let rows = linkedIDs.map {
-        SharedMatchSummaryRow(matchID: match.id, sharedProfileID: $0, payload: payload)
+      let package = SharedMatchPackage(
+        matchID: match.id,
+        participants: match.participants.map(Self.packaged),
+        events: events)
+      let items = recipients.compactMap { recipient in
+        (try? MailboxCrypto.seal(package, for: recipient)).map {
+          MailboxItem(
+            mailboxKey: MailboxCrypto.lookupKey(for: recipient), matchID: match.id, ciphertext: $0)
+        }
       }
-
       do {
-        try await transport.push(rows)
+        try await transport.deposit(items)
         try? repository.markSharedProfileSyncComplete(match)
       } catch {
-        // Échec silencieux : `pendingSharedProfileSync` reste `true`, nouvelle tentative
-        // au prochain retour au premier plan (même patron que `MatchConnectionCoordinator`).
+        // Échec silencieux : `pendingSharedProfileSync` reste `true`, nouvelle tentative au
+        // prochain retour au premier plan.
       }
     }
   }
 
-  /// `materializeSharedSummary` est déjà un no-op si cette partie est connue localement (c'est
-  /// cet appareil qui l'a jouée et poussée).
-  private func pull(context: ModelContext) async {
-    let playerRepository = PlayerRepository(context: context)
-    let matchRepository = MatchRepository(context: context)
-    guard let linkedIDs = try? playerRepository.allSharedProfileIDs(), !linkedIDs.isEmpty else {
-      return
-    }
-    guard let rows = try? await transport.fetchPending(for: linkedIDs) else { return }
-
-    let myOwnID = (try? playerRepository.myOwnSharedPlayer())?.sharedProfileID
-
-    for row in rows {
-      let isMyOwnIdentity = row.sharedProfileID == myOwnID
-      // Doc 14, phase 4 — remontée : suivre un ami donnait accès à *toutes* ses parties,
-      // même jouées avec des tiers sans rapport. Une fiche qui suit un ami (pas la mienne)
-      // ne matérialise donc une partie que si j'y étais moi-même — mon propre identifiant
-      // partagé apparaît alors parmi les *autres* participants du résumé. Ma propre fiche
-      // partagée, elle, reçoit tout sans filtre : je veux consolider l'intégralité de mes
-      // parties, où qu'elles aient été jouées.
-      let isRelevant =
-        isMyOwnIdentity || row.payload.standings.contains { $0.sharedProfileID == myOwnID }
-      if isRelevant {
-        try? matchRepository.materializeSharedSummary(row.payload, matchID: row.matchID)
+  /// Ma boîte : chaque partie reçue est enregistrée (sans effet si je l'ai déjà, jouée ici ou
+  /// suivie dans une session), puis retirée. Un dépôt illisible est retiré aussi, pour ne pas
+  /// être relu indéfiniment.
+  private func collect(context: ModelContext) async {
+    guard let myID = (try? PlayerRepository(context: context).myOwnSharedPlayer())?.sharedProfileID
+    else { return }
+    let mailboxKey = MailboxCrypto.lookupKey(for: myID)
+    guard let items = try? await transport.fetch(mailboxKey: mailboxKey) else { return }
+    let repository = MatchRepository(context: context)
+    var received = false
+    for item in items {
+      if let package = MailboxCrypto.open(item.ciphertext, for: myID) {
+        guard (try? repository.importSharedMatch(package, catalog: .embedded)) != nil else {
+          continue
+        }
+        received = true
       }
-
-      // Doc 14, phase 4 — remontée : supprimer après chaque lecture, quel que soit
-      // l'appareil, faisait perdre la partie aux autres appareils qui suivent la même
-      // personne si l'un d'eux la lisait (et donc la supprimait) en premier — plusieurs
-      // amis peuvent suivre la même personne (doc 14 « Limites de confiance »). Seul
-      // l'appareil qui fait autorité sur cet identifiant (le sien — une seule fiche
-      // partagée par appareil, phase 4) nettoie la boîte aux lettres ; les autres laissent
-      // la purge programmée (30 jours, hors de ce dépôt) s'en charger.
-      if isMyOwnIdentity {
-        try? await transport.delete(matchID: row.matchID, sharedProfileID: row.sharedProfileID)
-      }
+      try? await transport.remove(mailboxKey: mailboxKey, matchID: item.matchID)
     }
+    if received { receivedToken = UUID() }
+  }
+
+  /// Un joueur tel que le destinataire l'affichera. Une photo ne voyage pas : repli sur l'emoji
+  /// dérivé du pseudo, comme pour toute nouvelle fiche.
+  private static func packaged(_ participant: ParticipantRecord) -> SharedMatchPackage.Participant {
+    let isPhoto = participant.avatarKindSnapshot == "photo"
+    let seed = LiveShareCoordinator.generatedSeed(for: participant.nicknameSnapshot)
+    return SharedMatchPackage.Participant(
+      participantID: participant.id,
+      sharedProfileID: participant.player?.sharedProfileID,
+      nickname: participant.nicknameSnapshot,
+      avatarKind: isPhoto ? seed.avatarKind : participant.avatarKindSnapshot,
+      avatarValue: isPhoto ? seed.avatarValue : participant.avatarValueSnapshot,
+      paletteID: participant.paletteIDSnapshot)
   }
 }

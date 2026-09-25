@@ -67,6 +67,7 @@ struct QuiMeneApp: App {
             // Doc 16, phase C — une session ouverte par cet appareil survit au redémarrage de
             // l'app : on la reprend avec sa partie courante.
             await LiveShareCoordinator.shared.resumeIfNeeded(context: container.mainContext)
+            MatchConnectionCoordinator.shared.configure(context: container.mainContext)
             let repository = MatchRepository(context: container.mainContext)
             MatchLiveActivityController.reconcileOnLaunch { matchID in
               guard let match = try? repository.match(withID: matchID) else { return false }

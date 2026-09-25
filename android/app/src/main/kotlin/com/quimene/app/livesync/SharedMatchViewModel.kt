@@ -13,6 +13,7 @@ import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarKind
 import com.quimene.domain.engine.MatchEngine
 import com.quimene.domain.engine.MatchEvent
+import com.quimene.domain.engine.StampedEvent
 import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.MatchStatus
 import com.quimene.domain.model.ModifierID
@@ -185,6 +186,32 @@ class SharedMatchViewModel(
         scope.launch { link.submitIdentity(SessionIdentityEvent.revoke(claim.claimID, link.session.deviceID), matchID) }
     }
 
+    // Historique partagé (doc 16, phase E)
+
+    /** Enregistre dans mon historique une partie terminée de la session où j'ai une place ; `true`
+     * une fois faite. Fourni par [MatchConnectionCoordinator], qui a accès aux fiches. */
+    var keepMatch: (suspend (UUID, List<StampedEvent>) -> Boolean)? = null
+    private val keptMatchIDs = mutableSetOf<UUID>()
+
+    /** Chaque partie terminée de la session, une fois : dans l'historique de chaque participant
+     * ayant un profil, complète, comme chez le créateur. Retentée tant qu'elle n'a pas pu l'être
+     * (place pas encore choisie, par exemple). */
+    suspend fun keepConcludedMatches() {
+        val keepMatch = keepMatch ?: return
+        val matchIDs =
+            link.session
+                .records()
+                .map { it.matchID }
+                .distinct()
+        for (matchID in matchIDs) {
+            if (matchID in keptMatchIDs) continue
+            val log = link.session.eventsForMatch(matchID)
+            val replayed = runCatching { MatchEngine().replay(log, catalog) }.getOrNull() ?: continue
+            if (replayed.status != MatchStatus.Ended && replayed.status != MatchStatus.Abandoned) continue
+            if (keepMatch(matchID, log)) keptMatchIDs += matchID
+        }
+    }
+
     /** Le créateur a annulé mon association : « Qui es-tu ? » réapparaît, avec l'explication. */
     private suspend fun noticeRevocation(records: List<SessionIdentityRecord>) {
         val me = me ?: return
@@ -230,7 +257,10 @@ class SharedMatchViewModel(
 
     init {
         link.onNewRecords = { reload(it) }
-        link.onNewIdentities = { noticeRevocation(it) }
+        link.onNewIdentities = {
+            noticeRevocation(it)
+            keepConcludedMatches()
+        }
     }
 
     /** Écran de résultats, avec des fiches en mémoire (avatar dérivé du pseudo). */
@@ -384,6 +414,7 @@ class SharedMatchViewModel(
             pendingScores = emptyMap()
             closedParticipantID = null
         }
+        keepConcludedMatches()
         if (replayed.rounds.size > previousRoundCount) {
             replayed.rounds
                 .lastOrNull()

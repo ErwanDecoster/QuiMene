@@ -3,6 +3,7 @@ import Domain
 import Foundation
 import Observation
 import Store
+import SwiftData
 import Sync
 
 /// Doc 16, phase C — côté participant d'une session en ligne. Rejoindre, c'est résoudre le code
@@ -22,6 +23,15 @@ final class MatchConnectionCoordinator {
 
   private let catalog = GameCatalog.embedded
   private let backend = SupabaseSessionBackend()
+  /// Doc 16, phase E — pour enregistrer dans mon historique les parties terminées de la session.
+  private var modelContext: ModelContext?
+
+  /// Au lancement (`QuiMeneApp`) : donne accès aux fiches, puis rattrape les parties terminées
+  /// pendant que l'app était fermée.
+  func configure(context: ModelContext) {
+    modelContext = context
+    Task { await sharedModel?.keepConcludedMatches() }
+  }
 
   private init() {
     if let persisted = PersistedOnlineSession.load(.participant) {
@@ -79,9 +89,56 @@ final class MatchConnectionCoordinator {
       persisted.isSpectator = spectator
       persisted.save()
     }
+    model.keepMatch = { [weak self, weak model] matchID, events in
+      guard let self, let model else { return false }
+      return self.keep(matchID: matchID, events: events, in: model)
+    }
     sharedModel = model
     await link.start()
     return role
+  }
+
+  /// Doc 16, phase E — une partie terminée de la session où j'ai une place : enregistrée dans mon
+  /// historique, complète, comme chez le créateur. Ma place est reliée à ma fiche, celles de mes
+  /// amis à leurs fiches ; les autres gardent leur pseudo et un avatar dérivé. Déjà enregistrée
+  /// (reçue par ailleurs) : mise à jour si le journal de la session est plus long.
+  private func keep(matchID: UUID, events: [StampedEvent], in model: SharedMatchModel) -> Bool {
+    guard let modelContext, let me = model.me, let first = events.first,
+      case .matchCreated(_, _, _, let participants) = first.event,
+      let mySeat = model.link.identities.seat(of: me.id),
+      participants.contains(where: { SharedMatchModel.seat(of: $0) == mySeat })
+    else { return false }
+    let repository = MatchRepository(context: modelContext)
+    if let existing = try? repository.match(withID: matchID) {
+      if let local = try? repository.currentLog(for: existing), events.count > local.count {
+        _ = try? repository.replaceLog(events, in: existing, catalog: catalog)
+      }
+      return true
+    }
+    let players = PlayerRepository(context: modelContext)
+    let myFiche = try? players.myOwnSharedPlayer()
+    let created = try? repository.createMirroredMatch(
+      id: matchID, events: events, catalog: catalog
+    ) { participant in
+      let seat = SharedMatchModel.seat(of: participant)
+      let fiche: PlayerRecord? =
+        if seat == mySeat {
+          myFiche
+        } else if let occupant = model.link.identities.occupant(of: seat) {
+          try? players.player(withSharedProfileID: occupant)
+        } else {
+          nil
+        }
+      guard let fiche else { return LiveShareCoordinator.generatedSeed(for: participant.displayName) }
+      return MatchRepository.ParticipantSeed(
+        player: fiche, nickname: participant.displayName, avatarKind: fiche.avatarKind,
+        avatarValue: fiche.avatarValue, paletteID: fiche.paletteID, teamID: participant.teamID)
+    }
+    if created != nil {
+      // Déposée tout de suite chez mes amis liés qui y ont joué (doc 16, phase E).
+      Task { await SharedProfileSyncCoordinator.shared.sync(context: modelContext) }
+    }
+    return created != nil
   }
 
   /// Départ volontaire : l'utilisateur quitte réellement la partie (« Quitter la partie »).

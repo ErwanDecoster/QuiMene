@@ -102,13 +102,28 @@ résultats, historique, choix des joueurs) et lien sur celles de mes amis pendan
 « Ferme » (Skyjo…) sur la ligne de chaque joueur, et même barre au-dessus du clavier pour le
 créateur et le participant (iOS).
 
+Phase E livrée (iOS puis Android) : chaque participant connecté qui occupe une place
+enregistre dans son historique chaque partie terminée de la session, complète (journal entier),
+sa place reliée à sa fiche et celles de ses amis aux leurs (`MatchConnectionCoordinator.keep`).
+Pour les absents, boîte aux lettres chiffrée par profil (migration `create_quimene_match_mailbox`,
+`MailboxCrypto`) : adresse = empreinte SHA-256 de l'identifiant partageable, contenu = la partie
+complète (`SharedMatchPackage`) scellée avec une clé HKDF de cet identifiant ; le serveur ne voit
+ni identifiant, ni joueurs, ni scores. Chaque appareil qui a une partie terminée avec des amis
+liés la dépose chez chacun (idempotent par partie) ; à l'ouverture, un appareil relève sa propre
+boîte, enregistre les parties (rien si déjà connue) puis les retire. Conservation 14 jours.
+Remplace les résumés du doc 14 (table et fonctions retirées en phase H, une fois Android passé à
+la boîte). Les dates d'une copie sont celles de la partie (premier et dernier événement), plus
+celles de l'enregistrement. Format commun : `spec/session/mailbox-package.json`. Dépôt immédiat
+dès l'écran de résultats ; relève au lancement, au retour au premier plan, à l'ouverture de
+l'Historique et en tirant la liste vers le bas.
+
 | Phase | Contenu | Dépend de |
 |---|---|---|
 | **A. Profil local** ✅ iOS + Android | Page Profil, création au premier lancement, onglets réorganisés, profil explicite (plus « la fiche partagée »), amis liés, profil sauvegardé via iCloud. | — |
 | **B. Sessions serveur** ✅ (migration `create_quimene_sessions`) | Tables session / parties / événements chiffrés, fonctions SQL (créer, ajouter avec numéro attendu, lire depuis un numéro, fermer), notification des appareils, expiration 14 jours. | — |
 | **C. Mode en ligne dans l'app** ✅ iOS + Android | L'écran de partie lit et écrit la session ; écrans créateur/participant unifiés ; rattrapage par numéro ; saisie bloquée hors ligne ; partie suivante par n'importe quel participant. | B |
 | **D. « Qui es-tu ? »** ✅ iOS + Android | Association à l'arrivée, liaison durable dans les deux sens, notification du créateur avec annulation, « Je regarde seulement ». | A, C |
-| **E. Historique partagé** | Enregistrement de la partie complète chez chaque participant connecté ; boîte aux lettres chiffrée par profil pour les absents, qui remplace les résumés. | A, C |
+| **E. Historique partagé** ✅ iOS + Android | Enregistrement de la partie complète chez chaque participant connecté ; boîte aux lettres chiffrée par profil pour les absents, qui remplace les résumés. | A, C |
 | **F. Écran verrouillé** | Push envoyé par l'appareil qui saisit, indépendant du créateur. | C |
 | **G. Android** | Même protocole, tests de compatibilité croisés. | A–F |
 | **H. Docs, site, recette** | Docs 09 et 14 réécrites, ADR, politique de confidentialité (14 jours, parties complètes chiffrées), scénarios « créateur éteint » et « ami absent ». | toutes |

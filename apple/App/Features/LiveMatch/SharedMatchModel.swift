@@ -183,7 +183,35 @@ final class SharedMatchModel {
       Task { @MainActor [weak self] in await self?.reload(fresh: records) }
     }
     link.onNewIdentities = { [weak self] records in
-      Task { @MainActor [weak self] in await self?.noticeRevocation(in: records) }
+      Task { @MainActor [weak self] in
+        await self?.noticeRevocation(in: records)
+        await self?.keepConcludedMatches()
+      }
+    }
+  }
+
+  // MARK: Historique partagé (doc 16, phase E)
+
+  /// Enregistre dans mon historique une partie terminée de la session où j'ai une place ; `true`
+  /// une fois faite. Fourni par `MatchConnectionCoordinator`, qui a accès aux fiches.
+  @ObservationIgnored var keepMatch: ((UUID, [StampedEvent]) -> Bool)?
+  @ObservationIgnored private var keptMatchIDs: Set<UUID> = []
+
+  /// Chaque partie terminée de la session, une fois : dans l'historique de chaque participant
+  /// ayant un profil, complète, comme chez le créateur. Retentée tant qu'elle n'a pas pu l'être
+  /// (place pas encore choisie, par exemple).
+  func keepConcludedMatches() async {
+    guard let keepMatch else { return }
+    let records = await link.session.records
+    let matchIDs = records.reduce(into: [UUID]()) { ids, record in
+      if !ids.contains(record.matchID) { ids.append(record.matchID) }
+    }
+    for matchID in matchIDs where !keptMatchIDs.contains(matchID) {
+      let log = await link.session.events(forMatch: matchID)
+      guard let replayed = try? engine.replay(log, catalog: catalog),
+        replayed.status == .ended || replayed.status == .abandoned
+      else { continue }
+      if keepMatch(matchID, log) { keptMatchIDs.insert(matchID) }
     }
   }
 
@@ -331,6 +359,8 @@ final class SharedMatchModel {
         self?.roundExplanationMessage = nil
       }
     }
+
+    await keepConcludedMatches()
 
     if let definition, let rules {
       MatchLiveActivityController.refresh(

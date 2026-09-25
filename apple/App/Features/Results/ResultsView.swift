@@ -49,7 +49,16 @@ struct ResultsView: View {
     standings.sorted { $0.rank < $1.rank }
   }
 
+  @Environment(\.modelContext) private var modelContext
+
   var body: some View {
+    content
+      // Doc 16, phase E — une partie qui vient de se terminer part tout de suite chez les amis
+      // liés qui y ont joué, sans attendre un retour au premier plan.
+      .task { await SharedProfileSyncCoordinator.shared.sync(context: modelContext) }
+  }
+
+  private var content: some View {
     ScrollView {
       VStack(alignment: .leading, spacing: Space.xxl) {
         podiumSection

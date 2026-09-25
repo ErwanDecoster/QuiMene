@@ -4,7 +4,11 @@ import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.quimene.domain.engine.MatchEvent
+import com.quimene.domain.engine.StampedEvent
 import com.quimene.domain.rules.GameCatalog
+import com.quimene.store.MatchRepository
+import com.quimene.store.PlayerRepository
 import com.quimene.sync.OnlineSession
 import com.quimene.sync.OnlineSessionError
 import com.quimene.sync.ProfileCard
@@ -13,6 +17,7 @@ import com.quimene.sync.SessionPresence
 import com.quimene.sync.SupabaseSessionBackend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 /**
  * Doc 16, phase C — miroir de `MatchConnectionCoordinator.swift` : côté participant d'une session
@@ -26,6 +31,10 @@ class MatchConnectionCoordinator(
     private val context: Context,
     private val resolveDeviceID: suspend () -> String,
     private val scope: CoroutineScope,
+    private val matchRepository: MatchRepository,
+    private val playerRepository: PlayerRepository,
+    /** Une partie vient d'être enregistrée : à déposer tout de suite chez mes amis liés. */
+    private val onMatchKept: suspend () -> Unit,
 ) {
     private val backend = SupabaseSessionBackend()
 
@@ -111,8 +120,62 @@ class MatchConnectionCoordinator(
                 sharedMatch = null
                 PersistedOnlineSession.clear(context, PersistedOnlineSession.Role.Participant)
             }
+        sharedMatch?.let { model -> model.keepMatch = { matchID, events -> keep(matchID, events, model) } }
         link.start()
         return role
+    }
+
+    /** Doc 16, phase E — une partie terminée de la session où j'ai une place : enregistrée dans mon
+     * historique, complète, comme chez le créateur. Ma place est reliée à ma fiche, celles de mes
+     * amis à leurs fiches ; les autres gardent leur pseudo et un avatar dérivé. Déjà enregistrée
+     * (reçue par ailleurs) : mise à jour si le journal de la session est plus long. Miroir de
+     * `MatchConnectionCoordinator.keep` (Swift). */
+    private suspend fun keep(
+        matchID: UUID,
+        events: List<StampedEvent>,
+        model: SharedMatchViewModel,
+    ): Boolean {
+        val me = model.me ?: return false
+        val created = events.firstOrNull()?.event as? MatchEvent.MatchCreated ?: return false
+        val mySeat = model.link.identities.seatOf(me.id) ?: return false
+        if (created.participants.none { SharedMatchViewModel.seatOf(it) == mySeat }) return false
+        matchRepository.match(matchID)?.let { existing ->
+            if (events.size > matchRepository.currentLog(existing).size) {
+                matchRepository.replaceLog(events, existing, catalog)
+            }
+            return true
+        }
+        val myFiche = playerRepository.myOwnSharedPlayer()
+        val fiches =
+            created.participants.associate { participant ->
+                val seat = SharedMatchViewModel.seatOf(participant)
+                participant.id to
+                    if (seat == mySeat) {
+                        myFiche
+                    } else {
+                        model.link.identities
+                            .occupant(seat)
+                            ?.let { playerRepository.player(it) }
+                    }
+            }
+        val kept =
+            matchRepository.createMirroredMatch(matchID, events, catalog) { participant ->
+                val fiche = fiches[participant.id]
+                if (fiche == null) {
+                    LiveShareCoordinator.generatedSeed(participant.displayName)
+                } else {
+                    MatchRepository.ParticipantSeed(
+                        player = fiche,
+                        nickname = participant.displayName,
+                        avatarKind = fiche.avatarKind,
+                        avatarValue = fiche.avatarValue,
+                        paletteID = fiche.paletteID,
+                        teamID = participant.teamID,
+                    )
+                }
+            }
+        if (kept != null) scope.launch { runCatching { onMatchKept() } }
+        return kept != null
     }
 
     /** « Quitter la partie » : départ volontaire. */

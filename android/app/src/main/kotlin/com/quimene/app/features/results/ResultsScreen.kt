@@ -97,6 +97,10 @@ fun ResultsScreen(
     var isPickingNextMatch by remember { mutableStateOf(false) }
     var isStartingNextMatch by remember { mutableStateOf(false) }
 
+    // Doc 16, phase E — une partie qui vient de se terminer part tout de suite chez les amis liés
+    // qui y ont joué, sans attendre un retour au premier plan.
+    LaunchedEffect(Unit) { runCatching { container.sharedProfileSyncCoordinator.sync() } }
+
     // Doc 16, phase C — un autre appareil de la session a lancé la partie suivante : on la suit.
     LaunchedEffect(id) {
         shareCoordinator.remoteStartedMatches.collect { started ->

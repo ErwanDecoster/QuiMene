@@ -55,9 +55,12 @@ class AppContainer(
             context = context,
             resolveDeviceID = { DeviceIdentity.current(context) },
             scope = applicationScope,
+            matchRepository = matchRepository,
+            playerRepository = playerRepository,
+            onMatchKept = { sharedProfileSyncCoordinator.sync() },
         )
 
     /** Doc 14 — poussé au lancement et à chaque retour au premier plan (voir
      * [com.quimene.app.QuiMeneApplication]), pas par un minuteur propre. */
-    val sharedProfileSyncCoordinator = SharedProfileSyncCoordinator(matchRepository, playerRepository)
+    val sharedProfileSyncCoordinator = SharedProfileSyncCoordinator(matchRepository, playerRepository, catalog)
 }

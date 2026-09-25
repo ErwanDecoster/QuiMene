@@ -88,6 +88,10 @@ struct HistoryListView: View {
         model.reload()
         consumePendingHistoryFilter()
       }
+      // Doc 16, phase E — les parties jouées par des amis arrivent sans relancer l'app.
+      .task { await SharedProfileSyncCoordinator.shared.sync(context: modelContext) }
+      .refreshable { await SharedProfileSyncCoordinator.shared.sync(context: modelContext) }
+      .onChange(of: SharedProfileSyncCoordinator.shared.receivedToken) { _, _ in model.reload() }
       .onChange(of: deepLinkRouter.pendingHistoryGameID) { _, _ in consumePendingHistoryFilter() }
     }
   }

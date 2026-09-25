@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,11 +23,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +46,7 @@ import com.quimene.designsystem.components.ListRowDivider
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.rules.GameDefinition
+import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -61,6 +66,22 @@ fun HistoryListScreen(
         rememberViewModel { HistoryViewModel(container.catalog, container.matchRepository, initialGameFilter) }
     val state by viewModel.uiState.collectAsState()
     val rows = state.rows
+    // Doc 16, phase E — les parties jouées par des amis arrivent sans relancer l'app : relève de
+    // la boîte aux lettres à l'ouverture, et en tirant la liste vers le bas. La liste observe la
+    // base, elle se met à jour d'elle-même.
+    val scope = rememberCoroutineScope()
+    var isRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { runCatching { container.sharedProfileSyncCoordinator.sync() } }
+    val refresh: () -> Unit = {
+        scope.launch {
+            isRefreshing = true
+            try {
+                runCatching { container.sharedProfileSyncCoordinator.sync() }
+            } finally {
+                isRefreshing = false
+            }
+        }
+    }
     val availableGames =
         rows
             .orEmpty()
@@ -91,14 +112,46 @@ fun HistoryListScreen(
             )
         },
     ) { innerPadding ->
-        if (rows == null) return@Scaffold
-        if (rows.isEmpty()) {
-            EmptyState(
-                icon = Icons.Filled.History,
-                message = "Aucune partie terminée pour l'instant.",
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
+        PullToRefreshBox(isRefreshing = isRefreshing, onRefresh = refresh, modifier = Modifier.fillMaxSize()) {
+            HistoryContent(
+                rows = rows,
+                filteredRows = filteredRows,
+                state = state,
+                viewModel = viewModel,
+                availableGames = availableGames,
+                availablePlayers = availablePlayers,
+                innerPadding = innerPadding,
+                onOpenMatch = onOpenMatch,
+                onOpenArchivedMatches = onOpenArchivedMatches,
             )
-            return@Scaffold
+        }
+    }
+}
+
+@Composable
+private fun HistoryContent(
+    rows: List<HistoryViewModel.Row>?,
+    filteredRows: List<HistoryViewModel.Row>,
+    state: HistoryViewModel.UiState,
+    viewModel: HistoryViewModel,
+    availableGames: List<GameDefinition>,
+    availablePlayers: List<Pair<HistoryViewModel.PlayerFilterID, String>>,
+    innerPadding: PaddingValues,
+    onOpenMatch: (String) -> Unit,
+    onOpenArchivedMatches: () -> Unit,
+) {
+    run {
+        if (rows == null) return
+        if (rows.isEmpty()) {
+            // Défilable pour que « tirer pour actualiser » marche aussi sur une liste vide.
+            Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(innerPadding)) {
+                EmptyState(
+                    icon = Icons.Filled.History,
+                    message = "Aucune partie terminée pour l'instant.",
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+            return
         }
         Column(modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding())) {
             if (availableGames.isNotEmpty() || availablePlayers.isNotEmpty()) {

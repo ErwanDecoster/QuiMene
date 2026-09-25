@@ -80,7 +80,7 @@ object SessionCrypto {
     }
 
     /** RFC 5869 — extract puis expand, sur `HmacSHA256` (longueur de hash 32 octets). */
-    private fun hkdfSha256(
+    internal fun hkdfSha256(
         inputKeyMaterial: ByteArray,
         salt: ByteArray,
         info: ByteArray,

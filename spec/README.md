@@ -113,5 +113,9 @@ retrouver exactement l'événement décrit par `plaintext`. Le nonce étant alé
 `QUIMENE_WRITE_SPEC=1` sur `SessionIdentityTests` (via `TEST_RUNNER_QUIMENE_WRITE_SPEC=1` avec
 `xcodebuild test`).
 
+`mailbox-package.json` (doc 16, phase E) : une partie complète (`SharedMatchPackage`) scellée
+pour un profil (`MailboxCrypto`), avec l'adresse de sa boîte (`mailboxKey`, empreinte de
+l'identifiant) : Android doit retrouver la même adresse et le même paquet.
+
 Remplace les fixtures `wire/` de l'ancien protocole hôte/pair (doc 09), supprimé des deux
 plateformes par la phase C de la doc 16.

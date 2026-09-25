@@ -126,8 +126,9 @@ class SessionLink(
         try {
             val fresh = session.sync()
             isReachable = true
-            if (fresh.isNotEmpty()) onNewRecords?.invoke(fresh)
+            // Identités d'abord : qui occupe quelle place doit être connu quand la partie se recharge.
             publishIdentityChanges()
+            if (fresh.isNotEmpty()) onNewRecords?.invoke(fresh)
         } catch (cancellation: CancellationException) {
             throw cancellation
         } catch (error: Exception) {

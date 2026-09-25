@@ -1,137 +1,139 @@
 package com.quimene.app.profilesharing
 
-import com.quimene.domain.model.SharedMatchSummaryPayload
+import com.quimene.app.livesync.LiveShareCoordinator
+import com.quimene.domain.model.SharedMatchPackage
+import com.quimene.domain.rules.GameCatalog
 import com.quimene.store.MatchRepository
+import com.quimene.store.ParticipantEntity
 import com.quimene.store.PlayerRepository
-import com.quimene.sync.SharedMatchSummaryRow
-import com.quimene.sync.SharedProfileTransport
+import com.quimene.sync.MailboxCrypto
+import com.quimene.sync.MailboxItem
+import com.quimene.sync.MatchMailboxTransport
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import java.util.UUID
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Miroir de `SharedProfileSyncCoordinator.swift` (doc 14, phase 2) — pousse le résumé d'une
- * partie tout juste conclue vers chaque participant lié à l'installation d'un ami, et récupère
- * les résumés que d'autres ont poussés vers l'une de mes propres fiches liées. Déclenché au
- * lancement et au retour au premier plan (voir `com.quimene.app.QuiMeneApplication`), pas par
- * un minuteur propre — même discipline que `com.quimene.app.livesync.MatchConnectionCoordinator`.
+ * Doc 16, phase E — miroir de `SharedProfileSyncCoordinator.swift` : historique partagé. Chaque
+ * partie terminée avec un ami lié lui est déposée, **complète** et chiffrée, dans sa boîte aux
+ * lettres ([MatchMailboxTransport]) ; les parties que d'autres m'ont déposées sont enregistrées ici
+ * comme si je les avais jouées. Remplace les résumés du doc 14. Déclenché au lancement et au retour
+ * au premier plan (`com.quimene.app.QuiMeneApplication`), dès qu'une partie se termine (écran de
+ * résultats) et à l'ouverture de l'Historique (avec « tirer pour actualiser »).
  */
 class SharedProfileSyncCoordinator(
     private val matchRepository: MatchRepository,
     private val playerRepository: PlayerRepository,
+    private val catalog: GameCatalog,
 ) {
-    private val transport = SharedProfileTransport()
-    private var isSyncing = false
+    private val transport = MatchMailboxTransport()
+    private val mutex = Mutex()
+    private val needsAnotherPass = AtomicBoolean(false)
 
+    /** Une demande pendant un passage en cours n'est pas perdue : un passage de plus suit. */
     suspend fun sync() {
-        if (isSyncing) return
-        isSyncing = true
+        if (!mutex.tryLock()) {
+            needsAnotherPass.set(true)
+            return
+        }
         try {
-            push()
-            pull()
+            do {
+                needsAnotherPass.set(false)
+                deposit()
+                collect()
+            } while (needsAnotherPass.get())
         } finally {
-            isSyncing = false
+            mutex.unlock()
         }
     }
 
-    /** Un résumé par partie conclue avec au moins un participant lié — jamais retenté
-     * indéfiniment pour une partie qui n'en a plus (fiche déliée entre-temps, par exemple). */
-    private suspend fun push() {
+    /** Une partie terminée avec au moins un ami lié (pas moi) : déposée chez chacun, une fois.
+     * Jamais retentée indéfiniment pour une partie qui n'en a plus (fiche déliée entre-temps). */
+    private suspend fun deposit() {
         val pending = matchRepository.matchesPendingSharedProfileSync()
         if (pending.isEmpty()) return
-        val playersByID = playerRepository.observeAll().first().associateBy { it.id }
+        val playersByID = playerRepository.allPlayers().associateBy { it.id }
+        val myID = playerRepository.myOwnSharedPlayer()?.sharedProfileID
 
         for (match in pending) {
             val participants = matchRepository.participants(match.id)
-            val linkedIDs =
-                participants
-                    .mapNotNull { participant -> participant.playerId?.let { playersByID[it]?.sharedProfileID } }
-                    .toSet()
-            val standings =
-                participants.mapNotNull { participant ->
-                    val rank = participant.finalRank ?: return@mapNotNull null
-                    val score = participant.finalScore ?: return@mapNotNull null
-                    SharedMatchSummaryPayload.Entry(
-                        sharedProfileID = participant.playerId?.let { playersByID[it]?.sharedProfileID },
-                        nickname = participant.nicknameSnapshot,
-                        avatarKind = participant.avatarKindSnapshot,
-                        avatarValue = participant.avatarValueSnapshot,
-                        paletteID = participant.paletteIDSnapshot,
-                        rank = rank,
-                        score = score,
-                    )
-                }
-
-            if (linkedIDs.isEmpty() || standings.isEmpty()) {
+            val profileOf = { participant: ParticipantEntity ->
+                participant.playerId?.let { playersByID[it]?.sharedProfileID }
+            }
+            val recipients = participants.mapNotNull(profileOf).toSet() - setOfNotNull(myID)
+            val events = matchRepository.currentLog(match)
+            if (match.isImportedSummary || recipients.isEmpty() || events.isEmpty()) {
                 matchRepository.markSharedProfileSyncComplete(match)
                 continue
             }
-
-            val payload =
-                SharedMatchSummaryPayload(
-                    gameID = match.gameID,
-                    rulesVersion = match.rulesVersion,
-                    playedAt = match.endedAt ?: match.startedAt,
-                    standings = standings,
+            val pkg =
+                SharedMatchPackage(
+                    matchID = match.id,
+                    participants = participants.map { packaged(it, profileOf(it)) },
+                    events = events,
                 )
-            val rows =
-                linkedIDs.map {
-                    SharedMatchSummaryRow(
-                        matchID = match.id,
-                        sharedProfileID = it,
-                        payload = payload,
-                    )
+            val items =
+                recipients.map { recipient ->
+                    MailboxItem(MailboxCrypto.lookupKey(recipient), match.id, MailboxCrypto.seal(pkg, recipient))
                 }
-
             try {
-                transport.push(rows)
+                transport.deposit(items)
                 matchRepository.markSharedProfileSyncComplete(match)
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (error: Exception) {
                 // Échec silencieux : pendingSharedProfileSync reste true, nouvelle tentative au
-                // prochain déclenchement (même patron que MatchConnectionCoordinator).
+                // prochain déclenchement.
             }
         }
     }
 
-    /** `materializeSharedSummary` est déjà un no-op si cette partie est connue localement (c'est
-     * cet appareil qui l'a jouée et poussée). */
-    private suspend fun pull() {
-        val linkedIDs = playerRepository.allSharedProfileIDs()
-        if (linkedIDs.isEmpty()) return
-        val rows =
+    /** Ma boîte : chaque partie reçue est enregistrée (sans effet si je l'ai déjà, jouée ici ou
+     * suivie dans une session), puis retirée. Un dépôt illisible est retiré aussi, pour ne pas
+     * être relu indéfiniment. */
+    private suspend fun collect() {
+        val myID = playerRepository.myOwnSharedPlayer()?.sharedProfileID ?: return
+        val mailboxKey = MailboxCrypto.lookupKey(myID)
+        val items =
             try {
-                transport.fetchPending(linkedIDs)
+                transport.fetch(mailboxKey)
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (error: Exception) {
                 return
             }
-
-        val myOwnID = playerRepository.myOwnSharedPlayer()?.sharedProfileID
-
-        for (row in rows) {
-            val isMyOwnIdentity = row.sharedProfileID == myOwnID
-            // Doc 14, phase 4 — suivre un ami donne accès à *toutes* ses parties seulement si
-            // j'y étais moi-même (mon propre identifiant apparaît alors parmi les *autres*
-            // participants du résumé) ; ma propre fiche partagée, elle, reçoit tout sans filtre.
-            val isRelevant = isMyOwnIdentity || row.payload.standings.any { it.sharedProfileID == myOwnID }
-            if (isRelevant) {
-                matchRepository.materializeSharedSummary(row.payload, row.matchID)
+        for (item in items) {
+            val pkg = MailboxCrypto.open(item.ciphertext, myID)
+            if (pkg != null) {
+                // L'Historique observe la base : la partie y apparaît d'elle-même.
+                runCatching { matchRepository.importSharedMatch(pkg, catalog) }.getOrNull() ?: continue
             }
-
-            // Doc 14, phase 4 — seul l'appareil qui fait autorité sur cet identifiant (le sien)
-            // nettoie la boîte aux lettres ; plusieurs amis peuvent suivre la même personne, et
-            // supprimer après chaque lecture ferait perdre la partie aux autres.
-            if (isMyOwnIdentity) {
-                try {
-                    transport.delete(row.matchID, row.sharedProfileID)
-                } catch (cancellation: CancellationException) {
-                    throw cancellation
-                } catch (error: Exception) {
-                    // Best-effort — une ligne non nettoyée sera relue (idempotent) puis purgée côté serveur.
-                }
+            try {
+                transport.remove(mailboxKey, item.matchID)
+            } catch (cancellation: CancellationException) {
+                throw cancellation
+            } catch (error: Exception) {
+                // Best-effort : relue plus tard (idempotent), puis purgée côté serveur.
             }
         }
+    }
+
+    /** Un joueur tel que le destinataire l'affichera. Une photo ne voyage pas : repli sur l'emoji
+     * dérivé du pseudo, comme pour toute nouvelle fiche. */
+    private fun packaged(
+        participant: ParticipantEntity,
+        profileID: UUID?,
+    ): SharedMatchPackage.Participant {
+        val isPhoto = participant.avatarKindSnapshot == "photo"
+        val seed = LiveShareCoordinator.generatedSeed(participant.nicknameSnapshot)
+        return SharedMatchPackage.Participant(
+            participantID = participant.id,
+            sharedProfileID = profileID,
+            nickname = participant.nicknameSnapshot,
+            avatarKind = if (isPhoto) seed.avatarKind else participant.avatarKindSnapshot,
+            avatarValue = if (isPhoto) seed.avatarValue else participant.avatarValueSnapshot,
+            paletteID = participant.paletteIDSnapshot,
+        )
     }
 }

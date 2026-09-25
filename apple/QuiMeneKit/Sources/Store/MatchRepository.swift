@@ -299,6 +299,32 @@ public struct MatchRepository {
     try context.save()
   }
 
+  /// Doc 16, phase E — enregistre une partie reçue d'un ami (boîte aux lettres), complète : même
+  /// journal, mêmes participants, rejouée comme une partie jouée ici. Chaque joueur lié à un
+  /// profil connu de cet appareil (le mien, ou un ami) est relié à sa fiche ; les autres gardent
+  /// seulement leurs *snapshots*. Sans effet si la partie est déjà connue (jouée ici, suivie dans
+  /// la session, ou déjà reçue) ; `nil` si le paquet est illisible.
+  @discardableResult
+  public func importSharedMatch(_ package: SharedMatchPackage, catalog: GameCatalog) throws
+    -> MatchRecord?
+  {
+    if let existing = try match(withID: package.matchID) { return existing }
+    let players = PlayerRepository(context: context)
+    let byID = Dictionary(
+      package.participants.map { ($0.participantID, $0) }, uniquingKeysWith: { first, _ in first })
+    return try createMirroredMatch(id: package.matchID, events: package.events, catalog: catalog) {
+      participant in
+      let entry = byID[participant.id]
+      let player = entry?.sharedProfileID.flatMap { try? players.player(withSharedProfileID: $0) }
+      return ParticipantSeed(
+        player: player,
+        nickname: entry?.nickname ?? participant.displayName,
+        avatarKind: entry?.avatarKind ?? "emoji",
+        avatarValue: entry?.avatarValue ?? "",
+        paletteID: entry?.paletteID ?? "1")
+    }
+  }
+
   /// Le journal complet d'une partie — publié tel quel quand elle rejoint une session en ligne
   /// (doc 16, `LiveShareCoordinator.attach`).
   public func currentLog(for match: MatchRecord) throws -> [StampedEvent] {
@@ -336,6 +362,7 @@ public struct MatchRepository {
       gameID: gameID,
       rulesVersion: rulesVersion,
       variantsData: try JSONEncoder().encode(variants),
+      startedAt: first.occurredAt,
       deviceOrigin: first.deviceID,
       eventLogData: try JSONEncoder().encode(events),
       participants: records
@@ -379,7 +406,9 @@ public struct MatchRepository {
     match.endReasonRaw = state.endReason?.rawValue
 
     if state.status == .ended || state.status == .abandoned {
-      match.endedAt = Date()
+      // L'heure du dernier événement, pas celle de l'écriture : une copie faite plus tard (partie
+      // suivie depuis un autre appareil, reçue d'un ami) garde la vraie heure de fin.
+      match.endedAt = events.last?.occurredAt ?? Date()
       applyFinalStandings(state: state, match: match, catalog: catalog)
       // Doc 14, phase 2 — un seul appel suffit même si le lien a été fait après coup entre
       // deux manches : ce drapeau est réévalué à chaque conclusion, jamais figé à la

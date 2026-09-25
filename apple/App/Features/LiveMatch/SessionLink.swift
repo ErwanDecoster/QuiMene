@@ -108,8 +108,9 @@ final class SessionLink {
     do {
       let fresh = try await session.sync()
       isReachable = true
-      if !fresh.isEmpty { onNewRecords?(fresh) }
+      // Identités d'abord : qui occupe quelle place doit être connu quand la partie se recharge.
       await publishIdentityChanges()
+      if !fresh.isEmpty { onNewRecords?(fresh) }
     } catch {
       isReachable = false
     }

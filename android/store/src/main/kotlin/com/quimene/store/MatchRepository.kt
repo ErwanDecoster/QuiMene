@@ -7,6 +7,7 @@ import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.MatchStatus
 import com.quimene.domain.model.Participant
 import com.quimene.domain.model.RoundDraft
+import com.quimene.domain.model.SharedMatchPackage
 import com.quimene.domain.model.SharedMatchSummaryPayload
 import com.quimene.domain.model.VariantSelection
 import com.quimene.domain.rules.GameCatalog
@@ -284,6 +285,34 @@ class MatchRepository(
         participantDao.insertAll(participants)
     }
 
+    /** Doc 16, phase E — enregistre une partie reçue d'un ami (boîte aux lettres), complète : même
+     * journal, mêmes participants, rejouée comme une partie jouée ici. Chaque joueur lié à un profil
+     * connu de cet appareil (le mien, ou un ami) est relié à sa fiche ; les autres gardent seulement
+     * leurs snapshots. Sans effet si la partie est déjà connue. Miroir de `importSharedMatch`. */
+    suspend fun importSharedMatch(
+        pkg: SharedMatchPackage,
+        catalog: GameCatalog,
+    ): MatchEntity? {
+        matchDao.get(pkg.matchID)?.let { return it }
+        val byID = pkg.participants.associateBy { it.participantID }
+        val players =
+            pkg.participants.mapNotNull { it.sharedProfileID }.associateWith {
+                playerDao.bySharedProfileID(
+                    it,
+                )
+            }
+        return createMirroredMatch(pkg.matchID, pkg.events, catalog) { participant ->
+            val entry = byID[participant.id]
+            ParticipantSeed(
+                player = entry?.sharedProfileID?.let { players[it] },
+                nickname = entry?.nickname ?: participant.displayName,
+                avatarKind = entry?.avatarKind ?: "emoji",
+                avatarValue = entry?.avatarValue.orEmpty(),
+                paletteID = entry?.paletteID ?: "1",
+            )
+        }
+    }
+
     /** Doc 16 — le journal complet d'une partie, tel que `LiveShareCoordinator` le publie dans
      * une session en ligne. */
     suspend fun currentLog(match: MatchEntity): List<StampedEvent> = decodeEvents(match.eventLogData)
@@ -329,6 +358,7 @@ class MatchRepository(
                 gameID = created.gameID,
                 rulesVersion = created.rulesVersion,
                 variantsData = encodeJson(VariantSelection.serializer(), created.variants),
+                startedAt = first.occurredAt,
                 deviceOrigin = first.deviceID,
                 eventLogData = encodeEvents(events),
             )
@@ -364,7 +394,9 @@ class MatchRepository(
                 eventLogData = encodeEvents(events),
                 status = state.status,
                 endReasonRaw = state.endReason?.name,
-                endedAt = if (ended) Instant.now() else null,
+                // L'heure du dernier événement, pas celle de l'écriture : une copie faite plus tard
+                // (partie suivie depuis un autre appareil, reçue d'un ami) garde la vraie heure.
+                endedAt = if (ended) events.lastOrNull()?.occurredAt ?: Instant.now() else null,
             )
 
         if (ended) {
