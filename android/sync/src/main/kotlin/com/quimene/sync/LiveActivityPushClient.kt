@@ -75,7 +75,9 @@ object LiveActivityPushClient {
                 connection.connectTimeout = 10_000
                 connection.readTimeout = 10_000
                 connection.setRequestProperty("Content-Type", "application/json")
-                connection.setRequestProperty("Authorization", "Bearer ${SupabaseSyncConfig.ANON_KEY}")
+                // Clé publishable dans `apikey` : Supabase réserve `Authorization` aux jetons
+                // d'utilisateur (il n'y accepte une clé que par compatibilité).
+                connection.setRequestProperty("apikey", SupabaseSyncConfig.ANON_KEY)
                 connection.outputStream.use { it.write(body(activityKey, ended, content).encodeToByteArray()) }
                 connection.responseCode
             } finally {
