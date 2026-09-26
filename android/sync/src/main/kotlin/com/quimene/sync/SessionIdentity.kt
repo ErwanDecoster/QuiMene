@@ -184,8 +184,4 @@ class SessionIdentities(
             ?: linkedSeats.entries.firstOrNull { it.value == profileID }?.key
 
     fun activeClaimOf(profileID: UUID): ActiveClaim? = activeClaims.firstOrNull { it.profile.id == profileID }
-
-    companion object {
-        val EMPTY = SessionIdentities(emptyList(), "")
-    }
 }

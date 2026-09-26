@@ -239,6 +239,6 @@ class MatchRepositoryTest : RoomTestBase() {
             participants.getValue(erwan.id).playerId shouldBe null
 
             repository.importSharedMatch(pkg, catalog)
-            db.matchDao().count() shouldBe 1
+            db.matchDao().getAll().size shouldBe 1
         }
 }

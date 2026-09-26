@@ -35,7 +35,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
@@ -53,13 +52,18 @@ import com.quimene.app.features.livematch.MeBadge
 import com.quimene.app.features.livematch.NextMatchBar
 import com.quimene.app.features.livematch.NextMatchPicker
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
-import com.quimene.app.ui.insightIcon
+import com.quimene.app.ui.InsightPresentation
 import com.quimene.app.ui.label
+import com.quimene.app.ui.presentation
 import com.quimene.app.ui.toAvatar
 import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
 import com.quimene.designsystem.components.Card
+import com.quimene.designsystem.components.ChartSymbolMarker
+import com.quimene.designsystem.components.PlayerPalette
 import com.quimene.designsystem.components.PrimaryButton
+import com.quimene.designsystem.components.accessibleScoreRow
+import com.quimene.designsystem.components.drawChartSymbol
 import com.quimene.designsystem.tokens.IconSize
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.LocalIsDarkTheme
@@ -172,7 +176,7 @@ internal fun MatchSummaryContent(
             PodiumSection(sortedStandings, state.participants, state.badgeByParticipant, state.myParticipantID)
         }
         if (state.insights.isNotEmpty()) {
-            item { InsightsSection(state.insights) }
+            item { InsightsSection(state.insights, state.participants) }
         }
         if (state.series.isNotEmpty() && state.rounds.isNotEmpty()) {
             item {
@@ -222,7 +226,12 @@ private fun PodiumRow(
     // remontée « les listes ne se détachent pas du fond » : tonal + ombre garantit une séparation
     // visuelle même quand le fond est proche de `background` en couleur dynamique.
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier =
+            Modifier.fillMaxWidth().accessibleScoreRow(
+                name = participant.nicknameSnapshot,
+                score = standing.score,
+                rank = standing.rank,
+            ),
         shape = RoundedCornerShape(Radius.md),
         color = background,
         tonalElevation = 1.dp,
@@ -254,7 +263,11 @@ private fun PodiumRow(
                     if (isMe) MeBadge()
                 }
                 badge?.let {
-                    Text(it.kind.label, style = MaterialTheme.typography.labelMedium, color = colors.brandBrass)
+                    Text(
+                        stringResource(it.kind.label),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = colors.brandBrass,
+                    )
                 }
             }
             Text(text = standing.score.toString(), style = ScoreTypography.scoreXL, color = accentColor)
@@ -263,7 +276,10 @@ private fun PodiumRow(
 }
 
 @Composable
-private fun InsightsSection(insights: List<Insight>) {
+private fun InsightsSection(
+    insights: List<Insight>,
+    participants: Map<UUID, ParticipantEntity>,
+) {
     val colors = LocalAppColors.current
     Column(verticalArrangement = Arrangement.spacedBy(Space.md)) {
         Text(
@@ -273,31 +289,30 @@ private fun InsightsSection(insights: List<Insight>) {
         )
         Column(verticalArrangement = Arrangement.spacedBy(CardGutterResults)) {
             for (insight in insights) {
-                Card {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(Space.md),
-                    ) {
-                        Icon(
-                            imageVector = insightIcon(insight.symbol),
-                            contentDescription = null,
-                            tint = colors.brandInk,
-                            modifier = Modifier.size(IconSize.lg),
-                        )
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                insight.headline,
-                                style = MaterialTheme.typography.titleSmall,
-                                color = colors.textPrimary,
-                            )
-                            Text(
-                                insight.detail,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = colors.textSecondary,
-                            )
-                        }
-                    }
-                }
+                val presentation = insight.presentation { participants[it]?.nicknameSnapshot ?: "?" }
+                if (presentation != null) InsightCard(presentation)
+            }
+        }
+    }
+}
+
+@Composable
+private fun InsightCard(presentation: InsightPresentation) {
+    val colors = LocalAppColors.current
+    Card {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(Space.md),
+        ) {
+            Icon(
+                imageVector = presentation.icon,
+                contentDescription = null,
+                tint = colors.brandInk,
+                modifier = Modifier.size(IconSize.lg),
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(presentation.headline, style = MaterialTheme.typography.titleSmall, color = colors.textPrimary)
+                Text(presentation.detail, style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
             }
         }
     }
@@ -389,8 +404,8 @@ private fun EvolutionChart(
         }
 
         for ((entry, points) in lines) {
-            val paletteID = participants[entry.id]?.paletteIDSnapshot?.toIntOrNull() ?: 1
-            val lineColor = colors.player(paletteID)
+            val palette = playerPalette(participants[entry.id])
+            val lineColor = colors.player(palette.index)
             val path = Path()
             points.forEachIndexed { index, (round, value) ->
                 val x = xFor(round)
@@ -398,6 +413,10 @@ private fun EvolutionChart(
                 if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
             }
             drawPath(path, color = lineColor, style = Stroke(width = 2.dp.toPx()))
+            // Charte §1.5 — la couleur doublée du symbole du joueur, lisible sans la couleur.
+            for ((round, value) in points) {
+                drawChartSymbol(palette.chartSymbol, Offset(xFor(round), yFor(value)), 3.5.dp.toPx(), lineColor)
+            }
         }
     }
 }
@@ -413,18 +432,12 @@ private fun EvolutionLegend(
         horizontalArrangement = Arrangement.spacedBy(Space.md),
     ) {
         for (entry in series) {
-            val paletteID = participants[entry.id]?.paletteIDSnapshot?.toIntOrNull() ?: 1
+            val palette = playerPalette(participants[entry.id])
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(Space.xxs),
             ) {
-                Box(
-                    modifier =
-                        Modifier
-                            .size(8.dp)
-                            .clip(RoundedCornerShape(50))
-                            .background(colors.player(paletteID)),
-                )
+                ChartSymbolMarker(palette.chartSymbol, colors.player(palette.index), Modifier.size(8.dp))
                 Text(entry.name, style = MaterialTheme.typography.labelSmall, color = colors.textSecondary)
             }
         }
@@ -499,3 +512,7 @@ private val CardGutterResults = Space.sm
 private val EvolutionChartHeight = 200.dp
 private val RoundColumnWidth = 28.dp
 private val ParticipantColumnWidth = 88.dp
+
+/** Palette du joueur figée dans la partie (`paletteIDSnapshot`), 1 par défaut. */
+private fun playerPalette(participant: ParticipantEntity?): PlayerPalette =
+    PlayerPalette((participant?.paletteIDSnapshot?.toIntOrNull() ?: 1).coerceIn(1, 10))

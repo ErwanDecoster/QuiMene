@@ -10,10 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,9 +34,11 @@ import com.quimene.app.features.livematch.RoundEntryDispatch
 import com.quimene.app.features.results.MatchSummaryContent
 import com.quimene.app.livesync.SharedMatchViewModel
 import com.quimene.app.livesync.ensureFriend
+import com.quimene.app.ui.asString
 import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.PrimaryButton
@@ -88,9 +86,7 @@ fun SharedMatchScreen(
                 // Doc 16, phase A — revenir en arrière garde la partie suivie (bandeau de reprise
                 // dans Jeux) ; seul « Quitter la partie » déconnecte.
                 navigationIcon = {
-                    IconButton(onClick = onClose) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.fermer))
-                    }
+                    BackButton(onClick = onClose, contentDescription = stringResource(R.string.fermer))
                 },
                 actions = { TextButton(onClick = onQuit) { Text(stringResource(R.string.quitter_la_partie)) } },
             )
@@ -112,12 +108,17 @@ fun SharedMatchScreen(
                     onAction = onReconnect,
                 )
             }
-            viewModel.roundExplanationMessage?.let { Banner(message = it, modifier = Modifier.padding(Space.lg)) }
+            viewModel.roundExplanationMessage?.let {
+                Banner(
+                    message = it.asString(),
+                    modifier = Modifier.padding(Space.lg),
+                )
+            }
             viewModel.latestRejectionReason?.let {
-                Banner(message = it, modifier = Modifier.padding(horizontal = Space.lg))
+                Banner(message = it.asString(), modifier = Modifier.padding(horizontal = Space.lg))
             }
             viewModel.validationErrorMessage?.let {
-                Banner(message = it, modifier = Modifier.padding(horizontal = Space.lg))
+                Banner(message = it.asString(), modifier = Modifier.padding(horizontal = Space.lg))
             }
 
             if (state == null) return@Column
@@ -155,12 +156,7 @@ fun SharedMatchScreen(
             if (!viewModel.canPropose) StandingsSection(viewModel)
 
             if (viewModel.canPropose) {
-                RoundEntryDispatch(viewModel) { gameName ->
-                    Text(
-                        "La saisie dédiée de $gameName n'est pas encore disponible en tant que contributeur.",
-                        modifier = Modifier.padding(Space.lg),
-                    )
-                }
+                RoundEntryDispatch(viewModel)
             } else {
                 Text(
                     if (viewModel.isSpectator) {

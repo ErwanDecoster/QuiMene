@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- brand/ink (charte §1), fond de l'icône d'application. -->
+    <color name="ic_launcher_background">#1F4899</color>
+</resources>

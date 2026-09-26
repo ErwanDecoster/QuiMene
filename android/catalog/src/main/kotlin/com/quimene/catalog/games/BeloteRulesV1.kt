@@ -32,21 +32,23 @@ class BeloteRulesV1 : GameRules {
     ): ValidationResult {
         if (draft.inputs.size != 2) {
             return ValidationResult.Invalid(
-                listOf(ValidationError(ValidationError.Field.General, "Deux équipes attendues par donne.")),
+                listOf(ValidationError(ValidationError.Field.General, ValidationError.Reason.TwoTeamsRequired)),
             )
         }
         val takers = draft.inputs.filter { ModifierID("isTaker") in it.modifiers }
         val takerInput =
             takers.singleOrNull()
                 ?: return ValidationResult.Invalid(
-                    listOf(ValidationError(ValidationError.Field.General, "Une seule équipe preneuse par donne.")),
+                    listOf(
+                        ValidationError(ValidationError.Field.General, ValidationError.Reason.SingleTakingTeamRequired),
+                    ),
                 )
         if (takerInput.rawValue !in 0..162) {
             return ValidationResult.Invalid(
                 listOf(
                     ValidationError(
                         ValidationError.Field.ParticipantField(takerInput.participantID),
-                        "Points invalides (0 à 162).",
+                        ValidationError.Reason.TakerPointsOutOfRange(max = 162),
                     ),
                 ),
             )

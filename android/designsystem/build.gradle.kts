@@ -23,6 +23,15 @@ android {
     buildFeatures {
         compose = true
     }
+
+    lint {
+        // Doc 10 — zéro avertissement, comme côté Apple : un avertissement Lint fait échouer le build.
+        warningsAsErrors = true
+        // Vérifications « une version plus récente existe » : elles dépendent du réseau et de la
+        // date, et casseraient un build reproductible dès qu'une bibliothèque sort — les montées
+        // de version se font par un passage dédié.
+        disable += setOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
+    }
 }
 
 kotlin {
@@ -38,12 +47,4 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.zxing.core)
     debugImplementation(libs.androidx.compose.ui.tooling)
-
-    testImplementation(libs.junit.jupiter)
-    testRuntimeOnly(libs.junit.platform.launcher)
-    testImplementation(libs.kotest.assertions.core)
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }

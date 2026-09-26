@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="acces_appareil_photo_necessaire">Serve l\'accesso alla fotocamera per scansionare un codice QR — puoi anche inserire il codice a mano qui sotto.</string>
+    <string name="annuler_la_selection">Annulla la selezione</string>
+    <string name="archiver_la_selection">Archivia la selezione</string>
+    <string name="autoriser_l_appareil_photo">Consenti l\'accesso alla fotocamera</string>
+    <string name="connexion_impossible_reessaie">Connessione impossibile. Riprova.</string>
+    <string name="couleur">Colore</string>
+    <plurals name="count1_selectionne_s">
+        <item quantity="one">%1$d selezionato</item>
+        <item quantity="many">%1$d selezionati</item>
+        <item quantity="other">%1$d selezionati</item>
+    </plurals>
+    <string name="effacer_la_recherche">Cancella la ricerca</string>
+    <string name="fermer_la_recherche">Chiudi la ricerca</string>
+    <string name="partie">Partita</string>
+    <string name="plus_d_actions">Altre azioni</string>
+    <string name="remplir_value1">Compila %1$s</string>
+    <string name="saisis_le_code_a_6_chiffres">Inserisci il codice a 6 cifre mostrato sul dispositivo che condivide la partita.</string>
+    <string name="selectionner_des_joueurs">Seleziona giocatori</string>
+</resources>

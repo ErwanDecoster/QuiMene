@@ -41,6 +41,7 @@ import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
 import com.quimene.app.navigation.floatingNavBarContentPadding
+import com.quimene.app.ui.rememberMediumDateFormatter
 import com.quimene.designsystem.components.Chip
 import com.quimene.designsystem.components.EmptyState
 import com.quimene.designsystem.components.ListContainer
@@ -51,9 +52,6 @@ import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.rules.GameDefinition
 import kotlinx.coroutines.launch
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 
 /** Miroir de `HistoryListView.swift` (doc 06) — liste des parties terminées, tap pour rouvrir le
  * classement final. Filtre par jeu, archivage par ligne (menu plutôt que balayage — aucune
@@ -150,7 +148,7 @@ private fun HistoryContent(
             Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(innerPadding)) {
                 EmptyState(
                     icon = Icons.Filled.History,
-                    message = "Aucune partie terminée pour l'instant.",
+                    message = stringResource(R.string.aucune_partie_terminee_pour_l_instant_l_historique_se),
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -285,9 +283,6 @@ private fun PlayerFilterChip(
     }
 }
 
-private val dateFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
-
 @Composable
 private fun HistoryRow(
     row: HistoryViewModel.Row,
@@ -310,7 +305,7 @@ private fun HistoryRow(
                 horizontalArrangement = Arrangement.spacedBy(Space.xs),
             ) {
                 Text(
-                    text = dateFormatter.format(row.match.startedAt.atZone(ZoneId.systemDefault())),
+                    text = rememberMediumDateFormatter().format(row.match.startedAt.atZone(ZoneId.systemDefault())),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textSecondary,
                 )
@@ -332,7 +327,7 @@ private fun HistoryRow(
             }
         }
         IconButton(onClick = onArchive) {
-            Icon(Icons.Filled.Archive, contentDescription = "Archiver cette partie")
+            Icon(Icons.Filled.Archive, contentDescription = stringResource(R.string.archiver))
         }
     }
 }

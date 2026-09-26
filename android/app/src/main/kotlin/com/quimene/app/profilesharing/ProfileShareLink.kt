@@ -1,6 +1,7 @@
 package com.quimene.app.profilesharing
 
 import android.net.Uri
+import androidx.core.net.toUri
 import java.util.UUID
 
 /**
@@ -47,7 +48,7 @@ object ProfileShareLink {
             .toString()
 
     fun parse(raw: String): Payload? {
-        val uri = runCatching { Uri.parse(raw) }.getOrNull() ?: return null
+        val uri = runCatching { raw.toUri() }.getOrNull() ?: return null
         if (uri.scheme != SCHEME || uri.host != HOST) return null
         val id = uri.getQueryParameter("id")?.let { runCatching { UUID.fromString(it) }.getOrNull() } ?: return null
         return Payload(

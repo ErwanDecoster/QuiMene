@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ds_back">Back</string>
+    <plurals name="ds_score_points">
+        <item quantity="one">%1$d point</item>
+        <item quantity="other">%1$d points</item>
+    </plurals>
+    <string name="ds_score_delta">%1$s this round</string>
+    <string name="ds_ordinal_fallback">number %1$d</string>
+    <string-array name="ds_ordinals">
+        <item>first</item>
+        <item>second</item>
+        <item>third</item>
+        <item>fourth</item>
+        <item>fifth</item>
+        <item>sixth</item>
+        <item>seventh</item>
+        <item>eighth</item>
+        <item>ninth</item>
+        <item>tenth</item>
+        <item>eleventh</item>
+        <item>twelfth</item>
+    </string-array>
+</resources>

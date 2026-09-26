@@ -27,20 +27,6 @@ private val chartSymbols =
         ChartSymbol.Plus, // 10
     )
 
-private val accessibilityNames =
-    listOf(
-        "Azur",
-        "Ambre",
-        "Émeraude",
-        "Magenta",
-        "Ardoise",
-        "Cyan",
-        "Vermillon",
-        "Violet",
-        "Olive",
-        "Rose",
-    )
-
 /**
  * Miroir de `PlayerPalette.swift` — sans champ `color` résolu à la construction : contrairement
  * à `Color("player/N", bundle:)` sur iOS qui s'adapte seul au thème système, une couleur Compose
@@ -55,7 +41,6 @@ data class PlayerPalette(
     }
 
     val chartSymbol: ChartSymbol get() = chartSymbols[index - 1]
-    val accessibilityName: String get() = accessibilityNames[index - 1]
 }
 
 /** Couleur résolue au thème courant (clair/sombre) pour ce joueur. */

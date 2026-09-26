@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Close
@@ -57,6 +56,7 @@ import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarKind
 import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.ListContainer
 import com.quimene.designsystem.components.ListRowDivider
 import com.quimene.designsystem.components.PlayerPalette
@@ -257,9 +257,7 @@ fun MyProfileQrScreen(onBack: () -> Unit) {
             TopAppBar(
                 title = { Text(stringResource(R.string.m_ajouter_comme_ami)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.fermer))
-                    }
+                    BackButton(onClick = onBack, contentDescription = stringResource(R.string.fermer))
                 },
             )
         },
@@ -286,6 +284,7 @@ fun MyProfileQrScreen(onBack: () -> Unit) {
                         avatarValue = me.avatarValue,
                         paletteID = me.paletteID,
                     ),
+                contentDescription = stringResource(R.string.code_qr_de_ton_profil),
                 modifier = Modifier.size(240.dp),
             )
             Text(

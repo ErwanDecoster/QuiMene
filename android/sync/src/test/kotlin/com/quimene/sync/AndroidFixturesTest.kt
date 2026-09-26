@@ -151,6 +151,8 @@ class AndroidFixturesTest {
                 ),
         )
 
+    private val prettyJson = Json { prettyPrint = true }
+
     private fun specFile(name: String) = File(System.getProperty("user.dir"), "../../spec/session/$name")
 
     private fun writeIfAsked(
@@ -158,7 +160,7 @@ class AndroidFixturesTest {
         document: JsonObject,
     ) {
         if (System.getenv("QUIMENE_WRITE_SPEC") != "1") return
-        specFile(name).writeText(Json { prettyPrint = true }.encodeToString(JsonObject.serializer(), document) + "\n")
+        specFile(name).writeText(prettyJson.encodeToString(JsonObject.serializer(), document) + "\n")
     }
 
     private fun read(name: String): JsonObject =

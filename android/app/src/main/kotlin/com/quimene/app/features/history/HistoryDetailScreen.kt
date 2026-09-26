@@ -5,11 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -23,6 +19,7 @@ import com.quimene.app.di.rememberViewModel
 import com.quimene.app.features.results.MatchSummaryContent
 import com.quimene.app.features.results.MatchSummaryViewModel
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.tokens.Space
 import java.util.UUID
@@ -43,9 +40,9 @@ fun HistoryDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(state.definition?.name?.localized ?: "Partie") },
+                title = { Text(state.definition?.name?.localized ?: stringResource(R.string.partie)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Retour") }
+                    BackButton(onClick = onBack)
                 },
             )
         },

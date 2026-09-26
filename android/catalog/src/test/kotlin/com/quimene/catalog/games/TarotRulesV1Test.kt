@@ -1,6 +1,7 @@
 package com.quimene.catalog.games
 
 import com.quimene.catalog.testing.SeededGenerator
+import com.quimene.catalog.testing.tarotHandScoreDetail
 import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.ModifierID
 import com.quimene.domain.model.Participant

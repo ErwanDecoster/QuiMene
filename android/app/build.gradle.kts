@@ -37,6 +37,15 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
+    lint {
+        // Doc 10 — zéro avertissement, comme côté Apple : un avertissement Lint fait échouer le build.
+        warningsAsErrors = true
+        // Vérifications « une version plus récente existe » : elles dépendent du réseau et de la
+        // date, et casseraient un build reproductible dès qu'une bibliothèque sort — les montées
+        // de version se font par un passage dédié.
+        disable += setOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
+    }
 }
 
 kotlin {
@@ -63,7 +72,6 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.compose.material.icons.core)
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -82,8 +90,7 @@ dependencies {
     // Android (Context via AppContainer/Application) et Robolectric exige son propre runner.
     testImplementation(libs.junit4)
     testImplementation(libs.robolectric)
-    testImplementation(libs.androidx.test.junit)
+    testImplementation(libs.androidx.test.core)
     testImplementation(libs.kotest.assertions.core)
-    testImplementation(libs.androidx.room.testing)
     testImplementation(libs.kotlinx.coroutines.test)
 }

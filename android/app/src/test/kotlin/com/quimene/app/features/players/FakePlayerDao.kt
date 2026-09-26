@@ -13,8 +13,6 @@ internal class FakePlayerDao : PlayerDao {
 
     override suspend fun update(player: PlayerEntity) = error("not used by this test")
 
-    override suspend fun updateAll(players: List<PlayerEntity>) = error("not used by this test")
-
     override suspend fun delete(player: PlayerEntity) = error("not used by this test")
 
     override fun observeAll(): Flow<List<PlayerEntity>> = flowOf(emptyList())
@@ -26,8 +24,6 @@ internal class FakePlayerDao : PlayerDao {
     override suspend fun activePlayers(): List<PlayerEntity> = emptyList()
 
     override suspend fun myOwnSharedPlayer(): PlayerEntity? = null
-
-    override suspend fun withSharedProfileID(): List<PlayerEntity> = emptyList()
 
     override suspend fun bySharedProfileID(id: UUID): PlayerEntity? = null
 }

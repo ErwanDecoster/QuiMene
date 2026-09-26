@@ -1,6 +1,7 @@
 package com.quimene.app.ui
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material.icons.filled.Adjust
 import androidx.compose.material.icons.filled.AutoAwesome
@@ -55,7 +56,7 @@ private val gameIconsByID: Map<String, ImageVector> =
         "tarot" to Icons.Filled.Extension, // suit.spade.fill — pas d'icône de couleur de carte côté Material.
         "times-up" to Icons.Filled.HourglassEmpty, // hourglass
         "triominos" to Icons.Filled.ChangeHistory, // triangle.fill
-        "trivial-pursuit" to Icons.Filled.Help, // questionmark.circle.fill
+        "trivial-pursuit" to Icons.AutoMirrored.Filled.Help, // questionmark.circle.fill
         "wizard" to Icons.Filled.AutoAwesome, // wand.and.stars
         "yams" to Icons.Filled.Casino, // dice.fill
     )

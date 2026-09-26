@@ -1,14 +1,16 @@
 package com.quimene.app.livesync
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.quimene.app.R
 import com.quimene.app.features.livematch.LiveRoundEntryState
 import com.quimene.app.features.livematch.ProfileBadge
+import com.quimene.app.features.livematch.lastRoundExplanation
+import com.quimene.app.features.livematch.message
 import com.quimene.app.features.results.MatchSummaryViewModel
 import com.quimene.app.features.results.matchSummaryState
+import com.quimene.app.ui.UiText
 import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarKind
 import com.quimene.domain.engine.MatchEngine
@@ -249,7 +251,7 @@ class SharedMatchViewModel(
     val isConcluded: Boolean
         get() = stateInternal?.status == MatchStatus.Ended || stateInternal?.status == MatchStatus.Abandoned
 
-    var latestRejectionReason by mutableStateOf<String?>(null)
+    var latestRejectionReason by mutableStateOf<UiText?>(null)
         private set
     var isSubmitting by mutableStateOf(false)
         private set
@@ -266,9 +268,9 @@ class SharedMatchViewModel(
     override var pendingScores by mutableStateOf<Map<UUID, Int>>(emptyMap())
         private set
     override var closedParticipantID by mutableStateOf<UUID?>(null)
-    override var validationErrorMessage by mutableStateOf<String?>(null)
+    override var validationErrorMessage by mutableStateOf<UiText?>(null)
         private set
-    override var roundExplanationMessage by mutableStateOf<String?>(null)
+    override var roundExplanationMessage by mutableStateOf<UiText?>(null)
         private set
 
     init {
@@ -386,10 +388,7 @@ class SharedMatchViewModel(
                 MatchEvent.MatchCreated(next.id, next.rulesVersion, variants, newParticipants),
                 matchID,
                 eventID = matchID,
-                overtakenMessage =
-                    link.context.getString(
-                        R.string.une_partie_vient_d_etre_lancee_sur_un_autre_appareil,
-                    ),
+                overtakenMessage = UiText.Resource(R.string.une_partie_vient_d_etre_lancee_sur_un_autre_appareil),
             )
         }
     }
@@ -398,7 +397,7 @@ class SharedMatchViewModel(
         event: MatchEvent,
         matchID: UUID,
         eventID: UUID = UUID.randomUUID(),
-        overtakenMessage: String? = null,
+        overtakenMessage: UiText? = null,
     ): Boolean {
         isSubmitting = true
         try {
@@ -408,16 +407,16 @@ class SharedMatchViewModel(
                     true
                 }
                 is SessionLink.SubmitResult.Overtaken -> {
-                    latestRejectionReason = overtakenMessage ?: overtakenMessage(link.context, result.byDeviceName)
+                    latestRejectionReason = overtakenMessage ?: overtakenMessage(result.byDeviceName)
                     false
                 }
                 SessionLink.SubmitResult.Offline -> {
                     latestRejectionReason =
-                        link.context.getString(R.string.hors_connexion_la_saisie_reprendra_au_retour_du_reseau)
+                        UiText.Resource(R.string.hors_connexion_la_saisie_reprendra_au_retour_du_reseau)
                     false
                 }
                 SessionLink.SubmitResult.Closed -> {
-                    latestRejectionReason = link.context.getString(R.string.le_createur_a_arrete_la_session)
+                    latestRejectionReason = UiText.Resource(R.string.le_createur_a_arrete_la_session)
                     false
                 }
             }
@@ -441,15 +440,11 @@ class SharedMatchViewModel(
         }
         keepConcludedMatches()
         if (replayed.rounds.size > previousRoundCount) {
-            replayed.rounds
-                .lastOrNull()
-                ?.entries
-                ?.firstNotNullOfOrNull { it.explanation }
-                ?.let(::showRoundExplanation)
+            replayed.lastRoundExplanation?.let(::showRoundExplanation)
         }
     }
 
-    private fun showRoundExplanation(message: String) {
+    private fun showRoundExplanation(message: UiText) {
         scope.launch {
             roundExplanationMessage = message
             delay(4_000)
@@ -465,14 +460,14 @@ class SharedMatchViewModel(
     companion object {
         fun seatOf(participant: Participant) = SeatRef(participant.seatIndex, participant.displayName)
 
-        fun overtakenMessage(
-            context: Context,
-            deviceName: String?,
-        ): String =
+        fun overtakenMessage(deviceName: String?): UiText =
             if (deviceName != null) {
-                context.getString(R.string.value1_vient_de_valider_une_manche_verifie_avant_de_valider, deviceName)
+                UiText.Resource(
+                    R.string.value1_vient_de_valider_une_manche_verifie_avant_de_valider,
+                    listOf(deviceName),
+                )
             } else {
-                context.getString(R.string.une_autre_manche_vient_d_etre_validee_verifie_avant_de)
+                UiText.Resource(R.string.une_autre_manche_vient_d_etre_validee_verifie_avant_de)
             }
     }
 }

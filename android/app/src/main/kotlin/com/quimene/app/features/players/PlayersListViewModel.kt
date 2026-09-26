@@ -5,7 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.quimene.store.AppSettings
+import com.quimene.domain.model.MatchStatus
+import com.quimene.store.MatchEntity
+import com.quimene.store.MatchRepository
+import com.quimene.store.ParticipantEntity
 import com.quimene.store.PlayerEntity
 import com.quimene.store.PlayerRepository
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,38 +18,35 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
 
-/** Miroir de la logique de liste de `PlayersListView.swift` (doc 06) — actifs triés (manuel ou
- * alphabétique selon [AppSettings.PlayerSortMode]) ; les archivés vivent sur un écran séparé
+/** Miroir de la logique de liste de `PlayersListView.swift` (doc 06) — actifs triés les
+ * habitués d'abord (pas de réordonnancement manuel) ; les archivés vivent sur un écran séparé
  * ([ArchivedPlayersScreen]), seul leur nombre est porté ici (lien en bas de liste). Mode
  * sélection : miroir de l'`EditButton`/`selectedPlayerIDs` d'Apple, réalisé côté Android comme un
  * mode contextuel de barre de titre plutôt qu'un `EditButton` (aucun équivalent Material) —
  * doc utilisateur, « respecte le style Android ». */
 class PlayersListViewModel(
     private val repository: PlayerRepository,
-    private val settings: AppSettings,
+    matchRepository: MatchRepository,
 ) : ViewModel() {
     data class UiState(
         /** Doc 16, phase A — mon profil, affiché à part au-dessus de la liste. */
         val me: PlayerEntity? = null,
         val active: List<PlayerEntity> = emptyList(),
         val archivedCount: Int = 0,
-        val sortMode: AppSettings.PlayerSortMode = AppSettings.PlayerSortMode.Automatic,
     )
 
     val uiState: StateFlow<UiState> =
-        combine(repository.observeAll(), settings.playerSortMode) { players, sortMode ->
+        combine(
+            repository.observeAll(),
+            matchRepository.observeAll(),
+            matchRepository.observeAllParticipants(),
+        ) { players, matches, participants ->
             val me = players.firstOrNull { it.sharedProfileIsMine }
             val (archived, active) = players.filterNot { it.sharedProfileIsMine }.partition { it.isArchived }
-            val orderedActive =
-                when (sortMode) {
-                    AppSettings.PlayerSortMode.Automatic -> active.sortedBy { it.nickname.lowercase() }
-                    AppSettings.PlayerSortMode.Manual -> active.sortedBy { it.sortIndex }
-                }
             UiState(
                 me = me,
-                active = orderedActive,
+                active = orderedPlayers(active, matches, participants),
                 archivedCount = archived.size,
-                sortMode = sortMode,
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), UiState())
 
@@ -75,4 +75,21 @@ class PlayersListViewModel(
             isSelecting = false
         }
     }
+}
+
+/** Miroir de `PlayersListView.activePlayers` : les habitués d'abord (parties terminées, comme
+ * `matchesPlayedCount`), l'ordre d'ajout départageant les égalités. */
+internal fun orderedPlayers(
+    players: List<PlayerEntity>,
+    matches: List<MatchEntity>,
+    participants: List<ParticipantEntity>,
+): List<PlayerEntity> {
+    val endedMatchIDs = matches.filter { it.status == MatchStatus.Ended }.map { it.id }.toSet()
+    val played =
+        participants
+            .filter { it.matchId in endedMatchIDs }
+            .mapNotNull { it.playerId }
+            .groupingBy { it }
+            .eachCount()
+    return players.sortedWith(compareByDescending<PlayerEntity> { played[it.id] ?: 0 }.thenBy { it.sortIndex })
 }

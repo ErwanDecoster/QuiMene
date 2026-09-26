@@ -18,9 +18,6 @@ interface PlayerDao {
     @Update
     suspend fun update(player: PlayerEntity)
 
-    @Update
-    suspend fun updateAll(players: List<PlayerEntity>)
-
     @Delete
     suspend fun delete(player: PlayerEntity)
 
@@ -38,9 +35,6 @@ interface PlayerDao {
 
     @Query("SELECT * FROM players WHERE sharedProfileIsMine = 1 LIMIT 1")
     suspend fun myOwnSharedPlayer(): PlayerEntity?
-
-    @Query("SELECT * FROM players WHERE sharedProfileID IS NOT NULL")
-    suspend fun withSharedProfileID(): List<PlayerEntity>
 
     @Query("SELECT * FROM players WHERE sharedProfileID = :id LIMIT 1")
     suspend fun bySharedProfileID(id: UUID): PlayerEntity?

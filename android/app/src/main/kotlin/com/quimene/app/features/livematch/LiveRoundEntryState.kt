@@ -1,5 +1,6 @@
 package com.quimene.app.features.livematch
 
+import com.quimene.app.ui.UiText
 import com.quimene.domain.model.Participant
 import com.quimene.domain.model.Round
 import com.quimene.domain.model.ScoreDetail
@@ -34,8 +35,8 @@ interface LiveRoundEntryState {
     val pendingScores: Map<UUID, Int>
     var closedParticipantID: UUID?
 
-    val validationErrorMessage: String?
-    val roundExplanationMessage: String?
+    val validationErrorMessage: UiText?
+    val roundExplanationMessage: UiText?
 
     fun setScore(
         participantID: UUID,

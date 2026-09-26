@@ -6,7 +6,6 @@ import javax.crypto.Cipher
 import javax.crypto.Mac
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
-import kotlin.random.Random
 
 /**
  * Doc 09 « Appairage et chiffrement » — remplace le chiffrement gratuit de MultipeerConnectivity,
@@ -23,10 +22,6 @@ object SessionCrypto {
     private const val AES_KEY_BYTES = 32 // 256 bits.
     private const val GCM_NONCE_BYTES = 12 // 96 bits — taille de nonce standard/seule supportée par CryptoKit.
     private const val GCM_TAG_BITS = 128
-
-    /** Affiché en clair par l'hôte (et encodé dans un QR) ; ne transite jamais sur le réseau —
-     * seule la clé qui en dérive y transite, jamais le code lui-même. */
-    fun generatePairingCode(): String = "%06d".format(Random.nextInt(0, 1_000_000))
 
     /**
      * HKDF-SHA256 : le `sessionID` sert de sel, ce qui garantit une clé différente par session

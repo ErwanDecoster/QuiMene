@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ds_back">Atrás</string>
+    <plurals name="ds_score_points">
+        <item quantity="one">%1$d punto</item>
+        <item quantity="many">%1$d puntos</item>
+        <item quantity="other">%1$d puntos</item>
+    </plurals>
+    <string name="ds_score_delta">%1$s esta manga</string>
+    <string name="ds_ordinal_fallback">%1$d.º</string>
+    <string-array name="ds_ordinals">
+        <item>primero</item>
+        <item>segundo</item>
+        <item>tercero</item>
+        <item>cuarto</item>
+        <item>quinto</item>
+        <item>sexto</item>
+        <item>séptimo</item>
+        <item>octavo</item>
+        <item>noveno</item>
+        <item>décimo</item>
+        <item>undécimo</item>
+        <item>duodécimo</item>
+    </string-array>
+</resources>

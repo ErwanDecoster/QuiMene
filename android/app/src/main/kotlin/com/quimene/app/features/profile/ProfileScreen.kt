@@ -14,7 +14,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EmojiEvents
@@ -30,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,9 +37,13 @@ import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
+import com.quimene.app.ui.formatPercent
+import com.quimene.app.ui.matchesWinsAndRateText
+import com.quimene.app.ui.rememberMediumDateFormatter
 import com.quimene.app.ui.toAvatar
 import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.EmptyState
 import com.quimene.designsystem.tokens.LocalAppColors
@@ -47,12 +51,9 @@ import com.quimene.designsystem.tokens.Space
 import com.quimene.store.ProfileStats
 import java.time.YearMonth
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.util.Locale
 import java.util.UUID
-import kotlin.math.roundToInt
 
 /** Miroir de `ProfileView.swift` (doc 06) — statistiques d'un joueur, recalculées à chaque
  * ouverture (aucun agrégat mis en cache). Atteint depuis une ligne de [com.quimene.app.features.players.PlayersListScreen]
@@ -82,9 +83,9 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(player?.nickname ?: "Profil") },
+                title = { Text(player?.nickname ?: stringResource(R.string.profil)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Retour") }
+                    BackButton(onClick = onBack)
                 },
                 actions = {
                     IconButton(onClick = { onEdit(playerId) }) {
@@ -141,9 +142,6 @@ fun ProfileScreen(
     }
 }
 
-private val dateFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
-
 @Composable
 private fun SummarySection(stats: ProfileStats) {
     val colors = LocalAppColors.current
@@ -161,7 +159,7 @@ private fun SummarySection(stats: ProfileStats) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 StatBlock(stringResource(R.string.parties), "${stats.played}")
                 StatBlock(stringResource(R.string.victoires), "${stats.wins}")
-                StatBlock(stringResource(R.string.taux_de_victoire), "${(stats.winRate * 100).roundToInt()} %")
+                StatBlock(stringResource(R.string.taux_de_victoire), formatPercent(stats.winRate))
                 StatBlock(stringResource(R.string.rang_moyen), String.format(locale, "%.1f", stats.averageRank))
             }
         }
@@ -198,12 +196,7 @@ private fun ByGameSection(
                         }
                     }
                     Text(
-                        stringResource(
-                            R.string.count1_partie_s_count2_victoire_s_value3,
-                            game.played,
-                            game.wins,
-                            "${(game.winRate * 100).roundToInt()} %",
-                        ),
+                        matchesWinsAndRateText(game.played, game.wins, formatPercent(game.winRate)),
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.textSecondary,
                     )
@@ -212,7 +205,7 @@ private fun ByGameSection(
                             stringResource(
                                 R.string.meilleur_score_count1_value2,
                                 it.value,
-                                dateFormatter.format(it.date.atZone(ZoneId.systemDefault())),
+                                rememberMediumDateFormatter().format(it.date.atZone(ZoneId.systemDefault())),
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.textTertiary,
@@ -223,7 +216,7 @@ private fun ByGameSection(
                             stringResource(
                                 R.string.pire_score_count1_value2,
                                 it.value,
-                                dateFormatter.format(it.date.atZone(ZoneId.systemDefault())),
+                                rememberMediumDateFormatter().format(it.date.atZone(ZoneId.systemDefault())),
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             color = colors.textTertiary,
@@ -248,10 +241,11 @@ private fun NemesisSection(nemesis: ProfileStats.Nemesis) {
             Column {
                 Text(nemesis.name, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
                 Text(
-                    stringResource(
-                        R.string.count1_partie_s_ensemble_value2_de_victoires,
+                    pluralStringResource(
+                        R.plurals.count1_partie_s_ensemble_value2_de_victoires,
                         nemesis.matchesTogether,
-                        "${(nemesis.winRateWithThemPresent * 100).roundToInt()} %",
+                        nemesis.matchesTogether,
+                        formatPercent(nemesis.winRateWithThemPresent),
                     ),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textSecondary,

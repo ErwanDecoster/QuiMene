@@ -1,5 +1,6 @@
 package com.quimene.app.features.join
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,11 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -39,6 +36,7 @@ import com.quimene.app.livesync.JoinLink
 import com.quimene.app.livesync.myProfileCard
 import com.quimene.app.livesync.sessionDisplayName
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.components.PrimaryButton
 import com.quimene.designsystem.tokens.Space
@@ -73,7 +71,7 @@ fun JoinScreen(onBack: () -> Unit) {
 
     var pairingCode by remember { mutableStateOf("") }
     var isConnecting by remember { mutableStateOf(false) }
-    var connectionError by remember { mutableStateOf<String?>(null) }
+    var connectionError by remember { mutableStateOf<Int?>(null) }
     var isManualEntryVisible by remember { mutableStateOf(false) }
     // Une image analysée par seconde peut contenir un QR plusieurs fois de suite tant qu'il reste
     // dans le champ — n'agir qu'une fois par code détecté, jusqu'à ce qu'une erreur autorise à
@@ -107,9 +105,7 @@ fun JoinScreen(onBack: () -> Unit) {
             TopAppBar(
                 title = { Text(stringResource(R.string.rejoindre_une_partie)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.fermer))
-                    }
+                    BackButton(onClick = onBack, contentDescription = stringResource(R.string.fermer))
                 },
             )
         },
@@ -129,7 +125,7 @@ fun JoinScreen(onBack: () -> Unit) {
             )
 
             connectionError?.let {
-                Banner(message = it, modifier = Modifier.align(Alignment.TopCenter).padding(Space.lg))
+                Banner(message = stringResource(it), modifier = Modifier.align(Alignment.TopCenter).padding(Space.lg))
             }
 
             if (isConnecting) {
@@ -182,7 +178,7 @@ private fun ManualCodeEntrySheet(
             verticalArrangement = Arrangement.spacedBy(Space.lg),
         ) {
             Text(
-                "Saisis le code à 6 chiffres affiché sur l'appareil qui partage la partie.",
+                stringResource(R.string.saisis_le_code_a_6_chiffres),
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
             )
@@ -208,9 +204,9 @@ private fun ManualCodeEntrySheet(
     }
 }
 
-private fun describe(error: Throwable): String =
+@StringRes
+private fun describe(error: Throwable): Int =
     when (error) {
-        is OnlineSessionError.SessionNotFound ->
-            "Aucune partie ne correspond à ce code. Vérifie qu'il est bien à jour."
-        else -> "Connexion impossible. Réessaie."
+        is OnlineSessionError.SessionNotFound -> R.string.aucune_partie_ne_correspond_a_ce_code_verifie_qu_il_est
+        else -> R.string.connexion_impossible_reessaie
     }

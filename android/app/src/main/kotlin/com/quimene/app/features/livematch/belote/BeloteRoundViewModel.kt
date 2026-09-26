@@ -1,6 +1,7 @@
 package com.quimene.app.features.livematch.belote
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -23,7 +24,7 @@ class BeloteRoundViewModel(
 
     var takerTeamID by mutableStateOf(teams.firstOrNull().orEmpty())
         private set
-    var takerPoints by mutableStateOf(82)
+    var takerPoints by mutableIntStateOf(82)
         private set
     var isCapot by mutableStateOf(false)
         private set

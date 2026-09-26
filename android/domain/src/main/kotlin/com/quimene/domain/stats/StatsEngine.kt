@@ -175,7 +175,6 @@ class StatsEngine {
         val direction = definition.scoring.direction
         val participants = state.participants.sortedBy { it.seatIndex }
         val rounds = state.rounds.sortedBy { it.index }
-        val nameByID = participants.associate { it.id to it.displayName }
 
         val allValues = rounds.flatMap { round -> round.entries.map { it.computedValue.toDouble() } }
         val overallMean = if (allValues.isEmpty()) 0.0 else allValues.sum() / allValues.size
@@ -188,9 +187,6 @@ class StatsEngine {
             result +=
                 Insight(
                     id = InsightID.highestRoundScore,
-                    headline = "Plus gros tour",
-                    detail = "${nameByID[id]} — ${value.toInt()} points, manche ${round + 1}",
-                    symbol = "flame.fill",
                     value = Insight.Value.Single(id, value, round),
                     interestScore = z,
                 )
@@ -202,9 +198,6 @@ class StatsEngine {
                 result +=
                     Insight(
                         id = InsightID.bestRoundScore,
-                        headline = "Meilleur tour",
-                        detail = "${nameByID[id]} — ${value.toInt()} points, manche ${round + 1}",
-                        symbol = "star.fill",
                         value = Insight.Value.Single(id, value, round),
                         interestScore = z * 0.9,
                     )
@@ -217,9 +210,6 @@ class StatsEngine {
                 result +=
                     Insight(
                         id = InsightID.mostRegular,
-                        headline = "Le Métronome",
-                        detail = "${nameByID[id]} — écart-type ${round2(lowest)}",
-                        symbol = "metronome",
                         value = Insight.Value.Single(id, round2(lowest), null),
                         interestScore = if (average > 0) (average - lowest) / average else 0.0,
                     )
@@ -228,9 +218,6 @@ class StatsEngine {
                 result +=
                     Insight(
                         id = InsightID.mostIrregular,
-                        headline = "Les montagnes russes",
-                        detail = "${nameByID[id]} — écart-type ${round2(highest)}",
-                        symbol = "chart.line.uptrend.xyaxis",
                         value = Insight.Value.Single(id, round2(highest), null),
                         interestScore = if (average > 0) (highest - average) / average else 0.0,
                     )
@@ -250,9 +237,6 @@ class StatsEngine {
             result +=
                 Insight(
                     id = InsightID.finalGap,
-                    headline = "Écart final",
-                    detail = "${gap.toInt()} points entre le premier et le deuxième",
-                    symbol = "arrow.left.and.right",
                     value = Insight.Value.Single(null, gap, null),
                     interestScore = if (relativeGap < 0.5) (0.5 - relativeGap) * 2 else 0.0,
                 )
@@ -264,9 +248,6 @@ class StatsEngine {
             result +=
                 Insight(
                     id = InsightID.leadChanges,
-                    headline = "Changements de tête",
-                    detail = if (changes == 0) "Domination du début à la fin" else "$changes changement(s) de leader",
-                    symbol = "arrow.left.arrow.right",
                     value = Insight.Value.Single(null, changes.toDouble(), null),
                     interestScore =
                         when {
@@ -280,9 +261,6 @@ class StatsEngine {
                 result +=
                     Insight(
                         id = InsightID.longestLeadStreak,
-                        headline = "Plus longue série en tête",
-                        detail = "${nameByID[id]} — $streak manche(s) d'affilée",
-                        symbol = "crown.fill",
                         value = Insight.Value.Single(id, streak.toDouble(), null),
                         interestScore = streak.toDouble() / rounds.size,
                     )
@@ -309,18 +287,12 @@ class StatsEngine {
             result +=
                 Insight(
                     id = InsightID.roundsClosed,
-                    headline = "Manches fermées",
-                    detail = "Répartition des fermetures de manche",
-                    symbol = "lock.fill",
                     value = Insight.Value.PerParticipant(closedCounts.mapValues { it.value.toDouble() }),
                     interestScore = 0.3,
                 )
             result +=
                 Insight(
                     id = InsightID.doublingsSuffered,
-                    headline = "Doublements subis",
-                    detail = "Répartition des scores doublés",
-                    symbol = "multiply.circle.fill",
                     value = Insight.Value.PerParticipant(doubledCounts.mapValues { it.value.toDouble() }),
                     interestScore = if (doubledCounts.values.any { it > 0 }) 0.5 else 0.1,
                 )

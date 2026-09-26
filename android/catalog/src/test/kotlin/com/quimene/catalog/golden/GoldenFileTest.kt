@@ -1,9 +1,9 @@
 package com.quimene.catalog.golden
 
 import com.quimene.catalog.GameCatalogEmbedded
-import com.quimene.catalog.games.tarotHandScoreDetail
-import com.quimene.catalog.games.wizardBidScoreDetail
-import com.quimene.catalog.games.yamsCategoryScoreDetail
+import com.quimene.catalog.testing.tarotHandScoreDetail
+import com.quimene.catalog.testing.wizardBidScoreDetail
+import com.quimene.catalog.testing.yamsCategoryScoreDetail
 import com.quimene.domain.engine.MatchEngine
 import com.quimene.domain.engine.MatchEvent
 import com.quimene.domain.model.MatchState

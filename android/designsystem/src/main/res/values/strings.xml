@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textes propres aux composants de :designsystem (accessibilité, bouton retour),
+     traduits ici plutôt que dans :app pour que chaque composant reste autonome. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="fr">
+    <string name="ds_back">Retour</string>
+    <plurals name="ds_score_points">
+        <item quantity="one">%1$d point</item>
+        <item quantity="many">%1$d points</item>
+        <item quantity="other">%1$d points</item>
+    </plurals>
+    <string name="ds_score_delta">%1$s cette manche</string>
+    <string name="ds_ordinal_fallback">%1$de</string>
+    <string-array name="ds_ordinals">
+        <item>premier</item>
+        <item>deuxième</item>
+        <item>troisième</item>
+        <item>quatrième</item>
+        <item>cinquième</item>
+        <item>sixième</item>
+        <item>septième</item>
+        <item>huitième</item>
+        <item>neuvième</item>
+        <item>dixième</item>
+        <item>onzième</item>
+        <item>douzième</item>
+    </string-array>
+</resources>

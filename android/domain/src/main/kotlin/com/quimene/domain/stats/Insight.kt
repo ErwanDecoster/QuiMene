@@ -27,12 +27,10 @@ value class InsightID(
     }
 }
 
-/** Miroir de `Insight.swift` — pas de sérialisation (résultat de calcul en mémoire). */
+/** Miroir de `Insight.swift` — pas de sérialisation (résultat de calcul en mémoire). Titre, texte
+ * et icône sont rédigés par l'app à partir de [id] et [value], dans la langue de l'utilisateur. */
 data class Insight(
     val id: InsightID,
-    val headline: String,
-    val detail: String,
-    val symbol: String,
     val prominence: Prominence = Prominence.Standard,
     val value: Value,
     /** `internal` (pas `private`), comme côté Swift : lu uniquement par la sélection gloutonne

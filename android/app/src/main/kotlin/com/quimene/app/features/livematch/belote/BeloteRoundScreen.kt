@@ -23,6 +23,7 @@ import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.CardGutter
 import com.quimene.designsystem.components.Chip
 import com.quimene.designsystem.components.PrimaryButton
+import com.quimene.designsystem.components.accessibleScoreRow
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.model.Participant
@@ -159,7 +160,7 @@ private fun TeamScoreRow(
     total: Int,
 ) {
     val colors = LocalAppColors.current
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(modifier = Modifier.fillMaxWidth().accessibleScoreRow(name = label, score = total)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(label, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
             Text(

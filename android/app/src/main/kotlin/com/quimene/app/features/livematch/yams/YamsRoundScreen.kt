@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.quimene.app.R
@@ -160,7 +161,7 @@ private fun CategoryRow(
                     IconButton(onClick = { onOpenEntry(participant) }, modifier = Modifier.size(28.dp)) {
                         Icon(
                             Icons.Filled.AddCircle,
-                            contentDescription = "Remplir ${category.label.localized}",
+                            contentDescription = stringResource(R.string.remplir_value1, category.label.localized),
                             tint = colors.brandInk,
                         )
                     }
@@ -188,13 +189,7 @@ private fun BonusRow(
             val filled = viewModel.filledEntries(participant.id)
             val text =
                 if (upperCategories.all { filled[it.id] != null }) {
-                    if (upperCategories.any { filled[it.id]?.explanation != null }) {
-                        "+35"
-                    } else {
-                        stringResource(
-                            R.string.n_0,
-                        )
-                    }
+                    if (upperCategories.any { filled[it.id]?.explanation != null }) "+35" else "0"
                 } else {
                     "—"
                 }
@@ -268,7 +263,9 @@ private fun YamsCategoryEntrySheet(
                         }
                     }
                     Text(
-                        stringResource(R.string.count1_points, diceCount * (category.scoring.value ?: 0)),
+                        (diceCount * (category.scoring.value ?: 0)).let { points ->
+                            pluralStringResource(R.plurals.count1_points, points, points)
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.textSecondary,
                     )

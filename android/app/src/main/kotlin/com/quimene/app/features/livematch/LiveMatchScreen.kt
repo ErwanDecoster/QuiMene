@@ -1,11 +1,11 @@
 package com.quimene.app.features.livematch
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Undo
 import androidx.compose.material3.AlertDialog
@@ -34,8 +34,8 @@ import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
 import com.quimene.app.livesync.sessionDisplayName
+import com.quimene.app.ui.asString
 import com.quimene.designsystem.components.Banner
-import com.quimene.designsystem.components.PrimaryButton
 import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.rules.GameDefinition
 import com.quimene.domain.rules.GameRules
@@ -94,9 +94,7 @@ fun LiveMatchScreen(
     }
 
     LiveMatchScaffold(viewModel, onAbandoned) {
-        RoundEntryDispatch(viewModel) { gameName ->
-            RoundEntryPlaceholder(gameName, onAbandoned)
-        }
+        RoundEntryDispatch(viewModel)
     }
 }
 
@@ -113,23 +111,6 @@ private data class LiveMatchSetup(
     val rules: GameRules,
     val deviceID: String,
 )
-
-@Composable
-private fun RoundEntryPlaceholder(
-    gameName: String,
-    onAbandoned: () -> Unit,
-) {
-    Scaffold(topBar = { TopAppBar(title = { Text(gameName) }) }) { innerPadding ->
-        Column(
-            modifier = Modifier.fillMaxSize().padding(innerPadding).padding(Space.xl),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Space.lg),
-        ) {
-            Text("La saisie dédiée de ce jeu n'est pas encore construite dans cette version.")
-            PrimaryButton(text = "Retour", onClick = onAbandoned)
-        }
-    }
-}
 
 /** Coquille commune aux 5 formes de saisie (générique + les 4 dédiées) : titre, « Annuler la
  * dernière manche » toujours visible (miroir de `LiveMatchView.swift` — Apple la sort du menu
@@ -160,13 +141,13 @@ private fun LiveMatchScaffold(
                     if (viewModel.canEndManually) {
                         IconButton(onClick = { viewModel.undoLastRound() }) {
                             Icon(
-                                Icons.Filled.Undo,
+                                Icons.AutoMirrored.Filled.Undo,
                                 contentDescription = stringResource(R.string.annuler_la_derniere_manche),
                             )
                         }
                     }
                     IconButton(onClick = { menuExpanded = true }) {
-                        Icon(Icons.Filled.MoreVert, contentDescription = "Plus d'actions")
+                        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.plus_d_actions))
                     }
                     DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
                         DropdownMenuItem(
@@ -242,10 +223,20 @@ private fun LiveMatchScaffold(
                     onAction = { scope.launch { coordinator.revoke(notice) } },
                 )
             }
-            viewModel.remoteActivityMessage?.let { Banner(message = it, modifier = Modifier.padding(Space.lg)) }
-            viewModel.roundExplanationMessage?.let { Banner(message = it, modifier = Modifier.padding(Space.lg)) }
+            viewModel.remoteActivityMessage?.let {
+                Banner(
+                    message = it.asString(),
+                    modifier = Modifier.padding(Space.lg),
+                )
+            }
+            viewModel.roundExplanationMessage?.let {
+                Banner(
+                    message = it.asString(),
+                    modifier = Modifier.padding(Space.lg),
+                )
+            }
             viewModel.validationErrorMessage?.let {
-                Banner(message = it, modifier = Modifier.padding(horizontal = Space.lg))
+                Banner(message = it.asString(), modifier = Modifier.padding(horizontal = Space.lg))
             }
             content()
         }

@@ -1,7 +1,6 @@
 package com.quimene.catalog.games
 
 import com.quimene.catalog.decodeDetail
-import com.quimene.catalog.toScoreDetail
 import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.ModifierID
 import com.quimene.domain.model.RoundDraft
@@ -60,7 +59,7 @@ class TarotRulesV1 : GameRules {
                     listOf(
                         ValidationError(
                             ValidationError.Field.General,
-                            "Une donne doit avoir un preneur, ou être marquée passée.",
+                            ValidationError.Reason.TakerRequired,
                         ),
                     ),
                 )
@@ -72,7 +71,7 @@ class TarotRulesV1 : GameRules {
                     listOf(
                         ValidationError(
                             ValidationError.Field.General,
-                            "Un partenaire (roi appelé) est requis à 5 joueurs.",
+                            ValidationError.Reason.PartnerRequired,
                         ),
                     ),
                 )
@@ -84,7 +83,7 @@ class TarotRulesV1 : GameRules {
                 listOf(
                     ValidationError(
                         ValidationError.Field.ParticipantField(takerInput.participantID),
-                        "Points invalides (0 à 91).",
+                        ValidationError.Reason.TakerPointsOutOfRange(max = 91),
                     ),
                 ),
             )
@@ -96,7 +95,7 @@ class TarotRulesV1 : GameRules {
                 listOf(
                     ValidationError(
                         ValidationError.Field.ParticipantField(takerInput.participantID),
-                        "Contrat, bouts ou poignée invalides.",
+                        ValidationError.Reason.InvalidTarotHand,
                     ),
                 ),
             )
@@ -186,9 +185,3 @@ class TarotRulesV1 : GameRules {
         private val POIGNEE_BONUSES = listOf(0, 20, 30, 40)
     }
 }
-
-internal fun tarotHandScoreDetail(
-    contract: Int,
-    bouts: Int,
-    poignee: Int,
-): ScoreDetail = TarotHandDetail(contract, bouts, poignee).toScoreDetail()

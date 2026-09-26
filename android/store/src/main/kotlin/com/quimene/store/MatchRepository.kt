@@ -188,8 +188,6 @@ class MatchRepository(
                 if (player.sharedProfileID == null) null else participant.id to player.sharedProfileIsMine
             }.toMap()
 
-    suspend fun hasAnyMatch(): Boolean = matchDao.count() > 0
-
     suspend fun finishedMatches(): List<MatchEntity> =
         matchDao
             .getAll()
