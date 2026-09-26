@@ -263,7 +263,8 @@ final class LiveShareCoordinator {
       guard let profileID = participant.player?.sharedProfileID else { continue }
       linkedSeats.append(
         LinkedSeat(
-          seat: SeatRef(seatIndex: participant.seatIndex, displayName: participant.nicknameSnapshot),
+          seat: SeatRef(
+            seatIndex: participant.seatIndex, displayName: participant.nicknameSnapshot),
           profileID: profileID))
     }
     let current = link.identities

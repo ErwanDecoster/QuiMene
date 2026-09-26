@@ -93,7 +93,6 @@ final class SharedMatchModel {
     return link.identities.occupant(of: seat) == nil ? .free : .taken
   }
 
-
   /// Le créateur, à ajouter à mes amis une fois ma place retenue : la liaison est durable dans
   /// les deux sens (doc 16).
   var ownerToBefriend: ProfileCard? {
@@ -269,7 +268,8 @@ final class SharedMatchModel {
       latestRejectionReason = Self.overtakenMessage(name)
       return false
     case .offline:
-      latestRejectionReason = String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
+      latestRejectionReason = String(
+        localized: "Hors connexion : la saisie reprendra au retour du réseau.")
       return false
     case .closed:
       latestRejectionReason = String(localized: "Le créateur a arrêté la session.")
@@ -301,10 +301,12 @@ final class SharedMatchModel {
       await reload(fresh: [])
       return true
     case .overtaken:
-      latestRejectionReason = String(localized: "Une partie vient d'être lancée sur un autre appareil.")
+      latestRejectionReason = String(
+        localized: "Une partie vient d'être lancée sur un autre appareil.")
       return false
     case .offline:
-      latestRejectionReason = String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
+      latestRejectionReason = String(
+        localized: "Hors connexion : la saisie reprendra au retour du réseau.")
       return false
     case .closed:
       latestRejectionReason = String(localized: "Le créateur a arrêté la session.")
@@ -333,9 +335,11 @@ final class SharedMatchModel {
 
   static func overtakenMessage(_ name: String?) -> String {
     if let name {
-      return String(localized: "\(name) vient de valider une manche : vérifie avant de valider la tienne.")
+      return String(
+        localized: "\(name) vient de valider une manche : vérifie avant de valider la tienne.")
     }
-    return String(localized: "Une autre manche vient d'être validée : vérifie avant de valider la tienne.")
+    return String(
+      localized: "Une autre manche vient d'être validée : vérifie avant de valider la tienne.")
   }
 
   /// Départ volontaire : termine la Live Activity et ferme le lien.

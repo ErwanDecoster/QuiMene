@@ -67,7 +67,8 @@ struct OnlineSessionTests {
   private func round(_ index: Int, _ value: Int) -> MatchEvent {
     .roundCommitted(
       RoundDraft(
-        index: index, inputs: participants.map { ScoreInput(participantID: $0.id, rawValue: value) }))
+        index: index, inputs: participants.map { ScoreInput(participantID: $0.id, rawValue: value) }
+      ))
   }
 
   @Test("Deux appareils partagent le même journal, ordonné par le serveur")

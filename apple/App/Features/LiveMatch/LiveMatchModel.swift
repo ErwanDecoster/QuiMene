@@ -200,7 +200,8 @@ final class LiveMatchModel {
   func startNextMatch(definition next: GameDefinition) async -> UUID? {
     isSubmitting = true
     defer { isSubmitting = false }
-    return await shareCoordinator.startNextMatch(definition: next, after: match, context: context)?.id
+    return await shareCoordinator.startNextMatch(definition: next, after: match, context: context)?
+      .id
   }
 
   /// Point d'entrée de la saisie (« Terminé ») : en local, écrit tout de suite ; dans une
@@ -260,7 +261,8 @@ final class LiveMatchModel {
     case .overtaken(let name):
       validationErrorMessage = SharedMatchModel.overtakenMessage(name)
     case .offline:
-      validationErrorMessage = String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
+      validationErrorMessage = String(
+        localized: "Hors connexion : la saisie reprendra au retour du réseau.")
     case .closed:
       validationErrorMessage = String(localized: "La session partagée a été arrêtée.")
     }

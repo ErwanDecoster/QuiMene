@@ -129,7 +129,9 @@ final class MatchConnectionCoordinator {
         } else {
           nil
         }
-      guard let fiche else { return LiveShareCoordinator.generatedSeed(for: participant.displayName) }
+      guard let fiche else {
+        return LiveShareCoordinator.generatedSeed(for: participant.displayName)
+      }
       return MatchRepository.ParticipantSeed(
         player: fiche, nickname: participant.displayName, avatarKind: fiche.avatarKind,
         avatarValue: fiche.avatarValue, paletteID: fiche.paletteID, teamID: participant.teamID)

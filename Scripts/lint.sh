@@ -5,6 +5,7 @@ set -eu
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 xcrun swift-format lint --recursive --strict --configuration "$ROOT/.swift-format" \
+    "$ROOT/apple/QuiMeneKit/Package.swift" \
     "$ROOT/apple/QuiMeneKit/Sources" \
     "$ROOT/apple/QuiMeneKit/Tests" \
     "$ROOT/apple/App"

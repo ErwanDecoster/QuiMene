@@ -118,7 +118,9 @@ struct MatchRepositoryTests {
     #expect(afterUndo.rounds.isEmpty)
   }
 
-  @Test("Une partie aux numéros de manche troués continue d'avancer, et deux annulations de suite en retirent deux")
+  @Test(
+    "Une partie aux numéros de manche troués continue d'avancer, et deux annulations de suite en retirent deux"
+  )
   func gappedRoundIndicesStillAdvance() throws {
     let schema = Schema(QuiMeneSchemaV1.models)
     let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
@@ -328,13 +330,16 @@ struct MatchRepositoryTests {
     let start = Date(timeIntervalSinceReferenceDate: 800_000_000)
     func round(_ index: Int) -> MatchEvent {
       .roundCommitted(
-        RoundDraft(index: index, inputs: [theo, erwan].map { ScoreInput(participantID: $0.id, rawValue: 3) }))
+        RoundDraft(
+          index: index, inputs: [theo, erwan].map { ScoreInput(participantID: $0.id, rawValue: 3) })
+      )
     }
     let events = [
       StampedEvent(
         id: matchID, lamport: 1, deviceID: "erwan", occurredAt: start,
         event: .matchCreated(
-          gameID: "dummy", rulesVersion: 1, variants: VariantSelection(), participants: [theo, erwan])),
+          gameID: "dummy", rulesVersion: 1, variants: VariantSelection(),
+          participants: [theo, erwan])),
       StampedEvent(lamport: 2, deviceID: "erwan", occurredAt: start + 60, event: round(0)),
       StampedEvent(lamport: 3, deviceID: "erwan", occurredAt: start + 120, event: round(1)),
     ]

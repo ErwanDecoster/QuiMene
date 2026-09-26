@@ -99,7 +99,9 @@ public actor OnlineSession {
   /// corrompues) est sauté, mais il occupe bien sa place dans la numérotation.
   public private(set) var lastSeq: Int64 = 0
 
-  public init(sessionID: UUID, pairingCode: String, deviceID: String, backend: any OnlineSessionBackend) {
+  public init(
+    sessionID: UUID, pairingCode: String, deviceID: String, backend: any OnlineSessionBackend
+  ) {
     self.sessionID = sessionID
     self.pairingCode = pairingCode
     self.deviceID = deviceID

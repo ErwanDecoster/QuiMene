@@ -39,7 +39,9 @@ struct SessionIdentityTests {
     let intruder = card("Théo")
     let identities = SessionIdentities(
       records: records([
-        .roster(owner: card("Erwan"), linkedSeats: [LinkedSeat(seat: theo, profileID: friend)], deviceID: owner),
+        .roster(
+          owner: card("Erwan"), linkedSeats: [LinkedSeat(seat: theo, profileID: friend)],
+          deviceID: owner),
         .claim(theo, profile: intruder, deviceID: "b"),
       ]),
       ownerDeviceID: owner)
@@ -70,7 +72,9 @@ struct SessionIdentityTests {
   func rosterFromParticipantIgnored() {
     let identities = SessionIdentities(
       records: records([
-        .roster(owner: card("Faux"), linkedSeats: [LinkedSeat(seat: theo, profileID: UUID())], deviceID: "b")
+        .roster(
+          owner: card("Faux"), linkedSeats: [LinkedSeat(seat: theo, profileID: UUID())],
+          deviceID: "b")
       ]),
       ownerDeviceID: owner)
     #expect(identities.owner == nil)
@@ -117,7 +121,8 @@ struct SessionIdentityTests {
       sessionID: sessionID, pairingCode: "042817", deviceID: "theo", backend: backend)
 
     try await erwan.append(
-      .matchCreated(gameID: "dummy", rulesVersion: 1, variants: VariantSelection(), participants: participants),
+      .matchCreated(
+        gameID: "dummy", rulesVersion: 1, variants: VariantSelection(), participants: participants),
       matchID: matchID, eventID: matchID)
     try await theoPhone.sync()
     try await theoPhone.appendIdentity(

@@ -70,9 +70,11 @@ struct GamesTabView: View {
           Button {
             deepLinkRouter.isPresentingJoin = true
           } label: {
-            Label("Partie partagée en cours · Reprendre", systemImage: "dot.radiowaves.left.and.right")
-              .font(.bodyText)
-              .foregroundStyle(.brandInk)
+            Label(
+              "Partie partagée en cours · Reprendre", systemImage: "dot.radiowaves.left.and.right"
+            )
+            .font(.bodyText)
+            .foregroundStyle(.brandInk)
           }
         }
       }

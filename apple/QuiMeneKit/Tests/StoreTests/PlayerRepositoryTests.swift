@@ -71,7 +71,9 @@ struct PlayerRepositoryTests {
     #expect(alice.sortIndex == 1)
   }
 
-  @Test("Deux profils « à moi » après une synchronisation : le plus ancien reste, le doublon vierge disparaît")
+  @Test(
+    "Deux profils « à moi » après une synchronisation : le plus ancien reste, le doublon vierge disparaît"
+  )
   func resolveDuplicateOwnProfilesKeepsOldest() throws {
     let schema = Schema(QuiMeneSchemaV1.models)
     let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)

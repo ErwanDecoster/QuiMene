@@ -142,9 +142,11 @@ struct SharedMatchView: View {
         readOnlyMessage: model.canPropose
           ? nil
           : model.isSpectator
-            ? String(localized: "Tu regardes la partie : la saisie se fait sur les appareils des joueurs.")
+            ? String(
+              localized: "Tu regardes la partie : la saisie se fait sur les appareils des joueurs.")
             : String(localized: "Tu observes cette partie : seul le créateur saisit les scores."),
-        profileBadges: model.profileBadges(friendProfileIDs: Set(friends.compactMap(\.sharedProfileID))),
+        profileBadges: model.profileBadges(
+          friendProfileIDs: Set(friends.compactMap(\.sharedProfileID))),
         closedParticipantID: $closedParticipantID,
         draftTexts: $draftTexts,
         focusedParticipantID: $focusedParticipantID

@@ -62,7 +62,9 @@ struct NextMatchPicker: View {
             }
           }
         } footer: {
-          Text("Avec les mêmes joueurs. Tous les appareils de la session passent à la nouvelle partie.")
+          Text(
+            "Avec les mêmes joueurs. Tous les appareils de la session passent à la nouvelle partie."
+          )
         }
       }
       .navigationTitle("Partie suivante")
