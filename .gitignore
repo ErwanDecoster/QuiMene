@@ -1,7 +1,8 @@
 # Swift Package Manager
+# Package.resolved est versionné : versions de dépendances reproductibles, et Xcode Cloud refuse
+# de résoudre les paquets sans lui.
 .build/
 .swiftpm/
-Package.resolved
 
 # Xcode
 xcuserdata/
