@@ -57,7 +57,7 @@ impossible à ignorer — elle fait échouer la suite de tests Android.
 | App Intents | App Actions + `ShortcutService` | |
 | Live Activity | Notification persistante + `MediaStyle` | Équivalent partiel |
 | Xcode Cloud | GitHub Actions | |
-| `Localizable.xcstrings` | `strings.xml` | Pas de `<plurals>` à gérer — le projet n'utilise déjà pas les variations plurielles côté `.xcstrings` (convention « partie(s) » en toutes lettres), voir étape G |
+| `Localizable.xcstrings` | `strings.xml` | Variations plurielles → `<plurals>` ; une phrase qui accorde plusieurs nombres (substitutions) → un modèle `<string>` et un `<plurals>` par nombre, voir étape G |
 
 **Deux dépendances tierces, de nature différente** (ADR-0012, [ADR-0016](13-decisions-adr.md)).
 Vico est **propre à Android** : Compose n'a pas d'équivalent natif à Swift Charts, c'est l'écart
@@ -264,9 +264,9 @@ chose, et aucune étape suivante ne retouche le métier.
     `ON DELETE SET NULL`, `nicknameSnapshot`, `avatarKindSnapshot`, `avatarValueSnapshot`,
     `paletteIDSnapshot`, `seatIndex`, `teamID: String?`, `finalRank`, `finalScore`, `matchId` FK
     `ON DELETE CASCADE`).
-- `@Relation` explicites (Room n'a pas de résolution implicite) : `MatchWithParticipants`,
-  `PlayerWithParticipations`. Ordre déterministe par `ORDER BY sortIndex`/`seatIndex` en
-  requête — l'avantage que la section « Persistance » ci-dessus note déjà pour Room.
+- Pas de classe `@Relation` : les participants d'une partie se lisent par `ParticipantDao`.
+  Ordre déterministe par `ORDER BY sortIndex`/`seatIndex` en requête — l'avantage que la
+  section « Persistance » ci-dessus note déjà pour Room.
 - `PlayerDao.kt`, `MatchDao.kt`, `ParticipantDao.kt` — requêtes `Flow<...>`, équivalent du
   rafraîchissement automatique SwiftData.
 - Repositories, mêmes noms que côté Swift : `PlayerRepository.kt`, `MatchRepository.kt`,
@@ -387,12 +387,24 @@ les 4 écrans de saisie dédiés :
   ressource stable (la clé source est le texte français lui-même, pas un identifiant symbolique
   — table de correspondance committée pour ne pas se réordonner à chaque régénération) ;
   convertir les spécificateurs positionnels (`%1$@`→`%1$s`, `%lld`/`%ld`→`%d`) ; échapper le
-  XML ; **pas de `<plurals>`** — le projet n'utilise déjà pas les variations plurielles
-  `.xcstrings` (convention « partie(s) »/« victoire(s) » en toutes lettres), donc pas de bascule
-  vers le système de quantités CLDR d'Android à gérer ; `values/` (sans qualificatif) porte le
+  XML ; pluriels (variations `.xcstrings`) vers `<plurals>`, avec les quantités CLDR que
+  demande Android (« many » en français, espagnol et italien) ; `values/` (sans qualificatif) porte le
   **français**, cohérent avec `sourceLanguage: fr` et le repli déjà choisi côté
   `GameDefinition.LocalizedText.localized`. Repasse humaine légère après coup (conventions
   Android, débordements de texte propres à Compose), pas une retraduction.
+
+  **Chaîne en place (audit du 2026-09-25, [15](15-plan-qualite-code.md))** :
+  `Scripts/extract-android-strings.py` génère `values*/strings.xml` depuis le catalogue Apple.
+  Un nom de ressource déjà attribué (`android/l10n-correspondence.json`) ne change jamais, et
+  seules les chaînes référencées par le Kotlin (`R.string.<nom>`) sont écrites — aucune chaîne
+  inutilisée dans l'APK. Pour utiliser un texte du catalogue : chercher son nom dans la table,
+  le référencer, relancer le script. Les textes propres à Android (permission caméra, mode
+  sélection, recherche…) vivent dans `values*/strings_android.xml`, maintenus à la main dans
+  les 5 langues ; ceux des composants de `:designsystem` (bouton retour, libellés TalkBack des
+  lignes de score) dans ses propres `values*/strings.xml`. Les messages produits par un
+  ViewModel sont des `UiText` (ressource + arguments), résolus à l'affichage ; les modules purs
+  (`:domain`, `:catalog`) ne produisent que des raisons typées (doc 04). La CI GitHub vérifie
+  que `strings.xml` est à jour par rapport au catalogue.
 - Raccourci de langue : `Settings.ACTION_APP_LOCALE_SETTINGS` (API 33+), équivalent
   d'`UIApplication.openSettingsURLString`.
 - Recette finale : Play Internal Testing track (équivalent TestFlight), fiche Play Store

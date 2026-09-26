@@ -140,11 +140,22 @@ Assumé explicitement, pour ne pas dépenser l'effort au mauvais endroit :
   d'état). Les deux `@unchecked Sendable` trouvés par le même audit (`SupabaseTransport`,
   `SupabaseTransportSession`) ont en revanche été corrigés pour de vrai plutôt que documentés
   comme exception — voir [15](15-plan-qualite-code.md).
-- **Avertissements = erreurs** (`SWIFT_TREAT_WARNINGS_AS_ERRORS`) sur le package.
+- **Avertissements = erreurs** partout : cibles Xcode (`SWIFT_TREAT_WARNINGS_AS_ERRORS`),
+  package (`.treatAllWarnings(as: .error)` dans `Package.swift`, que le réglage Xcode n'atteint
+  pas), et côté Android compilateur Kotlin (`allWarningsAsErrors`) et Android Lint
+  (`warningsAsErrors`, seule exception : les vérifications « nouvelle version disponible »,
+  dépendantes du réseau et de la date). Limite connue : Swift ne
+  promeut pas en erreur certains diagnostics (isolation assouplie par `@preconcurrency`,
+  visibilité des imports de membres) — ils restent à lire dans le journal de build.
 - **swift-format** avec la configuration par défaut d'Apple, appliqué à la validation.
 - Aucune dépendance tierce. Toute proposition d'en ajouter une passe par un ADR.
 
-## Intégration continue — Xcode Cloud
+## Intégration continue — Xcode Cloud (Apple) et GitHub Actions (Android)
+
+Côté Android et garde-fous partagés, `.github/workflows/android-ci.yml` : ktlint, build (avec
+Lint et tests unitaires), synchronisation de `spec/` avec ses copies Apple, et `strings.xml`
+à jour par rapport au catalogue Apple. Côté Apple, `ci_scripts/ci_post_clone.sh` fait échouer
+Xcode Cloud tôt sur `spec/` désynchronisé ou un fichier mal formaté (`Scripts/lint.sh`).
 
 Choisi par cohérence avec la contrainte « outils Apple » : intégration native à Xcode et à
 App Store Connect, aucune infrastructure à maintenir, signature de code gérée.
@@ -168,7 +179,9 @@ Un écran ou une fonctionnalité n'est terminé que si :
 - [ ] elle est lisible en Dynamic Type AX5 sans troncature ni chevauchement ;
 - [ ] elle est correcte en mode clair et en mode sombre ;
 - [ ] elle est correcte sur iPhone SE et sur iPad en Split View ;
-- [ ] toutes les chaînes sont dans le catalogue, français et anglais ;
+- [ ] toutes les chaînes sont dans le catalogue et traduites dans les 5 langues, libellés
+      VoiceOver/TalkBack compris — aucun texte affiché en dur, ni dans une `String` Swift qui
+      contourne le catalogue, ni dans un littéral Kotlin ;
 - [ ] aucun nouvel avertissement de compilation ;
 - [ ] le parcours a été fait une fois sur un appareil réel, pas seulement en simulateur.
 
