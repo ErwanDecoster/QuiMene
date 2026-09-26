@@ -32,7 +32,6 @@ final class SharedMatchModel {
   /// Joignable, et session toujours ouverte. Hors ligne, le tableau reste celui du dernier
   /// rattrapage et la saisie est bloquée (doc 16).
   var isHostConnected: Bool { link.isReachable && !link.isClosed }
-  var isOffline: Bool { !link.isReachable }
   var isSessionClosed: Bool { link.isClosed }
 
   var participants: [Participant] {
@@ -366,7 +365,7 @@ final class SharedMatchModel {
     if isNewMatch { latestRejectionReason = nil }
 
     if replayed.rounds.count > previousRoundCount,
-      let explanation = replayed.rounds.last?.entries.compactMap(\.explanation).first
+      let explanation = replayed.lastRoundExplanationMessage
     {
       roundExplanationMessage = explanation
       roundExplanationClearTask?.cancel()

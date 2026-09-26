@@ -22,19 +22,19 @@ public struct BeloteRulesV1: GameRules {
   {
     guard draft.inputs.count == 2 else {
       return .invalid([
-        ValidationError(field: .general, message: "Deux équipes attendues par donne.")
+        ValidationError(field: .general, reason: .twoTeamsRequired)
       ])
     }
     let takers = draft.inputs.filter { $0.modifiers.contains("isTaker") }
     guard takers.count == 1, let takerInput = takers.first else {
       return .invalid([
-        ValidationError(field: .general, message: "Une seule équipe preneuse par donne.")
+        ValidationError(field: .general, reason: .singleTakingTeamRequired)
       ])
     }
     guard (0...162).contains(takerInput.rawValue) else {
       return .invalid([
         ValidationError(
-          field: .participant(takerInput.participantID), message: "Points invalides (0 à 162).")
+          field: .participant(takerInput.participantID), reason: .takerPointsOutOfRange(max: 162))
       ])
     }
     return .valid

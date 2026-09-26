@@ -9,12 +9,6 @@ enum SessionCrypto {
     case sealFailed
   }
 
-  /// Affiché en clair par l'hôte (et encodé dans un QR) ; ne transite jamais sur le réseau —
-  /// seule la clé qui en dérive y transite, jamais le code lui-même.
-  static func generatePairingCode() -> String {
-    String(format: "%06d", Int.random(in: 0...999_999))
-  }
-
   /// HKDF-SHA256 : le `sessionID` sert de sel, ce qui garantit une clé différente par session
   /// même si deux hôtes choisissent le même code par coïncidence. Salé par la session — stable
   /// tant qu'elle dure — et non par la partie courante : une session peut enchaîner plusieurs

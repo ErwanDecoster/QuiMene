@@ -214,23 +214,15 @@ struct GamesTabView: View {
           refreshInProgressMatches()
         }
       }
-      .confirmationDialog(
-        "Abandonner cette partie ?",
+      .abandonMatchConfirmation(
         isPresented: Binding(
-          get: { matchPendingAbandon != nil }, set: { if !$0 { matchPendingAbandon = nil } }),
-        titleVisibility: .visible
+          get: { matchPendingAbandon != nil }, set: { if !$0 { matchPendingAbandon = nil } })
       ) {
-        Button("Abandonner", role: .destructive) {
-          if let match = matchPendingAbandon {
-            _ = try? MatchRepository(context: modelContext).abandonMatch(match, catalog: catalog)
-          }
-          matchPendingAbandon = nil
-          refreshInProgressMatches()
+        if let match = matchPendingAbandon {
+          _ = try? MatchRepository(context: modelContext).abandonMatch(match, catalog: catalog)
         }
-      } message: {
-        Text(
-          "La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée."
-        )
+        matchPendingAbandon = nil
+        refreshInProgressMatches()
       }
   }
 

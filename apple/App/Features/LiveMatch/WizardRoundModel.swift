@@ -94,7 +94,7 @@ final class WizardRoundModel {
       bids = [:]
       results = [:]
     } catch {
-      validationErrorMessage = "La manche n'a pas pu être enregistrée."
+      validationErrorMessage = String(localized: "La manche n'a pas pu être enregistrée.")
     }
   }
 

@@ -1,11 +1,22 @@
 import Foundation
 
+/// Pourquoi `computedValue` diffère de la saisie brute. Le texte affiché est rédigé par l'app,
+/// dans la langue de l'utilisateur (voir `ValidationResult`).
+public enum ScoreExplanation: String, Sendable, Codable, Equatable {
+  /// Skyjo : a fermé la manche sans le score le plus bas, score doublé.
+  case doubledForClosingWithoutLowest
+  /// Mölkky : dépassement de 50, retour à 25.
+  case bustBackTo25
+  /// Yams : bonus de la section haute (+35).
+  case upperSectionBonus
+}
+
 /// Résultat après application des règles (doublement Skyjo, bonus Yams…).
 public struct ScoreEntry: Sendable, Codable, Equatable {
   public let participantID: Participant.ID
   public let rawValue: Int
   public let computedValue: Int
-  public let explanation: String?
+  public let explanation: ScoreExplanation?
   public let detail: ScoreDetail?
   public let modifiers: Set<ModifierID>
 
@@ -13,7 +24,7 @@ public struct ScoreEntry: Sendable, Codable, Equatable {
     participantID: Participant.ID,
     rawValue: Int,
     computedValue: Int,
-    explanation: String? = nil,
+    explanation: ScoreExplanation? = nil,
     detail: ScoreDetail? = nil,
     modifiers: Set<ModifierID> = []
   ) {

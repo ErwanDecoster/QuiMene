@@ -175,13 +175,6 @@ public struct MatchRepository {
     return try context.fetch(descriptor).first
   }
 
-  /// Aucune partie jamais créée, terminée ou non — sert à distinguer « premier lancement ».
-  public func hasAnyMatch() throws -> Bool {
-    var descriptor = FetchDescriptor<MatchRecord>()
-    descriptor.fetchLimit = 1
-    return try !context.fetch(descriptor).isEmpty
-  }
-
   /// Doc 01 « Historique » — parties terminées ou abandonnées, les plus récentes d'abord. Les
   /// filtres par jeu/joueur restent en mémoire côté appelant (doc 06 : le volume attendu ne
   /// justifie pas des prédicats composés).
@@ -325,7 +318,7 @@ public struct MatchRepository {
       participants: records
     )
     context.insert(match)
-    try persist(events, to: match, catalog: catalog)
+    _ = try persist(events, to: match, catalog: catalog)
     return match
   }
 

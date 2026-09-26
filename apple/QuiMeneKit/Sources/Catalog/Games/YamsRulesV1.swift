@@ -31,20 +31,20 @@ public struct YamsRulesV1: GameRules {
   {
     guard draft.inputs.count == 1, let input = draft.inputs.first else {
       return .invalid([
-        ValidationError(field: .general, message: "Une seule catégorie est remplie par tour.")
+        ValidationError(field: .general, reason: .singleCategoryPerTurn)
       ])
     }
     guard let categoryID = categoryID(of: input),
       let category = category(withID: categoryID, in: definition)
     else {
       return .invalid([
-        ValidationError(field: .participant(input.participantID), message: "Catégorie inconnue.")
+        ValidationError(field: .participant(input.participantID), reason: .unknownCategory)
       ])
     }
     if filledCategories(for: input.participantID, in: state).contains(categoryID) {
       return .invalid([
         ValidationError(
-          field: .participant(input.participantID), message: "Cette catégorie est déjà remplie.")
+          field: .participant(input.participantID), reason: .categoryAlreadyFilled)
       ])
     }
 
@@ -53,20 +53,20 @@ public struct YamsRulesV1: GameRules {
       guard (0...5).contains(input.rawValue) else {
         return .invalid([
           ValidationError(
-            field: .participant(input.participantID), message: "Nombre de dés invalide (0 à 5).")
+            field: .participant(input.participantID), reason: .invalidDiceCount)
         ])
       }
     case .fixed:
       guard input.rawValue == 0 || input.rawValue == 1 else {
         return .invalid([
-          ValidationError(field: .participant(input.participantID), message: "Valeur invalide.")
+          ValidationError(field: .participant(input.participantID), reason: .invalidFigureValue)
         ])
       }
     case .sumOfDice:
       let max = category.scoring.max ?? 30
       guard input.rawValue == 0 || (5...max).contains(input.rawValue) else {
         return .invalid([
-          ValidationError(field: .participant(input.participantID), message: "Somme invalide.")
+          ValidationError(field: .participant(input.participantID), reason: .invalidDiceSum)
         ])
       }
     }
@@ -86,14 +86,14 @@ public struct YamsRulesV1: GameRules {
     let base = baseValue(rawValue: input.rawValue, kind: category.scoring.kind, category: category)
 
     var bonus = 0
-    var explanation: String?
+    var explanation: ScoreExplanation?
     if category.section == .upper {
       let threshold = state.variants.int("upperBonusThreshold", default: 63)
       let priorUpperTotal = sectionTotal(
         for: input.participantID, in: state, definition: definition, section: .upper)
       if priorUpperTotal < threshold && priorUpperTotal + base >= threshold {
         bonus = 35
-        explanation = "Bonus de section haute (+35)"
+        explanation = .upperSectionBonus
       }
     }
 

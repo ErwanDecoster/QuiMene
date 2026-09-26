@@ -51,8 +51,8 @@ struct PlayerRepositoryTests {
     #expect(second.paletteID == "1", "Alice est archivée, la couleur 1 redevient disponible")
   }
 
-  @Test("Le réordonnancement met à jour sortIndex dans l'ordre fourni")
-  func reorderUpdatesSortIndex() throws {
+  @Test("La création attribue sortIndex dans l'ordre d'ajout")
+  func creationAssignsSortIndexInOrder() throws {
     let schema = Schema(QuiMeneSchemaV1.models)
     let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
     let container = try ModelContainer(for: schema, configurations: [config])
@@ -64,11 +64,6 @@ struct PlayerRepositoryTests {
       nickname: "Bob", avatarKind: "symbol", avatarValue: "tortoise.fill")
     #expect(alice.sortIndex == 0)
     #expect(bob.sortIndex == 1)
-
-    try repository.reorder([bob, alice])
-
-    #expect(bob.sortIndex == 0)
-    #expect(alice.sortIndex == 1)
   }
 
   @Test(

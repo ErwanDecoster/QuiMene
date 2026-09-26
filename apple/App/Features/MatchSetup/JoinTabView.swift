@@ -2,6 +2,7 @@ import Catalog
 import DesignSystem
 import Domain
 import Store
+import SwiftData
 import SwiftUI
 import Sync
 import UIKit
@@ -166,9 +167,10 @@ struct JoinTabView: View {
   private static func describe(_ error: Error) -> String {
     switch error {
     case OnlineSessionError.sessionNotFound:
-      return "Aucune partie ne correspond à ce code. Vérifie qu'il est bien à jour."
+      return String(
+        localized: "Aucune partie ne correspond à ce code. Vérifie qu'il est bien à jour.")
     default:
-      return "Connexion impossible (\(error.localizedDescription)). Réessaie."
+      return String(localized: "Connexion impossible (\(error.localizedDescription)). Réessaie.")
     }
   }
 }

@@ -25,7 +25,8 @@ extension InsightID {
 }
 
 /// Doc 06 — un fait de la partie. `value` porte la donnée brute (vérifiable par golden file,
-/// partagée avec Android) ; `headline`/`detail` sont la présentation déjà en français.
+/// partagée avec Android) ; titre, texte et icône sont rédigés par l'app à partir de `id` et
+/// `value`, dans la langue de l'utilisateur.
 public struct Insight: Sendable, Identifiable, Equatable {
   public enum Prominence: Sendable, Equatable {
     case hero, standard, minor
@@ -39,26 +40,17 @@ public struct Insight: Sendable, Identifiable, Equatable {
   }
 
   public let id: InsightID
-  public let headline: String
-  public let detail: String
-  public let symbol: String
   public let prominence: Prominence
   public let value: Value
   let interestScore: Double
 
   public init(
     id: InsightID,
-    headline: String,
-    detail: String,
-    symbol: String,
     prominence: Prominence = .standard,
     value: Value,
     interestScore: Double = 0
   ) {
     self.id = id
-    self.headline = headline
-    self.detail = detail
-    self.symbol = symbol
     self.prominence = prominence
     self.value = value
     self.interestScore = interestScore

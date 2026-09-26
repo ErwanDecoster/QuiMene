@@ -315,6 +315,7 @@ public struct SupabaseSessionBackend: OnlineSessionBackend {
 
   /// Traduit les exceptions levées par les fonctions SQL (`raise exception '<code>'`) en
   /// erreurs du domaine `Sync` ; le reste (réseau…) passe tel quel.
+  @discardableResult
   private func call<T>(_ body: () async throws -> T) async throws -> T {
     do {
       return try await body()

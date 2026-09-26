@@ -15,12 +15,12 @@ public struct SkyjoRulesV1: GameRules {
     let closers = draft.inputs.filter { $0.modifiers.contains(.closedRound) }
     guard closers.count == 1 else {
       return .invalid([
-        ValidationError(field: .modifier(.closedRound), message: "Un seul joueur ferme la manche.")
+        ValidationError(field: .modifier(.closedRound), reason: .singleCloserRequired)
       ])
     }
 
     let extremes = draft.inputs.filter { $0.rawValue < -24 || $0.rawValue > 156 }
-    return extremes.isEmpty ? .valid : .warning(["Score inhabituel, à vérifier."])
+    return extremes.isEmpty ? .valid : .warning([.unusualScore])
   }
 
   public func score(_ draft: RoundDraft, in state: MatchState, definition: GameDefinition)
@@ -28,7 +28,6 @@ public struct SkyjoRulesV1: GameRules {
   {
     let doublingEnabled = state.variants.bool("doublePenalty", default: true)
     let lowest = draft.inputs.map(\.rawValue).min() ?? 0
-    let names = Dictionary(uniqueKeysWithValues: state.participants.map { ($0.id, $0.displayName) })
 
     return draft.inputs.map { input in
       let closed = input.modifiers.contains(.closedRound)
@@ -41,9 +40,7 @@ public struct SkyjoRulesV1: GameRules {
         participantID: input.participantID,
         rawValue: input.rawValue,
         computedValue: penalised ? input.rawValue * 2 : input.rawValue,
-        explanation: penalised
-          ? "Score doublé : \(names[input.participantID] ?? "ce joueur") a fermé la manche sans le score le plus bas."
-          : nil,
+        explanation: penalised ? .doubledForClosingWithoutLowest : nil,
         detail: nil,
         modifiers: input.modifiers
       )

@@ -231,19 +231,7 @@ struct LiveMatchView: View {
         "Une session est en cours de partage sur \(model.pendingShareSwitchGameName ?? "une autre partie"). Continuer ici la remplacera : les personnes connectées verront cette partie à la place."
       )
     }
-    .confirmationDialog(
-      "Abandonner cette partie ?",
-      isPresented: $isConfirmingAbandon,
-      titleVisibility: .visible
-    ) {
-      Button("Abandonner", role: .destructive) {
-        model.abandon()
-      }
-    } message: {
-      Text(
-        "La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée."
-      )
-    }
+    .abandonMatchConfirmation(isPresented: $isConfirmingAbandon, onAbandon: model.abandon)
     .sheet(isPresented: $isPresentingShareSession) {
       ShareSessionView { allowsContributors in
         try await model.startSharing(

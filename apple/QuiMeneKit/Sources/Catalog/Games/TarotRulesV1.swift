@@ -54,7 +54,7 @@ public struct TarotRulesV1: GameRules {
     guard takers.count == 1, let takerInput = takers.first else {
       return .invalid([
         ValidationError(
-          field: .general, message: "Une donne doit avoir un preneur, ou être marquée passée.")
+          field: .general, reason: .takerRequired)
       ])
     }
 
@@ -65,7 +65,7 @@ public struct TarotRulesV1: GameRules {
       else {
         return .invalid([
           ValidationError(
-            field: .general, message: "Un partenaire (roi appelé) est requis à 5 joueurs.")
+            field: .general, reason: .partnerRequired)
         ])
       }
     }
@@ -73,7 +73,7 @@ public struct TarotRulesV1: GameRules {
     guard (0...91).contains(takerInput.rawValue) else {
       return .invalid([
         ValidationError(
-          field: .participant(takerInput.participantID), message: "Points invalides (0 à 91).")
+          field: .participant(takerInput.participantID), reason: .takerPointsOutOfRange(max: 91))
       ])
     }
 
@@ -84,7 +84,7 @@ public struct TarotRulesV1: GameRules {
       return .invalid([
         ValidationError(
           field: .participant(takerInput.participantID),
-          message: "Contrat, bouts ou poignée invalides.")
+          reason: .invalidTarotHand)
       ])
     }
 

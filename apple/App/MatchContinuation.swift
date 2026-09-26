@@ -12,7 +12,9 @@ enum MatchContinuation {
   private static let matchIDKey = "matchID"
 
   static func configure(_ activity: NSUserActivity, for match: MatchRecord, gameName: String?) {
-    activity.title = gameName.map { "Partie de \($0)" } ?? "Continuer la partie"
+    activity.title =
+      gameName.map { String(localized: "Partie de \($0)") }
+      ?? String(localized: "Continuer la partie")
     activity.userInfo = [matchIDKey: match.id.uuidString]
     activity.isEligibleForHandoff = true
   }

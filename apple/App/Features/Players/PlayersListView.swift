@@ -6,41 +6,30 @@ import SwiftUI
 
 struct PlayersListView: View {
   @Environment(\.modelContext) private var modelContext
-  @Environment(AppSettings.self) private var settings
   @Environment(DeepLinkRouter.self) private var deepLinkRouter
   @Query(sort: \PlayerRecord.sortIndex) private var allPlayers: [PlayerRecord]
   @State private var isPresentingCreation = false
   @State private var editMode: EditMode = .inactive
   @State private var selectedPlayerIDs = Set<UUID>()
 
-  /// Doc 01 : tri automatique par nombre de parties jouées (habitués d'abord) par défaut,
-  /// tri manuel (glisser-déposer) en option — réglable dans Réglages.
+  /// Doc 01 : les habitués d'abord (nombre de parties terminées), l'ordre d'ajout départageant
+  /// les égalités. Pas de réordonnancement manuel.
   private var activePlayers: [PlayerRecord] {
     // Doc 16, phase A — mon profil a sa propre section en tête (`myProfileSection`) : il ne
-    // se trie, ne se déplace et ne se sélectionne pas avec les autres joueurs.
-    let filtered = allPlayers.filter { !$0.isArchived && !$0.sharedProfileIsMine }
-    let sorted: [PlayerRecord]
-    if settings.playerSortMode == .automatic {
-      sorted = filtered.sorted { lhs, rhs in
+    // se trie ni ne se sélectionne avec les autres joueurs.
+    allPlayers
+      .filter { !$0.isArchived && !$0.sharedProfileIsMine }
+      .sorted { lhs, rhs in
         let lhsCount = matchesPlayedCount(for: lhs)
         let rhsCount = matchesPlayedCount(for: rhs)
         guard lhsCount == rhsCount else { return lhsCount > rhsCount }
         return lhs.sortIndex < rhs.sortIndex
       }
-    } else {
-      sorted = filtered
-    }
-    return sorted
   }
 
   private var me: PlayerRecord? { allPlayers.first { $0.sharedProfileIsMine } }
 
   private var archivedCount: Int { allPlayers.count { $0.isArchived } }
-
-  private var onMoveAction: ((IndexSet, Int) -> Void)? {
-    guard settings.playerSortMode == .manual else { return nil }
-    return move
-  }
 
   var body: some View {
     NavigationStack {
@@ -68,7 +57,6 @@ struct PlayersListView: View {
                   }
                 }
             }
-            .onMove(perform: onMoveAction)
           }
         }
 
@@ -183,12 +171,6 @@ struct PlayersListView: View {
 
   private func matchesPlayedCount(for player: PlayerRecord) -> Int {
     player.participations.filter { $0.match?.statusRaw == MatchStatus.ended.rawValue }.count
-  }
-
-  private func move(from source: IndexSet, to destination: Int) {
-    var reordered = activePlayers
-    reordered.move(fromOffsets: source, toOffset: destination)
-    try? PlayerRepository(context: modelContext).reorder(reordered)
   }
 
   private func archiveSelected() {

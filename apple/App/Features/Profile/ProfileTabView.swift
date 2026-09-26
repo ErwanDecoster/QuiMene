@@ -175,14 +175,8 @@ private struct ProfileIntroView: View {
           "clock.arrow.circlepath", "Retrouver vos parties jouées ensemble dans ton historique.")
         benefit("lock", "Un pseudo et un avatar, rien de plus : aucun compte à créer.")
       }
-      Button {
-        onCreate()
-      } label: {
-        Text("Créer mon profil").frame(maxWidth: .infinity)
-      }
-      .buttonStyle(.borderedProminent)
-      .controlSize(.large)
-      .tint(.brandInk)
+      Button("Créer mon profil", action: onCreate)
+        .buttonStyle(.primary(size: .large))
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, Space.lg)

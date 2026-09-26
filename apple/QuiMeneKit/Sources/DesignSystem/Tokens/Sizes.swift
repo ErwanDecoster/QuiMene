@@ -24,10 +24,3 @@ public enum ButtonHeight {
   public static let medium: CGFloat = 44
   public static let small: CGFloat = 32
 }
-
-/// Charte graphique §6 — touches du pavé numérique, au-delà du minimum tactile : on tape à
-/// bout de bras, autour d'une table.
-public enum Keypad {
-  public static let key: CGFloat = 56
-  public static let gap: CGFloat = 12
-}

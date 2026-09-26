@@ -185,11 +185,6 @@ final class SessionLink {
   func deviceName(for deviceID: String) -> String? {
     presence.first { $0.deviceID == deviceID }?.deviceName
   }
-
-  /// Marque la session comme fermée côté appareil (le créateur vient de l'arrêter).
-  func markClosed() {
-    isClosed = true
-  }
 }
 
 /// Doc 16, phase C — ce qu'un appareil retient d'une session pour la reprendre après un

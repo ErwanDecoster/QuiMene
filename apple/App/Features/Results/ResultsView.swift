@@ -2,6 +2,7 @@ import Charts
 import DesignSystem
 import Domain
 import Store
+import SwiftData
 import SwiftUI
 
 /// Doc 06 : « L'écran de résultats est la récompense de la soirée. » Podium toujours affiché,
@@ -137,17 +138,19 @@ struct ResultsView: View {
     VStack(alignment: .leading, spacing: Space.md) {
       Text("Faits marquants").font(.h4).foregroundStyle(.textPrimary)
       ForEach(insights) { insight in
-        Card {
-          HStack(spacing: Space.md) {
-            Image(systemName: insight.symbol)
-              .font(.system(size: IconSize.lg))
-              .frame(width: IconSize.lg, height: IconSize.lg)
-              .foregroundStyle(.brandInk)
-            VStack(alignment: .leading, spacing: Space.xxs) {
-              Text(insight.headline).font(.h6).foregroundStyle(.textPrimary)
-              Text(insight.detail).font(.bodySmall).foregroundStyle(.textSecondary)
+        if let presentation = insight.presentation(in: state) {
+          Card {
+            HStack(spacing: Space.md) {
+              Image(systemName: presentation.symbol)
+                .font(.system(size: IconSize.lg))
+                .frame(width: IconSize.lg, height: IconSize.lg)
+                .foregroundStyle(.brandInk)
+              VStack(alignment: .leading, spacing: Space.xxs) {
+                Text(presentation.headline).font(.h6).foregroundStyle(.textPrimary)
+                Text(presentation.detail).font(.bodySmall).foregroundStyle(.textSecondary)
+              }
+              Spacer(minLength: 0)
             }
-            Spacer(minLength: 0)
           }
         }
       }
@@ -164,6 +167,10 @@ struct ResultsView: View {
       direction == .lowestWins ? Double(-total) : Double(total)
     }
 
+    // Doc 06 / charte §1.5 — chaque courbe prend la couleur du joueur, doublée de son symbole
+    // (lisible sans la couleur, pour un daltonien).
+    let palettes = series.map { recordByID[$0.id]?.palette ?? PlayerPalette(index: 1) }
+
     return VStack(alignment: .leading, spacing: Space.md) {
       Text("Évolution").font(.h4).foregroundStyle(.textPrimary)
       Chart {
@@ -174,6 +181,7 @@ struct ResultsView: View {
               y: .value("Total", displayValue(point.total))
             )
             .foregroundStyle(by: .value("Joueur", entry.name))
+            .symbol(by: .value("Joueur", entry.name))
             .interpolationMethod(.monotone)
           }
         }
@@ -183,6 +191,8 @@ struct ResultsView: View {
             .lineStyle(StrokeStyle(dash: [4, 4]))
         }
       }
+      .chartForegroundStyleScale(domain: series.map(\.name), range: palettes.map(\.color))
+      .chartSymbolScale(domain: series.map(\.name), range: palettes.map(\.chartSymbol))
       .chartYAxis {
         AxisMarks { value in
           AxisGridLine()
@@ -207,7 +217,8 @@ struct ResultsView: View {
     sortedStandings
       .compactMap { standing -> String? in
         guard let record = recordByID[standing.participantID] else { return nil }
-        return "\(record.nicknameSnapshot), \(standing.score.formatted()) points"
+        return String(
+          localized: "\(record.nicknameSnapshot), \(standing.score.formatted()) points")
       }
       .joined(separator: " · ")
   }
@@ -278,7 +289,7 @@ struct ResultsView: View {
 }
 
 extension Badge.Kind {
-  var label: String {
+  var label: LocalizedStringResource {
     switch self {
     case .winner: "Vainqueur"
     case .metronome: "Le Métronome"

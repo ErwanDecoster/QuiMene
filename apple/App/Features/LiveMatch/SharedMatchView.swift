@@ -89,9 +89,9 @@ struct SharedMatchView: View {
   }
 
   private var navigationTitle: String {
-    guard let definition = model.definition else { return "Partie partagée" }
+    guard let definition = model.definition else { return String(localized: "Partie partagée") }
     let roundNumber = (model.state?.rounds.count ?? 0) + 1
-    return "\(definition.name.localized) · Manche \(roundNumber)"
+    return String(localized: "\(definition.name.localized) · Manche \(roundNumber)")
   }
 
   private func liveView(definition: GameDefinition, state: MatchState) -> some View {

@@ -79,7 +79,7 @@ final class BeloteRoundModel {
       let takerRepresentative = state.participants.first(where: { $0.teamID == takerTeamID }),
       let defenderRepresentative = state.participants.first(where: { $0.teamID == defenderTeamID })
     else {
-      validationErrorMessage = "Deux équipes complètes sont nécessaires."
+      validationErrorMessage = String(localized: "Deux équipes complètes sont nécessaires.")
       return
     }
 
@@ -111,7 +111,7 @@ final class BeloteRoundModel {
       beloteRebeloteTeamID = nil
       takerPoints = 82
     } catch {
-      validationErrorMessage = "La donne n'a pas pu être enregistrée."
+      validationErrorMessage = String(localized: "La donne n'a pas pu être enregistrée.")
     }
   }
 
