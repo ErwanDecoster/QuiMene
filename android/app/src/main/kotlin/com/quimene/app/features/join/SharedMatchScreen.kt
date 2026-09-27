@@ -3,6 +3,7 @@ package com.quimene.app.features.join
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.features.livematch.MeBadge
@@ -34,6 +36,7 @@ import com.quimene.app.features.livematch.RoundEntryDispatch
 import com.quimene.app.features.results.MatchSummaryContent
 import com.quimene.app.livesync.SharedMatchViewModel
 import com.quimene.app.livesync.ensureFriend
+import com.quimene.app.navigation.LocalFloatingNavBarHeight
 import com.quimene.app.ui.asString
 import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarSize
@@ -133,11 +136,24 @@ fun SharedMatchScreen(
             // Doc 16, phase C — même écran de résultats que le créateur, puis « Partie suivante » :
             // un participant peut enchaîner même si le créateur est absent.
             if (viewModel.isConcluded) {
-                viewModel.summaryState()?.let { MatchSummaryContent(it, modifier = Modifier.weight(1f)) }
+                // Le dernier élément de l'écran remonte au-dessus de la barre de navigation
+                // flottante, comme sur l'écran de résultats du créateur.
+                val navBarHeight = LocalFloatingNavBarHeight.current
+                viewModel.summaryState()?.let {
+                    MatchSummaryContent(
+                        it,
+                        modifier = Modifier.weight(1f),
+                        contentPadding =
+                            PaddingValues(
+                                top = Space.lg,
+                                bottom = Space.lg + if (viewModel.canPropose) 0.dp else navBarHeight,
+                            ),
+                    )
+                }
                 if (viewModel.canPropose) {
                     NextMatchBar(
                         isBusy = viewModel.isSubmitting,
-                        modifier = Modifier.padding(Space.lg),
+                        modifier = Modifier.padding(Space.lg).padding(bottom = navBarHeight),
                     ) { isPickingNextMatch = true }
                 }
                 if (isPickingNextMatch) {
@@ -227,6 +243,7 @@ private fun WhoAreYou(viewModel: SharedMatchViewModel) {
     val colors = LocalAppColors.current
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = Space.lg),
+        contentPadding = PaddingValues(bottom = Space.lg + LocalFloatingNavBarHeight.current),
         verticalArrangement = Arrangement.spacedBy(Space.sm),
     ) {
         item {
