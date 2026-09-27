@@ -8,6 +8,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -38,9 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -78,7 +81,9 @@ import com.quimene.domain.stats.Insight
 import com.quimene.domain.stats.ParticipantSeries
 import com.quimene.store.ParticipantEntity
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
 import java.util.UUID
+import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 /** Miroir de `ResultsView.swift` (doc 06) : podium (rang, avatar, badge, score), faits marquants
@@ -220,7 +225,14 @@ private fun PodiumRow(
     val isDark = LocalIsDarkTheme.current
     val isFirst = standing.rank == 1
     val accentColor = if (isFirst) colors.brandBrass else colors.textSecondary
-    val background = if (isFirst) colors.brandBrass.copy(alpha = 0.08f) else colors.neutralSurface
+    // Teinte opaque (laiton sur la surface) : sous un fond translucide, l'ombre qu'Android dessine
+    // pour une surface opaque transparaissait en épais cadre gris.
+    val background =
+        if (isFirst) {
+            colors.brandBrass.copy(alpha = 0.08f).compositeOver(colors.neutralSurface)
+        } else {
+            colors.neutralSurface
+        }
 
     // Miroir de `Card` (:designsystem) plutôt qu'un simple `Modifier.background()` — même
     // remontée « les listes ne se détachent pas du fond » : tonal + ombre garantit une séparation
@@ -352,44 +364,59 @@ private fun EvolutionChart(
     val gridColor = colors.neutralBorder
     val thresholdColor = colors.semanticWarning
     val labelColorArgb = colors.textTertiary.toArgb()
+    val locale = LocalConfiguration.current.locales[0]
+    val numberFormat = remember(locale) { NumberFormat.getIntegerInstance(locale) }
 
+    // Le plus bas gagne : la courbe est retournée pour que le meneur reste en haut (comme côté
+    // Apple), mais l'axe affiche les vrais totaux.
     fun displayValue(total: Int): Float = if (direction == Direction.LowestWins) -total.toFloat() else total.toFloat()
+
+    fun axisLabel(value: Float): String =
+        numberFormat.format((if (direction == Direction.LowestWins) -value else value).roundToInt())
 
     val lines =
         series.mapNotNull { entry ->
             val points = entry.points.map { it.round to displayValue(it.total) }
-            if (points.size < 2) null else entry to points
+            if (points.isEmpty()) null else entry to points
         }
     val thresholdValue = threshold?.let { displayValue(it) }
     val allValues = lines.flatMap { (_, points) -> points.map { it.second } } + listOfNotNull(thresholdValue)
     if (allValues.isEmpty()) return
 
-    val minY = allValues.min()
-    val maxY = allValues.max()
-    val yRange = (maxY - minY).takeIf { it > 0f } ?: 1f
-    val maxRound = series.maxOf { entry -> entry.points.maxOfOrNull { it.round } ?: 0 }.coerceAtLeast(1)
+    val ticks = niceTicks(allValues.min(), allValues.max())
+    val minY = ticks.first()
+    val yRange = ticks.last() - minY
+    val lastRound = series.maxOf { entry -> entry.points.maxOfOrNull { it.round } ?: 0 }
+    val roundSpan = lastRound.coerceAtLeast(1)
 
     Canvas(modifier = Modifier.fillMaxWidth().height(EvolutionChartHeight)) {
         val leftAxisWidth = 36.dp.toPx()
+        val bottomAxisHeight = 18.dp.toPx()
         val chartWidth = (size.width - leftAxisWidth).coerceAtLeast(1f)
-        val chartHeight = size.height
+        val chartHeight = (size.height - bottomAxisHeight).coerceAtLeast(1f)
 
-        fun xFor(round: Int): Float = leftAxisWidth + chartWidth * (round / maxRound.toFloat())
+        fun xFor(round: Int): Float = leftAxisWidth + chartWidth * (round / roundSpan.toFloat())
 
         fun yFor(value: Float): Float = chartHeight - ((value - minY) / yRange) * chartHeight
 
-        val tickCount = 4
         val textPaint =
             Paint().apply {
                 color = labelColorArgb
                 textSize = 10.sp.toPx()
                 isAntiAlias = true
             }
-        for (tick in 0..tickCount) {
-            val value = minY + (yRange * tick / tickCount)
-            val y = yFor(value)
+        for (tick in ticks) {
+            val y = yFor(tick)
             drawLine(gridColor, Offset(leftAxisWidth, y), Offset(size.width, y), strokeWidth = 1.dp.toPx())
-            drawContext.canvas.nativeCanvas.drawText(value.roundToInt().toString(), 0f, y + 4.dp.toPx(), textPaint)
+            drawContext.canvas.nativeCanvas.drawText(axisLabel(tick), 0f, y + 4.dp.toPx(), textPaint)
+        }
+
+        // Numéros de manche, comme « Manche par manche » — un sur deux (ou moins) quand ils se
+        // chevaucheraient.
+        val roundPaint = Paint(textPaint).apply { textAlign = Paint.Align.CENTER }
+        val labelEvery = ceil(RoundLabelMinSpacing.toPx() * roundSpan / chartWidth).toInt().coerceAtLeast(1)
+        for (round in 0..lastRound step labelEvery) {
+            drawContext.canvas.nativeCanvas.drawText("${round + 1}", xFor(round), size.height - 4.dp.toPx(), roundPaint)
         }
 
         thresholdValue?.let { value ->
@@ -427,9 +454,12 @@ private fun EvolutionLegend(
     participants: Map<UUID, ParticipantEntity>,
 ) {
     val colors = LocalAppColors.current
-    Row(
-        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+    // Sur plusieurs lignes au besoin, comme la légende de Swift Charts : un défilement horizontal
+    // cachait les derniers joueurs.
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(Space.md),
+        verticalArrangement = Arrangement.spacedBy(Space.xxs),
     ) {
         for (entry in series) {
             val palette = playerPalette(participants[entry.id])
@@ -458,7 +488,7 @@ private fun RoundByRoundSection(
             style = MaterialTheme.typography.labelLarge,
             color = colors.textSecondary,
         )
-        Card {
+        Card(modifier = Modifier.fillMaxWidth()) {
             Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
                 Column {
                     Row {
@@ -509,7 +539,8 @@ private fun RoundByRoundSection(
 }
 
 private val CardGutterResults = Space.sm
-private val EvolutionChartHeight = 200.dp
+private val EvolutionChartHeight = 220.dp
+private val RoundLabelMinSpacing = 20.dp
 private val RoundColumnWidth = 28.dp
 private val ParticipantColumnWidth = 88.dp
 
