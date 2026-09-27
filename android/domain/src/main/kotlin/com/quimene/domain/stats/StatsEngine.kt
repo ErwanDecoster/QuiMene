@@ -324,7 +324,9 @@ class StatsEngine {
             for (participant in best.mentionedParticipants) {
                 mentionCounts[participant] = (mentionCounts[participant] ?: 0) + 1
             }
-            remaining = remaining.filterNot { it.id == best.id && it.value == best.value }
+            // Un même tour ne se raconte qu'une fois : quand le plus haut score gagne, le « plus
+            // gros tour » est aussi le « meilleur tour » (même joueur, même manche, même valeur).
+            remaining = remaining.filterNot { it.value == best.value && (it.id == best.id || best.describesOneRound) }
         }
         return selected
     }

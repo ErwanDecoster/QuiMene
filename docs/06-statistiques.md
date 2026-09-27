@@ -50,6 +50,9 @@ Score d'intérêt appliqué à chaque candidat :
 Les faits sous un seuil d'intérêt sont écartés. Sur une partie plate et sans relief, l'écran
 affiche trois faits, pas six remplis de vide.
 
+Un même tour (joueur, manche, valeur) n'est raconté qu'une fois : quand le plus haut score
+gagne, le « plus gros tour » est aussi le « meilleur tour », et seul le premier retenu s'affiche.
+
 ## Catalogue d'indicateurs
 
 ### Universels

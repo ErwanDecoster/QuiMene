@@ -289,7 +289,11 @@ public struct StatsEngine: Sendable {
       for participant in best.mentionedParticipants {
         mentionCounts[participant, default: 0] += 1
       }
-      remaining.removeAll { $0.id == best.id && $0.value == best.value }
+      // Un même tour ne se raconte qu'une fois : quand le plus haut score gagne, le « plus gros
+      // tour » est aussi le « meilleur tour » (même joueur, même manche, même valeur).
+      remaining.removeAll {
+        $0.value == best.value && ($0.id == best.id || best.describesOneRound)
+      }
     }
     return selected
   }
@@ -444,5 +448,11 @@ extension Insight {
     case .perParticipant(let map):
       Array(map.keys)
     }
+  }
+
+  /// Fait attaché à un tour précis : deux faits de même valeur racontent alors le même tour.
+  fileprivate var describesOneRound: Bool {
+    if case .single(_, _, let round) = value { return round != nil }
+    return false
   }
 }

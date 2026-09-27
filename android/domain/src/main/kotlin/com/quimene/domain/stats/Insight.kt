@@ -58,4 +58,9 @@ data class Insight(
                 is Value.Single -> listOfNotNull(v.participantID)
                 is Value.PerParticipant -> v.values.keys.toList()
             }
+
+    /** Miroir de `describesOneRound` (`StatsEngine.swift`) : fait attaché à un tour précis — deux
+     * faits de même valeur racontent alors le même tour. */
+    internal val describesOneRound: Boolean
+        get() = (value as? Value.Single)?.round != null
 }
