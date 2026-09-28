@@ -495,14 +495,15 @@ tous les appareils, créateur compris :
   devancé (`stale_seq`) — l'écrasement d'une manche devient impossible par construction ;
 - chaque appareil valide sa saisie avec le même moteur de règles, écrit directement dans le
   journal et met à jour les écrans verrouillés ;
-- saisie bloquée hors ligne (pas de file d'attente) ; seul le créateur arrête la session ;
-  n'importe quel participant lance la partie suivante ;
+- saisie bloquée hors ligne (pas de file d'attente) ; seul le créateur arrête la session, qui
+  s'arrête sinon d'elle-même après 6 h sans activité (ajouté le 28 septembre 2026) ; n'importe
+  quel participant lance la partie suivante ;
 - événements scellés (AES-GCM, clé dérivée du code d'appairage) ; identités (« Qui es-tu ? ») dans
   le même journal ;
 - historique partagé par **boîte aux lettres chiffrée par profil** (parties complètes), à la place
   des résumés en clair (doc [14](14-profils-partages.md)) ;
-- conservation : 14 jours d'inactivité pour une session, 24 h après sa fermeture ; 14 jours pour
-  une livraison en attente.
+- conservation : 24 h après la fermeture d'une session (14 jours d'inactivité au plus, filet de
+  sécurité) ; 14 jours pour une livraison en attente.
 
 **Alternatives.**
 - *Garder l'hôte autoritaire et le rendre plus robuste* (reconnexions, élection d'un nouvel hôte)
