@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="acces_appareil_photo_necessaire">Camera access is needed to scan a QR code — you can also type the code in below.</string>
+    <string name="annuler_la_selection">Cancel Selection</string>
+    <string name="archiver_la_selection">Archive Selection</string>
+    <string name="autoriser_l_appareil_photo">Allow Camera Access</string>
+    <string name="connexion_impossible_reessaie">Couldn\'t connect. Try again.</string>
+    <string name="couleur">Color</string>
+    <plurals name="count1_selectionne_s">
+        <item quantity="one">%1$d selected</item>
+        <item quantity="other">%1$d selected</item>
+    </plurals>
+    <string name="effacer_la_recherche">Clear Search</string>
+    <string name="fermer_la_recherche">Close Search</string>
+    <string name="partie">Match</string>
+    <string name="plus_d_actions">More Actions</string>
+    <string name="remplir_value1">Fill in %1$s</string>
+    <string name="saisis_le_code_a_6_chiffres">Enter the 6-digit code shown on the device sharing the match.</string>
+    <string name="selectionner_des_joueurs">Select Players</string>
+</resources>

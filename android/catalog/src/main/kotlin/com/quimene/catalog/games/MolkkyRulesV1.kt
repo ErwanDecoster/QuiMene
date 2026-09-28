@@ -4,6 +4,7 @@ import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.Round
 import com.quimene.domain.model.RoundDraft
 import com.quimene.domain.model.ScoreEntry
+import com.quimene.domain.model.ScoreExplanation
 import com.quimene.domain.rules.EndCheck
 import com.quimene.domain.rules.EndReason
 import com.quimene.domain.rules.GameDefinition
@@ -41,7 +42,7 @@ class MolkkyRulesV1 : GameRules {
                 participantID = input.participantID,
                 rawValue = input.rawValue,
                 computedValue = if (bust) 25 - priorTotal else input.rawValue,
-                explanation = if (bust) "Dépassement de 50 : retour à 25." else null,
+                explanation = if (bust) ScoreExplanation.BustBackTo25 else null,
                 detail = input.detail,
                 modifiers = input.modifiers,
             )

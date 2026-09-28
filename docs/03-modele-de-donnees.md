@@ -32,7 +32,7 @@ La fiche joueur, réutilisée d'une partie à l'autre.
 | `paletteID` | `String` | identifiant de palette, voir [charte §1.5](07-charte-graphique.md#15-palette-des-joueurs) |
 | `createdAt` | `Date` | |
 | `isArchived` | `Bool` | masqué des sélections, conservé dans l'historique |
-| `sortIndex` | `Int` | ordre manuel dans la liste des joueurs |
+| `sortIndex` | `Int` | ordre d'ajout ; départage le tri de la liste (les habitués d'abord) |
 
 Pas de contrainte d'unicité sur `nickname` : deux Alice sont autorisées, la couleur et
 l'avatar les distinguent. Le formulaire prévient d'un doublon sans l'interdire.

@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.quimene.app.R
@@ -59,7 +60,13 @@ fun PlayersListScreen(
     onOpenMyProfile: () -> Unit,
 ) {
     val container = LocalAppContainer.current
-    val viewModel = rememberViewModel { PlayersListViewModel(container.playerRepository, container.appSettings) }
+    val viewModel =
+        rememberViewModel {
+            PlayersListViewModel(
+                container.playerRepository,
+                container.matchRepository,
+            )
+        }
     val state by viewModel.uiState.collectAsState()
     val colors = LocalAppColors.current
 
@@ -67,10 +74,13 @@ fun PlayersListScreen(
         topBar = {
             if (viewModel.isSelecting) {
                 TopAppBar(
-                    title = { Text("${viewModel.selectedPlayerIDs.size} sélectionné(s)") },
+                    title = {
+                        val count = viewModel.selectedPlayerIDs.size
+                        Text(pluralStringResource(R.plurals.count1_selectionne_s, count, count))
+                    },
                     navigationIcon = {
                         IconButton(onClick = viewModel::toggleSelectionMode) {
-                            Icon(Icons.Filled.Close, contentDescription = "Annuler la sélection")
+                            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.annuler_la_selection))
                         }
                     },
                     actions = {
@@ -78,7 +88,10 @@ fun PlayersListScreen(
                             onClick = viewModel::archiveSelected,
                             enabled = viewModel.selectedPlayerIDs.isNotEmpty(),
                         ) {
-                            Icon(Icons.Filled.Archive, contentDescription = "Archiver la sélection")
+                            Icon(
+                                Icons.Filled.Archive,
+                                contentDescription = stringResource(R.string.archiver_la_selection),
+                            )
                         }
                     },
                 )
@@ -88,7 +101,10 @@ fun PlayersListScreen(
                     actions = {
                         if (state.active.isNotEmpty()) {
                             IconButton(onClick = viewModel::toggleSelectionMode) {
-                                Icon(Icons.Filled.Checklist, contentDescription = "Sélectionner des joueurs")
+                                Icon(
+                                    Icons.Filled.Checklist,
+                                    contentDescription = stringResource(R.string.selectionner_des_joueurs),
+                                )
                             }
                         }
                     },
@@ -113,7 +129,7 @@ fun PlayersListScreen(
         if (state.me == null && state.active.isEmpty() && state.archivedCount == 0) {
             EmptyState(
                 icon = Icons.Filled.Add,
-                message = "Aucun joueur pour l'instant — ajoutez le premier pour commencer une partie.",
+                message = stringResource(R.string.aucun_joueur_ajouter_un_joueur),
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
                 actionTitle = stringResource(R.string.ajouter_un_joueur),
                 onAction = onAddPlayer,

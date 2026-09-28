@@ -32,7 +32,6 @@ final class SharedMatchModel {
   /// Joignable, et session toujours ouverte. Hors ligne, le tableau reste celui du dernier
   /// rattrapage et la saisie est bloquée (doc 16).
   var isHostConnected: Bool { link.isReachable && !link.isClosed }
-  var isOffline: Bool { !link.isReachable }
   var isSessionClosed: Bool { link.isClosed }
 
   var participants: [Participant] {
@@ -93,7 +92,6 @@ final class SharedMatchModel {
     return link.identities.occupant(of: seat) == nil ? .free : .taken
   }
 
-
   /// Le créateur, à ajouter à mes amis une fois ma place retenue : la liaison est durable dans
   /// les deux sens (doc 16).
   var ownerToBefriend: ProfileCard? {
@@ -143,7 +141,7 @@ final class SharedMatchModel {
     if !sent {
       identityMessage =
         link.isClosed
-        ? String(localized: "Le créateur a arrêté la session.")
+        ? String(localized: "La session est terminée.")
         : String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
     } else if mySeat != seat {
       identityMessage = String(localized: "Cette place vient d'être prise par quelqu'un d'autre.")
@@ -269,10 +267,11 @@ final class SharedMatchModel {
       latestRejectionReason = Self.overtakenMessage(name)
       return false
     case .offline:
-      latestRejectionReason = String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
+      latestRejectionReason = String(
+        localized: "Hors connexion : la saisie reprendra au retour du réseau.")
       return false
     case .closed:
-      latestRejectionReason = String(localized: "Le créateur a arrêté la session.")
+      latestRejectionReason = String(localized: "La session est terminée.")
       return false
     }
   }
@@ -301,13 +300,15 @@ final class SharedMatchModel {
       await reload(fresh: [])
       return true
     case .overtaken:
-      latestRejectionReason = String(localized: "Une partie vient d'être lancée sur un autre appareil.")
+      latestRejectionReason = String(
+        localized: "Une partie vient d'être lancée sur un autre appareil.")
       return false
     case .offline:
-      latestRejectionReason = String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
+      latestRejectionReason = String(
+        localized: "Hors connexion : la saisie reprendra au retour du réseau.")
       return false
     case .closed:
-      latestRejectionReason = String(localized: "Le créateur a arrêté la session.")
+      latestRejectionReason = String(localized: "La session est terminée.")
       return false
     }
   }
@@ -333,9 +334,11 @@ final class SharedMatchModel {
 
   static func overtakenMessage(_ name: String?) -> String {
     if let name {
-      return String(localized: "\(name) vient de valider une manche : vérifie avant de valider la tienne.")
+      return String(
+        localized: "\(name) vient de valider une manche : vérifie avant de valider la tienne.")
     }
-    return String(localized: "Une autre manche vient d'être validée : vérifie avant de valider la tienne.")
+    return String(
+      localized: "Une autre manche vient d'être validée : vérifie avant de valider la tienne.")
   }
 
   /// Départ volontaire : termine la Live Activity et ferme le lien.
@@ -362,7 +365,7 @@ final class SharedMatchModel {
     if isNewMatch { latestRejectionReason = nil }
 
     if replayed.rounds.count > previousRoundCount,
-      let explanation = replayed.rounds.last?.entries.compactMap(\.explanation).first
+      let explanation = replayed.lastRoundExplanationMessage
     {
       roundExplanationMessage = explanation
       roundExplanationClearTask?.cancel()

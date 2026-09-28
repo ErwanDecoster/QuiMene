@@ -13,13 +13,17 @@ import Sync
 ///
 /// Vit aussi longtemps que l'app (même patron que `DeepLinkRouter.shared`) et retient la session
 /// (`PersistedOnlineSession`) : à la réouverture après un arrêt complet du processus, la partie
-/// suivie reprend sans redemander le code.
+/// suivie reprend sans redemander le code. Une session terminée (arrêtée par le créateur, ou
+/// après 6 h sans activité, doc 16) ne laisse pas de bandeau de reprise derrière elle.
 @MainActor
 @Observable
 final class MatchConnectionCoordinator {
   static let shared = MatchConnectionCoordinator()
 
   private(set) var sharedModel: SharedMatchModel?
+  /// Doc 16 — la session suivie s'est terminée hors de son écran : Jeux le dit une fois, à la
+  /// place du bandeau de reprise.
+  private(set) var showsEndedNotice = false
 
   private let catalog = GameCatalog.embedded
   private let backend = SupabaseSessionBackend()
@@ -36,9 +40,15 @@ final class MatchConnectionCoordinator {
   private init() {
     if let persisted = PersistedOnlineSession.load(.participant) {
       Task { [weak self] in
-        _ = try? await self?.connect(
-          code: persisted.pairingCode, deviceName: persisted.deviceName,
-          profile: persisted.profile, isSpectator: persisted.isSpectator ?? false)
+        do {
+          _ = try await self?.connect(
+            code: persisted.pairingCode, deviceName: persisted.deviceName,
+            profile: persisted.profile, isSpectator: persisted.isSpectator ?? false)
+        } catch OnlineSessionError.sessionNotFound {
+          // Terminée pendant que l'app était fermée : plus rien à reprendre.
+          PersistedOnlineSession.clear(.participant)
+          self?.showsEndedNotice = true
+        } catch {}
       }
     }
   }
@@ -93,9 +103,39 @@ final class MatchConnectionCoordinator {
       guard let self, let model else { return false }
       return self.keep(matchID: matchID, events: events, in: model)
     }
+    link.onClosed = { [weak self] in
+      Task { @MainActor [weak self] in await self?.sessionDidClose(sessionID: info.sessionID) }
+    }
     sharedModel = model
     await link.start()
     return role
+  }
+
+  /// Session fermée : la partie suivie s'arrête d'elle-même, sans « Quitter la partie ». Si son
+  /// écran est affiché, il garde le dernier tableau (« La session est terminée ») jusqu'à sa
+  /// fermeture (`endIfClosed`).
+  private func sessionDidClose(sessionID: UUID) async {
+    guard sharedModel?.link.sessionID == sessionID, !DeepLinkRouter.shared.isPresentingJoin
+    else { return }
+    await end()
+    showsEndedNotice = true
+  }
+
+  /// À la fermeture de l'écran « Rejoindre » : une session terminée s'arrête là.
+  func endIfClosed() async {
+    guard sharedModel?.isSessionClosed == true else { return }
+    await end()
+  }
+
+  func dismissEndedNotice() {
+    showsEndedNotice = false
+  }
+
+  /// Les parties terminées d'abord (la dernière peut arriver avec la fin de la session), puis
+  /// comme « Quitter la partie ».
+  private func end() async {
+    await sharedModel?.keepConcludedMatches()
+    await stop()
   }
 
   /// Doc 16, phase E — une partie terminée de la session où j'ai une place : enregistrée dans mon
@@ -129,7 +169,9 @@ final class MatchConnectionCoordinator {
         } else {
           nil
         }
-      guard let fiche else { return LiveShareCoordinator.generatedSeed(for: participant.displayName) }
+      guard let fiche else {
+        return LiveShareCoordinator.generatedSeed(for: participant.displayName)
+      }
       return MatchRepository.ParticipantSeed(
         player: fiche, nickname: participant.displayName, avatarKind: fiche.avatarKind,
         avatarValue: fiche.avatarValue, paletteID: fiche.paletteID, teamID: participant.teamID)

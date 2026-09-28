@@ -23,6 +23,15 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
+    lint {
+        // Doc 10 — zéro avertissement, comme côté Apple : un avertissement Lint fait échouer le build.
+        warningsAsErrors = true
+        // Vérifications « une version plus récente existe » : elles dépendent du réseau et de la
+        // date, et casseraient un build reproductible dès qu'une bibliothèque sort — les montées
+        // de version se font par un passage dédié.
+        disable += setOf("GradleDependency", "NewerVersionAvailable", "AndroidGradlePluginVersion")
+    }
 }
 
 kotlin {
@@ -45,7 +54,6 @@ dependencies {
     // (`QuiMeneDatabase` hérite de `RoomDatabase`, les DAOs sont un type Room) — :app en a
     // besoin sur son propre classpath de compilation pour construire/utiliser la base.
     api(libs.androidx.room.runtime)
-    api(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.datastore.preferences)
@@ -55,8 +63,6 @@ dependencies {
     // incohérence : @RunWith(RobolectricTestRunner) n'existe pas côté JUnit Platform).
     testImplementation(libs.junit4)
     testImplementation(libs.robolectric)
-    testImplementation(libs.androidx.test.junit)
-    testImplementation(libs.androidx.room.testing)
+    testImplementation(libs.androidx.test.core)
     testImplementation(libs.kotest.assertions.core)
-    testImplementation(kotlin("test-junit"))
 }

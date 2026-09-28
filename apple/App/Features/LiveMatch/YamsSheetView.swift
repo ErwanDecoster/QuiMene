@@ -78,28 +78,8 @@ struct YamsSheetView: View {
         )
       }
     }
-    .alert(
-      "Saisie invalide",
-      isPresented: Binding(
-        get: { model.validationErrorMessage != nil }, set: { if !$0 { model.dismissError() } })
-    ) {
-      Button("OK") {}
-    } message: {
-      Text(model.validationErrorMessage ?? "")
-    }
-    .confirmationDialog(
-      "Abandonner cette partie ?",
-      isPresented: $isConfirmingAbandon,
-      titleVisibility: .visible
-    ) {
-      Button("Abandonner", role: .destructive) {
-        model.abandon()
-      }
-    } message: {
-      Text(
-        "La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée."
-      )
-    }
+    .invalidEntryAlert(message: model.validationErrorMessage, onDismiss: model.dismissError)
+    .abandonMatchConfirmation(isPresented: $isConfirmingAbandon, onAbandon: model.abandon)
   }
 
   private var sheetGrid: some View {

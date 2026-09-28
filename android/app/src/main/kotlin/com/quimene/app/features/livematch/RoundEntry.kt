@@ -37,11 +37,11 @@ import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.CardGutter
 import com.quimene.designsystem.components.Chip
 import com.quimene.designsystem.components.PrimaryButton
+import com.quimene.designsystem.components.accessibleScoreRow
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.ScoreTypography
 import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.model.Participant
-import com.quimene.domain.rules.EntryKind
 
 /**
  * Dispatch sur la bonne forme de saisie de manche selon le moteur du jeu — miroir de
@@ -51,21 +51,14 @@ import com.quimene.domain.rules.EntryKind
  * connaissent la différence (voir [LiveRoundEntryState]).
  */
 @Composable
-fun RoundEntryDispatch(
-    source: LiveRoundEntryState,
-    onUnsupported: @Composable (gameName: String) -> Unit,
-) {
+fun RoundEntryDispatch(source: LiveRoundEntryState) {
     when (source.definition.engine) {
         BeloteRulesV1.ENGINE_ID -> BeloteRoundScreen(source)
         TarotRulesV1.ENGINE_ID -> TarotRoundScreen(source)
         WizardRulesV1.ENGINE_ID -> WizardRoundScreen(source)
         YamsRulesV1.ENGINE_ID -> YamsRoundScreen(source)
-        else ->
-            if (source.definition.scoring.entry.kind == EntryKind.Integer) {
-                GenericRoundEntry(source)
-            } else {
-                onUnsupported(source.definition.name.localized)
-            }
+        // Saisie entière (`integer`/`rank`), comme `LiveMatchView` côté Apple (`MatchPlayView`).
+        else -> GenericRoundEntry(source)
     }
 }
 
@@ -140,28 +133,39 @@ private fun ParticipantScoreRow(
     val colors = LocalAppColors.current
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Space.md)) {
-            Text(
-                text = rank?.toString() ?: "",
-                style = MaterialTheme.typography.labelLarge,
-                color = colors.textSecondary,
-                modifier = Modifier.width(20.dp),
-            )
+            // Doc 08 « Accessibilité » — rang, nom et total forment un seul arrêt TalkBack, comme
+            // `ScoreBoardView` côté Apple ; la puce et le champ de saisie gardent le leur.
             Row(
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(Space.xs),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .accessibleScoreRow(name = participant.displayName, score = total, rank = rank),
+                horizontalArrangement = Arrangement.spacedBy(Space.md),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = participant.displayName,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = colors.textPrimary,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false),
+                    text = rank?.toString() ?: "",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = colors.textSecondary,
+                    modifier = Modifier.width(20.dp),
                 )
-                ProfileBadgeView(badge)
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(Space.xs),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = participant.displayName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = colors.textPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    ProfileBadgeView(badge)
+                }
+                Text(text = total.toString(), style = ScoreTypography.scoreL, color = colors.textSecondary)
             }
-            Text(text = total.toString(), style = ScoreTypography.scoreL, color = colors.textSecondary)
             if (requiresCloserSelection) {
                 val closerDescription = stringResource(R.string.value1_a_ferme_la_manche, participant.displayName)
                 Chip(
@@ -171,13 +175,17 @@ private fun ParticipantScoreRow(
                     modifier = Modifier.semantics { contentDescription = closerDescription },
                 )
             }
+            val fieldDescription = stringResource(R.string.value1_score, participant.displayName)
             OutlinedTextField(
                 value = pendingValue?.toString() ?: "",
                 onValueChange = onScoreChange,
                 modifier =
-                    Modifier.width(96.dp).onFocusChanged { focusState ->
-                        if (focusState.isFocused) onFocus()
-                    },
+                    Modifier
+                        .width(96.dp)
+                        .semantics { contentDescription = fieldDescription }
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) onFocus()
+                        },
                 textStyle = ScoreTypography.scoreM,
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

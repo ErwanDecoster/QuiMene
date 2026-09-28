@@ -33,9 +33,12 @@ les manches. Le téléphone du créateur peut s'éteindre : la partie continue.
 - **Une session, plusieurs parties** : chaque partie commence par son `matchCreated` ; la partie
   courante est celle du plus récent. **N'importe quel participant** peut lancer la partie suivante
   (mêmes joueurs aux mêmes places, nouveaux identifiants de participant).
-- **Seul le créateur arrête** la session (« Arrêter le partage »). Après fermeture, le journal
-  reste lisible 24 h pour que les appareils rattrapent la fin, puis il est purgé. Une session
-  inactive est purgée après **14 jours**.
+- **Seul le créateur arrête** la session (« Terminer la session » sous les résultats, « Arrêter le
+  partage ») ; sinon, `quimene-close-idle-sessions` la ferme après **6 h sans activité**. Toute
+  fermeture prévient les appareils connectés (canal), et chacun la vérifie à chaque rattrapage
+  (`quimene_session_is_closed`) : la partie suivie s'arrête, sans bandeau de reprise. Après
+  fermeture, le journal reste lisible 24 h pour que les appareils rattrapent la fin, puis il est
+  purgé (au plus tard 14 jours après la dernière activité, filet de sécurité).
 - **Reprise** : créateur et participant retiennent la session (`PersistedOnlineSession`) et la
   reprennent après un redémarrage, sans ressaisir le code.
 
@@ -92,7 +95,7 @@ numéro de manche, quatre premiers pseudos et scores), qu'Apple exige pour l'aff
 ## Sécurité et vie privée
 
 - **Quiconque connaît le code** (ou scanne le QR) peut lire la session : c'est l'invitation. Un
-  code n'est valable que pour une session vivante (ouverte et active depuis moins de 14 jours).
+  code n'est valable que pour une session vivante (ouverte, donc active depuis moins de 6 h).
 - Aucune table n'est accessible directement : tout passe par des fonctions `security definer` qui
   exigent un code ou un identifiant de session (pas de policy `anon`). Un tiers sans le code ne
   peut ni lister ni lire les sessions.

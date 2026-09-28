@@ -47,5 +47,5 @@ et participant (colonnes C/P). Chaque ligne se coche deux fois.
 | 10 | Fin de partie | Partie complète dans l'historique du participant, marquée « Reçue » | ☐ | ☐ |
 | 11 | Partie locale avec un ami lié absent | Reçue à l'ouverture de son Historique (tirer pour actualiser) | ☐ | ☐ |
 | 12 | Abandon pendant que le participant choisit sa place | Le participant voit les résultats, pas une liste de places | ☐ | ☐ |
-| 13 | « Arrêter le partage » | Feuille fermée ; « Le créateur a arrêté la session » chez le participant | ☐ | ☐ |
+| 13 | « Terminer la session » sous les résultats du créateur | Le participant voit « La session est terminée » ; en fermant l'écran, plus de bandeau de reprise | ☐ | ☐ |
 | 14 | Relancer l'app du créateur et du participant en pleine partie | Les deux reprennent la session sans code | ☐ | ☐ |

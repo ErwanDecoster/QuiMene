@@ -13,8 +13,9 @@ import Sync
 /// lui compris, ajoute ses manches au journal serveur, qui garantit l'ordre.
 ///
 /// Survit à l'écran de partie (se recrée à chaque nouvelle partie) et au redémarrage de l'app
-/// (`PersistedOnlineSession`, reprise par `resumeIfNeeded`) : seul « Arrêter le partage » termine
-/// la session (doc 16 : créateur uniquement).
+/// (`PersistedOnlineSession`, reprise par `resumeIfNeeded`). Seul le créateur arrête la session
+/// (« Arrêter le partage », « Terminer la session ») ; sinon le serveur la ferme après 6 h sans
+/// activité (doc 16), ce que ce coordinateur constate au rattrapage.
 @MainActor
 @Observable
 final class LiveShareCoordinator {
@@ -36,6 +37,8 @@ final class LiveShareCoordinator {
   }
 
   private(set) var claimNotices: [ClaimNotice] = []
+  /// Doc 16 — la session s'est terminée d'elle-même (6 h sans activité) : Jeux le dit une fois.
+  private(set) var showsEndedNotice = false
 
   /// La partie actuellement diffusée — `nil` tant qu'aucune session n'est active.
   private(set) var attachedMatchID: UUID?
@@ -183,6 +186,9 @@ final class LiveShareCoordinator {
     link.onNewIdentities = { [weak self] _ in
       Task { @MainActor [weak self] in await self?.handleClaims() }
     }
+    link.onClosed = { [weak self] in
+      Task { @MainActor [weak self] in await self?.sessionDidClose(sessionID: sessionID) }
+    }
     self.link = link
     await link.start()
   }
@@ -232,13 +238,31 @@ final class LiveShareCoordinator {
       ownerDeviceID: DeviceIdentity.current, allowsContributors: allowed)
   }
 
-  /// Seul point d'arrêt d'une session (doc 16 : créateur uniquement). Les participants le
-  /// constatent à leur prochaine saisie ; le journal reste lisible 24 h pour qu'ils rattrapent.
+  /// Arrêt par le créateur (doc 16 : lui seul). Les appareils connectés en sont prévenus aussitôt,
+  /// les autres à leur prochain rattrapage ; le journal reste lisible 24 h pour qu'ils rattrapent.
   func stopSharing() async {
     if let link {
+      // Sa propre fermeture revient aussi par le canal : pas d'annonce « session terminée ».
+      link.onClosed = nil
       try? await backend.close(sessionID: link.sessionID, ownerDeviceID: DeviceIdentity.current)
-      await link.stop()
     }
+    await tearDown()
+  }
+
+  /// Fermée sans que ce créateur l'ait demandé : après 6 h sans activité. Le partage s'arrête ici
+  /// aussi ; une partie encore en cours continue en local.
+  private func sessionDidClose(sessionID: UUID) async {
+    guard link?.sessionID == sessionID else { return }
+    await tearDown()
+    showsEndedNotice = true
+  }
+
+  func dismissEndedNotice() {
+    showsEndedNotice = false
+  }
+
+  private func tearDown() async {
+    await link?.stop()
     PersistedOnlineSession.clear(.owner)
     if let sessionID = link?.sessionID { HandledClaims.clear(sessionID: sessionID) }
     link = nil
@@ -263,7 +287,8 @@ final class LiveShareCoordinator {
       guard let profileID = participant.player?.sharedProfileID else { continue }
       linkedSeats.append(
         LinkedSeat(
-          seat: SeatRef(seatIndex: participant.seatIndex, displayName: participant.nicknameSnapshot),
+          seat: SeatRef(
+            seatIndex: participant.seatIndex, displayName: participant.nicknameSnapshot),
           profileID: profileID))
     }
     let current = link.identities

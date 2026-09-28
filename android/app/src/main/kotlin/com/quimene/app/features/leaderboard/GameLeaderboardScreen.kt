@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Icon
@@ -30,16 +29,18 @@ import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
 import com.quimene.app.navigation.floatingNavBarContentPadding
+import com.quimene.app.ui.formatPercent
+import com.quimene.app.ui.matchesAndWinsText
 import com.quimene.app.ui.toAvatar
 import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.CardGutter
 import com.quimene.designsystem.components.EmptyState
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
 import com.quimene.store.LeaderboardEntry
-import kotlin.math.roundToInt
 
 /** Miroir de `GameLeaderboardView.swift` (doc 06) — classé par taux de victoire, départagé par
  * rang normalisé moyen (voir [LeaderboardEntry]). */
@@ -63,11 +64,11 @@ fun GameLeaderboardScreen(
             TopAppBar(
                 title = { Text(definitionName) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Retour") }
+                    BackButton(onClick = onBack)
                 },
                 actions = {
                     IconButton(onClick = { onOpenHistory(gameId) }) {
-                        Icon(Icons.Filled.History, contentDescription = "Historique de $definitionName")
+                        Icon(Icons.Filled.History, contentDescription = stringResource(R.string.historique))
                     }
                 },
             )
@@ -78,7 +79,7 @@ fun GameLeaderboardScreen(
         if (currentEntries.isEmpty()) {
             EmptyState(
                 icon = Icons.Filled.EmojiEvents,
-                message = "Aucune partie terminée pour ce jeu.",
+                message = stringResource(R.string.aucune_partie_de_value1_terminee_pour_l_instant_le, definitionName),
                 modifier = Modifier.fillMaxSize().padding(innerPadding),
             )
             return@Scaffold
@@ -117,13 +118,13 @@ private fun LeaderboardRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(entry.name, style = MaterialTheme.typography.bodyLarge, color = colors.textPrimary)
                 Text(
-                    text = stringResource(R.string.count1_partie_s_count2_victoire_s, entry.played, entry.wins),
+                    text = matchesAndWinsText(entry.played, entry.wins),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textSecondary,
                 )
             }
             Text(
-                text = "${(entry.winRate * 100).roundToInt()} %",
+                text = formatPercent(entry.winRate),
                 style = MaterialTheme.typography.titleMedium,
                 color = colors.textPrimary,
             )

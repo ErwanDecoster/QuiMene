@@ -1,19 +1,22 @@
 package com.quimene.app.ui
 
+import androidx.annotation.StringRes
+import com.quimene.app.R
 import com.quimene.domain.stats.Badge
 
 /** Miroir de l'extension `Badge.Kind.label` (`ResultsView.swift`). */
-val Badge.Kind.label: String
+@get:StringRes
+val Badge.Kind.label: Int
     get() =
         when (this) {
-            Badge.Kind.Winner -> "Vainqueur"
-            Badge.Kind.Metronome -> "Le Métronome"
-            Badge.Kind.Rollercoaster -> "Les montagnes russes"
-            Badge.Kind.Comeback -> "La remontada"
-            Badge.Kind.Kamikaze -> "Le kamikaze"
-            Badge.Kind.Unshakeable -> "Imperturbable"
-            Badge.Kind.PhotoFinish -> "Photo finish"
-            Badge.Kind.Sniper -> "Le Sniper"
-            Badge.Kind.Boulet -> "Le Boulet"
-            Badge.Kind.Landslide -> "Le Fossé"
+            Badge.Kind.Winner -> R.string.vainqueur
+            Badge.Kind.Metronome -> R.string.le_metronome
+            Badge.Kind.Rollercoaster -> R.string.les_montagnes_russes
+            Badge.Kind.Comeback -> R.string.la_remontada
+            Badge.Kind.Kamikaze -> R.string.le_kamikaze
+            Badge.Kind.Unshakeable -> R.string.imperturbable
+            Badge.Kind.PhotoFinish -> R.string.photo_finish
+            Badge.Kind.Sniper -> R.string.le_sniper
+            Badge.Kind.Boulet -> R.string.le_boulet
+            Badge.Kind.Landslide -> R.string.le_fosse
         }

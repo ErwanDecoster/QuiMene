@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ds_back">Indietro</string>
+    <plurals name="ds_score_points">
+        <item quantity="one">%1$d punto</item>
+        <item quantity="many">%1$d punti</item>
+        <item quantity="other">%1$d punti</item>
+    </plurals>
+    <string name="ds_score_delta">%1$s questa manche</string>
+    <string name="ds_ordinal_fallback">%1$dº</string>
+    <string-array name="ds_ordinals">
+        <item>primo</item>
+        <item>secondo</item>
+        <item>terzo</item>
+        <item>quarto</item>
+        <item>quinto</item>
+        <item>sesto</item>
+        <item>settimo</item>
+        <item>ottavo</item>
+        <item>nono</item>
+        <item>decimo</item>
+        <item>undicesimo</item>
+        <item>dodicesimo</item>
+    </string-array>
+</resources>

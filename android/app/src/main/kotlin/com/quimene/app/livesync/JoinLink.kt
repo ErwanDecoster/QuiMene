@@ -1,6 +1,6 @@
 package com.quimene.app.livesync
 
-import android.net.Uri
+import androidx.core.net.toUri
 
 /**
  * Miroir de `JoinLink.swift` — le lien encodé dans le QR de partage (`QrCodeView` côté hôte) et
@@ -18,7 +18,7 @@ object JoinLink {
     fun url(pairingCode: String): String = "$SCHEME://$HOST?code=$pairingCode"
 
     fun parse(raw: String): String? {
-        val uri = runCatching { Uri.parse(raw) }.getOrNull() ?: return null
+        val uri = runCatching { raw.toUri() }.getOrNull() ?: return null
         if (uri.scheme != SCHEME || uri.host != HOST) return null
         return uri.getQueryParameter("code")
     }

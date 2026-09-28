@@ -13,14 +13,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -41,16 +38,22 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
 import com.quimene.app.navigation.LocalFloatingNavBarHeight
+import com.quimene.app.ui.nameRes
+import com.quimene.app.ui.rememberMediumDateFormatter
 import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarKind
 import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.PlayerPalette
 import com.quimene.designsystem.components.PrimaryButton
 import com.quimene.designsystem.components.SecondaryButton
@@ -58,10 +61,6 @@ import com.quimene.designsystem.components.TertiaryButton
 import com.quimene.designsystem.components.color
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 import java.util.UUID
 
 /** Miroir de `PlayerEditorView.swift` (doc 08) — pseudo + avatar (généré automatiquement,
@@ -92,15 +91,13 @@ fun PlayerEditorScreen(
                     Text(
                         when {
                             isCreatingProfile -> stringResource(R.string.creer_mon_profil)
-                            playerId == null -> "Nouveau joueur"
-                            else -> stringResource(R.string.modifier)
+                            playerId == null -> stringResource(R.string.ajouter_un_joueur)
+                            else -> stringResource(R.string.modifier_le_joueur)
                         },
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = onDone) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Retour")
-                    }
+                    BackButton(onClick = onDone)
                 },
             )
         },
@@ -189,11 +186,16 @@ private fun PlayerEditorContent(
             }
         }
 
-        Text("Couleur", style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
+        Text(
+            stringResource(R.string.couleur),
+            style = MaterialTheme.typography.labelLarge,
+            color = colors.textSecondary,
+        )
         LazyRow(horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
             items((1..10).toList()) { index ->
                 val palette = PlayerPalette(index)
                 val isSelected = viewModel.paletteID == index.toString()
+                val name = stringResource(palette.nameRes)
                 Box(
                     modifier =
                         Modifier
@@ -201,7 +203,11 @@ private fun PlayerEditorContent(
                             .clip(CircleShape)
                             .background(palette.color())
                             .let { if (isSelected) it.border(2.dp, colors.textPrimary, CircleShape) else it }
-                            .clickable { viewModel.selectPalette(index.toString()) },
+                            .selectable(
+                                selected = isSelected,
+                                role = Role.RadioButton,
+                                onClick = { viewModel.selectPalette(index.toString()) },
+                            ).semantics { contentDescription = name },
                 )
             }
         }
@@ -276,7 +282,7 @@ private fun FriendSection(viewModel: PlayerEditorViewModel) {
                     stringResource(
                         R.string.lie_au_profil_de_value1_depuis_le_value2,
                         linkedName,
-                        dateFormatter.format(it),
+                        rememberMediumDateFormatter().format(it),
                     )
                 } ?: stringResource(R.string.lie_au_profil_de_value1, linkedName),
                 style = MaterialTheme.typography.bodySmall,
@@ -291,10 +297,3 @@ private fun FriendSection(viewModel: PlayerEditorViewModel) {
         )
     }
 }
-
-private val dateFormatter: DateTimeFormatter =
-    DateTimeFormatter
-        .ofLocalizedDate(
-            FormatStyle.MEDIUM,
-        ).withLocale(Locale.getDefault())
-        .withZone(ZoneId.systemDefault())

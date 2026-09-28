@@ -448,6 +448,59 @@ Vérification : `xcodebuild` (scheme `QuiMene`) réussit à 0 avertissement apr�
 widget et l'ajout de la capacité Siri ; `grep -rn "MatchWidget" apple/App apple/QuiMeneKit` ne trouve plus
 rien hors de ce journal.
 
+## Audit du 2026-09-25 — monorepo complet (pratiques, composants, traductions, inutile)
+
+Même méthode que l'audit du 2026-08-31, étendue aux deux apps. Outils qui font foi plutôt
+qu'une relecture : `Scripts/lint.sh`, `xcodebuild -exportLocalizations` croisé avec les
+`.stringsdata` du compilateur (emplacement exact de chaque texte réellement traduit — la table
+`__PotentialKeys` ne l'est **pas**), rapport XML d'Android Lint, et un repérage des déclarations
+jamais référencées (Swift et Kotlin), chaque candidat vérifié à la main.
+
+| Sujet | Constat | Corrigé |
+|---|---|---|
+| CI Apple | `Scripts/lint.sh` échouait sur Xcode 27 (clé `orderedImports.shouldGroupImports` devenue obligatoire) : Xcode Cloud s'arrêtait au clone, et 31 violations s'étaient accumulées | `.swift-format` régénéré (configuration par défaut d'Apple), 15 fichiers reformatés, `Package.swift` ajouté au lint |
+| Reproductibilité | `Package.resolved` ignoré par git — Xcode Cloud refuse de résoudre les paquets sans lui | plus ignoré (à commiter) |
+| Zéro avertissement | 6 avertissements Swift (imports `SwiftData`, résultats inutilisés, API dépréciée) ; package et Android sans « avertissements = erreurs » ; 13 avertissements Kotlin, 149 d'Android Lint | tous corrigés ; `.treatAllWarnings(as: .error)` (package), `allWarningsAsErrors` (Kotlin), `warningsAsErrors` (Lint) |
+| Traductions Apple | Textes jamais traduits : contrats/poignées du Tarot (`Text(String)`), messages des modèles de saisie, titres et erreurs de sessions, filtres de l'historique, badges, faits marquants et refus de saisie (en français dans `Domain`/`Catalog`), noms de couleurs et « cette manche » (VoiceOver), Live Activity (catalogue absent de la cible widget) ; 23 clés mortes ; 6 libellés VoiceOver jamais traduits | raisons typées dans les moteurs (doc 04, doc 06), textes rédigés par les apps ; 66 clés traduites en 4 langues, 11 clés manuelles, 23 supprimées ; catalogue ajouté au widget ; 349 clés, 0 manquante |
+| Traductions Android | Le script d'extraction écrasait `strings.xml` sans place pour les textes propres à Android, restés en dur (une soixantaine), et ne relisait pas sa table (noms instables) ; 98 ressources inutilisées ; « Le reste de l'application reste en français » affiché à tort dans les réglages ; dates et pourcentages au format français quelle que soit la langue | script réécrit (doc 11, étape G), `strings_android.xml`, `UiText`, textes du design system, formats selon la langue |
+| Composants | Bouton retour réécrit dans 12 écrans (icône dépréciée, libellés en dur) ; confirmation d'abandon copiée 6 fois et alerte « Saisie invalide » 5 fois côté Apple ; `accessibleScoreRow` Android jamais appliqué ; symbole par joueur (charte §1.5) inutilisé sur les deux plateformes, et courbe Apple aux couleurs par défaut de Swift Charts | `BackButton`, `abandonMatchConfirmation`/`invalidEntryAlert`, lignes de score regroupées pour TalkBack, courbes aux couleurs et symboles des joueurs, bouton primaire du design system dans l'onglet Profil |
+| Inutile | Dépendances jamais utilisées (vico, room-ktx vide depuis Room 2.7, room-testing, androidx.test.ext, kotest-property, plugin kotlin-android), fonctions mortes des deux côtés (`hasAnyMatch`, `allSharedProfileIDs`, `generatePairingCode`, `markClosed`, relations Room…), jetons `Keypad` du pavé abandonné (ADR-0013), repli « saisie pas encore construite » inatteignable | supprimés ; utilitaires de test du catalogue déplacés dans les tests |
+| Bugs trouvés en passant | Tri « Automatique » des joueurs alphabétique sur Android alors qu'il annonce « les habitués d'abord » (comme Apple) ; aucune icône d'application Android | tri aligné sur Apple + test ; icône adaptative (charte §11.5), avec couche monochrome |
+
+Vérification : `Scripts/lint.sh`, `Scripts/check-spec-sync.sh`, tests du package et de l'app
+(`xcodebuild test`) sans avertissement, extraction du catalogue stable d'un passage à l'autre ;
+`./gradlew build` (ktlint, Lint sans aucun problème, 193 tests). La CI GitHub vérifie
+désormais aussi `spec/` et `strings.xml`.
+
+**Tranché ensuite (2026-09-26)** :
+
+- **Vrais pluriels** à la place de la convention « partie(s) » : variations plurielles et
+  substitutions dans le catalogue Apple (13 phrases, « many » compris pour fr/es/it),
+  `<plurals>` générés côté Android, et `PluralsCandidate` réactivée dans Lint. Tests d'accord
+  sur les deux plateformes (`LocalizationPluralTests`, `PluralsTest`).
+- **Plus de réordonnancement manuel des joueurs** : réglage « Tri des joueurs » retiré des deux
+  apps (et `AppSettings` Android, devenu vide), liste toujours triée les habitués d'abord,
+  `PlayerRepository.reorder` supprimé. `sortIndex` reste : ordre d'ajout, départage des égalités.
+- **`supabase/config.toml`** ajouté (`supabase init`, Postgres 17 comme la production). Les deux
+  fonctions y sont déclarées `verify_jwt = true`, comme en production (vérifié) : la clé
+  publishable n'est pas un JWT, mais la plateforme l'accepte, et la vérification refuse tout
+  appel sans clé. Avec l'intégration GitHub, un merge sur `main` déploie désormais aussi ces
+  fonctions ; les réglages Auth/API du fichier restent locaux.
+- **Clé publishable dans l'en-tête `apikey`**, plus dans `Authorization` (que Supabase réserve
+  aux jetons d'utilisateur) : clients de push iOS et Android, et tâche de balayage (migration
+  `sweep_apikey_header`). Vérifié en production : une requête qui ne porte que `apikey` passe la
+  vérification JWT de la fonction, un appel sans clé est refusé (401).
+
+**Restent à décider** (pas des oublis, des choix produit ou des chantiers à part) :
+
+- **Avertissements de saisie** (« Score inhabituel, à vérifier ») : calculés par les moteurs,
+  prévus « affichés » par la doc 04, jamais montrés par aucune des deux apps.
+- **Faits « Remontada »/« Effondrement »** (doc 06) et `prominence` : spécifiés, jamais
+  produits ni exploités.
+- **Build de release Android sans R8** (`isMinifyEnabled = false`) ; montées de version des
+  dépendances (Kotlin 2.4.20, AGP 9.4.1, Room 2.8.5, Compose BOM 2026.09.00…) à faire dans un
+  passage dédié.
+
 ## Recommandation de pratique — README factuel plutôt que journal
 
 La dérive constatée sur le README (huit semaines sans mise à jour malgré un changement

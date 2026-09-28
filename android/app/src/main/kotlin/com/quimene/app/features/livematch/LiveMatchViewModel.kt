@@ -1,6 +1,7 @@
 package com.quimene.app.features.livematch
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.quimene.app.R
 import com.quimene.app.livesync.LiveShareCoordinator
 import com.quimene.app.livesync.SessionLink
 import com.quimene.app.livesync.SharedMatchViewModel
+import com.quimene.app.ui.UiText
 import com.quimene.domain.engine.MatchEvent
 import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.MatchStatus
@@ -63,14 +65,14 @@ class LiveMatchViewModel(
     override var pendingScores by mutableStateOf<Map<UUID, Int>>(emptyMap())
         private set
     override var closedParticipantID by mutableStateOf<UUID?>(null)
-    var activeSeatIndex by mutableStateOf(0)
+    var activeSeatIndex by mutableIntStateOf(0)
         private set
-    override var validationErrorMessage by mutableStateOf<String?>(null)
+    override var validationErrorMessage by mutableStateOf<UiText?>(null)
         private set
-    override var roundExplanationMessage by mutableStateOf<String?>(null)
+    override var roundExplanationMessage by mutableStateOf<UiText?>(null)
         private set
 
-    var remoteActivityMessage by mutableStateOf<String?>(null)
+    var remoteActivityMessage by mutableStateOf<UiText?>(null)
         private set
 
     /** Un envoi au journal de la session est en cours : « Terminé » est désactivé. */
@@ -120,7 +122,7 @@ class LiveMatchViewModel(
 
     private fun announceRemoteActivity(deviceName: String) {
         viewModelScope.launch {
-            val message = "$deviceName a ajouté une manche."
+            val message = UiText.Resource(R.string.value1_a_ajoute_une_manche, listOf(deviceName))
             remoteActivityMessage = message
             delay(4_000)
             if (remoteActivityMessage == message) remoteActivityMessage = null
@@ -248,11 +250,7 @@ class LiveMatchViewModel(
             viewModelScope.launch {
                 if (!submitShared(MatchEvent.RoundCommitted(draft))) return@launch
                 onCommitted()
-                state.rounds
-                    .lastOrNull()
-                    ?.entries
-                    ?.firstNotNullOfOrNull { it.explanation }
-                    ?.let(::showRoundExplanation)
+                state.lastRoundExplanation?.let(::showRoundExplanation)
             }
             return
         }
@@ -264,22 +262,18 @@ class LiveMatchViewModel(
                 } catch (cancellation: CancellationException) {
                     throw cancellation // ne jamais avaler l'annulation structurée d'une coroutine.
                 } catch (error: Exception) {
-                    validationErrorMessage = "La manche n'a pas pu être enregistrée."
+                    validationErrorMessage = UiText.Resource(R.string.la_manche_n_a_pas_pu_etre_enregistree)
                     return@launch
                 }
             match = requireNotNull(repository.match(match.id))
             stateInternal = newState
             validationErrorMessage = null
             onCommitted()
-            newState.rounds
-                .lastOrNull()
-                ?.entries
-                ?.firstNotNullOfOrNull { it.explanation }
-                ?.let(::showRoundExplanation)
+            newState.lastRoundExplanation?.let(::showRoundExplanation)
         }
     }
 
-    private fun showRoundExplanation(message: String) {
+    private fun showRoundExplanation(message: UiText) {
         viewModelScope.launch {
             roundExplanationMessage = message
             delay(4_000)
@@ -319,15 +313,13 @@ class LiveMatchViewModel(
             if (result is SessionLink.SubmitResult.Accepted) {
                 stateInternal?.let { state -> coordinator.link?.announceToLockScreens(state, definition, rules) }
             }
-            val context = coordinator.context
             validationErrorMessage =
                 when (result) {
                     is SessionLink.SubmitResult.Accepted -> null
-                    is SessionLink.SubmitResult.Overtaken ->
-                        SharedMatchViewModel.overtakenMessage(context, result.byDeviceName)
+                    is SessionLink.SubmitResult.Overtaken -> SharedMatchViewModel.overtakenMessage(result.byDeviceName)
                     SessionLink.SubmitResult.Offline ->
-                        context.getString(R.string.hors_connexion_la_saisie_reprendra_au_retour_du_reseau)
-                    SessionLink.SubmitResult.Closed -> context.getString(R.string.la_session_partagee_a_ete_arretee)
+                        UiText.Resource(R.string.hors_connexion_la_saisie_reprendra_au_retour_du_reseau)
+                    SessionLink.SubmitResult.Closed -> UiText.Resource(R.string.la_session_partagee_a_ete_arretee)
                 }
             return result is SessionLink.SubmitResult.Accepted
         } finally {

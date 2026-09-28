@@ -102,31 +102,12 @@ struct BeloteRoundView: View {
       RoundHistoryView(
         state: model.state, definition: model.definition, myParticipantID: myParticipantID)
     }
-    .alert(
-      "Saisie invalide",
-      isPresented: Binding(
-        get: { model.validationErrorMessage != nil }, set: { if !$0 { model.dismissError() } })
-    ) {
-      Button("OK") {}
-    } message: {
-      Text(model.validationErrorMessage ?? "")
-    }
-    .confirmationDialog(
-      "Abandonner cette partie ?",
-      isPresented: $isConfirmingAbandon,
-      titleVisibility: .visible
-    ) {
-      Button("Abandonner", role: .destructive) {
-        model.abandon()
-      }
-    } message: {
-      Text(
-        "La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée."
-      )
-    }
+    .invalidEntryAlert(message: model.validationErrorMessage, onDismiss: model.dismissError)
+    .abandonMatchConfirmation(isPresented: $isConfirmingAbandon, onAbandon: model.abandon)
   }
 
   private func teamLabel(_ team: (teamID: String, members: [Participant])) -> String {
-    "Équipe \(team.teamID) (\(team.members.map(\.displayName).joined(separator: " & ")))"
+    let members = team.members.map(\.displayName).joined(separator: " & ")
+    return String(localized: "Équipe \(team.teamID) (\(members))")
   }
 }

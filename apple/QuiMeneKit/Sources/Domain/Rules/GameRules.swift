@@ -56,28 +56,28 @@ extension GameRules {
   {
     let entry = definition.scoring.entry
     var errors: [ValidationError] = []
-    var warnings: [String] = []
+    var warnings: [ValidationWarning] = []
 
     for input in draft.inputs {
       if let min = entry.min, input.rawValue < min {
         errors.append(
           ValidationError(
             field: .participant(input.participantID),
-            message: "Score sous le minimum autorisé (\(min))."
+            reason: .scoreBelowMinimum(min)
           ))
       }
       if let max = entry.max, input.rawValue > max {
         errors.append(
           ValidationError(
             field: .participant(input.participantID),
-            message: "Score au-dessus du maximum autorisé (\(max))."
+            reason: .scoreAboveMaximum(max)
           ))
       }
       if let warnBelow = entry.warnBelow, input.rawValue < warnBelow {
-        warnings.append("Score inhabituel, à vérifier.")
+        warnings.append(.unusualScore)
       }
       if let warnAbove = entry.warnAbove, input.rawValue > warnAbove {
-        warnings.append("Score inhabituel, à vérifier.")
+        warnings.append(.unusualScore)
       }
     }
 

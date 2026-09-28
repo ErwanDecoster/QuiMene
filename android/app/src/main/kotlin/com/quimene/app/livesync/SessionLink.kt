@@ -77,8 +77,15 @@ class SessionLink(
     /** Faux hors ligne : la saisie est alors bloquée (doc 16). */
     var isReachable: Boolean by mutableStateOf(true)
         private set
+
+    /** Doc 16 — arrêtée par le créateur, ou d'elle-même après 6 h sans activité. */
     var isClosed: Boolean by mutableStateOf(false)
         private set
+
+    /** Appelé une fois, quand la fin est constatée (au rattrapage, ou par un ajout refusé). Pas
+     * suspendu : l'appelant réagit dans sa propre portée — arrêter ce lien depuis le rattrapage qui
+     * l'a constatée annulerait ce rattrapage. */
+    var onClosed: (() -> Unit)? = null
 
     /** Nouveaux événements lisibles, dans l'ordre — publiés à chaque rattrapage. */
     var onNewRecords: (suspend (List<SessionEventRecord>) -> Unit)? = null
@@ -127,7 +134,8 @@ class SessionLink(
         channel.disconnect()
     }
 
-    /** Rattrape le journal et publie ce qui est nouveau. */
+    /** Rattrape le journal et publie ce qui est nouveau, puis vérifie que la session est encore
+     * ouverte. */
     suspend fun refresh() {
         try {
             val fresh = session.sync()
@@ -139,7 +147,17 @@ class SessionLink(
             throw cancellation
         } catch (error: Exception) {
             isReachable = false
+            return
         }
+        // Après le rattrapage, pour que la fin d'une partie soit déjà publiée. Une erreur ici (réseau,
+        // serveur pas encore à jour) ne dit rien de la session : on ne conclut rien.
+        if (!isClosed && runCatching { session.isClosed() }.getOrDefault(false)) markClosed()
+    }
+
+    private fun markClosed() {
+        if (isClosed) return
+        isClosed = true
+        onClosed?.invoke()
     }
 
     suspend fun submit(
@@ -166,7 +184,7 @@ class SessionLink(
             val author = fresh.lastOrNull { it.event.deviceID != session.deviceID }?.event?.deviceID
             SubmitResult.Overtaken(author?.let(::deviceName))
         } catch (closed: OnlineSessionError.SessionClosed) {
-            isClosed = true
+            markClosed()
             SubmitResult.Closed
         } catch (error: Exception) {
             isReachable = false
@@ -193,7 +211,7 @@ class SessionLink(
             } catch (stale: OnlineSessionError.StaleSequence) {
                 publishIdentityChanges()
             } catch (closed: OnlineSessionError.SessionClosed) {
-                isClosed = true
+                markClosed()
                 return false
             } catch (error: Exception) {
                 isReachable = false

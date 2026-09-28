@@ -8,10 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -31,6 +27,7 @@ import com.quimene.app.navigation.LocalFloatingNavBarHeight
 import com.quimene.app.ui.toAvatar
 import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.CardGutter
 import com.quimene.designsystem.components.Chip
@@ -60,7 +57,7 @@ fun MatchSetupScreen(
             TopAppBar(
                 title = { Text(definition.name.localized) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) { Icon(Icons.Filled.ArrowBack, contentDescription = "Retour") }
+                    BackButton(onClick = onBack)
                 },
             )
         },

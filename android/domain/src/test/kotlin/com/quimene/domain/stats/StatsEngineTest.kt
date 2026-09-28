@@ -109,6 +109,24 @@ class StatsEngineTest {
     }
 
     @Test
+    fun `the same round is told only once when the highest score wins`() {
+        val definition = testDefinition(direction = Direction.HighestWins)
+        val alice = testParticipant("Alice", 0)
+        val bob = testParticipant("Bob", 1)
+        val state =
+            testMatchState(definition, listOf(alice, bob))
+                .withRound(0, alice.id to 40, bob.id to 5)
+                .withRound(1, alice.id to 5, bob.id to 5)
+
+        val roundFacts =
+            engine.insights(state, definition).filter {
+                it.id == InsightID.highestRoundScore || it.id == InsightID.bestRoundScore
+            }
+
+        roundFacts.size shouldBe 1
+    }
+
+    @Test
     fun `finalGap and leadChanges describe the shape of the whole match`() {
         val definition = testDefinition(direction = Direction.HighestWins)
         val alice = testParticipant("Alice", 0)

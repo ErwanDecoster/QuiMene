@@ -82,7 +82,8 @@ struct PlayerEditorView: View {
       }
       .navigationTitle(
         model.isCreatingProfile
-          ? "Créer mon profil" : model.isEditing ? "Modifier le joueur" : "Ajouter un joueur")
+          ? "Créer mon profil" : model.isEditing ? "Modifier le joueur" : "Ajouter un joueur"
+      )
       .onAppear {
         // Doc utilisateur — remontée : à la création d'un joueur, le champ de saisie du
         // pseudo doit déjà être prêt à recevoir la frappe, pas seulement affiché. Pas au

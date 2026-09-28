@@ -3,6 +3,7 @@ package com.quimene.app.features.join
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,10 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -28,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.features.livematch.MeBadge
@@ -38,9 +36,12 @@ import com.quimene.app.features.livematch.RoundEntryDispatch
 import com.quimene.app.features.results.MatchSummaryContent
 import com.quimene.app.livesync.SharedMatchViewModel
 import com.quimene.app.livesync.ensureFriend
+import com.quimene.app.navigation.LocalFloatingNavBarHeight
+import com.quimene.app.ui.asString
 import com.quimene.designsystem.components.Avatar
 import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.PrimaryButton
@@ -88,9 +89,7 @@ fun SharedMatchScreen(
                 // Doc 16, phase A — revenir en arrière garde la partie suivie (bandeau de reprise
                 // dans Jeux) ; seul « Quitter la partie » déconnecte.
                 navigationIcon = {
-                    IconButton(onClick = onClose) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.fermer))
-                    }
+                    BackButton(onClick = onClose, contentDescription = stringResource(R.string.fermer))
                 },
                 actions = { TextButton(onClick = onQuit) { Text(stringResource(R.string.quitter_la_partie)) } },
             )
@@ -101,7 +100,7 @@ fun SharedMatchScreen(
             // Le tableau reste celui du dernier rattrapage, la saisie est bloquée.
             if (viewModel.isSessionClosed) {
                 Banner(
-                    message = stringResource(R.string.le_createur_a_arrete_la_session_le_tableau_affiche_est_le),
+                    message = stringResource(R.string.la_session_est_terminee_le_tableau_affiche_est_le_dernier),
                     modifier = Modifier.padding(Space.lg),
                 )
             } else if (!viewModel.isHostConnected) {
@@ -112,12 +111,17 @@ fun SharedMatchScreen(
                     onAction = onReconnect,
                 )
             }
-            viewModel.roundExplanationMessage?.let { Banner(message = it, modifier = Modifier.padding(Space.lg)) }
+            viewModel.roundExplanationMessage?.let {
+                Banner(
+                    message = it.asString(),
+                    modifier = Modifier.padding(Space.lg),
+                )
+            }
             viewModel.latestRejectionReason?.let {
-                Banner(message = it, modifier = Modifier.padding(horizontal = Space.lg))
+                Banner(message = it.asString(), modifier = Modifier.padding(horizontal = Space.lg))
             }
             viewModel.validationErrorMessage?.let {
-                Banner(message = it, modifier = Modifier.padding(horizontal = Space.lg))
+                Banner(message = it.asString(), modifier = Modifier.padding(horizontal = Space.lg))
             }
 
             if (state == null) return@Column
@@ -132,11 +136,24 @@ fun SharedMatchScreen(
             // Doc 16, phase C — même écran de résultats que le créateur, puis « Partie suivante » :
             // un participant peut enchaîner même si le créateur est absent.
             if (viewModel.isConcluded) {
-                viewModel.summaryState()?.let { MatchSummaryContent(it, modifier = Modifier.weight(1f)) }
+                // Le dernier élément de l'écran remonte au-dessus de la barre de navigation
+                // flottante, comme sur l'écran de résultats du créateur.
+                val navBarHeight = LocalFloatingNavBarHeight.current
+                viewModel.summaryState()?.let {
+                    MatchSummaryContent(
+                        it,
+                        modifier = Modifier.weight(1f),
+                        contentPadding =
+                            PaddingValues(
+                                top = Space.lg,
+                                bottom = Space.lg + if (viewModel.canPropose) 0.dp else navBarHeight,
+                            ),
+                    )
+                }
                 if (viewModel.canPropose) {
                     NextMatchBar(
                         isBusy = viewModel.isSubmitting,
-                        modifier = Modifier.padding(Space.lg),
+                        modifier = Modifier.padding(Space.lg).padding(bottom = navBarHeight),
                     ) { isPickingNextMatch = true }
                 }
                 if (isPickingNextMatch) {
@@ -155,12 +172,7 @@ fun SharedMatchScreen(
             if (!viewModel.canPropose) StandingsSection(viewModel)
 
             if (viewModel.canPropose) {
-                RoundEntryDispatch(viewModel) { gameName ->
-                    Text(
-                        "La saisie dédiée de $gameName n'est pas encore disponible en tant que contributeur.",
-                        modifier = Modifier.padding(Space.lg),
-                    )
-                }
+                RoundEntryDispatch(viewModel)
             } else {
                 Text(
                     if (viewModel.isSpectator) {
@@ -231,6 +243,7 @@ private fun WhoAreYou(viewModel: SharedMatchViewModel) {
     val colors = LocalAppColors.current
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(horizontal = Space.lg),
+        contentPadding = PaddingValues(bottom = Space.lg + LocalFloatingNavBarHeight.current),
         verticalArrangement = Arrangement.spacedBy(Space.sm),
     ) {
         item {

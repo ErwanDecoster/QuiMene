@@ -35,14 +35,14 @@ public struct WizardRulesV1: GameRules {
         return .invalid([
           ValidationError(
             field: .participant(input.participantID),
-            message: "Résultat invalide (0 à \(roundNumber)).")
+            reason: .tricksOutOfRange(max: roundNumber))
         ])
       }
       guard let bid = bid(of: input), (0...roundNumber).contains(bid) else {
         return .invalid([
           ValidationError(
             field: .participant(input.participantID),
-            message: "Annonce invalide (0 à \(roundNumber)).")
+            reason: .bidOutOfRange(max: roundNumber))
         ])
       }
     }
@@ -51,7 +51,7 @@ public struct WizardRulesV1: GameRules {
       return .invalid([
         ValidationError(
           field: .general,
-          message: "Le total des plis réalisés (\(totalTricks)) doit égaler \(roundNumber).")
+          reason: .tricksTotalMismatch(total: totalTricks, expected: roundNumber))
       ])
     }
     return .valid

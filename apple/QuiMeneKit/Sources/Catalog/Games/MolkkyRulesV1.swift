@@ -27,7 +27,7 @@ public struct MolkkyRulesV1: GameRules {
         participantID: input.participantID,
         rawValue: input.rawValue,
         computedValue: bust ? (25 - priorTotal) : input.rawValue,
-        explanation: bust ? "Dépassement de 50 : retour à 25." : nil,
+        explanation: bust ? .bustBackTo25 : nil,
         detail: input.detail,
         modifiers: input.modifiers
       )

@@ -1,11 +1,11 @@
 package com.quimene.catalog.games
 
 import com.quimene.catalog.decodeDetail
-import com.quimene.catalog.toScoreDetail
 import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.RoundDraft
 import com.quimene.domain.model.ScoreDetail
 import com.quimene.domain.model.ScoreEntry
+import com.quimene.domain.model.ScoreExplanation
 import com.quimene.domain.model.ScoreInput
 import com.quimene.domain.model.ValidationError
 import com.quimene.domain.model.ValidationResult
@@ -48,7 +48,9 @@ class YamsRulesV1 : GameRules {
         val input =
             draft.inputs.singleOrNull()
                 ?: return ValidationResult.Invalid(
-                    listOf(ValidationError(ValidationError.Field.General, "Une seule catégorie est remplie par tour.")),
+                    listOf(
+                        ValidationError(ValidationError.Field.General, ValidationError.Reason.SingleCategoryPerTurn),
+                    ),
                 )
         val categoryID = categoryID(input)
         val category =
@@ -57,7 +59,7 @@ class YamsRulesV1 : GameRules {
                     listOf(
                         ValidationError(
                             ValidationError.Field.ParticipantField(input.participantID),
-                            "Catégorie inconnue.",
+                            ValidationError.Reason.UnknownCategory,
                         ),
                     ),
                 )
@@ -66,7 +68,7 @@ class YamsRulesV1 : GameRules {
                 listOf(
                     ValidationError(
                         ValidationError.Field.ParticipantField(input.participantID),
-                        "Cette catégorie est déjà remplie.",
+                        ValidationError.Reason.CategoryAlreadyFilled,
                     ),
                 ),
             )
@@ -79,7 +81,7 @@ class YamsRulesV1 : GameRules {
                         listOf(
                             ValidationError(
                                 ValidationError.Field.ParticipantField(input.participantID),
-                                "Nombre de dés invalide (0 à 5).",
+                                ValidationError.Reason.InvalidDiceCount,
                             ),
                         ),
                     )
@@ -91,7 +93,7 @@ class YamsRulesV1 : GameRules {
                         listOf(
                             ValidationError(
                                 ValidationError.Field.ParticipantField(input.participantID),
-                                "Valeur invalide.",
+                                ValidationError.Reason.InvalidFigureValue,
                             ),
                         ),
                     )
@@ -104,7 +106,7 @@ class YamsRulesV1 : GameRules {
                         listOf(
                             ValidationError(
                                 ValidationError.Field.ParticipantField(input.participantID),
-                                "Somme invalide.",
+                                ValidationError.Reason.InvalidDiceSum,
                             ),
                         ),
                     )
@@ -126,13 +128,13 @@ class YamsRulesV1 : GameRules {
         val base = baseValue(input.rawValue, category.scoring.kind, category)
 
         var bonus = 0
-        var explanation: String? = null
+        var explanation: ScoreExplanation? = null
         if (category.section == Category.Section.Upper) {
             val threshold = state.variants.int("upperBonusThreshold", default = 63)
             val priorUpperTotal = sectionTotal(input.participantID, state, definition, Category.Section.Upper)
             if (priorUpperTotal < threshold && priorUpperTotal + base >= threshold) {
                 bonus = 35
-                explanation = "Bonus de section haute (+35)"
+                explanation = ScoreExplanation.UpperSectionBonus
             }
         }
 
@@ -259,5 +261,3 @@ class YamsRulesV1 : GameRules {
         const val ENGINE_ID = "yams.v1"
     }
 }
-
-internal fun yamsCategoryScoreDetail(categoryID: String): ScoreDetail = YamsCategoryDetail(categoryID).toScoreDetail()

@@ -1,5 +1,6 @@
 package com.quimene.app.features.livematch.tarot
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,6 +25,7 @@ import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.CardGutter
 import com.quimene.designsystem.components.Chip
 import com.quimene.designsystem.components.PrimaryButton
+import com.quimene.designsystem.components.accessibleScoreRow
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.model.Participant
@@ -35,6 +37,7 @@ import com.quimene.domain.model.Participant
 fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
     val viewModel = rememberViewModel { TarotRoundViewModel(liveMatch) }
     val colors = LocalAppColors.current
+    val rankByParticipant = liveMatch.currentStandings.associate { it.participantID to it.rank }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         LazyColumn(
@@ -52,6 +55,7 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
             items(liveMatch.participants, key = { it.id }) { participant ->
                 ParticipantTotalRow(
                     participant,
+                    rankByParticipant[participant.id],
                     liveMatch.totals[participant.id] ?: 0,
                     liveMatch.profileBadges[participant.id],
                 )
@@ -130,12 +134,12 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
                             }
 
                             SteppedValue(
-                                label = "Points du preneur",
+                                label = R.string.points_du_preneur_count1,
                                 value = viewModel.points,
                                 onChange = viewModel::updatePoints,
                             )
                             SteppedValue(
-                                label = "Bouts",
+                                label = R.string.bouts_count1,
                                 value = viewModel.bouts,
                                 step = 1,
                                 onChange = viewModel::updateBouts,
@@ -214,13 +218,13 @@ fun TarotRoundScreen(liveMatch: LiveRoundEntryState) {
 
 @Composable
 internal fun SteppedValue(
-    label: String,
+    @StringRes label: Int,
     value: Int,
     onChange: (Int) -> Unit,
     step: Int = 1,
 ) {
     val colors = LocalAppColors.current
-    Text("$label : $value", style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
+    Text(stringResource(label, value), style = MaterialTheme.typography.bodyMedium, color = colors.textPrimary)
     Row(horizontalArrangement = Arrangement.spacedBy(Space.sm), verticalAlignment = Alignment.CenterVertically) {
         Chip(title = "−$step", isSelected = false, onClick = { onChange(value - step) })
         Chip(title = "+$step", isSelected = false, onClick = { onChange(value + step) })
@@ -230,11 +234,19 @@ internal fun SteppedValue(
 @Composable
 private fun ParticipantTotalRow(
     participant: Participant,
+    rank: Int?,
     total: Int,
     badge: ProfileBadge?,
 ) {
     val colors = LocalAppColors.current
-    Card(modifier = Modifier.fillMaxWidth()) {
+    Card(
+        modifier =
+            Modifier.fillMaxWidth().accessibleScoreRow(
+                name = participant.displayName,
+                score = total,
+                rank = rank,
+            ),
+    ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(Space.sm),

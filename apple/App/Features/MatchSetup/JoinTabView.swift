@@ -2,6 +2,7 @@ import Catalog
 import DesignSystem
 import Domain
 import Store
+import SwiftData
 import SwiftUI
 import Sync
 import UIKit
@@ -10,7 +11,7 @@ import UIKit
 /// — c'était un onglet jusqu'à la doc 16 (phase A), où Profil l'a remplacé. Doc utilisateur :
 /// réduire le nombre de taps pour rejoindre une partie — l'ouvrir affiche directement la caméra,
 /// prête à scanner. « Fermer » masque l'écran sans quitter la partie suivie (bandeau de reprise
-/// dans Jeux) ; seul « Quitter la partie » déconnecte.
+/// dans Jeux) ; seuls « Quitter la partie » et la fin de la session (doc 16) déconnectent.
 ///
 /// Le rôle n'est plus choisi ici : ce n'est pas à la personne qui rejoint de décider si elle peut
 /// modifier la partie, mais à l'hôte (`ShareSessionView`, « Autoriser les contributeurs »). On
@@ -55,6 +56,9 @@ struct JoinTabView: View {
     }
     .onAppear { consumePendingJoin() }
     .onChange(of: deepLinkRouter.pendingJoin) { _, _ in consumePendingJoin() }
+    // Doc 16 — une session terminée pendant que son écran était affiché s'arrête à sa fermeture :
+    // pas de bandeau de reprise pour une partie qui ne reprendra plus.
+    .onDisappear { Task { await coordinator.endIfClosed() } }
   }
 
   private var scannerView: some View {
@@ -166,9 +170,10 @@ struct JoinTabView: View {
   private static func describe(_ error: Error) -> String {
     switch error {
     case OnlineSessionError.sessionNotFound:
-      return "Aucune partie ne correspond à ce code. Vérifie qu'il est bien à jour."
+      return String(
+        localized: "Aucune partie ne correspond à ce code. Vérifie qu'il est bien à jour.")
     default:
-      return "Connexion impossible (\(error.localizedDescription)). Réessaie."
+      return String(localized: "Connexion impossible (\(error.localizedDescription)). Réessaie.")
     }
   }
 }

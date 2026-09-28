@@ -1,7 +1,6 @@
 package com.quimene.catalog.games
 
 import com.quimene.catalog.decodeDetail
-import com.quimene.catalog.toScoreDetail
 import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.RoundDraft
 import com.quimene.domain.model.ScoreDetail
@@ -51,7 +50,7 @@ class WizardRulesV1 : GameRules {
                     listOf(
                         ValidationError(
                             ValidationError.Field.ParticipantField(input.participantID),
-                            "Résultat invalide (0 à $roundNumber).",
+                            ValidationError.Reason.TricksOutOfRange(max = roundNumber),
                         ),
                     ),
                 )
@@ -62,7 +61,7 @@ class WizardRulesV1 : GameRules {
                     listOf(
                         ValidationError(
                             ValidationError.Field.ParticipantField(input.participantID),
-                            "Annonce invalide (0 à $roundNumber).",
+                            ValidationError.Reason.BidOutOfRange(max = roundNumber),
                         ),
                     ),
                 )
@@ -74,7 +73,7 @@ class WizardRulesV1 : GameRules {
                 listOf(
                     ValidationError(
                         ValidationError.Field.General,
-                        "Le total des plis réalisés ($totalTricks) doit égaler $roundNumber.",
+                        ValidationError.Reason.TricksTotalMismatch(total = totalTricks, expected = roundNumber),
                     ),
                 ),
             )
@@ -113,5 +112,3 @@ class WizardRulesV1 : GameRules {
         const val ENGINE_ID = "wizard.v1"
     }
 }
-
-internal fun wizardBidScoreDetail(bid: Int): ScoreDetail = WizardBidDetail(bid).toScoreDetail()

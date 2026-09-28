@@ -21,10 +21,11 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 @Composable
 fun QrCodeView(
     content: String,
+    contentDescription: String,
     modifier: Modifier = Modifier,
 ) {
     val bitmap = remember(content) { generateQrBitmap(content) } ?: return
-    Image(bitmap = bitmap.asImageBitmap(), contentDescription = "Code QR d'appairage", modifier = modifier)
+    Image(bitmap = bitmap.asImageBitmap(), contentDescription = contentDescription, modifier = modifier)
 }
 
 private const val QR_RESOLUTION_PX = 512

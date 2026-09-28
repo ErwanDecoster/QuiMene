@@ -126,10 +126,6 @@ class PlayerEditorViewModel(
         if (!isRegeneratingProgrammatically) hasManualAvatarOverride = true
     }
 
-    fun updatePhotoData(data: ByteArray?) {
-        photoData = data
-    }
-
     /** Charte §1.5 : « même pseudo → même emoji et même couleur, quel que soit l'appareil. »
      * N'agit que tant qu'aucun choix manuel n'a eu lieu. */
     private fun regenerateFromNickname() {

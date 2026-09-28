@@ -84,6 +84,11 @@
 		F90C9C1F96CB125785E4A63B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 166377630E42779B0C5793ED /* Foundation.framework */; };
 		FD8BC4C3AE2D4819B0583BCA /* QuiMeneUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FF955D9B59F4DB880763DAD /* QuiMeneUITests.swift */; };
 		FECF6A04A5074AE19E39062F /* MatchContinuation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6251C1B9A134F5DA88F87E3 /* MatchContinuation.swift */; };
+		CA15ACEAE50D18CD006AC511 /* Rules+Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 185220EBF3F606CAD5E43BD5 /* Rules+Messages.swift */; };
+		AAA2D13EF93A2A93D5DE7A5F /* Insight+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B64C5759F17E406BAC96E5AF /* Insight+Presentation.swift */; };
+		7DAF954EE949EC72533B15EA /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1FD83055930B42098109B9DD /* Localizable.xcstrings */; };
+		20DCD98B13AEFFCC2257158A /* View+MatchDialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8306D39B2C05E2DE04CE72D3 /* View+MatchDialogs.swift */; };
+		966F6D440C33F4BF43964757 /* LocalizationPluralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D4664FC775605091DA50815 /* LocalizationPluralTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -197,6 +202,10 @@
 		FEC066611F334B03347B64CF /* MatchSetupModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchSetupModel.swift; sourceTree = "<group>"; };
 		FECAC647297540EA84E48BF6 /* ProfileShareLink.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProfileShareLink.swift; sourceTree = "<group>"; };
 		FFA2D0561A3E0F80667540A2 /* QuiMeneTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = QuiMeneTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		185220EBF3F606CAD5E43BD5 /* Rules+Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rules+Messages.swift"; sourceTree = "<group>"; };
+		B64C5759F17E406BAC96E5AF /* Insight+Presentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Insight+Presentation.swift"; sourceTree = "<group>"; };
+		8306D39B2C05E2DE04CE72D3 /* View+MatchDialogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+MatchDialogs.swift"; sourceTree = "<group>"; };
+		7D4664FC775605091DA50815 /* LocalizationPluralTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationPluralTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -273,6 +282,7 @@
 				AAC33FCCCB34E3C6302345F6 /* LiveMatchModelTests.swift */,
 				8C242A8CBE4B3A54DF07033F /* MatchSetupModelTests.swift */,
 				E2B32522E3C3BECDBE1FBB2B /* PlayerEditorModelTests.swift */,
+				7D4664FC775605091DA50815 /* LocalizationPluralTests.swift */,
 			);
 			path = QuiMeneTests;
 			sourceTree = "<group>";
@@ -363,6 +373,7 @@
 				437E55AE4133903D59398F69 /* ParticipantRecord+Avatar.swift */,
 				7EF5EB3CCD9611F48C73CA25 /* ResultsView.swift */,
 				AAB3431F9771731267D9EC71 /* ResultsShareCard.swift */,
+				B64C5759F17E406BAC96E5AF /* Insight+Presentation.swift */,
 			);
 			path = Results;
 			sourceTree = "<group>";
@@ -417,6 +428,8 @@
 				C16C0000000000000000A001 /* SessionLink.swift */,
 				D90C5383931C73460C54F4F3 /* QRCodeView.swift */,
 				B18BE4332F79E7E4167B768D /* RoundHistoryView.swift */,
+				185220EBF3F606CAD5E43BD5 /* Rules+Messages.swift */,
+				8306D39B2C05E2DE04CE72D3 /* View+MatchDialogs.swift */,
 			);
 			path = LiveMatch;
 			sourceTree = "<group>";
@@ -624,6 +637,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7DAF954EE949EC72533B15EA /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -654,6 +668,7 @@
 				7640F44AE3EC6B71C8FB21C1 /* LiveMatchModelTests.swift in Sources */,
 				3D8ED29B740891E0A83141FC /* MatchSetupModelTests.swift in Sources */,
 				B6449644E869D1BE27A094BF /* PlayerEditorModelTests.swift in Sources */,
+				966F6D440C33F4BF43964757 /* LocalizationPluralTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -715,6 +730,9 @@
 				52E4F168D3F9659FD5DA76CE /* RoundHistoryView.swift in Sources */,
 				93ABBD31DC73BCD3BFF9E6A5 /* GameLeaderboardView.swift in Sources */,
 				219476AA6D1FAB5C436F851C /* LeaderboardEntry+Avatar.swift in Sources */,
+				CA15ACEAE50D18CD006AC511 /* Rules+Messages.swift in Sources */,
+				AAA2D13EF93A2A93D5DE7A5F /* Insight+Presentation.swift in Sources */,
+				20DCD98B13AEFFCC2257158A /* View+MatchDialogs.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

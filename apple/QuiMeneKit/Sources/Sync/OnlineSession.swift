@@ -79,6 +79,8 @@ public protocol OnlineSessionBackend: Sendable {
   ) async throws -> Int64
   func events(sessionID: UUID, after seq: Int64) async throws -> [RawSessionEvent]
   func close(sessionID: UUID, ownerDeviceID: String) async throws
+  /// Fermée (par le créateur ou après 6 h sans activité) ou déjà purgée.
+  func isClosed(sessionID: UUID) async throws -> Bool
 }
 
 /// Une session ouverte ou rejointe par cet appareil : son journal lisible, le rattrapage, l'ajout.
@@ -99,7 +101,9 @@ public actor OnlineSession {
   /// corrompues) est sauté, mais il occupe bien sa place dans la numérotation.
   public private(set) var lastSeq: Int64 = 0
 
-  public init(sessionID: UUID, pairingCode: String, deviceID: String, backend: any OnlineSessionBackend) {
+  public init(
+    sessionID: UUID, pairingCode: String, deviceID: String, backend: any OnlineSessionBackend
+  ) {
     self.sessionID = sessionID
     self.pairingCode = pairingCode
     self.deviceID = deviceID
@@ -126,6 +130,12 @@ public actor OnlineSession {
       if batch.count < Self.pageSize { break }
     }
     return fresh
+  }
+
+  /// Doc 16 — fermée par le créateur ou faute d'activité (6 h) : à vérifier au rattrapage, sans
+  /// attendre qu'un ajout soit refusé (`sessionClosed`).
+  public func isClosed() async throws -> Bool {
+    try await backend.isClosed(sessionID: sessionID)
   }
 
   /// Ajoute un événement à la suite du journal connu. Si un autre appareil l'a devancé, rattrape
@@ -311,8 +321,16 @@ public struct SupabaseSessionBackend: OnlineSessionBackend {
     }
   }
 
+  public func isClosed(sessionID: UUID) async throws -> Bool {
+    try await call {
+      try await client.rpc("quimene_session_is_closed", params: ["p_session_id": sessionID])
+        .execute().value
+    }
+  }
+
   /// Traduit les exceptions levées par les fonctions SQL (`raise exception '<code>'`) en
   /// erreurs du domaine `Sync` ; le reste (réseau…) passe tel quel.
+  @discardableResult
   private func call<T>(_ body: () async throws -> T) async throws -> T {
     do {
       return try await body()

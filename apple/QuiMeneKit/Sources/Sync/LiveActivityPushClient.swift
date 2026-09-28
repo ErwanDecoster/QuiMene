@@ -85,8 +85,9 @@ public enum LiveActivityPushClient {
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-    request.setValue(
-      "Bearer \(SupabaseSyncConfig.anonKey)", forHTTPHeaderField: "Authorization")
+    // Clé publishable dans `apikey` : Supabase réserve `Authorization` aux jetons d'utilisateur
+    // (il n'y accepte une clé que par compatibilité).
+    request.setValue(SupabaseSyncConfig.anonKey, forHTTPHeaderField: "apikey")
     request.httpBody = try? JSONEncoder().encode(
       PushBody(activityKey: activityKey, event: event, contentState: contentState))
     do {

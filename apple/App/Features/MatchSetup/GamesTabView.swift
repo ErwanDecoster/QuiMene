@@ -41,6 +41,11 @@ struct GamesTabView: View {
   private static let pullToSearchThreshold: CGFloat = 40
 
   private var catalog: GameCatalog { .embedded }
+
+  private var showsEndedSessionNotice: Bool {
+    MatchConnectionCoordinator.shared.showsEndedNotice
+      || LiveShareCoordinator.shared.showsEndedNotice
+  }
   private var activePlayers: [PlayerRecord] { allPlayers.filter { !$0.isArchived } }
 
   private var games: [GameDefinition] {
@@ -70,9 +75,11 @@ struct GamesTabView: View {
           Button {
             deepLinkRouter.isPresentingJoin = true
           } label: {
-            Label("Partie partagée en cours · Reprendre", systemImage: "dot.radiowaves.left.and.right")
-              .font(.bodyText)
-              .foregroundStyle(.brandInk)
+            Label(
+              "Partie partagée en cours · Reprendre", systemImage: "dot.radiowaves.left.and.right"
+            )
+            .font(.bodyText)
+            .foregroundStyle(.brandInk)
           }
         }
       }
@@ -116,6 +123,24 @@ struct GamesTabView: View {
         .listRowSeparator(.hidden)
       }
     }
+    // Doc 16 — une session partagée terminée sans qu'on l'ait arrêtée soi-même : dit une fois,
+    // là où était le bandeau de reprise (charte §5.5 : 4 s sans action).
+    .overlay(alignment: .bottom) {
+      if showsEndedSessionNotice {
+        Banner("La session partagée est terminée.")
+          .padding(.horizontal, Space.lg)
+          .padding(.bottom, Space.lg)
+          .transition(.move(edge: .bottom).combined(with: .opacity))
+          .task {
+            Banner.announce("La session partagée est terminée.")
+            try? await Task.sleep(for: .seconds(4))
+            guard !Task.isCancelled else { return }
+            MatchConnectionCoordinator.shared.dismissEndedNotice()
+            LiveShareCoordinator.shared.dismissEndedNotice()
+          }
+      }
+    }
+    .accessibleAnimation(.default, value: showsEndedSessionNotice)
     .navigationTitle("Jeux")
     .toolbar {
       ToolbarItem(placement: .topBarLeading) {
@@ -212,23 +237,15 @@ struct GamesTabView: View {
           refreshInProgressMatches()
         }
       }
-      .confirmationDialog(
-        "Abandonner cette partie ?",
+      .abandonMatchConfirmation(
         isPresented: Binding(
-          get: { matchPendingAbandon != nil }, set: { if !$0 { matchPendingAbandon = nil } }),
-        titleVisibility: .visible
+          get: { matchPendingAbandon != nil }, set: { if !$0 { matchPendingAbandon = nil } })
       ) {
-        Button("Abandonner", role: .destructive) {
-          if let match = matchPendingAbandon {
-            _ = try? MatchRepository(context: modelContext).abandonMatch(match, catalog: catalog)
-          }
-          matchPendingAbandon = nil
-          refreshInProgressMatches()
+        if let match = matchPendingAbandon {
+          _ = try? MatchRepository(context: modelContext).abandonMatch(match, catalog: catalog)
         }
-      } message: {
-        Text(
-          "La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée."
-        )
+        matchPendingAbandon = nil
+        refreshInProgressMatches()
       }
   }
 

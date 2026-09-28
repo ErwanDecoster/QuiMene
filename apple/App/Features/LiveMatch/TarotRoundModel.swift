@@ -114,7 +114,7 @@ final class TarotRoundModel {
       validationErrorMessage = nil
       resetDraft()
     } catch {
-      validationErrorMessage = "La donne n'a pas pu être enregistrée."
+      validationErrorMessage = String(localized: "La donne n'a pas pu être enregistrée.")
     }
   }
 

@@ -1,4 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Aperçu caméra intégré à l'écran Rejoindre (scan de QR, doc 09) — la saisie manuelle du
          code reste toujours disponible, donc pas d'appareil photo requis pour installer/utiliser
@@ -11,18 +12,17 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
-    <!-- Pas d'android:icon pour l'instant : l'icône adaptative (charte §11.5 — couche de fond +
-         premier plan, zone sûre 66/108 dp) demande un travail d'asset qui n'est pas fait dans
-         cette étape ; icône système par défaut en attendant. -->
     <application
         android:name=".QuiMeneApplication"
         android:allowBackup="true"
         android:usesCleartextTraffic="false"
-        android:label="Qui Mène ?"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
         android:theme="@android:style/Theme.Material.Light.NoActionBar"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/full_backup_content"
-        android:localeConfig="@xml/locale_config">
+        android:localeConfig="@xml/locale_config"
+        tools:targetApi="tiramisu">
 
         <activity
             android:name=".MainActivity"

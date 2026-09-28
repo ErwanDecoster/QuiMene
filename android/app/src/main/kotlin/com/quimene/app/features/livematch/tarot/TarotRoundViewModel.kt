@@ -1,6 +1,7 @@
 package com.quimene.app.features.livematch.tarot
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -26,13 +27,13 @@ class TarotRoundViewModel(
         private set
     var partnerID by mutableStateOf<UUID?>(null)
         private set
-    var points by mutableStateOf(46)
+    var points by mutableIntStateOf(46)
         private set
-    var contract by mutableStateOf(0)
+    var contract by mutableIntStateOf(0)
         private set
-    var bouts by mutableStateOf(0)
+    var bouts by mutableIntStateOf(0)
         private set
-    var poignee by mutableStateOf(0)
+    var poignee by mutableIntStateOf(0)
         private set
     var petitAuBout by mutableStateOf(false)
         private set

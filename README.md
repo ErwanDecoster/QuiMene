@@ -116,12 +116,12 @@ Ne peuvent pas être faites en CLI — à traiter quand tu as la main :
 | **Palette joueurs v2 (vive) — daltonisme non revérifié** | Recolorée le 29/07 pour plus d'impact visuel (avatars, courbe) ; le contraste WCAG 3:1 est revérifié par test, mais la distinguabilité en deutéranopie/protanopie des 6 premières teintes ne l'a pas été depuis ce changement (charte §1.5) | À confirmer par simulation dédiée avant un usage graphique dense (courbe à 6+ joueurs) |
 | **Tests `QuiMeneKit` non câblés dans le schéma `QuiMene`** | Xcode → Edit Scheme → Test → `+` → ajouter Domain/Catalog/Store/DesignSystemTests (30 secondes en UI, non fiabilisable en pbxproj à la main) | Xcode Cloud doit tester via ce schéma ; en attendant, `xcodebuild test -scheme QuiMeneKit-Package` valide tout |
 | **Proportion icône/wordmark dans les déclinaisons** | Le ratio exact entre la hauteur de l'icône et la casse du wordmark n'est pas chiffré dans la charte (§11.2 donne l'espacement, pas la proportion) — hauteurs égales choisies par défaut | Ajustement visuel possible en revue de design, pas un blocage technique |
-| **XCUITest « création joueur »** (doc 10, parcours n°1) | Pas encore écrit — la persistance est validée par `PlayerRepositoryTests` (10 joueurs, réouverture du magasin) et par capture d'écran manuelle sur simulateur, mais pas par un test UI automatisé | Couverture du parcours critique en CI (peut attendre que `QuiMeneUITests` soit créé) |
+| ~~**XCUITest « création joueur »**~~ **fait** — `QuiMeneUITests`, parcours n°1 et n°3 ([15](docs/15-plan-qualite-code.md), Phase C) | — | — |
 | **Règles de départage génériques incomplètes** | `mostRoundsWon`, `lowerSecondaryScore`, `higherSecondaryScore`, `headToHead` ne sont pas résolues par le classement générique (`GameRules.standings()`) faute de données modélisées — ignorées silencieusement, passage à la règle suivante | Un futur jeu déclarant l'une d'elles dans son `tieBreak` ne serait pas départagé dessus tant qu'elle n'est pas implémentée |
-| **Taps du pavé numérique non vérifiés par automatisation** | Le simulateur iOS n'expose pas les vues SwiftUI internes à l'accessibilité macOS (testé directement) — seul un vrai XCUITest peut simuler des taps. Vérifié à la place : rendu réel par capture d'écran (le tableau, le focus, le doublement s'affichent juste) + logique de `LiveMatchModel`/`MatchRepository` couverte par tests | Confiance moindre sur le fil `draftText` → `setScore` (simple concaténation de chaînes), spécifiquement en attente d'un XCUITest |
+| ~~**Taps du pavé numérique non vérifiés par automatisation**~~ **sans objet** — le pavé maison a été remplacé par le clavier système ([ADR-0013](docs/13-decisions-adr.md)) | — | — |
 | **Sélection narrative des insights (score d'intérêt)** | La charte §06 décrit le principe (écart à la normale, unicité, rareté, diversité) sans formule exacte — l'implémentation dans `StatsEngine.select` est une heuristique de première passe, non vérifiée par golden (seuls les *candidats* le sont) | Le choix des 4 à 6 faits affichés peut être retravaillé sans casser les tests |
 | **Ordre de rareté des badges** | Doc 06 dit « le plus rare l'emporte » sans lister l'ordre — `photoFinish > comeback > rollercoaster > metronome > unshakeable > kamikaze > winner` est mon choix, pas une valeur de la charte | Ajustable en revue de design |
-| **Badge Chirurgien non implémenté** | Propre à Wizard/Mölkky (doc 06), aucun des deux n'existe encore dans le catalogue | Sans effet avant leur arrivée (Phase 7) |
+| **Badge Chirurgien non implémenté** | Propre à Wizard/Mölkky (doc 06) — les deux sont désormais au catalogue, le badge reste à coder | Badge absent des résultats de ces deux jeux |
 | **Photo d'avatar absente des snapshots de partie** | `ParticipantRecord` (doc 03) ne stocke que `avatarKindSnapshot`/`avatarValueSnapshot` en `String`, pas de photo — un joueur en avatar photo retombe sur un symbole générique dans les résultats/l'historique | Repli visuel, pas une perte de données côté `PlayerRecord` lui-même |
 | **Partage d'image non vérifié par interaction réelle** | Le bouton "Partager le résumé" s'affiche et `ImageRenderer` produit une image sans crash (vérifié), mais la feuille de partage elle-même n'a pas été ouverte (même limite d'automatisation que les taps du pavé) | Confiance moindre sur le rendu final de `ResultsShareCard` en dehors du bouton |
 | **Recette CloudKit sur deux appareils** (doc 12, critère de fin de Phase 6 : « une partie créée sur iPhone apparaît sur iPad sans rien faire ») | Nécessite un second appareil physique (ou un second compte iCloud de test) — pas simulable en CLI | Confirmation qu'une partie/un joueur créé localement se synchronise réellement, au-delà de la vérification statique de la configuration `ModelConfiguration`/entitlements |
@@ -132,11 +132,16 @@ Ne peuvent pas être faites en CLI — à traiter quand tu as la main :
 
 ## Prérequis
 
-Vérifiés sur cette machine le 29/07/2026 :
+Vérifiés sur cette machine le 25/09/2026 :
 
-- macOS 26.5.2 · Xcode 26.6 (build 17F113) · Swift 6.3.3
-
-Aucune dépendance tierce n'est prévue côté Apple.
+- Apple : Xcode 27.0 (build 27A266a) · Swift 6.4 — une seule dépendance tierce, `supabase-swift`
+  (exception à l'ADR-0012, voir `Package.swift`), versions figées par `Package.resolved`.
+- Android : JDK 17 · SDK `android-37.2` (le wrapper Gradle suffit, pas de Gradle global).
+- Site : Node 22.12 ou plus récent (`website/`).
+- Traductions Android : après un changement de `Localizable.xcstrings`, relancer
+  `python3 Scripts/extract-android-strings.py` (vérifié par la CI GitHub).
+- Supabase : CLI ≥ 2.117 ; `supabase/config.toml` sert à la pile locale (`supabase start`,
+  `supabase test db`, Docker requis) et déclare les fonctions déployées au merge sur `main`.
 
 ## Étape suivante
 

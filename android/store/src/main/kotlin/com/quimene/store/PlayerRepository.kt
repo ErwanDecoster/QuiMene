@@ -114,19 +114,10 @@ class PlayerRepository(
         )
     }
 
-    /** Doc 14, phase 2 — toutes les fiches liées sur cet appareil. */
-    suspend fun allSharedProfileIDs(): List<UUID> = dao.withSharedProfileID().mapNotNull { it.sharedProfileID }
-
     suspend fun player(sharedProfileID: UUID): PlayerEntity? = dao.bySharedProfileID(sharedProfileID)
 
     /** Toutes les fiches, archivées comprises. */
     suspend fun allPlayers(): List<PlayerEntity> = dao.getAll()
-
-    /** Ordre manuel de la liste des joueurs (`sortIndex`) — Room ne préserve pas non plus
-     * l'ordre d'une collection sans tri explicite. */
-    suspend fun reorder(players: List<PlayerEntity>) {
-        dao.updateAll(players.mapIndexed { index, player -> player.copy(sortIndex = index) })
-    }
 
     /** Charte §1.5 : première couleur libre parmi les joueurs actifs à la création. Si les dix
      * sont prises, reboucle plutôt que d'échouer. */

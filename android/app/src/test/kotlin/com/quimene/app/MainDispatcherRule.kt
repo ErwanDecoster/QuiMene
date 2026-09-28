@@ -1,6 +1,7 @@
 package com.quimene.app
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -16,6 +17,7 @@ import org.junit.runner.Description
  * le thread appelant, tout le chargement d'un ViewModel se termine avant la fin de son
  * constructeur, sans avoir besoin d'attendre explicitement dans chaque test.
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherRule(
     private val dispatcher: TestDispatcher = UnconfinedTestDispatcher(),
 ) : TestWatcher() {

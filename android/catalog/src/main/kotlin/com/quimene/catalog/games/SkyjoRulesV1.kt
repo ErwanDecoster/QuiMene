@@ -4,8 +4,10 @@ import com.quimene.domain.model.MatchState
 import com.quimene.domain.model.ModifierID
 import com.quimene.domain.model.RoundDraft
 import com.quimene.domain.model.ScoreEntry
+import com.quimene.domain.model.ScoreExplanation
 import com.quimene.domain.model.ValidationError
 import com.quimene.domain.model.ValidationResult
+import com.quimene.domain.model.ValidationWarning
 import com.quimene.domain.rules.GameDefinition
 import com.quimene.domain.rules.GameRules
 
@@ -29,7 +31,7 @@ class SkyjoRulesV1 : GameRules {
                 listOf(
                     ValidationError(
                         ValidationError.Field.ModifierField(ModifierID.closedRound),
-                        "Un seul joueur ferme la manche.",
+                        ValidationError.Reason.SingleCloserRequired,
                     ),
                 ),
             )
@@ -40,7 +42,7 @@ class SkyjoRulesV1 : GameRules {
             ValidationResult.Valid
         } else {
             ValidationResult.Warning(
-                listOf("Score inhabituel, à vérifier."),
+                listOf(ValidationWarning.UnusualScore),
             )
         }
     }
@@ -52,7 +54,6 @@ class SkyjoRulesV1 : GameRules {
     ): List<ScoreEntry> {
         val doublingEnabled = state.variants.bool("doublePenalty", default = true)
         val lowest = draft.inputs.minOfOrNull { it.rawValue } ?: 0
-        val names = state.participants.associate { it.id to it.displayName }
 
         return draft.inputs.map { input ->
             val closed = ModifierID.closedRound in input.modifiers
@@ -64,12 +65,7 @@ class SkyjoRulesV1 : GameRules {
                 participantID = input.participantID,
                 rawValue = input.rawValue,
                 computedValue = if (penalised) input.rawValue * 2 else input.rawValue,
-                explanation =
-                    if (penalised) {
-                        "Score doublé : ${names[input.participantID] ?: "ce joueur"} a fermé la manche sans le score le plus bas."
-                    } else {
-                        null
-                    },
+                explanation = if (penalised) ScoreExplanation.DoubledForClosingWithoutLowest else null,
                 detail = null,
                 modifiers = input.modifiers,
             )

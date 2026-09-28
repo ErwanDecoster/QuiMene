@@ -92,7 +92,7 @@ final class YamsSheetModel {
       state = try repository.commitRound(draft, to: match, catalog: catalog)
       validationErrorMessage = nil
     } catch {
-      validationErrorMessage = "La saisie n'a pas pu être enregistrée."
+      validationErrorMessage = String(localized: "La saisie n'a pas pu être enregistrée.")
     }
   }
 

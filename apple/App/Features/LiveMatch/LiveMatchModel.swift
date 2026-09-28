@@ -200,7 +200,8 @@ final class LiveMatchModel {
   func startNextMatch(definition next: GameDefinition) async -> UUID? {
     isSubmitting = true
     defer { isSubmitting = false }
-    return await shareCoordinator.startNextMatch(definition: next, after: match, context: context)?.id
+    return await shareCoordinator.startNextMatch(definition: next, after: match, context: context)?
+      .id
   }
 
   /// Point d'entrée de la saisie (« Terminé ») : en local, écrit tout de suite ; dans une
@@ -235,7 +236,7 @@ final class LiveMatchModel {
     closedParticipantID = nil
     activeSeatIndex = 0
     validationErrorMessage = nil
-    if let explanation = state.rounds.last?.entries.compactMap(\.explanation).first {
+    if let explanation = state.lastRoundExplanationMessage {
       showRoundExplanation(explanation)
     }
   }
@@ -260,7 +261,8 @@ final class LiveMatchModel {
     case .overtaken(let name):
       validationErrorMessage = SharedMatchModel.overtakenMessage(name)
     case .offline:
-      validationErrorMessage = String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
+      validationErrorMessage = String(
+        localized: "Hors connexion : la saisie reprendra au retour du réseau.")
     case .closed:
       validationErrorMessage = String(localized: "La session partagée a été arrêtée.")
     }
@@ -275,7 +277,7 @@ final class LiveMatchModel {
       state = try repository.commitRound(
         draft, to: match, catalog: catalog, deviceID: DeviceIdentity.current)
     } catch {
-      validationErrorMessage = "La manche n'a pas pu être enregistrée."
+      validationErrorMessage = String(localized: "La manche n'a pas pu être enregistrée.")
       return false
     }
     clearDraftAfterCommit()
@@ -368,8 +370,10 @@ final class LiveMatchModel {
   /// propres manches de l'hôte via ce chemin (`session.events` ne porte que les propositions
   /// acceptées d'un pair, jamais les écritures locales), donc pas de filtre à refaire ici.
   private func announceIfRemote(deviceID: String) {
-    let name = connectedPeers.first { $0.deviceID == deviceID }?.deviceName ?? "Un appareil"
-    remoteActivityMessage = "\(name) a ajouté une manche."
+    let name =
+      connectedPeers.first { $0.deviceID == deviceID }?.deviceName
+      ?? String(localized: "Un appareil")
+    remoteActivityMessage = String(localized: "\(name) a ajouté une manche.")
     remoteActivityClearTask?.cancel()
     remoteActivityClearTask = Task { [weak self] in
       try? await Task.sleep(for: .seconds(4))

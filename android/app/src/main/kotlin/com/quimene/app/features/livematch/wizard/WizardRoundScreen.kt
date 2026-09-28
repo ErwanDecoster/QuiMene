@@ -94,12 +94,12 @@ private fun ParticipantBidRow(
                 ProfileBadgeView(badge)
             }
             SteppedValue(
-                label = "Annonce",
+                label = R.string.annonce_count1,
                 value = viewModel.bid(participant.id),
                 onChange = { viewModel.setBid(participant.id, it) },
             )
             SteppedValue(
-                label = "Réalisé",
+                label = R.string.realise_count1,
                 value = viewModel.result(participant.id),
                 onChange = { viewModel.setResult(participant.id, it) },
             )

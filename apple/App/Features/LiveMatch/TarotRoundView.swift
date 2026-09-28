@@ -10,10 +10,10 @@ struct TarotRoundView: View {
   @State private var isConfirmingAbandon = false
   @State private var isPresentingRoundHistory = false
 
-  private let contractNames = [
+  private let contractNames: [LocalizedStringResource] = [
     "Petite", "Garde", "Garde sans le chien", "Garde contre le chien",
   ]
-  private let poigneeNames = ["Aucune", "Simple", "Double", "Triple"]
+  private let poigneeNames: [LocalizedStringResource] = ["Aucune", "Simple", "Double", "Triple"]
 
   /// Doc utilisateur (audit qualité, 15) — même garantie que `LiveMatchView` : `MatchPlayView`
   /// ne route ici qu'après avoir vérifié que `definition` résout.
@@ -68,28 +68,8 @@ struct TarotRoundView: View {
       RoundHistoryView(
         state: model.state, definition: model.definition, myParticipantID: myParticipantID)
     }
-    .alert(
-      "Saisie invalide",
-      isPresented: Binding(
-        get: { model.validationErrorMessage != nil }, set: { if !$0 { model.dismissError() } })
-    ) {
-      Button("OK") {}
-    } message: {
-      Text(model.validationErrorMessage ?? "")
-    }
-    .confirmationDialog(
-      "Abandonner cette partie ?",
-      isPresented: $isConfirmingAbandon,
-      titleVisibility: .visible
-    ) {
-      Button("Abandonner", role: .destructive) {
-        model.abandon()
-      }
-    } message: {
-      Text(
-        "La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée."
-      )
-    }
+    .invalidEntryAlert(message: model.validationErrorMessage, onDismiss: model.dismissError)
+    .abandonMatchConfirmation(isPresented: $isConfirmingAbandon, onAbandon: model.abandon)
   }
 
   private var scoresSection: some View {

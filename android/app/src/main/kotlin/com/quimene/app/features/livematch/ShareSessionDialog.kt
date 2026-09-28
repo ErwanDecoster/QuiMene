@@ -63,7 +63,7 @@ fun ShareSessionDialog(
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState()
     var isStarting by remember { mutableStateOf(false) }
-    var startError by remember { mutableStateOf<String?>(null) }
+    var startError by remember { mutableStateOf(false) }
     // Une seule tentative par ouverture de la feuille : après « Arrêter le partage », la partie
     // n'est plus rattachée, et sans ce garde une nouvelle session s'ouvrait aussitôt.
     var hasStarted by remember { mutableStateOf(false) }
@@ -72,14 +72,14 @@ fun ShareSessionDialog(
         if (!isAttached && startAction != null && !hasStarted) {
             hasStarted = true
             isStarting = true
-            startError = null
+            startError = false
             try {
                 startAction()
             } catch (cancellation: CancellationException) {
                 throw cancellation
             } catch (error: Exception) {
                 isStarting = false
-                startError = error.message ?: "Le partage n'a pas pu démarrer."
+                startError = true
             }
         }
     }
@@ -93,8 +93,8 @@ fun ShareSessionDialog(
             verticalArrangement = Arrangement.spacedBy(Space.lg),
         ) {
             when {
-                startError != null ->
-                    Banner(message = startError.orEmpty())
+                startError ->
+                    Banner(message = stringResource(R.string.impossible_de_demarrer_le_partage_verifie_ta_connexion))
                 isStarting || coordinator.pairingCode == null ->
                     Column(
                         modifier = Modifier.fillMaxWidth().padding(Space.xl),
@@ -128,7 +128,11 @@ private fun SharingContent(
     val code = coordinator.pairingCode.orEmpty()
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-        QrCodeView(content = JoinLink.url(code), modifier = Modifier.size(180.dp))
+        QrCodeView(
+            content = JoinLink.url(code),
+            contentDescription = stringResource(R.string.code_qr_d_appairage),
+            modifier = Modifier.size(180.dp),
+        )
         Text(
             code,
             style =

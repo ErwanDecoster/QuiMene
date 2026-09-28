@@ -19,17 +19,19 @@ public struct StatsEngine: Sendable {
 }
 
 public struct Insight: Sendable, Identifiable {
-    public let id: InsightID
-    public let headline: String          // « Plus gros tour »
-    public let detail: String            // « Chloé — 40 points, manche 5 »
-    public let participantID: Participant.ID?
-    public let symbol: String            // SF Symbol
+    public let id: InsightID             // .highestRoundScore
     public let prominence: Prominence    // .hero, .standard, .minor
+    public let value: Value              // .single(Chloé, 40, manche 4) ou une valeur par joueur
 }
 ```
 
+Le moteur ne produit que des valeurs : titre (« Plus gros tour »), texte (« Chloé — 40 points,
+manche 5 ») et icône sont rédigés par chaque app à partir de `id` et `value`, dans la langue de
+l'utilisateur (`Insight+Presentation.swift`, `InsightText.kt`).
+
 `prominence` permet à l'UI de composer sans logique métier : un `.hero` occupe une grande
-carte, les `.standard` une grille de deux colonnes, les `.minor` une liste repliée.
+carte, les `.standard` une grille de deux colonnes, les `.minor` une liste repliée — pas encore
+exploité, tous les faits sont aujourd'hui `.standard`.
 
 ## Sélection : montrer 5 faits, pas 20
 
@@ -47,6 +49,9 @@ Score d'intérêt appliqué à chaque candidat :
 
 Les faits sous un seuil d'intérêt sont écartés. Sur une partie plate et sans relief, l'écran
 affiche trois faits, pas six remplis de vide.
+
+Un même tour (joueur, manche, valeur) n'est raconté qu'une fois : quand le plus haut score
+gagne, le « plus gros tour » est aussi le « meilleur tour », et seul le premier retenu s'affiche.
 
 ## Catalogue d'indicateurs
 

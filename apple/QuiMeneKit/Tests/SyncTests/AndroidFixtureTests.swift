@@ -42,7 +42,9 @@ struct AndroidFixtureTests {
     let kinds: [MatchEvent] = [
       .matchCreated(
         gameID: "skyjo", rulesVersion: 1,
-        variants: ["threshold": .int(100), "doublePenalty": .bool(true), "mode": .string("classic")],
+        variants: [
+          "threshold": .int(100), "doublePenalty": .bool(true), "mode": .string("classic"),
+        ],
         participants: [marion, theo]),
       .roundCommitted(round),
       .roundAmended(index: 0, draft: RoundDraft(index: 0, inputs: round.inputs)),

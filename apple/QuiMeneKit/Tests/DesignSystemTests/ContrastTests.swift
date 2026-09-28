@@ -15,13 +15,15 @@ struct ContrastTests {
     case token(String)
     case white
 
+    /// `@MainActor` : les traits mutables d'UIKit (`UITraitCollection(mutations:)`) le sont.
+    @MainActor
     func resolve(style: UIUserInterfaceStyle, contrast: UIAccessibilityContrast = .unspecified)
       -> UIColor
     {
-      let trait = UITraitCollection(traitsFrom: [
-        UITraitCollection(userInterfaceStyle: style),
-        UITraitCollection(accessibilityContrast: contrast),
-      ])
+      let trait = UITraitCollection { traits in
+        traits.userInterfaceStyle = style
+        traits.accessibilityContrast = contrast
+      }
       switch self {
       case .white:
         return UIColor.white.resolvedColor(with: trait)
@@ -316,6 +318,7 @@ struct ContrastTests {
   ]
 
   @Test("Paire respecte le ratio documenté dans la charte §1", arguments: cases)
+  @MainActor
   func pairMatchesDocumentedRatio(_ testCase: Case) {
     let foreground = testCase.foreground.resolve(style: testCase.style)
     let background = testCase.background.resolve(style: testCase.style)
@@ -331,6 +334,7 @@ struct ContrastTests {
   }
 
   @Test("Variante contraste augmenté des couleurs de joueur", arguments: highContrastCases)
+  @MainActor
   func highContrastPairMatchesRatio(_ testCase: Case) {
     let foreground = testCase.foreground.resolve(style: testCase.style, contrast: testCase.contrast)
     let background = testCase.background.resolve(style: testCase.style, contrast: testCase.contrast)

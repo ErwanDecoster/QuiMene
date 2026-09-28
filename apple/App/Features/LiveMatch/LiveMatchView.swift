@@ -13,6 +13,7 @@ struct LiveMatchView: View {
   @State private var isConfirmingManualEnd = false
   @State private var isConfirmingAbandon = false
   @State private var isConfirmingShareSwitch = false
+  @State private var isConfirmingEndSession = false
   @State private var isPresentingShareSession = false
   @State private var isPresentingRoundHistory = false
   @State private var keyboardObserver = KeyboardObserver()
@@ -78,7 +79,11 @@ struct LiveMatchView: View {
         // Doc 16, phase C — dans une session en ligne, tout le monde peut enchaîner.
         .safeAreaInset(edge: .bottom) {
           if model.isSharing {
-            NextMatchBar(isBusy: model.isSubmitting) { isPickingNextMatch = true }
+            NextMatchBar(isBusy: model.isSubmitting) {
+              isPickingNextMatch = true
+            } onEndSession: {
+              isConfirmingEndSession = true
+            }
           }
         }
         .sheet(isPresented: $isPickingNextMatch) {
@@ -200,6 +205,20 @@ struct LiveMatchView: View {
     .onChange(of: LiveShareCoordinator.shared.remoteEventToken) { _, _ in
       model.refreshFromRemote()
     }
+    // Doc 16 — sinon, la session s'arrête d'elle-même après 6 h sans activité.
+    .confirmationDialog(
+      "Terminer la session ?",
+      isPresented: $isConfirmingEndSession,
+      titleVisibility: .visible
+    ) {
+      Button("Terminer la session", role: .destructive) {
+        Task { await model.stopSharing() }
+      }
+    } message: {
+      Text(
+        "Plus personne ne pourra saisir ni lancer de partie. Les parties terminées restent dans l'historique de chacun."
+      )
+    }
     .confirmationDialog(
       "Terminer la partie ?",
       isPresented: $isConfirmingManualEnd,
@@ -231,19 +250,7 @@ struct LiveMatchView: View {
         "Une session est en cours de partage sur \(model.pendingShareSwitchGameName ?? "une autre partie"). Continuer ici la remplacera : les personnes connectées verront cette partie à la place."
       )
     }
-    .confirmationDialog(
-      "Abandonner cette partie ?",
-      isPresented: $isConfirmingAbandon,
-      titleVisibility: .visible
-    ) {
-      Button("Abandonner", role: .destructive) {
-        model.abandon()
-      }
-    } message: {
-      Text(
-        "La partie sera classée comme abandonnée dans l'historique, avec le classement atteint jusque-là. Cette action ne peut pas être annulée."
-      )
-    }
+    .abandonMatchConfirmation(isPresented: $isConfirmingAbandon, onAbandon: model.abandon)
     .sheet(isPresented: $isPresentingShareSession) {
       ShareSessionView { allowsContributors in
         try await model.startSharing(

@@ -3,7 +3,7 @@ package com.quimene.app.ui
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import androidx.core.net.toUri
 import com.quimene.app.R
 
 /**
@@ -33,7 +33,7 @@ object GameRequestMail {
         searchTerm: String?,
     ): Intent =
         Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
+            data = "mailto:".toUri()
             putExtra(Intent.EXTRA_EMAIL, arrayOf(RECIPIENT))
             putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.demande_d_ajout_d_un_jeu_qui_mene))
             putExtra(Intent.EXTRA_TEXT, body(context, searchTerm))

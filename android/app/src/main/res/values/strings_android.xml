@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textes propres à l'app Android, sans équivalent dans le catalogue Apple : maintenus ici
+     à la main, jamais touchés par Scripts/extract-android-strings.py (voir strings.xml). -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="fr">
+    <!-- Espace insécable avant « ? » (charte §12.3). -->
+    <string name="app_name" translatable="false">Qui Mène ?</string>
+    <string name="acces_appareil_photo_necessaire">L\'accès à l\'appareil photo est nécessaire pour scanner un code QR — tu peux aussi saisir le code à la main ci-dessous.</string>
+    <string name="annuler_la_selection">Annuler la sélection</string>
+    <string name="archiver_la_selection">Archiver la sélection</string>
+    <string name="autoriser_l_appareil_photo">Autoriser l\'appareil photo</string>
+    <string name="connexion_impossible_reessaie">Connexion impossible. Réessaie.</string>
+    <string name="couleur">Couleur</string>
+    <plurals name="count1_selectionne_s">
+        <item quantity="one">%1$d sélectionné</item>
+        <item quantity="many">%1$d sélectionnés</item>
+        <item quantity="other">%1$d sélectionnés</item>
+    </plurals>
+    <string name="effacer_la_recherche">Effacer la recherche</string>
+    <string name="fermer_la_recherche">Fermer la recherche</string>
+    <string name="partie">Partie</string>
+    <string name="plus_d_actions">Plus d\'actions</string>
+    <string name="remplir_value1">Remplir %1$s</string>
+    <string name="saisis_le_code_a_6_chiffres">Saisis le code à 6 chiffres affiché sur l\'appareil qui partage la partie.</string>
+    <string name="selectionner_des_joueurs">Sélectionner des joueurs</string>
+</resources>

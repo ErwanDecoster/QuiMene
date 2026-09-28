@@ -6,6 +6,7 @@ import com.quimene.domain.model.RoundDraft
 import com.quimene.domain.model.ScoreEntry
 import com.quimene.domain.model.ValidationError
 import com.quimene.domain.model.ValidationResult
+import com.quimene.domain.model.ValidationWarning
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import java.util.UUID
@@ -70,7 +71,7 @@ interface GameRules {
     ): ValidationResult {
         val entry = definition.scoring.entry
         val errors = mutableListOf<ValidationError>()
-        val warnings = mutableListOf<String>()
+        val warnings = mutableListOf<ValidationWarning>()
 
         for (input in draft.inputs) {
             val min = entry.min
@@ -79,23 +80,23 @@ interface GameRules {
                 errors +=
                     ValidationError(
                         ValidationError.Field.ParticipantField(input.participantID),
-                        "Score sous le minimum autorisé ($min).",
+                        ValidationError.Reason.ScoreBelowMinimum(min),
                     )
             }
             if (max != null && input.rawValue > max) {
                 errors +=
                     ValidationError(
                         ValidationError.Field.ParticipantField(input.participantID),
-                        "Score au-dessus du maximum autorisé ($max).",
+                        ValidationError.Reason.ScoreAboveMaximum(max),
                     )
             }
             val warnBelow = entry.warnBelow
             if (warnBelow != null && input.rawValue < warnBelow) {
-                warnings += "Score inhabituel, à vérifier."
+                warnings += ValidationWarning.UnusualScore
             }
             val warnAbove = entry.warnAbove
             if (warnAbove != null && input.rawValue > warnAbove) {
-                warnings += "Score inhabituel, à vérifier."
+                warnings += ValidationWarning.UnusualScore
             }
         }
 

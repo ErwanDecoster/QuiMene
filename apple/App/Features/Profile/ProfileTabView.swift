@@ -171,17 +171,12 @@ private struct ProfileIntroView: View {
         .foregroundStyle(.textPrimary)
       VStack(alignment: .leading, spacing: Space.sm) {
         benefit("person.2", "Rejoindre les parties de tes amis et y être reconnu.")
-        benefit("clock.arrow.circlepath", "Retrouver vos parties jouées ensemble dans ton historique.")
+        benefit(
+          "clock.arrow.circlepath", "Retrouver vos parties jouées ensemble dans ton historique.")
         benefit("lock", "Un pseudo et un avatar, rien de plus : aucun compte à créer.")
       }
-      Button {
-        onCreate()
-      } label: {
-        Text("Créer mon profil").frame(maxWidth: .infinity)
-      }
-      .buttonStyle(.borderedProminent)
-      .controlSize(.large)
-      .tint(.brandInk)
+      Button("Créer mon profil", action: onCreate)
+        .buttonStyle(.primary(size: .large))
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, Space.lg)
@@ -351,7 +346,8 @@ private struct AddFriendFlow: View {
             Button {
               createFiche(for: payload)
             } label: {
-              Label("Créer la fiche « \(payload.name) »", systemImage: "person.crop.circle.badge.plus")
+              Label(
+                "Créer la fiche « \(payload.name) »", systemImage: "person.crop.circle.badge.plus")
             }
           } footer: {
             Text("Nouvelle fiche avec son pseudo et son avatar.")

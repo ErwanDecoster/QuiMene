@@ -1,5 +1,6 @@
 package com.quimene.app.features.play
 
+import android.content.ClipData
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.QrCodeScanner
@@ -43,10 +43,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
@@ -55,6 +58,8 @@ import com.quimene.app.features.livematch.ShareSessionDialog
 import com.quimene.app.navigation.floatingNavBarContentPadding
 import com.quimene.app.ui.GameRequestMail
 import com.quimene.app.ui.gameIcon
+import com.quimene.designsystem.components.BackButton
+import com.quimene.designsystem.components.Banner
 import com.quimene.designsystem.components.EmptyState
 import com.quimene.designsystem.components.ListContainer
 import com.quimene.designsystem.components.ListRowDivider
@@ -64,6 +69,7 @@ import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.rules.GameDefinition
 import com.quimene.store.DeviceIdentity
 import com.quimene.store.MatchEntity
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /** Miroir de `GamesTabView.swift` (doc 05) — la liste des jeux du catalogue : icône, nom,
@@ -91,10 +97,22 @@ fun GamesCatalogScreen(
     var isPresentingMailFallback by remember { mutableStateOf(false) }
     val isSharing = container.liveShareCoordinator.attachedMatchID != null
     val searchFocusRequester = remember { FocusRequester() }
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
 
     LaunchedEffect(isSearching) {
         if (isSearching) searchFocusRequester.requestFocus()
+    }
+
+    // Doc 16 — une session partagée terminée sans qu'on l'ait arrêtée soi-même : dit une fois, là
+    // où était le bandeau de reprise (charte §5.5 : 4 s sans action).
+    val showsEndedSessionNotice =
+        container.matchConnectionCoordinator.showsEndedNotice || container.liveShareCoordinator.showsEndedNotice
+    LaunchedEffect(showsEndedSessionNotice) {
+        if (showsEndedSessionNotice) {
+            delay(4_000)
+            container.matchConnectionCoordinator.dismissEndedNotice()
+            container.liveShareCoordinator.dismissEndedNotice()
+        }
     }
 
     Scaffold(
@@ -122,21 +140,23 @@ fun GamesCatalogScreen(
                 },
                 navigationIcon = {
                     if (isSearching) {
-                        IconButton(
+                        BackButton(
                             onClick = {
                                 isSearching = false
                                 viewModel.updateSearchText("")
                             },
-                        ) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Fermer la recherche")
-                        }
+                            contentDescription = stringResource(R.string.fermer_la_recherche),
+                        )
                     }
                 },
                 actions = {
                     if (isSearching) {
                         if (viewModel.searchText.isNotEmpty()) {
                             IconButton(onClick = { viewModel.updateSearchText("") }) {
-                                Icon(Icons.Filled.Close, contentDescription = "Effacer la recherche")
+                                Icon(
+                                    Icons.Filled.Close,
+                                    contentDescription = stringResource(R.string.effacer_la_recherche),
+                                )
                             }
                         }
                     } else {
@@ -186,6 +206,12 @@ fun GamesCatalogScreen(
                     .padding(floatingNavBarContentPadding(systemBottomInset = innerPadding.calculateBottomPadding())),
             verticalArrangement = Arrangement.spacedBy(Space.lg),
         ) {
+            if (showsEndedSessionNotice) {
+                Banner(
+                    message = stringResource(R.string.la_session_partagee_est_terminee),
+                    modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+                )
+            }
             // Doc 16, phase A — la partie suivie chez quelqu'un d'autre vit dans l'écran Rejoindre,
             // qu'on peut quitter en arrière sans la quitter : ce bandeau est le chemin du retour.
             if (viewModel.searchText.isBlank() && container.matchConnectionCoordinator.sharedMatch != null) {
@@ -250,7 +276,11 @@ fun GamesCatalogScreen(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        clipboardManager.setText(AnnotatedString(GameRequestMail.RECIPIENT))
+                        scope.launch {
+                            clipboard.setClipEntry(
+                                ClipEntry(ClipData.newPlainText(GameRequestMail.RECIPIENT, GameRequestMail.RECIPIENT)),
+                            )
+                        }
                         isPresentingMailFallback = false
                     },
                 ) { Text(stringResource(R.string.copier_l_adresse)) }
@@ -326,7 +356,7 @@ private fun ResumeMatchRow(
             Text(text = gameName, style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
         }
         IconButton(onClick = onAbandon) {
-            Icon(Icons.Filled.Close, contentDescription = "Abandonner la partie en cours de $gameName")
+            Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.abandonner_la_partie))
         }
     }
 }
@@ -370,7 +400,7 @@ private fun GameRow(
             }
         }
         IconButton(onClick = onOpenLeaderboard) {
-            Icon(Icons.Filled.EmojiEvents, contentDescription = "Classement de ${definition.name.localized}")
+            Icon(Icons.Filled.EmojiEvents, contentDescription = stringResource(R.string.meilleurs_joueurs))
         }
     }
 }

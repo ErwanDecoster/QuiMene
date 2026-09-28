@@ -72,7 +72,7 @@ de `ink`, des gris neutres paraissent jaunes.
 |---|---|---|
 | `neutral/bg` | `#F6F7F9` | Fond d'écran |
 | `neutral/surface` | `#FFFFFF` | Cartes, lignes de liste, feuilles |
-| `neutral/sunken` | `#ECEEF2` | Zones en creux, fond du pavé numérique |
+| `neutral/sunken` | `#ECEEF2` | Zones en creux |
 | `neutral/fill` | `#E3E6EC` | Remplissages, chips, fonds désactivés |
 | `neutral/border` | `#D4D9E2` | Séparateurs, bordures décoratives |
 | `neutral/borderStrong` | `#7E879A` | **Bordures de contrôles interactifs** (champs, boutons secondaires) — 3,61:1 |
@@ -273,10 +273,9 @@ Grille de 4 colonnes en compact, 8 en regular. Les cartes de jeu du catalogue oc
 
 - **Jamais de valeur codée en dur** pour l'encoche, la Dynamic Island, la barre d'état ou
   l'indicateur d'accueil. iOS : `safeAreaInset`. Android : `WindowInsets`.
-- Le pavé numérique s'ancre par `.safeAreaInset(edge: .bottom)` : il remonte automatiquement
-  au-dessus de l'indicateur d'accueil, et le tableau des scores se rétracte d'autant.
-- `space/sm` = 8 pt de dégagement supplémentaire sous la dernière touche du pavé, au-dessus de
-  la safe area — le geste de retour à l'accueil part du bord et intercepte sinon les taps.
+- La saisie passe par le clavier système
+  ([ADR-0013](13-decisions-adr.md#adr-0013--retour-au-clavier-système-plutôt-que-le-pavé-propriétaire)),
+  qui s'ancre seul au-dessus de l'indicateur d'accueil : rien à décaler à la main.
 - Le contenu défilant passe **sous** les barres translucides (`.contentMargins`), il n'est pas
   coupé net.
 - Mode paysage : marges latérales portées à 24 pt minimum sur iPhone, pour dégager les coins
@@ -767,8 +766,11 @@ Directement exploitable en implémentation. Nommage identique dans les deux base
 | `space/lg` | 16 | | `radius/xl` | 28 | | `icon/xl` | 32 |
 | `space/xl` | 24 | | `radius/full` | 999 | | `touch/min` | 44 |
 | `space/2xl` | 32 | | `button/large` | 52 | | `touch/gap` | 8 |
-| `space/3xl` | 48 | | `button/medium` | 44 | | `keypad/key` | 56 |
-| `space/4xl` | 64 | | `button/small` | 32 | | `keypad/gap` | 12 |
+| `space/3xl` | 48 | | `button/medium` | 44 | | | |
+| `space/4xl` | 64 | | `button/small` | 32 | | | |
+
+Les jetons `keypad/key` et `keypad/gap` ont disparu avec le pavé numérique maison
+([ADR-0013](13-decisions-adr.md#adr-0013--retour-au-clavier-système-plutôt-que-le-pavé-propriétaire)).
 
 ### Mouvement
 

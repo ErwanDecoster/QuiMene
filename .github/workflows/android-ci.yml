@@ -1,7 +1,7 @@
 name: Android CI
 
-# Xcode Cloud reste propre à Apple (docs/11-portage-android.md, étape A) — nouveau workflow
-# dédié à Android, le dépôt n'avait pas de .github/ avant cette étape.
+# Xcode Cloud reste propre à Apple (docs/11-portage-android.md, étape A) — ce workflow couvre
+# Android, plus les garde-fous partagés qui ne demandent pas de Mac.
 
 on:
   push:
@@ -9,14 +9,40 @@ on:
     paths:
       - "android/**"
       - "spec/**"
+      - "Scripts/**"
+      - "apple/App/Resources/Localizable.xcstrings"
+      - "apple/QuiMeneKit/Sources/Catalog/GameDefinitions/**"
+      - "apple/QuiMeneKit/Tests/CatalogTests/GoldenResources/**"
+      - "apple/QuiMeneKit/Tests/SyncTests/SessionResources/**"
       - ".github/workflows/android-ci.yml"
   pull_request:
     paths:
       - "android/**"
       - "spec/**"
+      - "Scripts/**"
+      - "apple/App/Resources/Localizable.xcstrings"
+      - "apple/QuiMeneKit/Sources/Catalog/GameDefinitions/**"
+      - "apple/QuiMeneKit/Tests/CatalogTests/GoldenResources/**"
+      - "apple/QuiMeneKit/Tests/SyncTests/SessionResources/**"
       - ".github/workflows/android-ci.yml"
 
 jobs:
+  consistency:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # spec/ est la seule source de vérité ; les copies embarquées côté Apple doivent suivre.
+      - name: spec/ et ses copies
+        run: Scripts/check-spec-sync.sh
+
+      # Les strings.xml Android sont générés depuis le catalogue Apple : un changement de
+      # catalogue sans relance du script, ou un texte référencé mais absent, échoue ici.
+      - name: strings.xml à jour
+        run: |
+          python3 Scripts/extract-android-strings.py
+          git diff --exit-code -- android/app/src/main/res android/l10n-correspondence.json
+
   build-and-test:
     runs-on: ubuntu-latest
     defaults:
@@ -37,5 +63,7 @@ jobs:
       - name: ktlint
         run: ./gradlew ktlintCheck
 
+      # Compilation (avertissements Kotlin = erreurs), Android Lint (avertissements = erreurs) et
+      # tests unitaires de tous les modules.
       - name: Build and unit test
         run: ./gradlew build

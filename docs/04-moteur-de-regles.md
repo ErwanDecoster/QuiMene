@@ -72,7 +72,7 @@ public struct ScoreEntry: Sendable, Codable, Equatable {
     public let participantID: Participant.ID
     public let rawValue: Int
     public let computedValue: Int        // après règles
-    public let explanation: String?      // « doublé : n'a pas le score le plus bas »
+    public let explanation: ScoreExplanation?  // .doubledForClosingWithoutLowest, rédigé par l'app
     public let detail: ScoreDetail?
     public let modifiers: Set<ModifierID>
 }
@@ -173,10 +173,18 @@ résultats.
 ```swift
 public enum ValidationResult: Sendable, Equatable {
     case valid
-    case warning([String])          // affiché, n'empêche pas de valider
-    case invalid([ValidationError]) // bloque, ancré sur le champ fautif
+    case warning([ValidationWarning]) // affiché, n'empêche pas de valider
+    case invalid([ValidationError])   // bloque, ancré sur le champ fautif
 }
 ```
+
+Aucun texte d'interface dans le moteur : un refus porte une raison typée
+(`ValidationError.Reason`, ex. `.takerPointsOutOfRange(max: 162)`), un avertissement une
+`ValidationWarning`, une explication de score une `ScoreExplanation`. Chaque app les rédige
+dans la langue de l'utilisateur (`Rules+Messages.swift`, `RulesMessages.kt`) — `Domain` n'a
+accès à aucune ressource de traduction, et `:domain` côté Android encore moins (ADR-0002).
+L'avertissement est calculé mais pas encore affiché par les apps (voir
+[15](15-plan-qualite-code.md), audit du 2026-09-25).
 
 Distinction volontaire entre *warning* et *invalid*. Un score de 137 au Skyjo est
 mathématiquement possible mais très improbable : on avertit, on n'interdit pas. Deux joueurs
@@ -261,11 +269,11 @@ struct SkyjoRulesV1: GameRules {
         let closers = draft.inputs.filter { $0.modifiers.contains(.closedRound) }
         guard closers.count == 1 else {
             return .invalid([.init(field: .modifier(.closedRound),
-                                   message: "Un seul joueur ferme la manche.")])
+                                   reason: .singleCloserRequired)])
         }
         let extremes = draft.inputs.filter { $0.rawValue < -24 || $0.rawValue > 156 }
         return extremes.isEmpty ? .valid
-                                : .warning(["Score inhabituel, à vérifier."])
+                                : .warning([.unusualScore])
     }
 
     func score(_ draft: RoundDraft, in state: MatchState,
@@ -284,9 +292,7 @@ struct SkyjoRulesV1: GameRules {
                 participantID: input.participantID,
                 rawValue: input.rawValue,
                 computedValue: penalised ? input.rawValue * 2 : input.rawValue,
-                explanation: penalised
-                    ? "Score doublé : a fermé la manche sans le score le plus bas."
-                    : nil,
+                explanation: penalised ? .doubledForClosingWithoutLowest : nil,
                 detail: nil,
                 modifiers: input.modifiers
             )

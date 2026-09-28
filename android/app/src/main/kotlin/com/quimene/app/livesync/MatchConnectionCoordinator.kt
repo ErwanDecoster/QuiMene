@@ -24,7 +24,8 @@ import java.util.UUID
  * en ligne. Rejoindre, c'est résoudre le code, rattraper le journal serveur, puis écouter le canal :
  * plus de poignée de main avec un hôte, qui n'a plus besoin d'être allumé. Retient la session
  * ([PersistedOnlineSession]) : après un arrêt complet du processus, la partie suivie reprend sans
- * redemander le code.
+ * redemander le code. Une session terminée (arrêtée par le créateur, ou après 6 h sans activité,
+ * doc 16) ne laisse pas de bandeau de reprise derrière elle.
  */
 class MatchConnectionCoordinator(
     private val catalog: GameCatalog,
@@ -41,11 +42,26 @@ class MatchConnectionCoordinator(
     var sharedMatch: SharedMatchViewModel? by mutableStateOf(null)
         private set
 
+    /** Doc 16 — la session suivie s'est terminée hors de son écran : Jeux le dit une fois, à la
+     * place du bandeau de reprise. */
+    var showsEndedNotice: Boolean by mutableStateOf(false)
+        private set
+
+    /** L'écran de la partie suivie ([com.quimene.app.features.join.JoinScreen]) est affiché : une
+     * session terminée y garde son dernier tableau jusqu'à sa fermeture. */
+    @Volatile private var isSessionScreenVisible = false
+
     init {
         PersistedOnlineSession.load(context, PersistedOnlineSession.Role.Participant)?.let { persisted ->
             scope.launch {
                 runCatching {
                     connect(persisted.pairingCode, persisted.deviceName, persisted.profile, persisted.isSpectator)
+                }.onFailure { error ->
+                    // Terminée pendant que l'app était fermée : plus rien à reprendre.
+                    if (error is OnlineSessionError.SessionNotFound) {
+                        PersistedOnlineSession.clear(context, PersistedOnlineSession.Role.Participant)
+                        showsEndedNotice = true
+                    }
                 }
             }
         }
@@ -121,8 +137,39 @@ class MatchConnectionCoordinator(
                 PersistedOnlineSession.clear(context, PersistedOnlineSession.Role.Participant)
             }
         sharedMatch?.let { model -> model.keepMatch = { matchID, events -> keep(matchID, events, model) } }
+        link.onClosed = { scope.launch { sessionDidClose(info.sessionID) } }
         link.start()
         return role
+    }
+
+    /** Session fermée : la partie suivie s'arrête d'elle-même, sans « Quitter la partie ». Si son
+     * écran est affiché, il garde le dernier tableau (« La session est terminée ») jusqu'à sa
+     * fermeture ([sessionScreenHidden]). */
+    private suspend fun sessionDidClose(sessionID: UUID) {
+        if (sharedMatch?.link?.sessionID != sessionID || isSessionScreenVisible) return
+        end()
+        showsEndedNotice = true
+    }
+
+    fun sessionScreenShown() {
+        isSessionScreenVisible = true
+    }
+
+    /** À la fermeture de l'écran : une session terminée s'arrête là. */
+    fun sessionScreenHidden() {
+        isSessionScreenVisible = false
+        if (sharedMatch?.isSessionClosed == true) scope.launch { end() }
+    }
+
+    fun dismissEndedNotice() {
+        showsEndedNotice = false
+    }
+
+    /** Les parties terminées d'abord (la dernière peut arriver avec la fin de la session), puis
+     * comme « Quitter la partie ». */
+    private suspend fun end() {
+        sharedMatch?.keepConcludedMatches()
+        stop()
     }
 
     /** Doc 16, phase E — une partie terminée de la session où j'ai une place : enregistrée dans mon

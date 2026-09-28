@@ -135,6 +135,13 @@ class SupabaseSessionBackend : OnlineSessionBackend {
         }
     }
 
+    override suspend fun isClosed(sessionID: UUID): Boolean =
+        call {
+            client.postgrest
+                .rpc("quimene_session_is_closed", buildJsonObject { put("p_session_id", sessionID.toString()) })
+                .decodeAs<Boolean>()
+        }
+
     /** Traduit les exceptions levées par les fonctions SQL (`raise exception '<code>'`). */
     private suspend fun <T> call(body: suspend () -> T): T =
         try {

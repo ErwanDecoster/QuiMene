@@ -154,7 +154,6 @@ public struct StatsEngine: Sendable {
     let direction = definition.scoring.direction
     let participants = state.participants.sorted { $0.seatIndex < $1.seatIndex }
     let totals = state.totals()
-    let nameByID = Dictionary(uniqueKeysWithValues: participants.map { ($0.id, $0.displayName) })
 
     var results: [Insight] = []
 
@@ -167,9 +166,6 @@ public struct StatsEngine: Sendable {
       results.append(
         Insight(
           id: .highestRoundScore,
-          headline: "Plus gros tour",
-          detail: "\(nameByID[participantID] ?? "?") — \(Int(value)) points, manche \(round + 1)",
-          symbol: "flame.fill",
           value: .single(participantID: participantID, value: value, round: round),
           interestScore: z
         ))
@@ -182,9 +178,6 @@ public struct StatsEngine: Sendable {
       results.append(
         Insight(
           id: .bestRoundScore,
-          headline: "Meilleur tour",
-          detail: "\(nameByID[participantID] ?? "?") — \(Int(value)) points, manche \(round + 1)",
-          symbol: "star.fill",
           value: .single(participantID: participantID, value: value, round: round),
           interestScore: z * 0.9
         ))
@@ -197,10 +190,6 @@ public struct StatsEngine: Sendable {
         results.append(
           Insight(
             id: .mostRegular,
-            headline: "Le Métronome",
-            detail:
-              "\(nameByID[lowestID] ?? "?") — écart-type \(String(format: "%.2f", lowestValue))",
-            symbol: "metronome",
             value: .single(
               participantID: lowestID, value: (lowestValue * 100).rounded() / 100, round: nil),
             interestScore: average > 0 ? (average - lowestValue) / average : 0
@@ -210,10 +199,6 @@ public struct StatsEngine: Sendable {
         results.append(
           Insight(
             id: .mostIrregular,
-            headline: "Les montagnes russes",
-            detail:
-              "\(nameByID[highestID] ?? "?") — écart-type \(String(format: "%.2f", highestValue))",
-            symbol: "chart.line.uptrend.xyaxis",
             value: .single(
               participantID: highestID, value: (highestValue * 100).rounded() / 100, round: nil),
             interestScore: average > 0 ? (highestValue - average) / average : 0
@@ -228,9 +213,6 @@ public struct StatsEngine: Sendable {
       results.append(
         Insight(
           id: .finalGap,
-          headline: "Écart final",
-          detail: "\(Int(gap)) points entre le premier et le deuxième",
-          symbol: "arrow.left.and.right",
           value: .single(participantID: nil, value: gap, round: nil),
           interestScore: relativeGap < 0.5 ? (0.5 - relativeGap) * 2 : 0
         ))
@@ -242,10 +224,6 @@ public struct StatsEngine: Sendable {
       results.append(
         Insight(
           id: .leadChanges,
-          headline: "Changements de tête",
-          detail: changes == 0
-            ? "Domination du début à la fin" : "\(changes) changement(s) de leader",
-          symbol: "arrow.left.arrow.right",
           value: .single(participantID: nil, value: Double(changes), round: nil),
           interestScore: changes == 0 ? 1.2 : (changes >= 4 ? 1.0 : 0.2)
         ))
@@ -254,9 +232,6 @@ public struct StatsEngine: Sendable {
         results.append(
           Insight(
             id: .longestLeadStreak,
-            headline: "Plus longue série en tête",
-            detail: "\(nameByID[leaderID] ?? "?") — \(streak) manche(s) d'affilée",
-            symbol: "crown.fill",
             value: .single(participantID: leaderID, value: Double(streak), round: nil),
             interestScore: Double(streak) / Double(rounds.count)
           ))
@@ -283,18 +258,12 @@ public struct StatsEngine: Sendable {
       results.append(
         Insight(
           id: .roundsClosed,
-          headline: "Manches fermées",
-          detail: "Répartition des fermetures de manche",
-          symbol: "lock.fill",
           value: .perParticipant(closedCounts),
           interestScore: 0.3
         ))
       results.append(
         Insight(
           id: .doublingsSuffered,
-          headline: "Doublements subis",
-          detail: "Répartition des scores doublés",
-          symbol: "multiply.circle.fill",
           value: .perParticipant(doubledCounts),
           interestScore: doubledCounts.values.contains(where: { $0 > 0 }) ? 0.5 : 0.1
         ))
@@ -320,7 +289,11 @@ public struct StatsEngine: Sendable {
       for participant in best.mentionedParticipants {
         mentionCounts[participant, default: 0] += 1
       }
-      remaining.removeAll { $0.id == best.id && $0.value == best.value }
+      // Un même tour ne se raconte qu'une fois : quand le plus haut score gagne, le « plus gros
+      // tour » est aussi le « meilleur tour » (même joueur, même manche, même valeur).
+      remaining.removeAll {
+        $0.value == best.value && ($0.id == best.id || best.describesOneRound)
+      }
     }
     return selected
   }
@@ -475,5 +448,11 @@ extension Insight {
     case .perParticipant(let map):
       Array(map.keys)
     }
+  }
+
+  /// Fait attaché à un tour précis : deux faits de même valeur racontent alors le même tour.
+  fileprivate var describesOneRound: Bool {
+    if case .single(_, _, let round) = value { return round != nil }
+    return false
   }
 }

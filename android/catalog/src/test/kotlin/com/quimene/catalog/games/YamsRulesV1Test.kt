@@ -1,5 +1,6 @@
 package com.quimene.catalog.games
 
+import com.quimene.catalog.testing.yamsCategoryScoreDetail
 import com.quimene.domain.engine.MatchEngine
 import com.quimene.domain.engine.MatchEvent
 import com.quimene.domain.model.MatchState

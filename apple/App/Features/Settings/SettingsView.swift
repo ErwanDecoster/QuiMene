@@ -24,17 +24,6 @@ struct SettingsView: View {
           )
         }
 
-        Section {
-          Picker("Tri des joueurs", selection: $settings.playerSortMode) {
-            Text("Automatique").tag(AppSettings.PlayerSortMode.automatic)
-            Text("Manuel").tag(AppSettings.PlayerSortMode.manual)
-          }
-        } footer: {
-          Text(
-            "Automatique : les joueurs les plus actifs (nombre de parties jouées) en premier. Manuel : réordonne-les toi-même dans l'onglet Joueurs."
-          )
-        }
-
         // Doc utilisateur (audit qualité, 15) — iOS ne permet pas à une app tierce de changer sa
         // propre langue en direct : le seul levier est le sélecteur système par app (Réglages >
         // Qui Mène ? > Langue), qui n'existe que parce que le projet déclare plusieurs langues

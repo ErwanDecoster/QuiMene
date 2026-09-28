@@ -29,10 +29,3 @@ object ButtonHeight {
     val medium: Dp = 44.dp
     val small: Dp = 32.dp
 }
-
-/** Pavé numérique (charte §6) — tokens de charte conservés même si aucun composant `ScoreField`
- * n'est construit à cette étape (voir plan : saisie à revalider à l'étape E, ADR-0013). */
-object Keypad {
-    val key: Dp = 56.dp
-    val gap: Dp = 12.dp
-}

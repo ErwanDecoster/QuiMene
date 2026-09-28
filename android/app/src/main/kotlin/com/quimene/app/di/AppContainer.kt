@@ -6,7 +6,6 @@ import com.quimene.app.livesync.MatchConnectionCoordinator
 import com.quimene.app.profilesharing.SharedProfileSyncCoordinator
 import com.quimene.catalog.GameCatalogEmbedded
 import com.quimene.domain.rules.GameCatalog
-import com.quimene.store.AppSettings
 import com.quimene.store.DeviceIdentity
 import com.quimene.store.LeaderboardRepository
 import com.quimene.store.MatchRepository
@@ -33,8 +32,6 @@ class AppContainer(
     val leaderboardRepository =
         LeaderboardRepository(database.matchDao(), database.participantDao(), database.playerDao())
     val profileRepository = ProfileRepository(database.matchDao(), database.participantDao())
-
-    val appSettings = AppSettings(context, applicationScope)
 
     /** Doc 16 — une session en ligne créée et une rejointe au plus, toutes deux de durée de vie
      * applicative (pas liées à un écran) : voir [LiveShareCoordinator]/

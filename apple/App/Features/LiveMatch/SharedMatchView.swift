@@ -89,9 +89,9 @@ struct SharedMatchView: View {
   }
 
   private var navigationTitle: String {
-    guard let definition = model.definition else { return "Partie partagée" }
+    guard let definition = model.definition else { return String(localized: "Partie partagée") }
     let roundNumber = (model.state?.rounds.count ?? 0) + 1
-    return "\(definition.name.localized) · Manche \(roundNumber)"
+    return String(localized: "\(definition.name.localized) · Manche \(roundNumber)")
   }
 
   private func liveView(definition: GameDefinition, state: MatchState) -> some View {
@@ -99,7 +99,7 @@ struct SharedMatchView: View {
       if !model.isHostConnected {
         Section {
           if model.isSessionClosed {
-            Text("Le créateur a arrêté la session. Le tableau affiché est le dernier reçu.")
+            Text("La session est terminée. Le tableau affiché est le dernier reçu.")
               .font(.label)
               .foregroundStyle(.textSecondary)
           } else {
@@ -142,9 +142,11 @@ struct SharedMatchView: View {
         readOnlyMessage: model.canPropose
           ? nil
           : model.isSpectator
-            ? String(localized: "Tu regardes la partie : la saisie se fait sur les appareils des joueurs.")
+            ? String(
+              localized: "Tu regardes la partie : la saisie se fait sur les appareils des joueurs.")
             : String(localized: "Tu observes cette partie : seul le créateur saisit les scores."),
-        profileBadges: model.profileBadges(friendProfileIDs: Set(friends.compactMap(\.sharedProfileID))),
+        profileBadges: model.profileBadges(
+          friendProfileIDs: Set(friends.compactMap(\.sharedProfileID))),
         closedParticipantID: $closedParticipantID,
         draftTexts: $draftTexts,
         focusedParticipantID: $focusedParticipantID

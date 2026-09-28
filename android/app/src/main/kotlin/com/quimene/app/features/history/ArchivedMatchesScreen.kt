@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -33,6 +32,8 @@ import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.di.rememberViewModel
 import com.quimene.app.navigation.floatingNavBarContentPadding
 import com.quimene.app.ui.gameIcon
+import com.quimene.app.ui.rememberMediumDateFormatter
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.CardGutter
 import com.quimene.designsystem.components.EmptyState
@@ -41,9 +42,6 @@ import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
 import com.quimene.store.MatchEntity
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 
 /** Miroir de `ArchivedMatchesView.swift` (doc 06) — parties archivées, chacune réactivable
  * (« Réactiver ») ou supprimable définitivement (icône, avec confirmation — pas de balayage,
@@ -59,9 +57,7 @@ fun ArchivedMatchesScreen(onBack: () -> Unit) {
             TopAppBar(
                 title = { Text(stringResource(R.string.parties_archivees)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Retour")
-                    }
+                    BackButton(onClick = onBack)
                 },
             )
         },
@@ -114,9 +110,6 @@ fun ArchivedMatchesScreen(onBack: () -> Unit) {
     }
 }
 
-private val dateFormatter: DateTimeFormatter =
-    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(Locale.getDefault())
-
 @Composable
 private fun ArchivedMatchRow(
     match: MatchEntity,
@@ -131,14 +124,14 @@ private fun ArchivedMatchRow(
             Column(modifier = Modifier.weight(1f)) {
                 Text(gameName, style = MaterialTheme.typography.titleMedium, color = colors.textPrimary)
                 Text(
-                    text = dateFormatter.format(match.startedAt.atZone(ZoneId.systemDefault())),
+                    text = rememberMediumDateFormatter().format(match.startedAt.atZone(ZoneId.systemDefault())),
                     style = MaterialTheme.typography.bodySmall,
                     color = colors.textSecondary,
                 )
             }
             TertiaryButton(text = stringResource(R.string.reactiver), onClick = onUnarchive)
             IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, contentDescription = "Supprimer définitivement")
+                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.supprimer))
             }
         }
     }

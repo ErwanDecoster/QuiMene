@@ -222,8 +222,10 @@ struct ProfileView: View {
           .accessibilityElement(children: .ignore)
           .accessibilityLabel("Activité par mois")
           .accessibilityValue(
-            stats.activity.map { "\(monthLabel($0.monthKey)) : \($0.count) partie(s)" }
-              .joined(separator: " · ")
+            stats.activity.map {
+              String(localized: "\(monthLabel($0.monthKey)) : \($0.count) partie(s)")
+            }
+            .joined(separator: " · ")
           )
         } else {
           HStack {

@@ -29,14 +29,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
+import com.quimene.app.R
 import com.quimene.designsystem.components.PrimaryButton
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
@@ -166,12 +168,12 @@ private fun CameraPermissionRationale(
         verticalArrangement = Arrangement.Center,
     ) {
         Text(
-            "L'accès à l'appareil photo est nécessaire pour scanner un code QR — tu peux aussi saisir le code à la main ci-dessous.",
+            stringResource(R.string.acces_appareil_photo_necessaire),
             style = MaterialTheme.typography.bodyLarge,
             color = LocalAppColors.current.textSecondary,
         )
         PrimaryButton(
-            text = "Autoriser l'appareil photo",
+            text = stringResource(R.string.autoriser_l_appareil_photo),
             onClick = onRequestPermission,
             modifier = Modifier.padding(top = Space.lg),
         )

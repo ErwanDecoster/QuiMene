@@ -138,7 +138,8 @@ struct HistoryListView: View {
           }
         } label: {
           filterLabel(
-            model.availableGames.first { $0.id == model.selectedGameID }?.name ?? "Tous les jeux"
+            model.availableGames.first { $0.id == model.selectedGameID }?.name
+              ?? String(localized: "Tous les jeux")
           )
         }
       }
@@ -151,7 +152,7 @@ struct HistoryListView: View {
         } label: {
           filterLabel(
             model.availablePlayers.first { $0.id == model.selectedPlayerID }?.name
-              ?? "Tous les joueurs"
+              ?? String(localized: "Tous les joueurs")
           )
         }
       }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material3.AlertDialog
@@ -36,6 +35,7 @@ import com.quimene.app.navigation.floatingNavBarContentPadding
 import com.quimene.app.ui.toAvatar
 import com.quimene.designsystem.components.AvatarSize
 import com.quimene.designsystem.components.AvatarView
+import com.quimene.designsystem.components.BackButton
 import com.quimene.designsystem.components.Card
 import com.quimene.designsystem.components.CardGutter
 import com.quimene.designsystem.components.EmptyState
@@ -63,9 +63,7 @@ fun ArchivedPlayersScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.joueurs_archives)) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Retour")
-                    }
+                    BackButton(onClick = onBack)
                 },
             )
         },
@@ -140,7 +138,7 @@ private fun ArchivedPlayerRow(
             }
             TertiaryButton(text = stringResource(R.string.reactiver), onClick = onUnarchive)
             IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, contentDescription = "Supprimer définitivement ${player.nickname}")
+                Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.supprimer))
             }
         }
     }

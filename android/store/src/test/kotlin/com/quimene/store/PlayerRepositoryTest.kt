@@ -33,18 +33,6 @@ class PlayerRepositoryTest : RoomTestBase() {
         }
 
     @Test
-    fun `reorder rewrites sort index to match the given order`() =
-        runTest {
-            val alice = repository.create(nickname = "Alice", avatarKind = "emoji", avatarValue = "🦊")
-            val bob = repository.create(nickname = "Bob", avatarKind = "emoji", avatarValue = "🐻")
-
-            repository.reorder(listOf(bob, alice))
-
-            db.playerDao().get(bob.id)?.sortIndex shouldBe 0
-            db.playerDao().get(alice.id)?.sortIndex shouldBe 1
-        }
-
-    @Test
     fun `sharing a second profile from the same device is refused`() =
         runTest {
             val alice = repository.create(nickname = "Alice", avatarKind = "emoji", avatarValue = "🦊")
