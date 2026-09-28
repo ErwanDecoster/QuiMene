@@ -15,7 +15,7 @@ const faq = [
   },
   {
     id: 'ecran-verrouille',
-    q: 'Le score ne s’affiche pas sur l’écran verrouillé',
+    q: 'Le score ne s’affiche pas sur l’écran verrouillé de l’iPhone',
     a: `Vérifier dans Réglages › ${site.name} que « Activités en direct » est activé. L’affichage se termine de lui-même 30 minutes après la dernière manche.`,
   },
   {
@@ -26,7 +26,7 @@ const faq = [
   {
     id: 'nouvel-appareil',
     q: 'Retrouver ses parties sur un nouvel appareil',
-    a: 'Activer « Synchronisation iCloud » dans les Réglages de l’app (onglet Profil), sur les deux appareils, avec le même compte Apple.',
+    a: 'Sur iPhone et iPad : activer « Synchronisation iCloud » dans les Réglages de l’app (onglet Profil), sur les deux appareils, avec le même compte Apple. Sur Android : restaurer la sauvegarde de l’ancien téléphone pendant la configuration du nouveau.',
   },
   {
     id: 'partie-recue',
@@ -67,7 +67,7 @@ const faq = [
     <p>
       Pour un problème, une suggestion ou une question sur vos données :
       <a href={`mailto:${site.email}`}>{site.email}</a>. Indiquer le modèle de l’appareil et la
-      version d’iOS aide à répondre plus vite.
+      version d’iOS ou d’Android aide à répondre plus vite.
     </p>
   </article>
 </Base>
