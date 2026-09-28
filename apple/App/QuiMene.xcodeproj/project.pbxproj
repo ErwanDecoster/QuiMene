@@ -90,6 +90,9 @@
 		20DCD98B13AEFFCC2257158A /* View+MatchDialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8306D39B2C05E2DE04CE72D3 /* View+MatchDialogs.swift */; };
 		966F6D440C33F4BF43964757 /* LocalizationPluralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D4664FC775605091DA50815 /* LocalizationPluralTests.swift */; };
 		A1C0FFEE00000000000000C2 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE00000000000000C1 /* InfoPlist.xcstrings */; };
+		A1C0FFEE00000000000000D2 /* StoreScreenshots.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE00000000000000D1 /* StoreScreenshots.swift */; };
+		A1C0FFEE00000000000000D4 /* StoreScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE00000000000000D3 /* StoreScreenshotTests.swift */; };
+		A1C0FFEE00000000000000D6 /* demo-data.json in Resources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE00000000000000D5 /* demo-data.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -208,6 +211,9 @@
 		B64C5759F17E406BAC96E5AF /* Insight+Presentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Insight+Presentation.swift"; sourceTree = "<group>"; };
 		8306D39B2C05E2DE04CE72D3 /* View+MatchDialogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+MatchDialogs.swift"; sourceTree = "<group>"; };
 		7D4664FC775605091DA50815 /* LocalizationPluralTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationPluralTests.swift; sourceTree = "<group>"; };
+		A1C0FFEE00000000000000D1 /* StoreScreenshots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreScreenshots.swift; sourceTree = "<group>"; };
+		A1C0FFEE00000000000000D3 /* StoreScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreScreenshotTests.swift; sourceTree = "<group>"; };
+		A1C0FFEE00000000000000D5 /* demo-data.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = "demo-data.json"; path = "../../spec/screenshots/demo-data.json"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -293,6 +299,8 @@
 			isa = PBXGroup;
 			children = (
 				8FF955D9B59F4DB880763DAD /* QuiMeneUITests.swift */,
+				A1C0FFEE00000000000000D3 /* StoreScreenshotTests.swift */,
+				A1C0FFEE00000000000000D5 /* demo-data.json */,
 			);
 			path = QuiMeneUITests;
 			sourceTree = "<group>";
@@ -396,6 +404,7 @@
 				528F4F1174DBC240F83F45EB /* QuiMeneWidget */,
 				08AE0320DC761E1775EBBD52 /* MatchLiveActivityController.swift */,
 				B4069F1BD7B30DB92C9BF1AB /* KeyboardObserver.swift */,
+				A1C0FFEE00000000000000D1 /* StoreScreenshots.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -659,6 +668,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1C0FFEE00000000000000D6 /* demo-data.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -725,6 +735,7 @@
 				C3AA6E864D68EC394369D686 /* JoinLink.swift in Sources */,
 				EB18547401CE403AA928257E /* ProfileShareLink.swift in Sources */,
 				9090DFA008FD57B2EDE7BB98 /* GameRequestMail.swift in Sources */,
+				A1C0FFEE00000000000000D2 /* StoreScreenshots.swift in Sources */,
 				203B4F66DD594430ADC288C6 /* SharedProfileSyncCoordinator.swift in Sources */,
 				CC4C14AE1927D962679B0443 /* DeepLinkRouter.swift in Sources */,
 				FECF6A04A5074AE19E39062F /* MatchContinuation.swift in Sources */,
@@ -754,6 +765,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FD8BC4C3AE2D4819B0583BCA /* QuiMeneUITests.swift in Sources */,
+				A1C0FFEE00000000000000D4 /* StoreScreenshotTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -78,7 +78,11 @@ struct QuiMeneApp: App {
         } else {
           ProgressView()
             .task {
-              container = await Self.loadContainer(iCloudSyncEnabled: settings.iCloudSyncEnabled)
+              let loaded = await Self.loadContainer(iCloudSyncEnabled: settings.iCloudSyncEnabled)
+              #if DEBUG
+                StoreScreenshots.seedIfRequested(into: loaded.mainContext)
+              #endif
+              container = loaded
             }
         }
       }

@@ -1,0 +1,137 @@
+{
+  "fr-FR": {
+    "01-partie": {
+      "title": "Le score, sans papier ni calcul",
+      "subtitle": "Saisir la manche : les règles de chaque jeu comptent le reste."
+    },
+    "02-resultats": {
+      "title": "Et à la fin, un podium",
+      "accent": "podium",
+      "subtitle": "Classement final, faits marquants et courbe de la partie."
+    },
+    "03-jeux": {
+      "title": "20 jeux, règles comprises",
+      "subtitle": "Skyjo, Tarot, Belote, Mölkky, Yams et bien d’autres."
+    },
+    "04-profil": {
+      "title": "Une partie, plusieurs téléphones",
+      "subtitle": "Un code ou un QR code, et chacun suit le tableau sur son appareil."
+    },
+    "05-historique": {
+      "title": "Chaque soirée, gardée en mémoire",
+      "subtitle": "L’historique du groupe, filtrable par jeu et par joueur."
+    },
+    "06-joueurs": {
+      "title": "Sans compte, sans publicité",
+      "subtitle": "Un pseudo et un avatar suffisent. Aucun pistage."
+    }
+  },
+  "en-US": {
+    "01-partie": {
+      "title": "Scores without paper or math",
+      "subtitle": "Enter the round, and each game’s rules do the counting."
+    },
+    "02-resultats": {
+      "title": "And at the end, a podium",
+      "accent": "podium",
+      "subtitle": "Final standings, highlights and the game’s trend."
+    },
+    "03-jeux": {
+      "title": "20 games, rules included",
+      "subtitle": "Skyjo, French Tarot, Belote, Mölkky, Yahtzee and many more."
+    },
+    "04-profil": {
+      "title": "One game, several phones",
+      "subtitle": "A code or a QR code, and everyone follows the scoreboard on their own device."
+    },
+    "05-historique": {
+      "title": "Every game night, remembered",
+      "subtitle": "The group’s history, filterable by game and by player."
+    },
+    "06-joueurs": {
+      "title": "No account, no ads",
+      "subtitle": "A nickname and an avatar are all it takes. No tracking."
+    }
+  },
+  "es-ES": {
+    "01-partie": {
+      "title": "La puntuación, sin papel ni cuentas",
+      "subtitle": "Introduce la manga: las reglas de cada juego cuentan el resto."
+    },
+    "02-resultats": {
+      "title": "Y al final, un podio",
+      "accent": "podio",
+      "subtitle": "Clasificación final, momentos destacados y evolución de la partida."
+    },
+    "03-jeux": {
+      "title": "20 juegos, reglas incluidas",
+      "subtitle": "Skyjo, Tarot, Belote, Mölkky, Yahtzee y muchos más."
+    },
+    "04-profil": {
+      "title": "Una partida, varios teléfonos",
+      "subtitle": "Un código o un código QR, y cada uno sigue el marcador en su dispositivo."
+    },
+    "05-historique": {
+      "title": "Cada velada, guardada",
+      "subtitle": "El historial del grupo, filtrable por juego y por jugador."
+    },
+    "06-joueurs": {
+      "title": "Sin cuenta ni publicidad",
+      "subtitle": "Basta con un apodo y un avatar. Sin rastreo."
+    }
+  },
+  "de-DE": {
+    "01-partie": {
+      "title": "Punkte zählen ohne Zettel und Rechnen",
+      "subtitle": "Runde eintragen, die Regeln jedes Spiels zählen den Rest."
+    },
+    "02-resultats": {
+      "title": "Und am Ende ein Podium",
+      "accent": "Podium",
+      "subtitle": "Endstand, Highlights und die Entwicklung der Partie."
+    },
+    "03-jeux": {
+      "title": "20 Spiele, Regeln inklusive",
+      "subtitle": "Skyjo, Tarot, Belote, Mölkky, Kniffel und viele mehr."
+    },
+    "04-profil": {
+      "title": "Eine Partie, mehrere Handys",
+      "subtitle": "Ein Code oder QR-Code, und alle verfolgen den Spielstand auf ihrem Gerät."
+    },
+    "05-historique": {
+      "title": "Jeder Spieleabend, festgehalten",
+      "subtitle": "Der Verlauf der Gruppe, filterbar nach Spiel und Spieler."
+    },
+    "06-joueurs": {
+      "title": "Ohne Konto, ohne Werbung",
+      "subtitle": "Ein Spitzname und ein Avatar genügen. Kein Tracking."
+    }
+  },
+  "it-IT": {
+    "01-partie": {
+      "title": "Il punteggio, senza carta né calcoli",
+      "subtitle": "Inserisci la manche: le regole di ogni gioco contano il resto."
+    },
+    "02-resultats": {
+      "title": "E alla fine, un podio",
+      "accent": "podio",
+      "subtitle": "Classifica finale, momenti salienti e andamento della partita."
+    },
+    "03-jeux": {
+      "title": "20 giochi, regole incluse",
+      "subtitle": "Skyjo, Tarot, Belote, Mölkky, Yahtzee e molti altri."
+    },
+    "04-profil": {
+      "title": "Una partita, più telefoni",
+      "subtitle": "Un codice o un QR code, e ognuno segue il tabellone sul proprio dispositivo."
+    },
+    "05-historique": {
+      "title": "Ogni serata, ricordata",
+      "subtitle": "La cronologia del gruppo, filtrabile per gioco e per giocatore."
+    },
+    "06-joueurs": {
+      "title": "Niente account, niente pubblicità",
+      "subtitle": "Bastano un nickname e un avatar. Nessun tracciamento."
+    }
+  }
+}

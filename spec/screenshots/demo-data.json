@@ -1,0 +1,102 @@
+{
+  "players": [
+    { "id": "emma", "nickname": "Emma", "emoji": "🦊", "palette": "1", "isMe": true },
+    { "id": "hugo", "nickname": "Hugo", "emoji": "🐻", "palette": "2" },
+    { "id": "nina", "nickname": "Nina", "emoji": "🐼", "palette": "3" },
+    { "id": "lucas", "nickname": "Lucas", "emoji": "🐯", "palette": "4" },
+    { "id": "sofia", "nickname": "Sofia", "emoji": "🦉", "palette": "5" },
+    { "id": "tom", "nickname": "Tom", "emoji": "🐸", "palette": "6" }
+  ],
+  "matches": [
+    {
+      "game": "skyjo",
+      "players": ["emma", "hugo", "nina", "lucas"],
+      "startedMinutesAgo": 38,
+      "minutesPerRound": 7,
+      "end": "inProgress",
+      "rounds": [
+        { "scores": [12, 25, 8, 19], "closedBy": 2 },
+        { "scores": [5, 18, 14, 22], "closedBy": 0 },
+        { "scores": [21, 3, 16, 9], "closedBy": 1 },
+        { "scores": [7, 26, 11, 14], "closedBy": 0 },
+        { "scores": [15, 10, 4, 27], "closedBy": 2 }
+      ]
+    },
+    {
+      "game": "skyjo",
+      "players": ["emma", "hugo", "nina", "lucas", "sofia"],
+      "startedMinutesAgo": 1500,
+      "minutesPerRound": 8,
+      "end": "auto",
+      "rounds": [
+        { "scores": [24, 6, 15, 11, 18], "closedBy": 1 },
+        { "scores": [9, 20, 3, 17, 12], "closedBy": 2 },
+        { "scores": [2, 18, 22, 14, 9], "closedBy": 0 },
+        { "scores": [4, 11, 16, 1, 20], "closedBy": 3 },
+        { "scores": [0, 23, 9, 19, 14], "closedBy": 0 },
+        { "scores": [6, 12, 5, 21, 17], "closedBy": 2 },
+        { "scores": [3, 15, 13, 20, 8], "closedBy": 0 }
+      ]
+    },
+    {
+      "game": "flip7",
+      "players": ["hugo", "emma", "tom"],
+      "startedMinutesAgo": 3000,
+      "minutesPerRound": 6,
+      "end": "auto",
+      "rounds": [
+        { "scores": [45, 30, 0] },
+        { "scores": [22, 51, 38] },
+        { "scores": [60, 0, 44] },
+        { "scores": [35, 48, 27] },
+        { "scores": [41, 77, 19] }
+      ]
+    },
+    {
+      "game": "six-qui-prend",
+      "players": ["nina", "lucas", "emma", "sofia", "tom"],
+      "startedMinutesAgo": 5820,
+      "minutesPerRound": 9,
+      "end": "auto",
+      "rounds": [
+        { "scores": [3, 12, 5, 8, 14] },
+        { "scores": [4, 9, 7, 2, 18] },
+        { "scores": [6, 16, 10, 13, 21] },
+        { "scores": [5, 14, 6, 11, 15] }
+      ]
+    },
+    {
+      "game": "skyjo",
+      "players": ["emma", "hugo", "nina", "lucas"],
+      "startedMinutesAgo": 14460,
+      "minutesPerRound": 8,
+      "end": "auto",
+      "rounds": [
+        { "scores": [14, 22, 17, 8], "closedBy": 3 },
+        { "scores": [19, 4, 12, 10], "closedBy": 1 },
+        { "scores": [11, 25, 6, 13], "closedBy": 2 },
+        { "scores": [3, 17, 21, 9], "closedBy": 0 },
+        { "scores": [16, 12, 14, 2], "closedBy": 3 },
+        { "scores": [25, 9, 18, 5], "closedBy": 3 },
+        { "scores": [13, 14, 20, 7], "closedBy": 3 }
+      ]
+    },
+    {
+      "game": "scrabble",
+      "players": ["emma", "sofia"],
+      "startedMinutesAgo": 18780,
+      "minutesPerRound": 6,
+      "end": "manual",
+      "rounds": [
+        { "scores": [24, 30] },
+        { "scores": [31, 22] },
+        { "scores": [18, 37] },
+        { "scores": [42, 26] },
+        { "scores": [27, 45] },
+        { "scores": [35, 17] },
+        { "scores": [22, 29] },
+        { "scores": [19, 33] }
+      ]
+    }
+  ]
+}

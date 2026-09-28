@@ -36,6 +36,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.quimene.app.R
 import com.quimene.app.di.LocalAppContainer
@@ -294,6 +295,7 @@ private fun HistoryRow(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .testTag("history-match")
                 .clickable(onClick = onClick)
                 .padding(horizontal = Space.lg, vertical = Space.md),
         verticalAlignment = Alignment.CenterVertically,

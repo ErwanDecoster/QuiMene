@@ -119,6 +119,7 @@ struct HistoryListView: View {
         row(for: match)
       }
       .buttonStyle(.plain)
+      .accessibilityIdentifier("history-match")
     }
   }
 

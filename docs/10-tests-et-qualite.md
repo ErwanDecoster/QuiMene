@@ -170,6 +170,52 @@ Objectif : **moins de 5 minutes** sur un push de branche. Les tests unitaires du
 comptant en millisecondes, le temps est presque entièrement celui de la compilation — d'où
 l'intérêt d'un `Domain` sans dépendance.
 
+## Captures des stores
+
+`Scripts/store-screenshots.sh [ios|android|slides|all]` produit, sans manipulation à la main, les
+images des fiches App Store et Play Store dans toutes les langues. Résultat dans
+`store-screenshots/` (non versionné) :
+
+```
+store-screenshots/
+├── app-store/<langue>/iphone-6.9/   1320 × 2868   captures brutes (iPhone 17 Pro Max)
+├── app-store/<langue>/ipad-13/      2064 × 2752   (iPad Pro 13 pouces)
+├── play-store/<langue>/phone/       1200 × 2400
+├── play-store/<langue>/tablet-7/    1200 × 1920
+├── play-store/<langue>/tablet-10/   1600 × 2560
+└── slides/                          les images à publier, mêmes dossiers :
+                                     App Store aux tailles ci-dessus, Play Store en 1440 × 2560
+```
+
+Chaque dossier contient six écrans, numérotés dans l'ordre de la fiche : `01-partie` (partie de
+Skyjo en cours), `02-resultats`, `03-jeux`, `04-profil`, `05-historique`, `06-joueurs`.
+`LOCALES=fr-FR,en-US` limite les langues (défaut : les cinq). `slides` seul recompose les slides
+à partir des captures existantes, en quelques secondes — utile après une retouche de texte.
+
+- **Données** : `spec/screenshots/demo-data.json`, un seul fichier pour les deux apps (6 joueurs,
+  une partie en cours, 5 terminées). Les dates sont relatives au moment de la capture. Une partie
+  dont le statut final ne correspond pas à son champ `end` (seuil jamais atteint…) fait échouer
+  la capture plutôt que de produire une image fausse.
+- **iOS** : `StoreScreenshotTests` (XCUITest, sauté sans `QUIMENE_SCREENSHOT_LOCALES`) lance
+  l'app avec `-uitesting-reset -screenshots` ; l'app (Debug uniquement) charge les données de
+  démo dans le magasin des tests d'interface et coupe ses appels au serveur. Le script utilise
+  ses propres simulateurs « Qui Mène Screenshots … », effacés à chaque passage et redémarrés dans
+  chaque langue (la date de la barre d'état iPad suit la langue du système), barre d'état à
+  9:41, et extrait les images des pièces jointes du `.xcresult`.
+- **Android** : `StoreScreenshotsTest` rend les vrais écrans (`QuiMeneApp`) par Robolectric, sans
+  émulateur, au SDK 30 : la palette de la marque plutôt que les couleurs dynamiques d'un fond
+  d'écran arbitraire. Proportions d'appareils réels, dans la limite de la Play Console (un côté au
+  plus deux fois plus long que l'autre). Robolectric ne dessine ni barre d'état, ni clavier, ni
+  ombres portées : la barre d'état est ajoutée par les slides.
+- **Slides** (`store/slides/`) : `captions.json` porte le titre et le sous-titre de chaque écran
+  dans les cinq langues ; `slide.html` les met en page, `render.mjs` les fait rendre par Chrome
+  sans interface (Node 22+ et Google Chrome, aucune dépendance). Mise en page fidèle à la charte
+  ([07](07-charte-graphique.md)) : fond `brand/ink` uni (le seul fond coloré admis sous le logo,
+  sans dégradé), déclinaison horizontale du logo en blanc sur la première slide, SF Pro côté App
+  Store et Roboto côté Play Store (chargée depuis Google Fonts : le rendu Android demande le
+  réseau), laiton réservé au mot « podium » de la slide des résultats. Play Store en 9:16, le
+  format que la Play Console met en avant.
+
 ## Définition de « terminé »
 
 Un écran ou une fonctionnalité n'est terminé que si :

@@ -98,6 +98,7 @@ struct GamesTabView: View {
               resumeRow(for: match)
             }
             .buttonStyle(.plain)
+            .accessibilityIdentifier("resume-match")
             .swipeActions {
               Button("Abandonner", role: .destructive) {
                 matchPendingAbandon = match

@@ -12,8 +12,10 @@ spec/
 ├── schema/game-definition.schema.json   contrat de format (JSON Schema 2020-12)
 ├── games/*.json                         définitions déclaratives des jeux
 ├── golden/*.json                        parties complètes + résultats attendus
-└── session/*.json                       événements de session en ligne scellés par le code
-                                          Swift (doc 16), à relire à l'identique sur Android
+├── session/*.json                       événements de session en ligne scellés par le code
+│                                         Swift (doc 16), à relire à l'identique sur Android
+└── screenshots/demo-data.json           joueurs et parties de démo des captures des stores
+                                          (Scripts/store-screenshots.sh, doc 10)
 ```
 
 ## Règle d'or

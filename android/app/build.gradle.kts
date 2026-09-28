@@ -93,4 +93,21 @@ dependencies {
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotlinx.coroutines.test)
+
+    // Captures des stores (StoreScreenshotsTest) — écrans Compose rendus par Robolectric.
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+// Doc 10 « Captures des stores » — StoreScreenshotsTest ne tourne que si
+// Scripts/store-screenshots.sh passe ces propriétés : un `test` ordinaire le saute.
+tasks.withType<Test>().configureEach {
+    for (name in listOf("quimene.screenshots.locales", "quimene.screenshots.output")) {
+        providers.gradleProperty(name).orNull?.let { systemProperty(name, it) }
+    }
+    systemProperty(
+        "quimene.screenshots.demoData",
+        rootProject.file("../spec/screenshots/demo-data.json").absolutePath,
+    )
 }

@@ -54,6 +54,7 @@ enum MatchLiveActivityController {
     definition: GameDefinition, rules: any GameRules, state: MatchState,
     isAuthoritative: Bool = false, sessionID: UUID? = nil
   ) {
+    guard !StoreScreenshots.isActive else { return }
     guard ActivityAuthorizationInfo().areActivitiesEnabled else {
       logger.info("Live Activities disabled by system/user")
       return

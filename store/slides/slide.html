@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Slide des stores — Qui Mène ?</title>
+<!-- Roboto pour les slides Play Store : police système d'Android (charte §2.1). Côté App Store,
+     -apple-system donne SF Pro sans rien charger. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=block" rel="stylesheet">
+<style>
+  /* Tokens de la charte (docs/07) : fond `brand/ink` uni — le seul fond coloré autorisé sous le
+     logo, sans dégradé (§11.4) —, texte blanc, laiton réservé à la célébration (§1.2, variante
+     sombre, lisible sur l'encre). */
+  :root {
+    --ink: #1f4899;
+    --brass: #f0a73f;
+    --text-on-ink: #ffffff;
+    --text-on-ink-secondary: rgba(255, 255, 255, 0.78);
+    --bezel: #0d1015;
+    --rim: #3a4150;
+    --status-text: #161b24;
+  }
+
+  html, body {
+    margin: 0;
+    background: var(--ink);
+  }
+
+  .slide {
+    position: relative;
+    width: var(--w);
+    height: var(--h);
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--text-on-ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    -webkit-font-smoothing: antialiased;
+  }
+  .slide[data-platform="ios"] { font-family: -apple-system, system-ui, "Helvetica Neue", sans-serif; }
+  .slide[data-platform="android"] { font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+  header {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--text-width);
+    padding-top: calc(var(--h) * 0.058);
+    text-align: center;
+  }
+
+  /* Déclinaison horizontale du logo (charte §11.2, `LogoLockupHorizontal`) : marque et wordmark
+     de même hauteur, séparés de 2 × l'épaisseur de trait (hauteur / 12). */
+  .lockup {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: calc(var(--lockup) / 6);
+    height: var(--lockup);
+    margin-bottom: calc(var(--title) * 0.55);
+    color: var(--text-on-ink);
+  }
+  .lockup svg { height: 100%; width: auto; display: block; }
+
+  h1 {
+    margin: 0;
+    font-size: var(--title);
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+  h1 em { font-style: normal; color: var(--brass); }
+
+  header p {
+    margin: calc(var(--title) * 0.4) auto 0;
+    max-width: 30em;
+    font-size: var(--subtitle);
+    font-weight: 400;
+    line-height: 1.34;
+    color: var(--text-on-ink-secondary);
+    text-wrap: balance;
+  }
+
+  /* Appareil : l'écran est la capture elle-même ; le cadre déborde en bas de la slide. */
+  .device {
+    --dw: calc(var(--w) * var(--device-scale));
+    --sw: calc(var(--dw) * (1 - 2 * var(--bezel-ratio)));
+    position: relative;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: var(--dw);
+    margin-top: calc(var(--h) * 0.042);
+    padding: calc(var(--dw) * var(--bezel-ratio));
+    border-radius: calc(var(--dw) * var(--outer-radius));
+    background: var(--bezel);
+    box-shadow:
+      0 0 0 calc(var(--dw) * 0.004) var(--rim),
+      0 calc(var(--dw) * 0.05) calc(var(--dw) * 0.12) rgba(4, 12, 35, 0.5);
+  }
+  .screen {
+    position: relative;
+    overflow: hidden;
+    border-radius: calc(var(--dw) * var(--screen-radius));
+    background: #fff;
+  }
+  .screen img { display: block; width: 100%; height: auto; }
+
+  /* iPhone : Dynamic Island (126 × 37 pt sur 440 pt de large) au-dessus de la barre d'état
+     capturée, qui lui laisse déjà sa place. */
+  .island {
+    position: absolute;
+    top: calc(var(--sw) * 0.025);
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(var(--sw) * 0.286);
+    aspect-ratio: 126 / 37;
+    border-radius: 999px;
+    background: #000;
+  }
+
+  /* Android : Robolectric ne dessine pas de barre d'état — elle est reproduite ici, avec la
+     caméra en poinçon. */
+  .statusbar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--status-height);
+    padding: 0 calc(var(--status-height) * 0.66);
+    background: #fff;
+    color: var(--status-text);
+    font-family: Roboto, sans-serif;
+    font-weight: 500;
+    font-size: calc(var(--status-height) * 0.52);
+  }
+  .statusbar .icons { display: flex; align-items: center; gap: calc(var(--status-height) * 0.18); height: 50%; }
+  .statusbar .icons svg { height: 100%; width: auto; display: block; }
+  .punch-hole {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--status-height) * 0.56);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: #000;
+  }
+  .tablet-camera {
+    position: absolute;
+    top: calc(var(--dw) * var(--bezel-ratio) / 2);
+    left: 50%;
+    width: calc(var(--dw) * 0.008);
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: #1c2230;
+  }
+</style>
+</head>
+<body>
+<main class="slide" id="slide"></main>
+<script>
+  // Proportions des cadres, en fraction de la largeur de l'appareil (bezel, rayons) — relevées sur
+  // les appareils de référence : iPhone 17 Pro Max, iPad Pro 13 pouces, Pixel, tablette Android.
+  const FRAMES = {
+    iphone: { bezel: 0.028, outerRadius: 0.148, screenRadius: 0.12 },
+    ipad: { bezel: 0.022, outerRadius: 0.04, screenRadius: 0.018 },
+    'android-phone': { bezel: 0.026, outerRadius: 0.1, screenRadius: 0.075 },
+    'android-tablet': { bezel: 0.03, outerRadius: 0.045, screenRadius: 0.02 },
+  };
+
+  const MARK = `<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="4.5" y1="4" x2="4.5" y2="20"/><line x1="9.5" y1="4" x2="9.5" y2="20"/>
+    <line x1="14.5" y1="4" x2="14.5" y2="20"/><line x1="19.5" y1="4" x2="19.5" y2="20"/>
+    <line x1="2" y1="16.04" x2="22" y2="7.96"/></svg>`;
+
+  const STATUS_ICONS = `
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5 1.2 9.7a15.3 15.3 0 0 1 21.6 0z"/></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 22 22 2v20z"/></svg>
+    <svg viewBox="0 0 14 24" fill="currentColor" aria-hidden="true"><path d="M4 1h6v2h2.5c.8 0 1.5.7 1.5 1.5v18c0 .8-.7 1.5-1.5 1.5h-11C.7 24 0 23.3 0 22.5v-18C0 3.7.7 3 1.5 3H4z"/></svg>`;
+
+  const escape = (text) => text.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+
+  function titleHTML(title, accent) {
+    const safe = escape(title);
+    if (!accent || !title.includes(accent)) return safe;
+    return safe.replace(escape(accent), `<em>${escape(accent)}</em>`);
+  }
+
+  window.renderSlide = async (slide) => {
+    const root = document.getElementById('slide');
+    const frame = FRAMES[slide.frame];
+    const style = root.style;
+    style.setProperty('--w', `${slide.width}px`);
+    style.setProperty('--h', `${slide.height}px`);
+    style.setProperty('--title', `${slide.width * slide.titleScale}px`);
+    style.setProperty('--subtitle', `${slide.width * slide.subtitleScale}px`);
+    style.setProperty('--lockup', `${slide.width * slide.titleScale * 0.6}px`);
+    style.setProperty('--text-width', `${slide.width * slide.textWidth}px`);
+    style.setProperty('--device-scale', slide.deviceScale);
+    style.setProperty('--bezel-ratio', frame.bezel);
+    style.setProperty('--outer-radius', frame.outerRadius);
+    style.setProperty('--screen-radius', frame.screenRadius);
+    root.dataset.platform = slide.platform;
+
+    const lockup = slide.lockup ? `<div class="lockup">${MARK}${slide.wordmark}</div>` : '';
+    const isAndroid = slide.platform === 'android';
+    const statusBar = isAndroid
+      ? `<div class="statusbar" style="--status-height: calc(var(--sw) * ${slide.statusBarRatio})">
+           <span>9:41</span>${slide.frame === 'android-phone' ? '<span class="punch-hole"></span>' : ''}
+           <span class="icons">${STATUS_ICONS}</span>
+         </div>`
+      : '';
+    const island = slide.frame === 'iphone' ? '<span class="island"></span>' : '';
+    const tabletCamera = slide.frame === 'android-tablet' ? '<span class="tablet-camera"></span>' : '';
+
+    root.innerHTML = `
+      <header>
+        ${lockup}
+        <h1>${titleHTML(slide.title, slide.accent)}</h1>
+        <p>${escape(slide.subtitle)}</p>
+      </header>
+      <div class="device">
+        <div class="screen">${statusBar}<img alt="" src="${slide.image}">${island}</div>
+        ${tabletCamera}
+      </div>`;
+
+    await root.querySelector('img').decode();
+    // Une police web ne se charge qu'une fois utilisée : la demander explicitement plutôt que de
+    // capturer la police de repli.
+    if (isAndroid) {
+      await Promise.all(['400', '500', '700'].map((weight) => document.fonts.load(`${weight} 40px Roboto`)));
+      if (!document.fonts.check('700 40px Roboto')) {
+        throw new Error('Roboto n’a pas pu être chargée (réseau indisponible ?)');
+      }
+    }
+    await document.fonts.ready;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return true;
+  };
+</script>
+</body>
+</html>
