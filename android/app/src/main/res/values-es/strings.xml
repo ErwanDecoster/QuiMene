@@ -81,6 +81,7 @@
     <string name="archiver_ce_joueur">Archivar este jugador</string>
     <string name="ardoise">Pizarra</string>
     <string name="arreter_le_partage">Detener el uso compartido</string>
+    <string name="assistance">Ayuda</string>
     <string name="aucun_ami_lie_pour_l_instant">Todavía no hay amigos vinculados.</string>
     <string name="aucun_jeu_ne_correspond_a_ta_recherche">Ningún juego coincide con tu búsqueda.</string>
     <string name="aucun_joueur_archive">Ningún jugador archivado.</string>
@@ -206,6 +207,7 @@
     <string name="obtenu_count1">Conseguido (%1$d)</string>
     <string name="olive">Oliva</string>
     <string name="ou_c_est_une_de_mes_fiches">O es una de mis fichas</string>
+    <string name="ouvre_la_page_dans_ton_navigateur">Abre la página en tu navegador.</string>
     <string name="ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app">Abre los ajustes del sistema para elegir el idioma de la app.</string>
     <string name="par_jeu">Por juego</string>
     <string name="partager_en_direct">Compartir en directo</string>
@@ -229,6 +231,7 @@
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Puntos del atacante: %1$d</string>
     <string name="points_invalides_0_a_count1">Puntos no válidos (de 0 a %1$d).</string>
+    <string name="politique_de_confidentialite">Política de privacidad</string>
     <string name="preneur">Atacante</string>
     <string name="profil">Perfil</string>
     <string name="pseudo">Apodo</string>

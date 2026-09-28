@@ -71,6 +71,7 @@
     <string name="archiver_ce_joueur">Diesen Spieler archivieren</string>
     <string name="ardoise">Schiefer</string>
     <string name="arreter_le_partage">Freigabe beenden</string>
+    <string name="assistance">Hilfe</string>
     <string name="aucun_ami_lie_pour_l_instant">Noch keine verknüpften Freunde.</string>
     <string name="aucun_jeu_ne_correspond_a_ta_recherche">Kein Spiel entspricht deiner Suche.</string>
     <string name="aucun_joueur_archive">Keine archivierten Spieler.</string>
@@ -196,6 +197,7 @@
     <string name="obtenu_count1">Erzielt (%1$d)</string>
     <string name="olive">Oliv</string>
     <string name="ou_c_est_une_de_mes_fiches">Oder es ist eine meiner Karten</string>
+    <string name="ouvre_la_page_dans_ton_navigateur">Öffnet die Seite in deinem Browser.</string>
     <string name="ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app">Öffnet die Systemeinstellungen, um die Sprache der App zu wählen.</string>
     <string name="par_jeu">Nach Spiel</string>
     <string name="partager_en_direct">Live teilen</string>
@@ -219,6 +221,7 @@
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Punkte des Angreifers: %1$d</string>
     <string name="points_invalides_0_a_count1">Ungültige Punkte (0 bis %1$d).</string>
+    <string name="politique_de_confidentialite">Datenschutzerklärung</string>
     <string name="preneur">Angreifer</string>
     <string name="profil">Profil</string>
     <string name="pseudo">Spitzname</string>

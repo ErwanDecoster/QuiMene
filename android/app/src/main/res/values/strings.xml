@@ -81,6 +81,7 @@
     <string name="archiver_ce_joueur">Archiver ce joueur</string>
     <string name="ardoise">Ardoise</string>
     <string name="arreter_le_partage">Arrêter le partage</string>
+    <string name="assistance">Assistance</string>
     <string name="aucun_ami_lie_pour_l_instant">Aucun ami lié pour l\'instant.</string>
     <string name="aucun_jeu_ne_correspond_a_ta_recherche">Aucun jeu ne correspond à ta recherche.</string>
     <string name="aucun_joueur_archive">Aucun joueur archivé.</string>
@@ -206,6 +207,7 @@
     <string name="obtenu_count1">Obtenu (%1$d)</string>
     <string name="olive">Olive</string>
     <string name="ou_c_est_une_de_mes_fiches">Ou c\'est une de mes fiches</string>
+    <string name="ouvre_la_page_dans_ton_navigateur">Ouvre la page dans ton navigateur.</string>
     <string name="ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app">Ouvre les réglages système pour choisir la langue de l\'app.</string>
     <string name="par_jeu">Par jeu</string>
     <string name="partager_en_direct">Partager en direct</string>
@@ -229,6 +231,7 @@
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Points du preneur : %1$d</string>
     <string name="points_invalides_0_a_count1">Points invalides (0 à %1$d).</string>
+    <string name="politique_de_confidentialite">Politique de confidentialité</string>
     <string name="preneur">Preneur</string>
     <string name="profil">Profil</string>
     <string name="pseudo">Pseudo</string>
