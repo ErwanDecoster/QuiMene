@@ -62,6 +62,16 @@ struct SettingsView: View {
         } footer: {
           Text("Suggère un jeu à ajouter à l'app par e-mail.")
         }
+
+        // App Store, règle 5.1.1(i) — la politique de confidentialité doit être accessible depuis
+        // l'app elle-même, pas seulement depuis la fiche App Store.
+        Section {
+          websiteLink("Assistance", systemImage: "questionmark.circle", url: Self.supportURL)
+          websiteLink(
+            "Politique de confidentialité", systemImage: "hand.raised", url: Self.privacyURL)
+        } footer: {
+          Text("Ouvre la page dans ton navigateur.")
+        }
       }
       .navigationTitle("Réglages")
       .navigationBarTitleDisplayMode(.inline)
@@ -78,6 +88,38 @@ struct SettingsView: View {
     if !GameRequestMail.open() {
       showsNoMailClientAlert = true
     }
+  }
+
+  private func websiteLink(
+    _ title: LocalizedStringKey, systemImage: String, url: URL
+  ) -> some View {
+    Link(destination: url) {
+      HStack {
+        Text(title)
+          .foregroundStyle(.textPrimary)
+        Spacer()
+        Image(systemName: systemImage)
+          .foregroundStyle(.textSecondary)
+      }
+    }
+  }
+
+  /// Le site (`website/`) n'existe qu'en français et en anglais : les autres langues de l'app
+  /// ouvrent la version anglaise.
+  private static var websiteIsFrench: Bool {
+    Bundle.main.preferredLocalizations.first == "fr"
+  }
+
+  private static var supportURL: URL {
+    URL(
+      string: websiteIsFrench
+        ? "https://quimene.vercel.app/assistance" : "https://quimene.vercel.app/en/support")!
+  }
+
+  private static var privacyURL: URL {
+    URL(
+      string: websiteIsFrench
+        ? "https://quimene.vercel.app/confidentialite" : "https://quimene.vercel.app/en/privacy")!
   }
 
   /// Doc utilisateur — `Bundle.main.preferredLocalizations` (même résolution que

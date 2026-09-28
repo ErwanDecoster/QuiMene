@@ -89,6 +89,7 @@
 		7DAF954EE949EC72533B15EA /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 1FD83055930B42098109B9DD /* Localizable.xcstrings */; };
 		20DCD98B13AEFFCC2257158A /* View+MatchDialogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8306D39B2C05E2DE04CE72D3 /* View+MatchDialogs.swift */; };
 		966F6D440C33F4BF43964757 /* LocalizationPluralTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D4664FC775605091DA50815 /* LocalizationPluralTests.swift */; };
+		A1C0FFEE00000000000000C2 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A1C0FFEE00000000000000C1 /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -171,6 +172,7 @@
 		B16A0000000000000000A001 /* ProfileTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTabView.swift; sourceTree = "<group>"; };
 		995D8274A3CEAA3E755A72E6 /* PlayerRecord+Avatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlayerRecord+Avatar.swift"; sourceTree = "<group>"; };
 		9BB59FBD1B31E852B0902041 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1C0FFEE00000000000000C1 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		A1C0FFEE00000000000000A1 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A44F1408763A46ADA3A64F4D /* ArchivedMatchesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArchivedMatchesView.swift; sourceTree = "<group>"; };
 		A7EEC50D41274CA386185DD0 /* ReceivedMatchDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReceivedMatchDetailView.swift; sourceTree = "<group>"; };
@@ -300,6 +302,7 @@
 			children = (
 				9BB59FBD1B31E852B0902041 /* Assets.xcassets */,
 				1FD83055930B42098109B9DD /* Localizable.xcstrings */,
+				A1C0FFEE00000000000000C1 /* InfoPlist.xcstrings */,
 				A1C0FFEE00000000000000A1 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
@@ -648,6 +651,7 @@
 				6389CCBC2E955F0259E97312 /* Assets.xcassets in Resources */,
 				5F633A43AE7C4EE4BACFCB7C /* Localizable.xcstrings in Resources */,
 				A1C0FFEE00000000000000B2 /* PrivacyInfo.xcprivacy in Resources */,
+				A1C0FFEE00000000000000C2 /* InfoPlist.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
