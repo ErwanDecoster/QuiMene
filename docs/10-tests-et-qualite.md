@@ -184,7 +184,9 @@ store-screenshots/
 ├── play-store/<langue>/tablet-7/    1200 × 1920
 ├── play-store/<langue>/tablet-10/   1600 × 2560
 └── slides/                          les images à publier, mêmes dossiers :
-                                     App Store aux tailles ci-dessus, Play Store en 1440 × 2560
+                                     App Store aux tailles ci-dessus, Play Store en 1440 × 2560,
+                                     plus play-store/<langue>/feature-graphic.png (1024 × 500)
+                                     et play-store/icon-512.png
 ```
 
 Chaque dossier contient six écrans, numérotés dans l'ordre de la fiche : `01-partie` (partie de

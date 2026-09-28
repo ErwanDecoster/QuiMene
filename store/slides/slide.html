@@ -147,6 +147,13 @@
     border-radius: 50%;
     background: #000;
   }
+  /* Image de présentation Play Store (1024 × 500) : logo et accroche seuls, centrés — Google peut
+     la recadrer ou y superposer un bouton de lecture, rien d'important près des bords. */
+  .slide.feature { justify-content: center; }
+  .slide.feature header { padding-top: 0; }
+  .slide.feature .lockup { margin-bottom: calc(var(--title) * 0.55); }
+  .slide.feature h1 { font-weight: 500; letter-spacing: -0.01em; color: var(--text-on-ink-secondary); }
+
   .tablet-camera {
     position: absolute;
     top: calc(var(--dw) * var(--bezel-ratio) / 2);
@@ -190,8 +197,41 @@
     return safe.replace(escape(accent), `<em>${escape(accent)}</em>`);
   }
 
+  // Une police web ne se charge qu'une fois utilisée : la demander explicitement plutôt que de
+  // capturer la police de repli.
+  async function fontsLoaded(isAndroid) {
+    if (isAndroid) {
+      await Promise.all(['400', '500', '700'].map((weight) => document.fonts.load(`${weight} 40px Roboto`)));
+      if (!document.fonts.check('700 40px Roboto')) {
+        throw new Error('Roboto n’a pas pu être chargée (réseau indisponible ?)');
+      }
+    }
+    await document.fonts.ready;
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  }
+
+  window.renderFeatureGraphic = async (feature) => {
+    const root = document.getElementById('slide');
+    const style = root.style;
+    style.setProperty('--w', `${feature.width}px`);
+    style.setProperty('--h', `${feature.height}px`);
+    style.setProperty('--title', `${feature.width * 0.05}px`);
+    style.setProperty('--lockup', `${feature.width * 0.085}px`);
+    style.setProperty('--text-width', `${feature.width * 0.8}px`);
+    root.dataset.platform = 'android';
+    root.classList.add('feature');
+    root.innerHTML = `
+      <header>
+        <div class="lockup">${MARK}${feature.wordmark}</div>
+        <h1>${escape(feature.tagline)}</h1>
+      </header>`;
+    await fontsLoaded(true);
+    return true;
+  };
+
   window.renderSlide = async (slide) => {
     const root = document.getElementById('slide');
+    root.classList.remove('feature');
     const frame = FRAMES[slide.frame];
     const style = root.style;
     style.setProperty('--w', `${slide.width}px`);
@@ -229,16 +269,7 @@
       </div>`;
 
     await root.querySelector('img').decode();
-    // Une police web ne se charge qu'une fois utilisée : la demander explicitement plutôt que de
-    // capturer la police de repli.
-    if (isAndroid) {
-      await Promise.all(['400', '500', '700'].map((weight) => document.fonts.load(`${weight} 40px Roboto`)));
-      if (!document.fonts.check('700 40px Roboto')) {
-        throw new Error('Roboto n’a pas pu être chargée (réseau indisponible ?)');
-      }
-    }
-    await document.fonts.ready;
-    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await fontsLoaded(isAndroid);
     return true;
   };
 </script>

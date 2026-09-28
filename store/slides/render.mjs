@@ -1,6 +1,6 @@
 // Slides des fiches App Store et Play Store (doc 10 « Captures des stores ») : chaque capture de
 // store-screenshots/ est posée dans un cadre d'appareil, sous un titre traduit (captions.json),
-// puis rendue en PNG par Chrome sans interface. Aucune dépendance : Node 22+ (WebSocket natif) et
+// puis rendue en PNG par Chrome sans interface ; plus l'image de présentation du Play Store. Aucune dépendance : Node 22+ (WebSocket natif) et
 // Google Chrome suffisent.
 //
 //   node store/slides/render.mjs <dossier des captures> <dossier des slides>
@@ -148,7 +148,21 @@ try {
       }
     }
   }
-  console.log(`${count} slides dans ${output}`);
+
+  // Image de présentation Play Store, une par langue : logo et accroche de la première slide.
+  const feature = { width: 1024, height: 500 };
+  await page.send('Emulation.setDeviceMetricsOverride', { ...feature, deviceScaleFactor: 1, mobile: false });
+  for (const [locale, texts] of Object.entries(captions)) {
+    await page.evaluate(`renderFeatureGraphic(${JSON.stringify({ ...feature, tagline: texts['01-partie'].title, wordmark })})`);
+    const { data } = await page.send('Page.captureScreenshot', {
+      format: 'png', clip: { x: 0, y: 0, ...feature, scale: 1 },
+    });
+    const destination = path.join(output, 'play-store', locale);
+    mkdirSync(destination, { recursive: true });
+    writeFileSync(path.join(destination, 'feature-graphic.png'), Buffer.from(data, 'base64'));
+    count += 1;
+  }
+  console.log(`${count} images dans ${output}`);
 } finally {
   await close();
 }

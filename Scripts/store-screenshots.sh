@@ -8,6 +8,7 @@
 #   app-store/<langue>/<iphone-6.9|ipad-13>/<écran>.png            captures brutes
 #   play-store/<langue>/<phone|tablet-7|tablet-10>/<écran>.png
 #   slides/<store>/<langue>/<appareil>/<écran>.png                  slides à publier (store/slides)
+#   slides/play-store/<langue>/feature-graphic.png, slides/play-store/icon-512.png
 #
 # Variables facultatives :
 #   LOCALES  codes de langue séparés par des virgules (défaut : fr-FR,en-US,es-ES,de-DE,it-IT)
@@ -134,11 +135,17 @@ capture_ios() {
     done
 }
 
-# Chaque capture dans un cadre d'appareil, sous son titre traduit (store/slides/captions.json).
+# Chaque capture dans un cadre d'appareil, sous son titre traduit (store/slides/captions.json),
+# l'image de présentation du Play Store et son icône 512 × 512 — celle de l'app, la même que
+# l'icône adaptative Android (fond brand/ink, marque blanche), sans coins arrondis : le Play
+# Store applique son propre masque.
 render_slides() {
     log "Slides des fiches"
     rm -rf "$OUTPUT/slides"
     node "$ROOT/store/slides/render.mjs" "$OUTPUT" "$OUTPUT/slides"
+    sips -s format png -z 512 512 \
+        "$ROOT/apple/App/Resources/Assets.xcassets/AppIcon.appiconset/AppIcon-light.png" \
+        --out "$OUTPUT/slides/play-store/icon-512.png" > /dev/null
 }
 
 capture_android() {

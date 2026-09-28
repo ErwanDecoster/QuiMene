@@ -78,8 +78,12 @@ The camera is only used to scan these QR codes. Game names in the catalog belong
 - Suppression : automatique, 24 h après la fin d'une session partagée et 14 jours au plus
   pour une partie déposée. Une demande reste possible par e-mail.
 
-**Éléments graphiques :** captures `store-screenshots/slides/play-store/<langue>/`
-(téléphone, tablette 7", tablette 10").
+**Éléments graphiques**, tous produits par `Scripts/store-screenshots.sh` dans
+`store-screenshots/slides/play-store/` :
+
+- icône 512 × 512 : `icon-512.png` ;
+- image de présentation 1024 × 500 : `<langue>/feature-graphic.png` ;
+- captures : `<langue>/phone/`, `<langue>/tablet-7/`, `<langue>/tablet-10/`.
 
 ## Avant de publier
 
@@ -88,11 +92,8 @@ The camera is only used to scan these QR codes. Game names in the catalog belong
    Ils ne figurent jamais dans le nom, le sous-titre ni les mots-clés : Apple le refuse
    (règle 2.3.7) et Google aussi. Les mots-clés ne contiennent que des noms génériques
    (tarot, belote, rami, pétanque).
-2. **Play Store, lien de confidentialité dans l'app.** Google l'exige comme Apple ; il manque
-   encore sur Android, où il est prévu après la validation iOS.
-3. **Play Store, image de présentation (1024 × 500) et icône 512 × 512 :** obligatoires, pas
-   encore produites.
-4. **Politique de confidentialité :** rédigée pour iOS (iCloud, Activités en direct). Ajouter
-   la sauvegarde automatique d'Android avant la publication sur le Play Store.
-5. **Nom sur l'App Store :** « Qui Mène ? – Scores de jeux » doit être libre, car les noms
+2. **Site :** la politique de confidentialité et l'assistance distinguent maintenant iPhone et
+   Android (sauvegarde Google, écran verrouillé propre à l'iPhone). Ces pages ne sont à jour en
+   ligne qu'une fois déployées sur Vercel.
+3. **Nom sur l'App Store :** « Qui Mène ? – Scores de jeux » doit être libre, car les noms
    sont uniques sur l'App Store. Sous l'icône, l'app s'affiche toujours « Qui Mène ? ».
