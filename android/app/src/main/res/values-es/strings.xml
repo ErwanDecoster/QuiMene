@@ -161,7 +161,10 @@
     <string name="la_partie_et_ses_manches_seront_definitivement_supprimees_y">La partida y sus mangas se eliminarán definitivamente, incluidas las estadísticas de los jugadores implicados. Esta acción no se puede deshacer.</string>
     <string name="la_partie_sera_classee_comme_abandonnee_dans_l_historique">La partida se clasificará como abandonada en el historial, con la clasificación alcanzada hasta ese momento. Esta acción no se puede deshacer.</string>
     <string name="la_remontada">La Remontada</string>
+    <string name="la_session_est_terminee">La sesión ha terminado.</string>
+    <string name="la_session_est_terminee_le_tableau_affiche_est_le_dernier">La sesión ha terminado. El marcador mostrado es el último recibido.</string>
     <string name="la_session_partagee_a_ete_arretee">La sesión compartida se ha detenido.</string>
+    <string name="la_session_partagee_est_terminee">La sesión compartida ha terminado.</string>
     <string name="langue">Idioma</string>
     <string name="le_boulet">El Lastre</string>
     <string name="le_fosse">El Abismo</string>
@@ -169,8 +172,6 @@
     <string name="le_sniper">El Francotirador</string>
     <string name="le_classement_final_sera_calcule_a_partir_des_manches">La clasificación final se calculará a partir de las mangas jugadas. Esta acción no se puede deshacer.</string>
     <string name="le_createur_a_annule_ton_association_a_cette_place">El creador ha anulado tu asociación a este puesto.</string>
-    <string name="le_createur_a_arrete_la_session">El creador detuvo la sesión.</string>
-    <string name="le_createur_a_arrete_la_session_le_tableau_affiche_est_le">El creador detuvo la sesión. El marcador mostrado es el último recibido.</string>
     <string name="le_jeu_que_je_cherche_value1">El juego que buscaba: %1$s</string>
     <string name="le_jeu_que_je_souhaite_voir_ajoute">El juego que me gustaría que añadierais:</string>
     <string name="le_kamikaze">El Kamikaze</string>
@@ -224,6 +225,7 @@
     <string name="plis_distribues">Bazas repartidas</string>
     <string name="plus_gros_tour">Manga más alta</string>
     <string name="plus_longue_serie_en_tete">Racha más larga en cabeza</string>
+    <string name="plus_personne_ne_pourra_saisir_ni_lancer_de_partie_les">Nadie podrá introducir puntuaciones ni iniciar una partida. Las partidas terminadas se quedan en el historial de cada uno.</string>
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Puntos del atacante: %1$d</string>
     <string name="points_invalides_0_a_count1">Puntos no válidos (de 0 a %1$d).</string>
@@ -276,6 +278,8 @@
     <string name="taux_de_victoire">Tasa de victorias</string>
     <string name="terminer_la_partie">Terminar la partida</string>
     <string name="terminer_la_partie_2">¿Terminar la partida?</string>
+    <string name="terminer_la_session">Terminar la sesión</string>
+    <string name="terminer_la_session_2">¿Terminar la sesión?</string>
     <string name="termine">Hecho</string>
     <string name="tes_amis_ne_recevront_plus_les_parties_jouees_avec_toi_ta">Tus amigos ya no recibirán las partidas jugadas contigo. Tu ficha y su historial se conservan, y después crearás un nuevo perfil.</string>
     <string name="ton_profil_est_lie_a_cette_place_chez_le_createur_qui_en">Tu perfil queda vinculado a este puesto en el dispositivo del creador, que recibe un aviso y puede anularlo.</string>

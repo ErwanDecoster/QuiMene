@@ -28,6 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.util.UUID
 
@@ -50,8 +51,9 @@ data class RemoteStartedMatch(
 /**
  * Doc 16, phase C — miroir de `LiveShareCoordinator.swift` : côté créateur d'une session en ligne.
  * Le journal de chaque partie partagée vit sur le serveur et fait foi ; la partie locale en est le
- * miroir. Survit à l'écran de partie et au redémarrage de l'app ([PersistedOnlineSession]) : seul
- * « Arrêter le partage » termine la session (créateur uniquement).
+ * miroir. Survit à l'écran de partie et au redémarrage de l'app ([PersistedOnlineSession]). Seul
+ * le créateur arrête la session (« Arrêter le partage », « Terminer la session ») ; sinon le
+ * serveur la ferme après 6 h sans activité (doc 16), ce que ce coordinateur constate au rattrapage.
  */
 class LiveShareCoordinator(
     private val catalog: GameCatalog,
@@ -81,6 +83,10 @@ class LiveShareCoordinator(
     )
 
     var claimNotices: List<ClaimNotice> by mutableStateOf(emptyList())
+        private set
+
+    /** Doc 16 — la session s'est terminée d'elle-même (6 h sans activité) : Jeux le dit une fois. */
+    var showsEndedNotice: Boolean by mutableStateOf(false)
         private set
 
     val pairingCode: String? get() = link?.pairingCode
@@ -200,6 +206,7 @@ class LiveShareCoordinator(
             )
         link.onNewRecords = { handle(it) }
         link.onNewIdentities = { handleClaims() }
+        link.onClosed = { scope.launch { sessionDidClose(sessionID) } }
         this.link = link
         link.start()
     }
@@ -259,12 +266,31 @@ class LiveShareCoordinator(
         runCatching { backend.open(link.sessionID, link.pairingCode, deviceID ?: resolveDeviceID(), allowed) }
     }
 
-    /** Seul point d'arrêt d'une session (créateur uniquement). */
+    /** Arrêt par le créateur (doc 16 : lui seul). Les appareils connectés en sont prévenus aussitôt,
+     * les autres à leur prochain rattrapage ; le journal reste lisible 24 h pour qu'ils rattrapent. */
     suspend fun stopSharing() {
         link?.let { link ->
+            // Sa propre fermeture revient aussi par le canal : pas d'annonce « session terminée ».
+            link.onClosed = null
             runCatching { backend.close(link.sessionID, deviceID ?: resolveDeviceID()) }
-            link.stop()
         }
+        tearDown()
+    }
+
+    /** Fermée sans que ce créateur l'ait demandé : après 6 h sans activité. Le partage s'arrête ici
+     * aussi ; une partie encore en cours continue en local. */
+    private suspend fun sessionDidClose(sessionID: UUID) {
+        if (link?.sessionID != sessionID) return
+        tearDown()
+        showsEndedNotice = true
+    }
+
+    fun dismissEndedNotice() {
+        showsEndedNotice = false
+    }
+
+    private suspend fun tearDown() {
+        link?.stop()
         PersistedOnlineSession.clear(context, PersistedOnlineSession.Role.Owner)
         link?.let { HandledClaims.clear(context, it.sessionID) }
         link = null

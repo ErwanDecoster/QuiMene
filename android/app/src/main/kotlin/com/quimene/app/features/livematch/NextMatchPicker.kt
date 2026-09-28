@@ -24,6 +24,7 @@ import com.quimene.app.di.LocalAppContainer
 import com.quimene.app.ui.gameIcon
 import com.quimene.catalog.games.TarotRulesV1
 import com.quimene.designsystem.components.PrimaryButton
+import com.quimene.designsystem.components.TertiaryButton
 import com.quimene.designsystem.tokens.LocalAppColors
 import com.quimene.designsystem.tokens.Space
 import com.quimene.domain.rules.EntryKind
@@ -111,18 +112,34 @@ private fun isShareable(definition: GameDefinition): Boolean =
     definition.engine != TarotRulesV1.ENGINE_ID &&
         (definition.scoring.entry.kind == EntryKind.Integer || definition.scoring.entry.kind == EntryKind.Rank)
 
-/** Bouton « Partie suivante » posé sous l'écran de résultats d'une partie partagée. */
+/** Bouton « Partie suivante » posé sous l'écran de résultats d'une partie partagée. Côté créateur
+ * (doc 16), [onEndSession] ajoute « Terminer la session » dessous, pour clore la soirée ici plutôt
+ * que de chercher « Arrêter le partage ». */
 @Composable
 fun NextMatchBar(
     isBusy: Boolean,
     modifier: Modifier = Modifier,
+    onEndSession: (() -> Unit)? = null,
     onClick: () -> Unit,
 ) {
-    PrimaryButton(
-        text = stringResource(R.string.partie_suivante),
-        onClick = onClick,
-        enabled = !isBusy,
-        isLoading = isBusy,
+    Column(
         modifier = modifier.fillMaxWidth(),
-    )
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(Space.xs),
+    ) {
+        PrimaryButton(
+            text = stringResource(R.string.partie_suivante),
+            onClick = onClick,
+            enabled = !isBusy,
+            isLoading = isBusy,
+            modifier = Modifier.fillMaxWidth(),
+        )
+        if (onEndSession != null) {
+            TertiaryButton(
+                text = stringResource(R.string.terminer_la_session),
+                onClick = onEndSession,
+                enabled = !isBusy,
+            )
+        }
+    }
 }

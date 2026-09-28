@@ -1617,6 +1617,22 @@
     "de": "Die Eingabe konnte nicht gespeichert werden.",
     "it": "Impossibile salvare l'inserimento."
   },
+  "la_session_est_terminee": {
+    "key": "La session est terminée.",
+    "fr": "La session est terminée.",
+    "en": "The session has ended.",
+    "es": "La sesión ha terminado.",
+    "de": "Die Sitzung ist beendet.",
+    "it": "La sessione è terminata."
+  },
+  "la_session_est_terminee_le_tableau_affiche_est_le_dernier": {
+    "key": "La session est terminée. Le tableau affiché est le dernier reçu.",
+    "fr": "La session est terminée. Le tableau affiché est le dernier reçu.",
+    "en": "The session has ended. The board shown is the last one received.",
+    "es": "La sesión ha terminado. El marcador mostrado es el último recibido.",
+    "de": "Die Sitzung ist beendet. Die angezeigte Tabelle ist die zuletzt empfangene.",
+    "it": "La sessione è terminata. Il tabellone mostrato è l'ultimo ricevuto."
+  },
   "la_session_partagee_a_ete_arretee": {
     "key": "La session partagée a été arrêtée.",
     "fr": "La session partagée a été arrêtée.",
@@ -1624,6 +1640,14 @@
     "es": "La sesión compartida se ha detenido.",
     "de": "Die geteilte Sitzung wurde beendet.",
     "it": "La sessione condivisa è stata interrotta."
+  },
+  "la_session_partagee_est_terminee": {
+    "key": "La session partagée est terminée.",
+    "fr": "La session partagée est terminée.",
+    "en": "The shared session has ended.",
+    "es": "La sesión compartida ha terminado.",
+    "de": "Die geteilte Sitzung ist beendet.",
+    "it": "La sessione condivisa è terminata."
   },
   "langue": {
     "key": "Langue",
@@ -1680,22 +1704,6 @@
     "es": "El creador ha anulado tu asociación a este puesto.",
     "de": "Der Ersteller hat deine Zuordnung zu diesem Platz aufgehoben.",
     "it": "Il creatore ha annullato la tua associazione a questo posto."
-  },
-  "le_createur_a_arrete_la_session": {
-    "key": "Le créateur a arrêté la session.",
-    "fr": "Le créateur a arrêté la session.",
-    "en": "The creator stopped the session.",
-    "es": "El creador detuvo la sesión.",
-    "de": "Der Ersteller hat die Sitzung beendet.",
-    "it": "Il creatore ha interrotto la sessione."
-  },
-  "le_createur_a_arrete_la_session_le_tableau_affiche_est_le": {
-    "key": "Le créateur a arrêté la session. Le tableau affiché est le dernier reçu.",
-    "fr": "Le créateur a arrêté la session. Le tableau affiché est le dernier reçu.",
-    "en": "The creator stopped the session. The board shown is the last one received.",
-    "es": "El creador detuvo la sesión. El marcador mostrado es el último recibido.",
-    "de": "Der Ersteller hat die Sitzung beendet. Die angezeigte Tabelle ist die zuletzt empfangene.",
-    "it": "Il creatore ha interrotto la sessione. Il tabellone mostrato è l'ultimo ricevuto."
   },
   "le_jeu_que_je_cherche_value1": {
     "key": "Le jeu que je cherche : %@",
@@ -2201,6 +2209,14 @@
     "de": "Längste Führungsserie",
     "it": "Serie più lunga in testa"
   },
+  "plus_personne_ne_pourra_saisir_ni_lancer_de_partie_les": {
+    "key": "Plus personne ne pourra saisir ni lancer de partie. Les parties terminées restent dans l'historique de chacun.",
+    "fr": "Plus personne ne pourra saisir ni lancer de partie. Les parties terminées restent dans l'historique de chacun.",
+    "en": "No one will be able to enter scores or start a match anymore. Finished matches stay in everyone's history.",
+    "es": "Nadie podrá introducir puntuaciones ni iniciar una partida. Las partidas terminadas se quedan en el historial de cada uno.",
+    "de": "Niemand kann dann noch Punkte eintragen oder eine Partie starten. Beendete Partien bleiben im Verlauf aller.",
+    "it": "Nessuno potrà più inserire punteggi né avviare una partita. Le partite terminate restano nella cronologia di tutti."
+  },
   "poignee": {
     "key": "Poignée",
     "fr": "Poignée",
@@ -2704,6 +2720,22 @@
     "es": "¿Terminar la partida?",
     "de": "Partie beenden?",
     "it": "Terminare la partita?"
+  },
+  "terminer_la_session": {
+    "key": "Terminer la session",
+    "fr": "Terminer la session",
+    "en": "End the session",
+    "es": "Terminar la sesión",
+    "de": "Sitzung beenden",
+    "it": "Termina la sessione"
+  },
+  "terminer_la_session_2": {
+    "key": "Terminer la session ?",
+    "fr": "Terminer la session ?",
+    "en": "End the session?",
+    "es": "¿Terminar la sesión?",
+    "de": "Sitzung beenden?",
+    "it": "Terminare la sessione?"
   },
   "termine": {
     "key": "Terminé",

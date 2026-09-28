@@ -161,7 +161,10 @@
     <string name="la_partie_et_ses_manches_seront_definitivement_supprimees_y">La partita e le sue manche verranno eliminate definitivamente, comprese le statistiche dei giocatori coinvolti. Questa azione non può essere annullata.</string>
     <string name="la_partie_sera_classee_comme_abandonnee_dans_l_historique">La partita verrà classificata come abbandonata nella cronologia, con la classifica raggiunta fino a quel momento. Questa azione non può essere annullata.</string>
     <string name="la_remontada">La Rimonta</string>
+    <string name="la_session_est_terminee">La sessione è terminata.</string>
+    <string name="la_session_est_terminee_le_tableau_affiche_est_le_dernier">La sessione è terminata. Il tabellone mostrato è l\'ultimo ricevuto.</string>
     <string name="la_session_partagee_a_ete_arretee">La sessione condivisa è stata interrotta.</string>
+    <string name="la_session_partagee_est_terminee">La sessione condivisa è terminata.</string>
     <string name="langue">Lingua</string>
     <string name="le_boulet">La Zavorra</string>
     <string name="le_fosse">Il Divario</string>
@@ -169,8 +172,6 @@
     <string name="le_sniper">Il Cecchino</string>
     <string name="le_classement_final_sera_calcule_a_partir_des_manches">La classifica finale verrà calcolata in base alle manche giocate. Questa azione non può essere annullata.</string>
     <string name="le_createur_a_annule_ton_association_a_cette_place">Il creatore ha annullato la tua associazione a questo posto.</string>
-    <string name="le_createur_a_arrete_la_session">Il creatore ha interrotto la sessione.</string>
-    <string name="le_createur_a_arrete_la_session_le_tableau_affiche_est_le">Il creatore ha interrotto la sessione. Il tabellone mostrato è l\'ultimo ricevuto.</string>
     <string name="le_jeu_que_je_cherche_value1">Il gioco che stavo cercando: %1$s</string>
     <string name="le_jeu_que_je_souhaite_voir_ajoute">Il gioco che vorrei vedere aggiunto:</string>
     <string name="le_kamikaze">Il Kamikaze</string>
@@ -224,6 +225,7 @@
     <string name="plis_distribues">Prese distribuite</string>
     <string name="plus_gros_tour">Manche più alta</string>
     <string name="plus_longue_serie_en_tete">Serie più lunga in testa</string>
+    <string name="plus_personne_ne_pourra_saisir_ni_lancer_de_partie_les">Nessuno potrà più inserire punteggi né avviare una partita. Le partite terminate restano nella cronologia di tutti.</string>
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Punti dell\'attaccante: %1$d</string>
     <string name="points_invalides_0_a_count1">Punti non validi (da 0 a %1$d).</string>
@@ -276,6 +278,8 @@
     <string name="taux_de_victoire">Tasso di vittoria</string>
     <string name="terminer_la_partie">Termina la partita</string>
     <string name="terminer_la_partie_2">Terminare la partita?</string>
+    <string name="terminer_la_session">Termina la sessione</string>
+    <string name="terminer_la_session_2">Terminare la sessione?</string>
     <string name="termine">Fatto</string>
     <string name="tes_amis_ne_recevront_plus_les_parties_jouees_avec_toi_ta">I tuoi amici non riceveranno più le partite giocate con te. La tua scheda e la sua cronologia vengono conservate, poi creerai un nuovo profilo.</string>
     <string name="ton_profil_est_lie_a_cette_place_chez_le_createur_qui_en">Il tuo profilo viene collegato a questo posto sul dispositivo del creatore, che viene avvisato e può annullare.</string>

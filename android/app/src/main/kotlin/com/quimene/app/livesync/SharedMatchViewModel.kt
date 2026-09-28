@@ -158,7 +158,7 @@ class SharedMatchViewModel(
                 if (sent && mySeat == seat) isChoosingSeat = false
                 identityMessage =
                     when {
-                        !sent && link.isClosed -> link.context.getString(R.string.le_createur_a_arrete_la_session)
+                        !sent && link.isClosed -> link.context.getString(R.string.la_session_est_terminee)
                         !sent -> link.context.getString(R.string.hors_connexion_la_saisie_reprendra_au_retour_du_reseau)
                         mySeat != seat ->
                             link.context.getString(
@@ -416,7 +416,7 @@ class SharedMatchViewModel(
                     false
                 }
                 SessionLink.SubmitResult.Closed -> {
-                    latestRejectionReason = UiText.Resource(R.string.le_createur_a_arrete_la_session)
+                    latestRejectionReason = UiText.Resource(R.string.la_session_est_terminee)
                     false
                 }
             }

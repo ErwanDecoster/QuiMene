@@ -99,7 +99,7 @@ struct SharedMatchView: View {
       if !model.isHostConnected {
         Section {
           if model.isSessionClosed {
-            Text("Le créateur a arrêté la session. Le tableau affiché est le dernier reçu.")
+            Text("La session est terminée. Le tableau affiché est le dernier reçu.")
               .font(.label)
               .foregroundStyle(.textSecondary)
           } else {

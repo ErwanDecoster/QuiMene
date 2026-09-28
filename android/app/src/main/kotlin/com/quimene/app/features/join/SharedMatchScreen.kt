@@ -100,7 +100,7 @@ fun SharedMatchScreen(
             // Le tableau reste celui du dernier rattrapage, la saisie est bloquée.
             if (viewModel.isSessionClosed) {
                 Banner(
-                    message = stringResource(R.string.le_createur_a_arrete_la_session_le_tableau_affiche_est_le),
+                    message = stringResource(R.string.la_session_est_terminee_le_tableau_affiche_est_le_dernier),
                     modifier = Modifier.padding(Space.lg),
                 )
             } else if (!viewModel.isHostConnected) {

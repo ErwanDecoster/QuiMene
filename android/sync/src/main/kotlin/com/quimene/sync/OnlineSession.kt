@@ -99,6 +99,9 @@ interface OnlineSessionBackend {
         sessionID: UUID,
         ownerDeviceID: String,
     )
+
+    /** Fermée (par le créateur ou après 6 h sans activité) ou déjà purgée. */
+    suspend fun isClosed(sessionID: UUID): Boolean
 }
 
 /** Une session ouverte ou rejointe par cet appareil : son journal lisible, le rattrapage, l'ajout. */
@@ -126,6 +129,10 @@ class OnlineSession(
 
     /** Rattrape tout ce qui suit le dernier numéro connu, par lots ; renvoie le nouveau lisible. */
     suspend fun sync(): List<SessionEventRecord> = mutex.withLock { syncLocked() }
+
+    /** Doc 16 — fermée par le créateur ou faute d'activité (6 h) : à vérifier au rattrapage, sans
+     * attendre qu'un ajout soit refusé ([OnlineSessionError.SessionClosed]). */
+    suspend fun isClosed(): Boolean = backend.isClosed(sessionID)
 
     private suspend fun syncLocked(): List<SessionEventRecord> {
         val fresh = mutableListOf<SessionEventRecord>()

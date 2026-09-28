@@ -41,6 +41,11 @@ struct GamesTabView: View {
   private static let pullToSearchThreshold: CGFloat = 40
 
   private var catalog: GameCatalog { .embedded }
+
+  private var showsEndedSessionNotice: Bool {
+    MatchConnectionCoordinator.shared.showsEndedNotice
+      || LiveShareCoordinator.shared.showsEndedNotice
+  }
   private var activePlayers: [PlayerRecord] { allPlayers.filter { !$0.isArchived } }
 
   private var games: [GameDefinition] {
@@ -118,6 +123,24 @@ struct GamesTabView: View {
         .listRowSeparator(.hidden)
       }
     }
+    // Doc 16 — une session partagée terminée sans qu'on l'ait arrêtée soi-même : dit une fois,
+    // là où était le bandeau de reprise (charte §5.5 : 4 s sans action).
+    .overlay(alignment: .bottom) {
+      if showsEndedSessionNotice {
+        Banner("La session partagée est terminée.")
+          .padding(.horizontal, Space.lg)
+          .padding(.bottom, Space.lg)
+          .transition(.move(edge: .bottom).combined(with: .opacity))
+          .task {
+            Banner.announce("La session partagée est terminée.")
+            try? await Task.sleep(for: .seconds(4))
+            guard !Task.isCancelled else { return }
+            MatchConnectionCoordinator.shared.dismissEndedNotice()
+            LiveShareCoordinator.shared.dismissEndedNotice()
+          }
+      }
+    }
+    .accessibleAnimation(.default, value: showsEndedSessionNotice)
     .navigationTitle("Jeux")
     .toolbar {
       ToolbarItem(placement: .topBarLeading) {

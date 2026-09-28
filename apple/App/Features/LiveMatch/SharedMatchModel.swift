@@ -141,7 +141,7 @@ final class SharedMatchModel {
     if !sent {
       identityMessage =
         link.isClosed
-        ? String(localized: "Le créateur a arrêté la session.")
+        ? String(localized: "La session est terminée.")
         : String(localized: "Hors connexion : la saisie reprendra au retour du réseau.")
     } else if mySeat != seat {
       identityMessage = String(localized: "Cette place vient d'être prise par quelqu'un d'autre.")
@@ -271,7 +271,7 @@ final class SharedMatchModel {
         localized: "Hors connexion : la saisie reprendra au retour du réseau.")
       return false
     case .closed:
-      latestRejectionReason = String(localized: "Le créateur a arrêté la session.")
+      latestRejectionReason = String(localized: "La session est terminée.")
       return false
     }
   }
@@ -308,7 +308,7 @@ final class SharedMatchModel {
         localized: "Hors connexion : la saisie reprendra au retour du réseau.")
       return false
     case .closed:
-      latestRejectionReason = String(localized: "Le créateur a arrêté la session.")
+      latestRejectionReason = String(localized: "La session est terminée.")
       return false
     }
   }

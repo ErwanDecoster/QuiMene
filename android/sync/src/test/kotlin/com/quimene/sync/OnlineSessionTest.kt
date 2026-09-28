@@ -34,11 +34,12 @@ import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.UUID
 
-/** Mêmes règles que les fonctions SQL de `create_quimene_sessions` — miroir de
- * `InMemorySessionBackend` (Swift). */
+/** Mêmes règles que les fonctions SQL de `create_quimene_sessions` et `close_idle_sessions` —
+ * miroir de `InMemorySessionBackend` (Swift). */
 internal class InMemorySessionBackend : OnlineSessionBackend {
     private val mutex = Mutex()
     private val events = mutableMapOf<UUID, MutableList<RawSessionEvent>>()
+    private val closed = mutableSetOf<UUID>()
 
     override suspend fun open(
         sessionID: UUID,
@@ -62,6 +63,7 @@ internal class InMemorySessionBackend : OnlineSessionBackend {
         mutex.withLock {
             val log = events.getOrPut(sessionID) { mutableListOf() }
             log.firstOrNull { it.eventID == eventID }?.let { return@withLock it.seq }
+            if (sessionID in closed) throw OnlineSessionError.SessionClosed
             val next = log.size + 1L
             if (expectedSeq != next) throw OnlineSessionError.StaleSequence
             log += RawSessionEvent(next, eventID, matchID, deviceID, ciphertext)
@@ -79,7 +81,12 @@ internal class InMemorySessionBackend : OnlineSessionBackend {
     override suspend fun close(
         sessionID: UUID,
         ownerDeviceID: String,
-    ) = Unit
+    ) {
+        mutex.withLock { closed += sessionID }
+    }
+
+    override suspend fun isClosed(sessionID: UUID): Boolean =
+        mutex.withLock { sessionID in closed || sessionID !in events }
 
     suspend fun injectGarbage(sessionID: UUID) {
         mutex.withLock {
@@ -155,6 +162,19 @@ class OnlineSessionTest {
             val events = erwan.eventsForMatch(matchID)
             events.map { it.lamport } shouldBe listOf(1uL, 2uL)
             theo.eventsForMatch(matchID) shouldBe events
+        }
+
+    @Test
+    fun `a closed session is visible without appending`() =
+        runTest {
+            val backend = InMemorySessionBackend()
+            val sessionID = UUID.randomUUID()
+            backend.open(sessionID, "042817", "erwan", allowsContributors = true)
+            val theo = OnlineSession(sessionID, "042817", "theo", backend)
+
+            theo.isClosed() shouldBe false
+            backend.close(sessionID, "erwan")
+            theo.isClosed() shouldBe true
         }
 
     @Test

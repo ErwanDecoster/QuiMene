@@ -82,18 +82,26 @@ struct NextMatchPicker: View {
 struct NextMatchBar: View {
   let isBusy: Bool
   let action: () -> Void
+  /// Côté créateur (doc 16) : clore la soirée ici plutôt que de chercher « Arrêter le partage ».
+  var onEndSession: (() -> Void)?
 
   var body: some View {
-    Button {
-      action()
-    } label: {
-      if isBusy {
-        ProgressView().frame(maxWidth: .infinity)
-      } else {
-        Text("Partie suivante").frame(maxWidth: .infinity)
+    VStack(spacing: Space.xs) {
+      Button {
+        action()
+      } label: {
+        if isBusy {
+          ProgressView().frame(maxWidth: .infinity)
+        } else {
+          Text("Partie suivante").frame(maxWidth: .infinity)
+        }
+      }
+      .buttonStyle(.primary(size: .large))
+      if let onEndSession {
+        Button("Terminer la session", action: onEndSession)
+          .buttonStyle(.tertiary)
       }
     }
-    .buttonStyle(.primary(size: .large))
     .disabled(isBusy)
     .padding(.horizontal, Space.lg)
     .padding(.vertical, Space.sm)

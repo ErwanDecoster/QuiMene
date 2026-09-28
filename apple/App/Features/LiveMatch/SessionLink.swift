@@ -33,7 +33,10 @@ final class SessionLink {
   /// Faux quand le réseau manque ou qu'un appel vient d'échouer : la saisie est alors bloquée
   /// (doc 16, « saisie hors ligne »), l'écran rattrape dès le retour du réseau.
   private(set) var isReachable = true
+  /// Doc 16 — arrêtée par le créateur, ou d'elle-même après 6 h sans activité.
   private(set) var isClosed = false
+  /// Appelé une fois, quand la fin est constatée (au rattrapage, ou par un ajout refusé).
+  var onClosed: (() -> Void)?
   /// Nouveaux événements lisibles, dans l'ordre — publiés à chaque rattrapage.
   var onNewRecords: (([SessionEventRecord]) -> Void)?
   /// Doc 16, phase D — qui est qui, recalculé à chaque nouvel événement d'identité.
@@ -103,7 +106,8 @@ final class SessionLink {
     await channel.disconnect()
   }
 
-  /// Rattrape le journal et publie ce qui est nouveau.
+  /// Rattrape le journal et publie ce qui est nouveau, puis vérifie que la session est encore
+  /// ouverte.
   func refresh() async {
     do {
       let fresh = try await session.sync()
@@ -113,7 +117,17 @@ final class SessionLink {
       if !fresh.isEmpty { onNewRecords?(fresh) }
     } catch {
       isReachable = false
+      return
     }
+    // Après le rattrapage, pour que la fin d'une partie soit déjà publiée. Une erreur ici (réseau,
+    // serveur pas encore à jour) ne dit rien de la session : on ne conclut rien.
+    if !isClosed, (try? await session.isClosed()) == true { markClosed() }
+  }
+
+  private func markClosed() {
+    guard !isClosed else { return }
+    isClosed = true
+    onClosed?()
   }
 
   /// Ajoute un événement à la partie `matchID`. Le journal local est rattrapé dans tous les cas
@@ -139,7 +153,7 @@ final class SessionLink {
       let author = fresh.last { $0.event.deviceID != session.deviceID }?.event.deviceID
       return .overtaken(byDeviceName: author.flatMap(deviceName(for:)))
     } catch OnlineSessionError.sessionClosed {
-      isClosed = true
+      markClosed()
       return .closed
     } catch {
       isReachable = false
@@ -163,7 +177,7 @@ final class SessionLink {
         await publishIdentityChanges()
         continue
       } catch OnlineSessionError.sessionClosed {
-        isClosed = true
+        markClosed()
         return false
       } catch {
         isReachable = false

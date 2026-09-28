@@ -6279,6 +6279,62 @@
         }
       }
     },
+    "La session est terminée." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Sitzung ist beendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The session has ended."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sesión ha terminado."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sessione è terminata."
+          }
+        }
+      }
+    },
+    "La session est terminée. Le tableau affiché est le dernier reçu." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Sitzung ist beendet. Die angezeigte Tabelle ist die zuletzt empfangene."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The session has ended. The board shown is the last one received."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sesión ha terminado. El marcador mostrado es el último recibido."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sessione è terminata. Il tabellone mostrato è l'ultimo ricevuto."
+          }
+        }
+      }
+    },
     "La session partagée a été arrêtée." : {
       "localizations" : {
         "de" : {
@@ -6303,6 +6359,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La sessione condivisa è stata interrotta."
+          }
+        }
+      }
+    },
+    "La session partagée est terminée." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die geteilte Sitzung ist beendet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shared session has ended."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sesión compartida ha terminado."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sessione condivisa è terminata."
           }
         }
       }
@@ -6499,62 +6583,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Il creatore ha annullato la tua associazione a questo posto."
-          }
-        }
-      }
-    },
-    "Le créateur a arrêté la session." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Ersteller hat die Sitzung beendet."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The creator stopped the session."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El creador detuvo la sesión."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il creatore ha interrotto la sessione."
-          }
-        }
-      }
-    },
-    "Le créateur a arrêté la session. Le tableau affiché est le dernier reçu." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Der Ersteller hat die Sitzung beendet. Die angezeigte Tabelle ist die zuletzt empfangene."
-          }
-        },
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The creator stopped the session. The board shown is the last one received."
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El creador detuvo la sesión. El marcador mostrado es el último recibido."
-          }
-        },
-        "it" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Il creatore ha interrotto la sessione. Il tabellone mostrato è l'ultimo ricevuto."
           }
         }
       }
@@ -8355,6 +8383,34 @@
         }
       }
     },
+    "Plus personne ne pourra saisir ni lancer de partie. Les parties terminées restent dans l'historique de chacun." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niemand kann dann noch Punkte eintragen oder eine Partie starten. Beendete Partien bleiben im Verlauf aller."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No one will be able to enter scores or start a match anymore. Finished matches stay in everyone's history."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nadie podrá introducir puntuaciones ni iniciar una partida. Las partidas terminadas se quedan en el historial de cada uno."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nessuno potrà più inserire punteggi né avviare una partita. Le partite terminate restano nella cronologia di tutti."
+          }
+        }
+      }
+    },
     "Poignée" : {
       "localizations" : {
         "de" : {
@@ -10119,6 +10175,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminare la partita?"
+          }
+        }
+      }
+    },
+    "Terminer la session" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitzung beenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End the session"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminar la sesión"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Termina la sessione"
+          }
+        }
+      }
+    },
+    "Terminer la session ?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sitzung beenden?"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End the session?"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Terminar la sesión?"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminare la sessione?"
           }
         }
       }

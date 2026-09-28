@@ -20,12 +20,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -105,6 +107,7 @@ fun ResultsScreen(
     val scope = rememberCoroutineScope()
     var isPickingNextMatch by remember { mutableStateOf(false) }
     var isStartingNextMatch by remember { mutableStateOf(false) }
+    var isConfirmingEndSession by remember { mutableStateOf(false) }
 
     // Doc 16, phase E — une partie qui vient de se terminer part tout de suite chez les amis liés
     // qui y ont joué, sans attendre un retour au premier plan.
@@ -136,6 +139,7 @@ fun ResultsScreen(
                 NextMatchBar(
                     isBusy = isStartingNextMatch,
                     modifier = Modifier.padding(horizontal = Space.lg).padding(top = Space.lg),
+                    onEndSession = { isConfirmingEndSession = true },
                 ) { isPickingNextMatch = true }
             }
             PrimaryButton(
@@ -162,6 +166,26 @@ fun ResultsScreen(
                 }
             }
         }
+    }
+
+    // Doc 16 — sinon, la session s'arrête d'elle-même après 6 h sans activité.
+    if (isConfirmingEndSession) {
+        AlertDialog(
+            onDismissRequest = { isConfirmingEndSession = false },
+            title = { Text(stringResource(R.string.terminer_la_session_2)) },
+            text = { Text(stringResource(R.string.plus_personne_ne_pourra_saisir_ni_lancer_de_partie_les)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    isConfirmingEndSession = false
+                    scope.launch { shareCoordinator.stopSharing() }
+                }) {
+                    Text(stringResource(R.string.terminer_la_session))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { isConfirmingEndSession = false }) { Text(stringResource(R.string.annuler)) }
+            },
+        )
     }
 }
 

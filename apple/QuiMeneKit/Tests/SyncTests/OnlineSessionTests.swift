@@ -4,9 +4,10 @@ import Testing
 
 @testable import Sync
 
-/// Mêmes règles que les fonctions SQL de `create_quimene_sessions` (vérifiées de leur côté par
-/// `supabase/tests/quimene_sessions_test.sql`) : numérotation continue, ajout refusé s'il n'est
-/// pas au numéro attendu, idempotent sur l'identifiant d'événement, lecture par lots de 500.
+/// Mêmes règles que les fonctions SQL de `create_quimene_sessions` et `close_idle_sessions`
+/// (vérifiées de leur côté par `supabase/tests/`) : numérotation continue, ajout refusé s'il n'est
+/// pas au numéro attendu, idempotent sur l'identifiant d'événement, lecture par lots de 500, une
+/// session inconnue (purgée) lue comme fermée.
 actor InMemorySessionBackend: OnlineSessionBackend {
   private var events: [UUID: [RawSessionEvent]] = [:]
   private var closed: Set<UUID> = []
@@ -39,6 +40,10 @@ actor InMemorySessionBackend: OnlineSessionBackend {
 
   func close(sessionID: UUID, ownerDeviceID: String) {
     closed.insert(sessionID)
+  }
+
+  func isClosed(sessionID: UUID) -> Bool {
+    closed.contains(sessionID) || events[sessionID] == nil
   }
 
   /// Simule un événement écrit par un appareil sans la bonne clé.
@@ -179,6 +184,20 @@ struct OnlineSessionTests {
     let replayed = try MatchEngine().replay(await theo.events(forMatch: matchID), catalog: .testing)
     #expect(replayed.matchID == matchID)
     #expect(await theo.currentMatchID() == matchID)
+  }
+
+  @Test("Une session fermée se constate sans essayer d'ajouter")
+  func closureIsVisibleWithoutAppending() async throws {
+    let backend = InMemorySessionBackend()
+    let sessionID = UUID()
+    await backend.open(
+      sessionID: sessionID, pairingCode: "042817", ownerDeviceID: "erwan", allowsContributors: true)
+    let theo = OnlineSession(
+      sessionID: sessionID, pairingCode: "042817", deviceID: "theo", backend: backend)
+
+    #expect(try await theo.isClosed() == false)
+    await backend.close(sessionID: sessionID, ownerDeviceID: "erwan")
+    #expect(try await theo.isClosed())
   }
 
   @Test("La partie courante est celle du matchCreated le plus récent")

@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -57,6 +58,13 @@ fun JoinScreen(onBack: () -> Unit) {
     val coordinator = container.matchConnectionCoordinator
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+
+    // Doc 16 — une session terminée pendant que cet écran est affiché garde son dernier tableau,
+    // puis s'arrête à sa fermeture : pas de bandeau de reprise pour une partie qui ne reprendra plus.
+    DisposableEffect(coordinator) {
+        coordinator.sessionScreenShown()
+        onDispose { coordinator.sessionScreenHidden() }
+    }
 
     val sharedMatch = coordinator.sharedMatch
     if (sharedMatch != null) {

@@ -13,6 +13,7 @@ struct LiveMatchView: View {
   @State private var isConfirmingManualEnd = false
   @State private var isConfirmingAbandon = false
   @State private var isConfirmingShareSwitch = false
+  @State private var isConfirmingEndSession = false
   @State private var isPresentingShareSession = false
   @State private var isPresentingRoundHistory = false
   @State private var keyboardObserver = KeyboardObserver()
@@ -78,7 +79,11 @@ struct LiveMatchView: View {
         // Doc 16, phase C — dans une session en ligne, tout le monde peut enchaîner.
         .safeAreaInset(edge: .bottom) {
           if model.isSharing {
-            NextMatchBar(isBusy: model.isSubmitting) { isPickingNextMatch = true }
+            NextMatchBar(isBusy: model.isSubmitting) {
+              isPickingNextMatch = true
+            } onEndSession: {
+              isConfirmingEndSession = true
+            }
           }
         }
         .sheet(isPresented: $isPickingNextMatch) {
@@ -199,6 +204,20 @@ struct LiveMatchView: View {
     // écran) : ce jeton republié à chaque événement distant est ce qui déclenche le rechargement.
     .onChange(of: LiveShareCoordinator.shared.remoteEventToken) { _, _ in
       model.refreshFromRemote()
+    }
+    // Doc 16 — sinon, la session s'arrête d'elle-même après 6 h sans activité.
+    .confirmationDialog(
+      "Terminer la session ?",
+      isPresented: $isConfirmingEndSession,
+      titleVisibility: .visible
+    ) {
+      Button("Terminer la session", role: .destructive) {
+        Task { await model.stopSharing() }
+      }
+    } message: {
+      Text(
+        "Plus personne ne pourra saisir ni lancer de partie. Les parties terminées restent dans l'historique de chacun."
+      )
     }
     .confirmationDialog(
       "Terminer la partie ?",
