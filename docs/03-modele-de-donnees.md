@@ -65,9 +65,13 @@ ses résultats rejouent ce journal ([04](04-moteur-de-regles.md#event-sourcing))
 jamais un total mis en cache. Seuls `finalRank`/`finalScore` des participants sont écrits à la
 fin, pour que l'historique et les statistiques n'aient pas à rejouer chaque partie.
 
-Deux champs servent la compatibilité avec des parties reçues par un mécanisme antérieur de
-partage : `isImportedSummary` (résumé sans journal, seuls les rangs et scores font foi) et
-`pendingSharedProfileSync`.
+Deux champs servent l'historique partagé ([14](14-profils-partages.md)) :
+
+- `pendingSharedProfileSync` passe à `true` à la fin d'une partie dont un participant est lié à
+  un ami, jusqu'à ce qu'elle ait été déposée dans sa boîte aux lettres (nouvelle tentative à
+  chaque retour au premier plan) ;
+- `isImportedSummary` marque les parties reçues par un mécanisme antérieur, sous forme de
+  résumé sans journal : seuls les rangs et scores des participants y font foi.
 
 ### ParticipantRecord
 

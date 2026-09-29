@@ -184,6 +184,8 @@ Traitée comme une exigence de départ, pas comme une passe de finition.
 - **Reduce Motion** : `accessibleAnimation` remplace toute animation par un fondu court.
 - **Contraste augmenté** : les couleurs de joueur ont une variante renforcée dans le catalogue
   d'assets, sélectionnée par le système.
+- **Contrôle vocal** : chaque champ de score porte un libellé lié au pseudo, pour que « Appuyer
+  sur Alice » fonctionne.
 - **Zones tactiles** : 44 pt minimum, y compris pour les `Chip`.
 
 Barrière de qualité : la traversée complète du parcours principal à VoiceOver, sans regarder
