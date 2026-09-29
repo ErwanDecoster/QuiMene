@@ -150,7 +150,10 @@ Intégration continue : GitHub Actions pour Android et la cohérence de `spec/` 
 | 16 | [Sessions en ligne et profils](docs/16-sessions-en-ligne-et-profils.md) | Pourquoi et comment les sessions serveur ont remplacé l'hôte |
 | 17 | [Recette croisée](docs/17-recette-croisee.md) | Compatibilité iOS ↔ Android : fixtures et scénarios |
 
-## Crédits
+## Licence
+
+© 2026 Erwan Decoster. Tous droits réservés : le dépôt est publié pour consultation, sans
+licence de réutilisation (voir [LICENSE](LICENSE)).
 
 Wordmark en [Outfit](https://fonts.google.com/specimen/Outfit) (SIL Open Font License, voir
 `Licenses/`), vectorisé : la police n'est pas embarquée dans les applications.
