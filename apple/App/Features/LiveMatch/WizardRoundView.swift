@@ -10,8 +10,8 @@ struct WizardRoundView: View {
   @State private var isConfirmingAbandon = false
   @State private var isPresentingRoundHistory = false
 
-  /// Doc utilisateur (audit qualité, 15) — même garantie que `LiveMatchView` : `MatchPlayView`
-  /// ne route ici qu'après avoir vérifié que `definition` résout.
+  /// Même garantie que `LiveMatchView` : `MatchPlayView` ne route ici qu'après avoir vérifié que
+  /// `definition` résout.
   init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
     _model = State(
       initialValue: try! WizardRoundModel(match: match, context: context, catalog: catalog))

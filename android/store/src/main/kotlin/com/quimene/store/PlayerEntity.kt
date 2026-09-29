@@ -25,7 +25,7 @@ data class PlayerEntity(
     val createdAt: Instant = Instant.now(),
     val isArchived: Boolean = false,
     val sortIndex: Int = 0,
-    /** Doc 14 « Profils partagés » — identifiant permanent, jamais régénéré une fois posé. */
+    /** Doc 14 — identifiant permanent, jamais régénéré une fois posé. */
     val sharedProfileID: UUID? = null,
     /** `true` uniquement pour la fiche que cet appareil partage comme la sienne (une seule par
      * appareil, voir [com.quimene.store.PlayerRepository.sharedProfileID]). */

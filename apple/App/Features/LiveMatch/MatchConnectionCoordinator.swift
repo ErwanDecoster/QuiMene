@@ -7,9 +7,9 @@ import SwiftData
 import Sync
 
 /// Doc 16, phase C — côté participant d'une session en ligne. Rejoindre, c'est résoudre le code
-/// (`quimene_session_resolve`), rattraper le journal serveur, puis écouter le canal : plus de
-/// poignée de main avec un hôte, qui n'a plus besoin d'être allumé. La reconnexion se réduit à un
-/// rattrapage (`SessionLink.refresh`), fait tout seul au retour au premier plan et du réseau.
+/// (`quimene_session_resolve`), rattraper le journal serveur, puis écouter le canal : aucune
+/// poignée de main avec le créateur, qui n'a pas besoin d'être allumé. La reconnexion se réduit à
+/// un rattrapage (`SessionLink.refresh`), fait tout seul au retour au premier plan et du réseau.
 ///
 /// Vit aussi longtemps que l'app (même patron que `DeepLinkRouter.shared`) et retient la session
 /// (`PersistedOnlineSession`) : à la réouverture après un arrêt complet du processus, la partie

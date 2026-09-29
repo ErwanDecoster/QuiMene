@@ -116,7 +116,7 @@ public struct MatchRepository {
       .roundRemoved(index: lastIndex), to: match, catalog: catalog, deviceID: deviceID)
   }
 
-  /// Doc 05 « Jeu libre » et tout jeu `manualStop` (Scrabble, Qwirkle…) : `endCheck` ne
+  /// Doc 05 « Jeu libre » et tout jeu `manualStop` (Scrabble, Qwixx…) : `endCheck` ne
   /// détecte jamais cette fin tout seul, elle vient toujours d'une action explicite du joueur.
   @discardableResult
   public func endMatchManually(
@@ -155,9 +155,9 @@ public struct MatchRepository {
     try context.save()
   }
 
-  /// Doc utilisateur — remontée : rien n'empêche de démarrer plusieurs parties sans terminer la
-  /// précédente ; toutes doivent rester reprenables, pas seulement la première trouvée. Triées
-  /// par date de début, la plus récente d'abord (même convention que `finishedMatches`).
+  /// Rien n'empêche de démarrer plusieurs parties sans terminer la précédente ; toutes doivent
+  /// rester reprenables, pas seulement la première trouvée. Triées par date de début, la plus
+  /// récente d'abord (même convention que `finishedMatches`).
   public func inProgressMatches() throws -> [MatchRecord] {
     let descriptor = FetchDescriptor<MatchRecord>(
       predicate: #Predicate { $0.statusRaw == "inProgress" || $0.statusRaw == "finalRound" },
@@ -166,9 +166,8 @@ public struct MatchRepository {
     return try context.fetch(descriptor)
   }
 
-  /// Doc utilisateur « Handoff » (P9) — résout la partie reprise sur un autre appareil à partir
-  /// du seul id transporté par `NSUserActivity` ; `nil` si elle n'est pas (encore) synchronisée
-  /// localement via CloudKit.
+  /// Handoff : résout la partie reprise sur un autre appareil à partir du seul id transporté par
+  /// `NSUserActivity` ; `nil` si elle n'est pas (encore) synchronisée localement via CloudKit.
   public func match(withID id: UUID) throws -> MatchRecord? {
     var descriptor = FetchDescriptor<MatchRecord>(predicate: #Predicate { $0.id == id })
     descriptor.fetchLimit = 1
@@ -217,8 +216,7 @@ public struct MatchRepository {
   }
 
   /// Nombre de parties jouées (terminées ou abandonnées), tous jeux confondus, par joueur — sert
-  /// à faire remonter les habitués en tête de la présélection d'une nouvelle partie (comportement
-  /// calqué sur culnugame, doc utilisateur).
+  /// à faire remonter les habitués en tête de la présélection d'une nouvelle partie.
   public func participationCounts() throws -> [UUID: Int] {
     let descriptor = FetchDescriptor<MatchRecord>(
       predicate: #Predicate { $0.statusRaw == "ended" || $0.statusRaw == "abandoned" }
@@ -233,9 +231,9 @@ public struct MatchRepository {
     return counts
   }
 
-  /// Doc 14, phase 2 — parties conclues avec au moins un participant lié, dont le résumé n'a
-  /// pas encore été confirmé poussé (`SharedProfileSyncCoordinator` les retente à chaque retour
-  /// au premier plan).
+  /// Doc 14 — parties conclues avec au moins un participant lié, pas encore déposées dans la
+  /// boîte aux lettres de chaque ami (`SharedProfileSyncCoordinator` retente à chaque retour au
+  /// premier plan).
   public func matchesPendingSharedProfileSync() throws -> [MatchRecord] {
     let descriptor = FetchDescriptor<MatchRecord>(
       predicate: #Predicate { $0.pendingSharedProfileSync })
@@ -360,7 +358,7 @@ public struct MatchRepository {
       // suivie depuis un autre appareil, reçue d'un ami) garde la vraie heure de fin.
       match.endedAt = events.last?.occurredAt ?? Date()
       applyFinalStandings(state: state, match: match, catalog: catalog)
-      // Doc 14, phase 2 — un seul appel suffit même si le lien a été fait après coup entre
+      // Doc 14 — un seul appel suffit même si le lien a été fait après coup entre
       // deux manches : ce drapeau est réévalué à chaque conclusion, jamais figé à la
       // création de la partie.
       match.pendingSharedProfileSync = match.participants.contains {

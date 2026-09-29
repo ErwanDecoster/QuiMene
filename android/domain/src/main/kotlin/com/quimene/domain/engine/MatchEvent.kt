@@ -10,11 +10,10 @@ import java.time.Instant
 import java.util.UUID
 
 /**
- * Miroir de `MatchEvent.swift` — **7 cas**, pas 6 comme l'énumère par erreur le texte de
- * docs/11-portage-android.md (étape B) : le code Swift source fait foi. `Codable` côté Swift ;
+ * Miroir de `MatchEvent.swift` — **7 cas** ; le code Swift source fait foi. `Codable` côté Swift ;
  * sérialisé ici via [MatchEventSerializer], qui reproduit exactement la forme du `Codable`
  * synthétisé par Swift (`{"<cas>": {…}}`, `_0` pour un paramètre non nommé) — vérifié bit-à-bit
- * contre les golden files du protocole applicatif (dossier `spec/wire`, doc 09, étape F), pas le
+ * contre les fichiers de référence croisés (dossier `spec/session`, doc 17), pas le
  * polymorphisme à discriminant par défaut de kotlinx.serialization (`{"type": "roundCommitted",
  * ...}`) qu'aurait produit un simple `@Serializable` sur cette interface.
  */

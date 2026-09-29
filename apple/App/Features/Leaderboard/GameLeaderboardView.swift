@@ -3,9 +3,8 @@ import Store
 import SwiftData
 import SwiftUI
 
-/// Doc 06 « Statistiques de groupe » (roadmap « après la v1 ») — qui est le/la meilleur(e) à ce
-/// jeu, tous joueurs confondus. Calculé à la demande comme le reste des statistiques (doc 06
-/// « Performance »).
+/// Doc 06 « Classement par jeu » — qui est le/la meilleur(e) à ce jeu, tous joueurs confondus.
+/// Calculé à la demande comme le reste des statistiques (doc 06).
 struct GameLeaderboardView: View {
   let gameID: String
   let gameName: String

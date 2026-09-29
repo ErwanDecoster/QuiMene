@@ -8,13 +8,12 @@ import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * Doc 09 « Appairage et chiffrement » — remplace le chiffrement gratuit de MultipeerConnectivity,
- * perdu en passant à des sockets/GATT bruts (ADR-0014). Miroir de `SessionCrypto.swift`
- * (`CryptoKit`, framework système) : `javax.crypto` (JCE, dans le JDK/Android, pas une dépendance
- * ajoutée — ADR-0012) couvre l'AES-GCM directement, mais **pas de primitive HKDF prête à
- * l'emploi** (contrairement à `CryptoKit.HKDF<SHA256>`) — réimplémenté à la main sur
- * `Mac("HmacSHA256")` (RFC 5869) plutôt que d'importer une bibliothèque de crypto entière
- * (Tink/Bouncy Castle) pour un seul primitif.
+ * Doc 09 « Format d'un événement » — clé de session dérivée du code d'appairage, événements
+ * scellés en AES-GCM. Miroir de `SessionCrypto.swift` (`CryptoKit`, framework système) :
+ * `javax.crypto` (JCE, dans le JDK/Android, pas une dépendance ajoutée — ADR-0012) couvre l'AES-GCM
+ * directement, mais **pas de primitive HKDF prête à l'emploi** (contrairement à
+ * `CryptoKit.HKDF<SHA256>`) — réimplémenté à la main sur `Mac("HmacSHA256")` (RFC 5869) plutôt que
+ * d'importer une bibliothèque de crypto entière (Tink/Bouncy Castle) pour un seul primitif.
  */
 object SessionCrypto {
     class SealFailedException : Exception("Le chiffrement du message a échoué.")
@@ -25,9 +24,9 @@ object SessionCrypto {
 
     /**
      * HKDF-SHA256 : le `sessionID` sert de sel, ce qui garantit une clé différente par session
-     * même si deux hôtes choisissent le même code par coïncidence. Salé par la session — stable
+     * même si deux créateurs obtiennent le même code par coïncidence. Salé par la session — stable
      * tant qu'elle dure — et non par la partie courante : une session peut enchaîner plusieurs
-     * parties (doc 09 « Fin de partie ») sans que la clé ne change, donc sans qu'un pair déjà
+     * parties (doc 09 « Session ») sans que la clé ne change, donc sans qu'un participant déjà
      * connecté ait besoin de se réappairer entre deux parties.
      *
      * **`sessionID.toString().uppercase()`, pas `.toString()`** : `UUID.uuidString` côté Swift

@@ -6,11 +6,10 @@ import Testing
 
 @testable import QuiMene
 
-/// Doc 15 « Reste au plan — Phase C » : `LiveMatchModel` n'avait aucun test avant celui-ci, alors
-/// que c'est le flux qui porte `commitRound`/`undoLastRound` — exactement le comportement qu'un
-/// `ViewModel` Kotlin devra reproduire au portage Android (doc 11). Mêmes réglages SwiftData en
-/// mémoire que `QuiMeneKit/Tests/StoreTests` (`MatchRepositoryTests`), même catalogue de test
-/// minimal (`generic.sum.v1` implicite via les valeurs par défaut de `GameRules`).
+/// `LiveMatchModel` porte `commitRound`/`undoLastRound` — le comportement que `LiveMatchViewModel`
+/// reproduit côté Android (doc 11). Mêmes réglages SwiftData en mémoire que
+/// `QuiMeneKit/Tests/StoreTests` (`MatchRepositoryTests`), même catalogue de test minimal
+/// (`generic.sum.v1` implicite via les valeurs par défaut de `GameRules`).
 @MainActor
 @Suite("LiveMatchModel", .serialized)
 struct LiveMatchModelTests {
@@ -53,10 +52,10 @@ struct LiveMatchModelTests {
     container: ModelContainer, model: LiveMatchModel, ids: [Participant.ID]
   ) {
     let schema = Schema(QuiMeneSchemaV1.models)
-    // Doc utilisateur — `cloudKitDatabase: .none` explicite : ce test tourne hébergé dans
-    // `QuiMene.app` (`TEST_HOST`), qui porte l'entitlement iCloud réel. Sans ce réglage
-    // explicite, `.automatic` (par défaut) tente quand même CloudKit dans ce process précis —
-    // absent d'un exécutable de test non hébergé comme `QuiMeneKit/Tests/StoreTests`.
+    // `cloudKitDatabase: .none` explicite : ce test tourne hébergé dans `QuiMene.app`
+    // (`TEST_HOST`), qui porte l'entitlement iCloud réel. Sans ce réglage explicite, `.automatic`
+    // (par défaut) tente quand même CloudKit dans ce process précis — absent d'un exécutable de
+    // test non hébergé comme `QuiMeneKit/Tests/StoreTests`.
     let config = ModelConfiguration(
       schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
     let container = try ModelContainer(for: schema, configurations: [config])

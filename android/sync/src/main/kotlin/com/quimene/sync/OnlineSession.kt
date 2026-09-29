@@ -233,7 +233,7 @@ class OnlineSession(
     companion object {
         const val PAGE_SIZE = 500
 
-        /** Même configuration que l'ancien `WireCodec` : JSON identique à `JSONEncoder` Swift. */
+        /** JSON identique à celui de `JSONEncoder` côté Swift. */
         val json =
             Json {
                 encodeDefaults = true

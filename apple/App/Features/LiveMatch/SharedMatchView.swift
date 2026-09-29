@@ -4,17 +4,16 @@ import Store
 import SwiftData
 import SwiftUI
 
-/// Doc 09 — l'écran d'un pair non-hôte. Observateur : lecture seule, le tableau se met à jour
-/// tout seul à mesure que l'hôte diffuse. Contributeur : le même tableau que `LiveMatchView`
-/// (`ScoreBoardView`, partagé entre les deux écrans), mais « Envoyer » propose la manche à l'hôte
-/// au lieu de l'écrire directement — elle n'apparaît aux autres qu'une fois acceptée.
+/// Doc 09 — l'écran d'un appareil qui a rejoint une session. Observateur : lecture seule, le
+/// tableau suit le journal de la session. Contributeur : le même tableau que `LiveMatchView`
+/// (`ScoreBoardView`, partagé entre les deux écrans) ; « Envoyer » ajoute la manche au journal
+/// de la session, qui la refuse si quelqu'un l'a devancée.
 struct SharedMatchView: View {
   let model: SharedMatchModel
-  /// Doc utilisateur P9 — `MatchConnectionCoordinator` retente déjà seul, toutes les quelques
-  /// secondes, tant que cet écran affiche une perte de connexion : ce bouton ne sert qu'à forcer
-  /// une tentative immédiate plutôt que d'attendre la prochaine. Retourne si la tentative a
-  /// abouti, pour qu'un échec affiche un vrai message plutôt qu'un aller-retour silencieux vers
-  /// l'état initial.
+  /// `MatchConnectionCoordinator` retente déjà seul, toutes les quelques secondes, tant que cet
+  /// écran affiche une perte de connexion : ce bouton ne sert qu'à forcer une tentative immédiate
+  /// plutôt que d'attendre la prochaine. Retourne si la tentative a abouti, pour qu'un échec
+  /// affiche un vrai message plutôt qu'un aller-retour silencieux vers l'état initial.
   let onReconnect: () async -> Bool
   @State private var isReconnecting = false
   @State private var reconnectFailed = false
@@ -23,11 +22,8 @@ struct SharedMatchView: View {
   @FocusState private var focusedParticipantID: Participant.ID?
   @State private var isPresentingRoundHistory = false
   @State private var keyboardObserver = KeyboardObserver()
-  /// Doc utilisateur — remontée : rien ne validait localement avant d'envoyer une proposition à
-  /// l'hôte. Une manche invalide (Skyjo : aucun joueur désigné comme ayant fermé) était acceptée
-  /// *optimistiquement* en local, montrée un instant, puis rejetée et retirée par l'hôte — assez
-  /// vite pour donner l'impression que rien n'empêchait de l'ajouter. `ScoreBoardView.validationMessage`
-  /// combine ce contrôle local et un rejet distant tardif dans le même message.
+  /// Refus du contrôle local fait avant l'envoi (Skyjo : aucun joueur désigné comme ayant fermé…).
+  /// `ScoreBoardView.validationMessage` le combine avec un refus du serveur dans le même message.
   @State private var validationErrorMessage: String?
   @State private var isPickingNextMatch = false
   @Environment(\.modelContext) private var modelContext
@@ -103,8 +99,8 @@ struct SharedMatchView: View {
               .font(.label)
               .foregroundStyle(.textSecondary)
           } else {
-            // Doc 16, phase C — plus d'hôte à rejoindre : seule la connexion de cet appareil
-            // compte. Le tableau reste celui du dernier rattrapage, la saisie est bloquée.
+            // Doc 16, phase C — seule la connexion de cet appareil compte. Le tableau reste celui
+            // du dernier rattrapage, la saisie est bloquée.
             Text("Hors connexion. Le tableau affiché est le dernier reçu.")
               .font(.label)
               .foregroundStyle(.semanticError)
@@ -151,9 +147,9 @@ struct SharedMatchView: View {
         draftTexts: $draftTexts,
         focusedParticipantID: $focusedParticipantID
       ) { _, _ in
-        // Doc utilisateur — contrairement à l'hôte, un contributeur n'a pas de totaux
-        // « en direct » à mettre à jour pendant la saisie : `model.totals` ne reflète que
-        // les manches déjà acceptées par l'hôte, jamais un brouillon local.
+        // Contrairement à l'écran du créateur, un contributeur n'a pas de totaux « en direct » à
+        // mettre à jour pendant la saisie : `model.totals` ne reflète que les manches déjà
+        // acceptées par le serveur, jamais un brouillon local.
       }
     }
     .listStyle(.plain)
@@ -166,12 +162,12 @@ struct SharedMatchView: View {
         }
       }
     }
-    // Doc utilisateur — posé au niveau de l'écran, pas dans `ScoreBoardView` : un enfant de
-    // liste qui porte lui-même `.safeAreaInset` faisait dupliquer tout le rendu (voir la note
-    // en tête de `ScoreBoardView.swift`). Pas de `ToolbarItemGroup(placement: .keyboard)` ici :
-    // cet écran vit dans le plein écran « Rejoindre » posé à la racine (doc 16, phase A), où
-    // SwiftUI n'affiche pas la barre d'accessoires du clavier — ni signe, ni « Envoyer ». La
-    // barre du bas, remontée au-dessus du clavier par la zone sûre, en tient lieu.
+    // Posé au niveau de l'écran, pas dans `ScoreBoardView` : un enfant de liste qui porte lui-même
+    // `.safeAreaInset` faisait dupliquer tout le rendu (voir la note en tête de
+    // `ScoreBoardView.swift`). Pas de `ToolbarItemGroup(placement: .keyboard)` ici : cet écran vit
+    // dans le plein écran « Rejoindre » posé à la racine (doc 16, phase A), où SwiftUI n'affiche
+    // pas la barre d'accessoires du clavier — ni signe, ni « Envoyer ». La barre du bas, remontée
+    // au-dessus du clavier par la zone sûre, en tient lieu.
     .safeAreaInset(edge: .bottom) {
       if model.canPropose {
         if keyboardObserver.isVisible {
@@ -205,7 +201,7 @@ struct SharedMatchView: View {
       }
     }
     .accessibleAnimation(.default, value: model.roundExplanationMessage)
-    // Doc 08 « Accessibilité » — voir la même remontée dans `LiveMatchView.swift`.
+    // Doc 08 « Accessibilité » — voir la même note dans `LiveMatchView.swift`.
     .onChange(of: model.roundExplanationMessage) { _, newValue in
       if let newValue { Banner.announce(LocalizedStringResource(stringLiteral: newValue)) }
     }
@@ -243,10 +239,9 @@ struct SharedMatchView: View {
     draftTexts[participantID] = text
   }
 
-  /// Doc utilisateur — remontée : valide localement *avant* d'envoyer, exactement comme
-  /// `LiveMatchModel.commitRound` côté hôte, plutôt que de compter uniquement sur le rejet
-  /// distant de l'hôte (`SharedMatchModel.validate`, mêmes règles de jeu des deux côtés). Une
-  /// manche invalide n'est ainsi plus jamais montrée comme acceptée, même un instant.
+  /// Valide localement *avant* d'envoyer, exactement comme `LiveMatchModel.commitRound` côté
+  /// créateur (`SharedMatchModel.validate`, mêmes règles de jeu des deux côtés) : une manche
+  /// invalide n'est jamais envoyée.
   private func sendRound() async {
     let inputs = model.participants.map { participant in
       ScoreInput(

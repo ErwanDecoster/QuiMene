@@ -25,8 +25,8 @@ import com.quimene.designsystem.tokens.dynamicAppColors
  * (`docs/07-charte-graphique.md`, [appColorScheme]/[LightAppColors]/[DarkAppColors]). Les
  * couleurs sémantiques et la palette des 10 joueurs restent toujours fixes, même en mode
  * dynamique (voir [dynamicAppColors]). Fournit [LocalAppColors] pour les tokens sans rôle M3
- * direct (palette joueurs, `brandInkPressed`, etc.). Suit le thème clair/sombre système, avec
- * une bascule manuelle prévue plus tard (réglages) — jamais forcé (charte §8).
+ * direct (palette joueurs, `brandInkPressed`, etc.). Suit le thème clair/sombre système, jamais
+ * forcé (charte §8).
  */
 @Composable
 fun QuiMeneTheme(

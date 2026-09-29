@@ -51,8 +51,9 @@ import com.quimene.designsystem.tokens.Space
 
 /**
  * Vue d'une partie rejointe — miroir de `SharedMatchView.swift`. Contributeur : mêmes écrans de
- * saisie que l'hôte ([RoundEntryDispatch], partagés via [com.quimene.app.features.livematch.LiveRoundEntryState]).
- * Observateur : classement en lecture seule, aucune saisie affichée.
+ * saisie que le créateur ([RoundEntryDispatch], partagés via
+ * [com.quimene.app.features.livematch.LiveRoundEntryState]). Observateur : classement en lecture
+ * seule, aucune saisie affichée.
  */
 @Composable
 fun SharedMatchScreen(
@@ -96,8 +97,8 @@ fun SharedMatchScreen(
         },
     ) { innerPadding ->
         Column(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-            // Doc 16, phase C — plus d'hôte à rejoindre : seule la connexion de cet appareil compte.
-            // Le tableau reste celui du dernier rattrapage, la saisie est bloquée.
+            // Doc 16, phase C — seule la connexion de cet appareil compte. Le tableau reste celui
+            // du dernier rattrapage, la saisie est bloquée.
             if (viewModel.isSessionClosed) {
                 Banner(
                     message = stringResource(R.string.la_session_est_terminee_le_tableau_affiche_est_le_dernier),

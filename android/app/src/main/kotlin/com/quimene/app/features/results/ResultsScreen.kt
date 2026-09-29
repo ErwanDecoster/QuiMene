@@ -258,9 +258,9 @@ private fun PodiumRow(
             colors.neutralSurface
         }
 
-    // Miroir de `Card` (:designsystem) plutôt qu'un simple `Modifier.background()` — même
-    // remontée « les listes ne se détachent pas du fond » : tonal + ombre garantit une séparation
-    // visuelle même quand le fond est proche de `background` en couleur dynamique.
+    // Miroir de `Card` (:designsystem) plutôt qu'un simple `Modifier.background()` : tonal +
+    // ombre garantit que la liste se détache du fond, même quand celui-ci est proche de
+    // `background` en couleur dynamique.
     Surface(
         modifier =
             Modifier.fillMaxWidth().accessibleScoreRow(

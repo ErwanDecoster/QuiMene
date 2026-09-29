@@ -45,7 +45,7 @@ import com.quimene.domain.model.Participant
 
 /**
  * Dispatch sur la bonne forme de saisie de manche selon le moteur du jeu — miroir de
- * `LiveMatchView.swift`, partagé entre l'hôte ([LiveMatchScreen]) et le contributeur
+ * `LiveMatchView.swift`, partagé entre le créateur ([LiveMatchScreen]) et le contributeur
  * ([com.quimene.app.features.join.JoinScreen]) : [source] est un [LiveMatchViewModel] pour l'un,
  * un `SharedMatchViewModel` pour l'autre — ni les écrans dédiés ni [GenericRoundEntry] ne
  * connaissent la différence (voir [LiveRoundEntryState]).
@@ -67,8 +67,8 @@ fun GenericRoundEntry(source: LiveRoundEntryState) {
     val rankByParticipant = source.currentStandings.associate { it.participantID to it.rank }
     // Miroir de `ScoreBoardView.rankedParticipants` — la liste elle-même est triée par
     // classement (l'ordre des sièges ne sert qu'à départager une égalité), pas seulement le
-    // numéro affiché sur chaque ligne : remontée utilisateur, le numéro de rang affiché ne
-    // correspondait pas à la position dans la liste tant que celle-ci restait triée par siège.
+    // numéro affiché sur chaque ligne : sinon le numéro de rang ne correspondrait pas à la
+    // position dans la liste.
     val rankedParticipants =
         source.participants.sortedWith(
             compareBy({ rankByParticipant[it.id] ?: Int.MAX_VALUE }, { it.seatIndex }),
@@ -115,7 +115,7 @@ fun GenericRoundEntry(source: LiveRoundEntryState) {
 
 /** Miroir de `ScoreBoardView.swift` : rang, nom, total (grand format, sans étiquette « Total »),
  * fermeture de manche selon le jeu, saisie — dans cet ordre, tout tenant sur une seule ligne
- * (doc utilisateur). Pas d'avatar ici, comme côté Apple : la place gagnée est ce qui garantit que
+ *. Pas d'avatar ici, comme côté Apple : la place gagnée est ce qui garantit que
  * le pseudo reste lisible même à 6+ joueurs. */
 @Composable
 private fun ParticipantScoreRow(

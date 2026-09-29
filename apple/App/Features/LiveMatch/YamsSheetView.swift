@@ -11,9 +11,9 @@ struct YamsSheetView: View {
   @State private var isConfirmingAbandon = false
   @State private var isPresentingRoundHistory = false
 
-  /// Doc utilisateur (audit qualité, 15) — même garantie que `LiveMatchView` : `MatchPlayView`
-  /// ne route ici qu'après avoir vérifié que `definition` résout. Risque résiduel accepté :
-  /// `repository.loadState` échouerait quand même sur un journal d'événements corrompu.
+  /// Même garantie que `LiveMatchView` : `MatchPlayView` ne route ici qu'après avoir vérifié que
+  /// `definition` résout. Risque résiduel accepté : `repository.loadState` échouerait quand même
+  /// sur un journal d'événements corrompu.
   init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
     _model = State(
       initialValue: try! YamsSheetModel(match: match, context: context, catalog: catalog))

@@ -66,7 +66,7 @@ class PlayerRepository(
         dao.delete(player)
     }
 
-    /** Doc 14, phase 4 — génère l'identifiant partageable de cette fiche s'il n'existe pas
+    /** Doc 14 — génère l'identifiant partageable de cette fiche s'il n'existe pas
      * encore, et la désigne comme *la* fiche de cet appareil. Jamais régénéré une fois posé. */
     suspend fun sharedProfileID(player: PlayerEntity): UUID {
         val existing = player.sharedProfileID

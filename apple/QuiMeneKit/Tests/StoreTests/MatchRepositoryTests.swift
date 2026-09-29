@@ -142,7 +142,7 @@ struct MatchRepositoryTests {
         to: match, catalog: catalog)
     }
 
-    // Manche 1 perdue en route : l'ancien hôte acceptait la 2 hors séquence (remontée).
+    // Manche 1 perdue en route : une ancienne version acceptait la 2 hors séquence.
     _ = try commit(0)
     let gapped = try commit(2)
     #expect(gapped.rounds.count == 2)

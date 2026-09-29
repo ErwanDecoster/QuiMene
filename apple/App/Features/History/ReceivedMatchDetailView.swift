@@ -4,10 +4,9 @@ import Domain
 import Store
 import SwiftUI
 
-/// Doc 14 « Profils partagés », phase 2 — le détail d'une partie reçue de l'installation d'un
-/// ami. Seul le classement final est connu (un résumé, pas le journal d'événements complet —
-/// voir `MatchRecord.isImportedSummary`) : pas de courbe d'évolution ni de manche par manche ici,
-/// contrairement à `ResultsView`.
+/// Doc 14 — le détail d'une partie reçue de l'installation d'un ami. Seul le classement final est
+/// connu (un résumé, pas le journal d'événements complet — voir `MatchRecord.isImportedSummary`) :
+/// pas de courbe d'évolution ni de manche par manche ici, contrairement à `ResultsView`.
 struct ReceivedMatchDetailView: View {
   let match: MatchRecord
   let catalog: GameCatalog

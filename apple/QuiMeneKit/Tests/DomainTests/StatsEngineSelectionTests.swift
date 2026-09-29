@@ -7,7 +7,7 @@ private struct SumRules: GameRules {
   static let engineID = "test.sum.v1"
 }
 
-/// Doc 06 « Faits marquants » — la sélection (`StatsEngine.select`), au-delà des candidats que
+/// Doc 06 « Sélection » — la sélection (`StatsEngine.select`), au-delà des candidats que
 /// vérifient les golden files.
 @Suite("Sélection des faits marquants (doc 06)")
 struct StatsEngineSelectionTests {

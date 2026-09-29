@@ -5,25 +5,24 @@ import Store
 import Sync
 import os
 
-/// Doc utilisateur — Live Activity (roadmap P9) : point d'entrée unique pour les trois écrans de
-/// saisie (`LiveMatchModel`, `YamsSheetModel`, `BeloteRoundModel`), qui partagent tous la même
-/// forme `state`/`definition`/`rules` (doc « point d'aiguillage unique », `MatchPlayView`). Un
+/// Live Activity : point d'entrée unique pour les trois écrans de saisie (`LiveMatchModel`,
+/// `YamsSheetModel`, `BeloteRoundModel`), qui partagent tous la même forme
+/// `state`/`definition`/`rules` (doc « point d'aiguillage unique », `MatchPlayView`). Un
 /// dictionnaire par clé d'activité plutôt qu'un singleton simple : rien n'empêche en théorie deux
 /// parties d'être à l'écran l'une après l'autre dans la même session.
 ///
-/// Doc utilisateur P9 — remontée : un `Activity.update` local ne peut s'exécuter que pendant que
-/// l'app tourne, or l'OS suspend le processus peu après une mise en arrière-plan — l'écran
-/// verrouillé d'un pair backgrounded gelait alors sur le dernier score reçu. Chaque activité est
-/// donc créée avec `pushType: .token` : son jeton (`Activity.pushTokenUpdates`) est enregistré
-/// auprès de Supabase (`LiveActivityPushClient`), et l'hôte — seul appareil qui fait foi sur le
-/// journal — pousse un vrai APNs à chaque manche validée (`isAuthoritative: true`), qui met à jour
-/// l'écran verrouillé de chaque pair même suspendu. La mise à jour locale (`activity.update`) reste
-/// en place à côté : instantanée pour l'appareil qui tourne encore, le push ne fait que couvrir les
-/// autres.
+/// Un `Activity.update` local ne peut s'exécuter que pendant que l'app tourne, or l'OS suspend le
+/// processus peu après une mise en arrière-plan — l'écran verrouillé d'un appareil en
+/// arrière-plan se figerait sur le dernier score reçu. Chaque activité est donc créée avec
+/// `pushType: .token` : son jeton (`Activity.pushTokenUpdates`) est enregistré auprès de Supabase
+/// (`LiveActivityPushClient`), et l'appareil qui enregistre un événement pousse un vrai APNs
+/// (`isAuthoritative: true`, doc 16, phase F), qui met à jour l'écran verrouillé de chaque
+/// participant même suspendu. La mise à jour locale (`activity.update`) reste en place à côté :
+/// instantanée pour l'appareil qui tourne encore, le push ne fait que couvrir les autres.
 ///
-/// Doc 09 « Fin de partie » — la clé d'activité (`activityKey`) est `"session:<sessionID>"` tant
-/// qu'une session de partage est active, `"match:<matchID>"` sinon (partie solo, ou pair non
-/// partagé). C'est ce qui permet à un changement de partie au sein d'une même session de
+/// Doc 09 « Session » — la clé d'activité (`activityKey`) est `"session:<sessionID>"` tant
+/// qu'une session de partage est active, `"match:<matchID>"` sinon (partie solo, non
+/// partagée). C'est ce qui permet à un changement de partie au sein d'une même session de
 /// **réutiliser la même Activity** (`activity.update`, jamais `end` + `request`) : les jetons de
 /// push déjà enregistrés sous cette clé restent valides, donc un appareil suspendu qui n'a jamais
 /// eu l'occasion de créer une nouvelle Activity pour la partie suivante reçoit quand même la mise
@@ -79,19 +78,18 @@ enum MatchLiveActivityController {
     let hasEnded = state.status == .ended || state.status == .abandoned
     let key = activityKey(matchID: matchID, sessionID: sessionID)
 
-    // Doc utilisateur — tout le travail (y compris la lecture/écriture d'`activities`) se
-    // fait à l'intérieur de cette tâche : `Activity` n'est pas `Sendable` côté SDK, donc le
-    // capturer depuis l'extérieur pour l'utiliser ici violerait la vérification « sending »
-    // de Swift 6. `activities` reste protégé par `@MainActor`, pas par cette tâche elle-même.
+    // Tout le travail (y compris la lecture/écriture d'`activities`) se fait à l'intérieur de cette
+    // tâche : `Activity` n'est pas `Sendable` côté SDK, donc le capturer depuis l'extérieur pour
+    // l'utiliser ici violerait la vérification « sending » de Swift 6. `activities` reste protégé
+    // par `@MainActor`, pas par cette tâche elle-même.
     Task { @MainActor in
-      // Doc utilisateur : `Activity` (ActivityKit) n'est pas `Sendable` côté SDK alors que
-      // `update`/`end` sont `nonisolated async` — `nonisolated(unsafe)` est l'échappatoire
-      // documentée pour ce décalage précis, pas un contournement maison.
+      // `Activity` (ActivityKit) n'est pas `Sendable` côté SDK alors que `update`/`end` sont
+      // `nonisolated async` — `nonisolated(unsafe)` est l'échappatoire documentée pour ce décalage
+      // précis, pas un contournement maison.
       if hasEnded {
-        // Doc utilisateur — remontée : `.default` gardait la carte affichée un moment
-        // après la fin de partie (comportement voulu au départ, « voir le score final »),
-        // mais ça se lisait comme un bug (« la partie est finie, pourquoi c'est encore
-        // là ? »). Retrait immédiat, comme `stopTracking` ci-dessous.
+        // `.default` gardait la carte affichée un moment après la fin de partie (comportement voulu
+        // au départ, « voir le score final »), mais ça se lisait comme un bug (« la partie est
+        // finie, pourquoi c'est encore là ? »). Retrait immédiat, comme `stopTracking` ci-dessous.
         pushTokenTasks.removeValue(forKey: key)?.cancel()
         keysByMatchID[matchID] = nil
         guard let found = activities.removeValue(forKey: key) else { return }
@@ -107,9 +105,9 @@ enum MatchLiveActivityController {
       keysByMatchID[matchID] = key
 
       if activities[key] == nil, let existing = existingActivity(forKey: key) {
-        // Doc utilisateur — remontée « la Live Activity ne disparaît jamais » : une activité
-        // créée avant un redémarrage de l'app restait orpheline, et rouvrir la partie en
-        // demandait une seconde. On reprend celle qui existe déjà pour cette clé.
+        // Une activité créée avant un redémarrage de l'app resterait orpheline, et rouvrir la
+        // partie en demanderait une seconde, qui ne disparaîtrait jamais : on reprend celle qui
+        // existe déjà pour cette clé.
         adopt(existing, key: key)
       }
 
@@ -117,10 +115,9 @@ enum MatchLiveActivityController {
         nonisolated(unsafe) let activity = found
         await activity.update(ActivityContent(state: content, staleDate: nil))
       } else {
-        // Doc utilisateur : `Activity.request` échoue si les Live Activities sont
-        // refusées dans les réglages système, ou si le budget d'activités simultanées
-        // est épuisé — la partie reste jouable sans, seul l'écran verrouillé n'affiche
-        // rien de plus.
+        // `Activity.request` échoue si les Live Activities sont refusées dans les réglages système,
+        // ou si le budget d'activités simultanées est épuisé — la partie reste jouable sans, seul
+        // l'écran verrouillé n'affiche rien de plus.
         let activity: Activity<MatchActivityAttributes>
         do {
           activity = try Activity.request(
@@ -172,12 +169,10 @@ enum MatchLiveActivityController {
     }
   }
 
-  /// Doc utilisateur — remontée « la Live Activity ne disparaît jamais » : `activities` ne vit
-  /// qu'en mémoire, donc après un redémarrage de l'app, rien ne connaissait plus les activités
-  /// encore affichées. Appelé une fois au lancement : garde (et reprend) l'activité d'une partie
-  /// solo encore en cours, termine immédiatement toutes les autres. Une session de partage ne
-  /// survit pas à un redémarrage côté hôte ; côté pair, la reconnexion automatique
-  /// (`MatchConnectionCoordinator`) en recrée une au premier événement reçu.
+  /// `activities` ne vit qu'en mémoire : après un redémarrage de l'app, rien ne connaîtrait plus
+  /// les activités encore affichées, qui ne disparaîtraient jamais. Appelé une fois au lancement :
+  /// garde (et reprend) l'activité d'une partie solo encore en cours, termine immédiatement toutes
+  /// les autres ; la reprise d'une session partagée en recrée une au premier événement reçu.
   static func reconcileOnLaunch(isMatchInProgress: @escaping (UUID) -> Bool) {
     Task { @MainActor in
       let tracked = Set(activities.values.map(\.id))
@@ -199,8 +194,8 @@ enum MatchLiveActivityController {
     }
   }
 
-  /// Doc utilisateur — un pair qui quitte une partie partagée sans qu'elle soit terminée (P9,
-  /// remontée utilisateur) : retrait immédiat, même logique que la fin de partie ci-dessus.
+  /// Un participant qui quitte une partie partagée sans qu'elle soit terminée : retrait immédiat,
+  /// même logique que la fin de partie ci-dessus.
   static func stopTracking(matchID: UUID) {
     Task { @MainActor in
       guard let key = keysByMatchID.removeValue(forKey: matchID) else { return }
@@ -211,12 +206,11 @@ enum MatchLiveActivityController {
     }
   }
 
-  /// Doc utilisateur — remontée : une connexion perdue côté pair (hôte arrêté, coupure réseau
-  /// prolongée) sans rien faire laissait l'écran verrouillé afficher le dernier score reçu comme
-  /// s'il était toujours en direct.
-  /// Republie le même contenu marqué `isStale`, plutôt que de le deviner depuis `staleDate` seul
-  /// (peu visible pour du contenu statique) — `refresh` efface le marqueur de lui-même dès que
-  /// de nouveaux événements arrivent (reconnexion réussie).
+  /// Sans ça, une connexion perdue (coupure réseau prolongée) laisserait l'écran verrouillé
+  /// afficher le dernier score reçu comme s'il était toujours en direct. Republie le même contenu
+  /// marqué `isStale`, plutôt que de le deviner depuis `staleDate` seul (peu visible pour du
+  /// contenu statique) — `refresh` efface le marqueur de lui-même dès que de nouveaux événements
+  /// arrivent (reconnexion réussie).
   static func markStale(matchID: UUID) {
     Task { @MainActor in
       guard let key = keysByMatchID[matchID], let found = activities[key] else { return }

@@ -42,7 +42,7 @@ import java.util.UUID
  * Doc 16, phase C — miroir de `SessionLink.swift` : lien d'un appareil avec une session en ligne,
  * commun au créateur ([LiveShareCoordinator]) et aux participants ([MatchConnectionCoordinator]).
  * Le journal ([OnlineSession]), le canal temps réel, le rattrapage à chaque notification, retour
- * du réseau ou au premier plan, et l'ajout d'un événement. Plus d'hôte qui arbitre : chaque
+ * du réseau ou au premier plan, et l'ajout d'un événement. Aucun appareil n'arbitre : chaque
  * appareil valide sa saisie, le serveur garantit l'ordre.
  */
 class SessionLink(

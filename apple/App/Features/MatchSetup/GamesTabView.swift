@@ -22,15 +22,15 @@ struct GamesTabView: View {
   /// exige `Hashable`, que `GameDefinition` n'a pas besoin de porter par ailleurs.
   @State private var leaderboardGameID: String?
   @State private var activeMatch: MatchRecord?
-  /// Doc utilisateur — remontée : rien n'empêche de démarrer plusieurs parties sans terminer la
-  /// précédente ; toutes doivent apparaître ici, pas seulement la première trouvée.
+  /// Rien n'empêche de démarrer plusieurs parties sans terminer la précédente ; toutes doivent
+  /// apparaître ici, pas seulement la première trouvée.
   @State private var inProgressMatches: [MatchRecord] = []
   @State private var matchPendingAbandon: MatchRecord?
   @State private var showsNoMailClientAlert = false
-  /// Doc 09 « Fin de partie » — une session de partage démarrée depuis une partie survit à sa
-  /// fin (`LiveShareCoordinator`) : ce bouton laisse l'hôte la retrouver (code, pairs connectés,
-  /// « Arrêter le partage ») même en revenant ici entre deux parties, sans avoir à en rouvrir
-  /// une pour y accéder.
+  /// Doc 09 « Session » — une session de partage démarrée depuis une partie survit à sa fin
+  /// (`LiveShareCoordinator`) : ce bouton laisse le créateur la retrouver (code, appareils
+  /// connectés, « Arrêter le partage ») même en revenant ici entre deux parties, sans avoir à en
+  /// rouvrir une pour y accéder.
   @State private var isPresentingActiveShare = false
 
   /// Distance de glissement du doigt (pas du décalage de contenu) avant d'activer la
@@ -56,10 +56,10 @@ struct GamesTabView: View {
     }
   }
 
-  // Doc utilisateur — le vérificateur de types de Swift met un temps déraisonnable à résoudre
-  // une seule très longue chaîne de modificateurs SwiftUI ; scindée en deux (`listView` /
-  // `withNavigationHandling`) pour que chaque moitié reste vérifiable indépendamment plutôt
-  // qu'en une seule expression géante (même raison que `gameRow`/`leaderboardSwipeAction`).
+  // Le vérificateur de types de Swift met un temps déraisonnable à résoudre une seule très longue
+  // chaîne de modificateurs SwiftUI ; scindée en deux (`listView` / `withNavigationHandling`) pour
+  // que chaque moitié reste vérifiable indépendamment plutôt qu'en une seule expression géante
+  // (même raison que `gameRow`/`leaderboardSwipeAction`).
   var body: some View {
     NavigationStack {
       withNavigationHandling(listView)
@@ -86,9 +86,9 @@ struct GamesTabView: View {
 
       // Doc 01 : reprendre une partie en cours reste possible, mais en simple
       // suggestion — un onglet qu'on revisite pour parcourir le catalogue ne doit pas
-      // y être redirigé de force à chaque fois. Masquée pendant une recherche active
-      // (remontée : elle restait sinon affichée quel que soit le terme cherché, et
-      // masquait même le message « aucun résultat » ci-dessous).
+      // y être redirigé de force à chaque fois. Masquée pendant une recherche active :
+      // elle resterait sinon affichée quel que soit le terme cherché, et masquerait même le
+      // message « aucun résultat » ci-dessous.
       if !inProgressMatches.isEmpty, searchText.isEmpty {
         Section {
           ForEach(inProgressMatches, id: \.id) { match in
@@ -167,11 +167,11 @@ struct GamesTabView: View {
       prompt: "Rechercher un jeu"
     )
     .searchFocused($isSearchFocused)
-    // Doc utilisateur : reproduire le geste de l'écran d'accueil (tiré vers le bas ->
-    // recherche activée). `.onScrollGeometryChange` sert uniquement à savoir si on est
-    // déjà en haut de la liste — le déclenchement lui-même suit le doigt directement via
-    // `simultaneousGesture` ci-dessous, pas le décalage de défilement (qui n'évolue pas
-    // de façon exploitable quand on tire depuis le repos avec la barre déjà visible).
+    // Reproduire le geste de l'écran d'accueil (tiré vers le bas -> recherche activée).
+    // `.onScrollGeometryChange` sert uniquement à savoir si on est déjà en haut de la liste — le
+    // déclenchement lui-même suit le doigt directement via `simultaneousGesture` ci-dessous, pas le
+    // décalage de défilement (qui n'évolue pas de façon exploitable quand on tire depuis le repos
+    // avec la barre déjà visible).
     .onScrollGeometryChange(for: CGFloat.self) { geometry in
       geometry.contentOffset.y
     } action: { _, offsetY in
@@ -209,13 +209,12 @@ struct GamesTabView: View {
     }
   }
 
-  // Doc utilisateur — Handoff et « Reprends » (Live Activity) arrivent ici,
-  // potentiellement alors qu'on est sur un autre onglet ; `DeepLinkRouter` fait le pont depuis
-  // `.onContinueUserActivity`/`.onOpenURL` (QuiMeneApp). Le lien `quimene://join` est consommé
-  // par `JoinTabView`, pas ici (doc utilisateur — onglet dédié). `QuiMeneApp.selectedTab`
-  // garantit que cet onglet est déjà construit quand l'un de ces événements arrive — reste à le
-  // consommer, ici et dans `.onAppear` ci-dessous pour le cas où il était déjà en attente au
-  // moment du montage.
+  // Handoff et « Reprends » (Live Activity) arrivent ici, potentiellement alors qu'on est sur un
+  // autre onglet ; `DeepLinkRouter` fait le pont depuis `.onContinueUserActivity`/`.onOpenURL`
+  // (QuiMeneApp). Le lien `quimene://join` est consommé par `JoinTabView`, pas ici (onglet dédié).
+  // `QuiMeneApp.selectedTab` garantit que cet onglet est déjà construit quand l'un de ces
+  // événements arrive — reste à le consommer, ici et dans `.onAppear` ci-dessous pour le cas où il
+  // était déjà en attente au moment du montage.
   private func withNavigationHandling<Content: View>(_ content: Content) -> some View {
     content
       .onChange(of: deepLinkRouter.pendingContinuedMatchID) { _, _ in consumePendingDeepLinks() }
@@ -250,10 +249,10 @@ struct GamesTabView: View {
       }
   }
 
-  /// Doc utilisateur — un seul point qui vérifie les déclencheurs possibles
-  /// (`DeepLinkRouter`) et agit sur ceux effectivement en attente ; appelé aussi bien depuis
-  /// chaque `.onChange` (nouvel événement pendant que cet onglet est déjà affiché) que depuis
-  /// `.onAppear` (événement déjà arrivé avant que cet onglet n'existe).
+  /// Un seul point qui vérifie les déclencheurs possibles (`DeepLinkRouter`) et agit sur ceux
+  /// effectivement en attente ; appelé aussi bien depuis chaque `.onChange` (nouvel événement
+  /// pendant que cet onglet est déjà affiché) que depuis `.onAppear` (événement déjà arrivé avant
+  /// que cet onglet n'existe).
   private func consumePendingDeepLinks() {
     if let matchID = deepLinkRouter.pendingContinuedMatchID {
       deepLinkRouter.pendingContinuedMatchID = nil
@@ -262,8 +261,8 @@ struct GamesTabView: View {
     if deepLinkRouter.wantsResume {
       deepLinkRouter.wantsResume = false
       refreshInProgressMatches()
-      // Doc utilisateur — Live Activity « Reprends » : sans précision de laquelle,
-      // reprend la plus récemment démarrée (déjà l'ordre de `inProgressMatches`).
+      // Live Activity « Reprends » : sans précision de laquelle, reprend la plus récemment démarrée
+      // (déjà l'ordre de `inProgressMatches`).
       if let mostRecent = inProgressMatches.first {
         activeMatch = mostRecent
       }
@@ -305,12 +304,12 @@ struct GamesTabView: View {
     catalog.allGames.first { $0.id == gameID }?.name.localized ?? gameID
   }
 
-  // Doc utilisateur — remontée : le bouton trophée à côté de chaque ligne rendait la liste
-  // encombrée (deux cibles de tap par jeu, « pas idéal »). Un swipe pour révéler « Meilleurs
-  // joueurs » libère la ligne pour son seul rôle (démarrer une partie), sans faire disparaître
-  // l'accès au classement. Extrait en fonctions dédiées (plutôt qu'en ligne dans le `ForEach`) :
-  // au-delà d'un certain nombre de modificateurs chaînés, le vérificateur de types de Swift met
-  // un temps déraisonnable à résoudre une seule grosse expression.
+  // Le bouton trophée à côté de chaque ligne rendait la liste encombrée (deux cibles de tap par
+  // jeu, « pas idéal »). Un swipe pour révéler « Meilleurs joueurs » libère la ligne pour son seul
+  // rôle (démarrer une partie), sans faire disparaître l'accès au classement. Extrait en fonctions
+  // dédiées (plutôt qu'en ligne dans le `ForEach`) : au-delà d'un certain nombre de modificateurs
+  // chaînés, le vérificateur de types de Swift met un temps déraisonnable à résoudre une seule
+  // grosse expression.
   private func gameRow(for definition: GameDefinition) -> some View {
     Button {
       selectedDefinition = definition

@@ -9,7 +9,7 @@ import com.quimene.designsystem.tokens.Space
 /** `contentPadding` d'une liste défilante plein écran, sous la barre de navigation flottante
  * (voir [LocalFloatingNavBarHeight]) : le bas reçoit assez d'espace pour que le dernier élément
  * puisse remonter au-dessus de l'îlot plutôt que de rester durablement caché dessous — le reste
- * de la liste continue de défiler *derrière* elle (doc utilisateur).
+ * de la liste continue de défiler *derrière* elle.
  *
  * [systemBottomInset] doit venir du `innerPadding.calculateBottomPadding()` du `Scaffold` propre
  * à l'écran appelant — cette fonction ne le lit pas elle-même car [LocalFloatingNavBarHeight] ne

@@ -21,11 +21,10 @@ import java.util.UUID
  * les plus récentes en premier. Filtre par jeu et par joueur (comme Apple).
  *
  * Observe [MatchRepository.observeAll]/[MatchRepository.observeAllParticipants] plutôt qu'un
- * chargement ponctuel — remontée utilisateur : l'onglet Historique restait vide après une partie
- * tout juste conclue. Cause : la `ViewModel` d'un onglet vit aussi longtemps que son entrée de
- * pile de retour est conservée par le sélecteur d'onglets (`saveState`/`restoreState`) —
- * `init{}` ne se relance pas à chaque retour sur l'onglet, donc un chargement ponctuel y restait
- * figé sur l'instantané du premier passage. */
+ * chargement ponctuel : la `ViewModel` d'un onglet vit aussi longtemps que son entrée de pile de
+ * retour est conservée par le sélecteur d'onglets (`saveState`/`restoreState`) — `init{}` ne se
+ * relance pas à chaque retour sur l'onglet, donc un chargement ponctuel resterait figé sur
+ * l'instantané du premier passage (onglet Historique vide après une partie tout juste conclue). */
 class HistoryViewModel(
     private val catalog: GameCatalog,
     private val repository: MatchRepository,

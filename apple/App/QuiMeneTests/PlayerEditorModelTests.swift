@@ -5,19 +5,17 @@ import Testing
 
 @testable import QuiMene
 
-/// Doc 15 « Reste au plan — Phase C » : `PlayerEditorModel` était le dernier des trois flux
-/// `@Observable` (doc 02) sans aucun test. Couvre la validation de saisie (`canSave`), la
-/// régénération d'avatar par pseudo tant qu'aucun choix manuel n'a eu lieu (charte §1.5), et la
-/// persistance via `PlayerRepository`.
+/// `PlayerEditorModel`, flux `@Observable` de l'éditeur de joueur (doc 02). Couvre la validation de
+/// saisie (`canSave`), la régénération d'avatar par pseudo tant qu'aucun choix manuel n'a eu lieu
+/// (charte §1.5), et la persistance via `PlayerRepository`.
 @MainActor
 @Suite("PlayerEditorModel", .serialized)
 struct PlayerEditorModelTests {
-  /// Doc utilisateur — voir `LiveMatchModelTests.makeModel` : renvoie le `ModelContainer` lui-
-  /// même, pas seulement son contexte. SwiftData invalide un `ModelContext` dès que le
-  /// conteneur qui le possède est désalloué ; l'appelant doit donc le garder en vie
-  /// (`withExtendedLifetime`) pour toute la durée du test. `cloudKitDatabase: .none` explicite,
-  /// nécessaire en hébergé (`TEST_HOST`) pour ne pas tenter CloudKit malgré l'entitlement réel
-  /// de `QuiMene.app`.
+  /// Voir `LiveMatchModelTests.makeModel` : renvoie le `ModelContainer` lui-même, pas seulement son
+  /// contexte. SwiftData invalide un `ModelContext` dès que le conteneur qui le possède est
+  /// désalloué ; l'appelant doit donc le garder en vie (`withExtendedLifetime`) pour toute la durée
+  /// du test. `cloudKitDatabase: .none` explicite, nécessaire en hébergé (`TEST_HOST`) pour ne pas
+  /// tenter CloudKit malgré l'entitlement réel de `QuiMene.app`.
   private func makeContainer() throws -> ModelContainer {
     let schema = Schema(QuiMeneSchemaV1.models)
     let config = ModelConfiguration(

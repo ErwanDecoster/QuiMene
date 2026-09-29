@@ -1,12 +1,11 @@
 import Foundation
 import Store
 
-/// Doc utilisateur — Handoff (roadmap P9) : reprendre la saisie d'une partie en cours sur un
-/// autre appareil connecté au même compte iCloud. Contrairement à `JoinLink` (partie partagée en
-/// temps réel, doc 09), un seul appareil saisit à la fois — l'activité ne transporte donc que
-/// l'id de la partie, résolue depuis le store local une fois reçue côté destinataire (déjà
-/// synchronisé via CloudKit, doc 03 ; sinon la reprise échoue silencieusement, comme un lien de
-/// partie qui n'existe plus).
+/// Handoff : reprendre la saisie d'une partie en cours sur un autre appareil connecté au même
+/// compte iCloud. Contrairement à `JoinLink` (partie partagée en temps réel, doc 09), un seul
+/// appareil saisit à la fois — l'activité ne transporte donc que l'id de la partie, résolue depuis
+/// le store local une fois reçue côté destinataire (déjà synchronisé via CloudKit, doc 03 ; sinon
+/// la reprise échoue silencieusement, comme un lien de partie qui n'existe plus).
 enum MatchContinuation {
   static let activityType = "com.quimene.app.continueMatch"
   private static let matchIDKey = "matchID"

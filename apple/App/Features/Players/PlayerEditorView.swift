@@ -85,10 +85,9 @@ struct PlayerEditorView: View {
           ? "Créer mon profil" : model.isEditing ? "Modifier le joueur" : "Ajouter un joueur"
       )
       .onAppear {
-        // Doc utilisateur — remontée : à la création d'un joueur, le champ de saisie du
-        // pseudo doit déjà être prêt à recevoir la frappe, pas seulement affiché. Pas au
-        // moment de modifier un joueur existant : ouvrirait le clavier sans y avoir été
-        // invité, pour une fiche déjà remplie.
+        // À la création d'un joueur, le champ de saisie du pseudo doit déjà être prêt à recevoir la
+        // frappe, pas seulement affiché. Pas au moment de modifier un joueur existant : ouvrirait
+        // le clavier sans y avoir été invité, pour une fiche déjà remplie.
         if !model.isEditing {
           isNicknameFocused = true
         }

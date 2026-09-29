@@ -48,9 +48,9 @@ import kotlinx.coroutines.launch
 /**
  * Miroir de `JoinTabView.swift` (doc 09) — l'appareil photo s'ouvre immédiatement (comme Apple,
  * caméra par défaut) avec un bouton flottant « Saisir un code » par-dessus, qui ouvre la saisie
- * manuelle en repli (doc utilisateur — voir [QrScannerView] pour pourquoi CameraX plutôt que le
- * Play Services Code Scanner utilisé un temps : celui-ci ne permet pas de bouton par-dessus son
- * propre écran de scan). Une fois connecté, remplacé par [SharedMatchScreen].
+ * manuelle en repli (voir [QrScannerView] pour pourquoi CameraX plutôt que le Play Services Code
+ * Scanner utilisé un temps : celui-ci ne permet pas de bouton par-dessus son propre écran de scan).
+ * Une fois connecté, remplacé par [SharedMatchScreen].
  */
 @Composable
 fun JoinScreen(onBack: () -> Unit) {

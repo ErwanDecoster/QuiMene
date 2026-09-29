@@ -2,12 +2,12 @@ import DesignSystem
 import Domain
 import SwiftUI
 
-/// Doc utilisateur — « voir les manches précédentes » en cours de partie (jusqu'ici, le détail
-/// manche par manche n'existait que dans `ResultsView`, une fois la partie terminée). Ordonné par
-/// siège plutôt que par classement : le classement change à chaque manche en cours de partie,
-/// l'ordre des sièges reste stable — et `Participant.displayName` (pas `ParticipantRecord`) parce
-/// que cette vue doit marcher aussi bien côté pair (`SharedMatchModel`, pas de fiche joueur locale)
-/// que côté hôte.
+/// « Voir les manches précédentes » en cours de partie (le détail manche par manche de
+/// `ResultsView`, avant la fin de la partie). Ordonné par siège plutôt que par classement : le
+/// classement change à chaque manche en cours de partie, l'ordre des sièges reste stable — et
+/// `Participant.displayName` (pas `ParticipantRecord`) parce que cette vue doit marcher aussi bien
+/// sur un appareil qui a rejoint (`SharedMatchModel`, pas de fiche joueur locale) que chez le
+/// créateur.
 struct RoundHistoryView: View {
   let state: MatchState
   let definition: GameDefinition

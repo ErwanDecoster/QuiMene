@@ -2,14 +2,14 @@ import Foundation
 import Supabase
 import os
 
-/// Doc utilisateur P9 — seul moyen fourni par Apple de rafraîchir une Live Activity (écran
-/// verrouillé / Dynamic Island) pendant que l'app est suspendue en arrière-plan : un push APNs
-/// dédié, envoyé par une fonction Edge Supabase (`supabase/functions/quimene-live-activity-push`) plutôt
-/// que par l'app elle-même (qui ne tourne justement plus à ce moment-là). Générique sur le contenu
-/// (`some Encodable`) plutôt que sur `Domain.MatchActivityAttributes.ContentState` directement :
-/// ce type n'existe que sous `#if os(iOS)` (`ActivityKit` indisponible sur macOS, dont `Domain`
-/// doit rester buildable), alors que `Sync` cible aussi macOS — l'appelant (App, iOS uniquement)
-/// passe son `ContentState` concret, `Sync` n'a besoin de rien en connaître de plus que `Encodable`.
+/// Seul moyen fourni par Apple de rafraîchir une Live Activity (écran verrouillé / Dynamic Island)
+/// pendant que l'app est suspendue en arrière-plan : un push APNs dédié, envoyé par une fonction
+/// Edge Supabase (`supabase/functions/quimene-live-activity-push`) plutôt que par l'app elle-même
+/// (qui ne tourne justement plus à ce moment-là). Générique sur le contenu (`some Encodable`)
+/// plutôt que sur `Domain.MatchActivityAttributes.ContentState` directement : ce type n'existe que
+/// sous `#if os(iOS)` (`ActivityKit` indisponible sur macOS, dont `Domain` doit rester buildable),
+/// alors que `Sync` cible aussi macOS — l'appelant (App, iOS uniquement) passe son `ContentState`
+/// concret, `Sync` n'a besoin de rien en connaître de plus que `Encodable`.
 public enum LiveActivityPushClient {
   private static let client = SupabaseClient(
     supabaseURL: SupabaseSyncConfig.projectURL, supabaseKey: SupabaseSyncConfig.anonKey)
@@ -31,17 +31,15 @@ public enum LiveActivityPushClient {
     }
   }
 
-  /// Doc utilisateur — appelé à chaque rotation de jeton signalée par
-  /// `Activity.pushTokenUpdates` (création de la Live Activity, ou rotation ultérieure par
-  /// iOS) : la fonction SQL remplace toujours l'ancien jeton de `(activity_key, device_id)`
-  /// plutôt que d'en accumuler plusieurs par appareil. Doc 09 « Fin de partie » —
-  /// `activityKey` identifie la session de partage (stable au changement de partie), pas
-  /// forcément la seule partie courante — voir `MatchLiveActivityController.activityKey`.
-  /// La table elle-même n'est plus accessible à l'anon (migration
-  /// `secure_cacompte_live_activity_tokens`).
-  /// `contentState` : contenu affiché au moment de l'inscription, conservé par le serveur pour que
-  /// le balayage puisse toujours envoyer une fin valide (voir la migration
-  /// `register_live_activity_token_content`).
+  /// Appelé à chaque rotation de jeton signalée par `Activity.pushTokenUpdates` (création de la
+  /// Live Activity, ou rotation ultérieure par iOS) : la fonction SQL remplace toujours l'ancien
+  /// jeton de `(activity_key, device_id)` plutôt que d'en accumuler plusieurs par appareil. Doc 09
+  /// « Session » — `activityKey` identifie la session de partage (stable au changement de partie),
+  /// pas forcément la seule partie courante — voir `MatchLiveActivityController.activityKey`. La
+  /// table elle-même n'est plus accessible à l'anon (migration
+  /// `secure_cacompte_live_activity_tokens`). `contentState` : contenu affiché au moment de
+  /// l'inscription, conservé par le serveur pour que le balayage puisse toujours envoyer une fin
+  /// valide (voir la migration `register_live_activity_token_content`).
   public static func registerToken(
     activityKey: String, deviceID: String, pushToken: String, contentState: some Encodable
   ) async {

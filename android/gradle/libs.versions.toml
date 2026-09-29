@@ -22,7 +22,7 @@ kotest = "6.2.4"
 ktlintGradle = "14.2.0"
 robolectric = "4.16.1" # Teste Room en JVM pur (JUnit4), sans émulateur ni appareil — étape D.
 androidxTestCore = "1.7.0" # ApplicationProvider : le Context d'application des tests Robolectric.
-zxingCore = "3.5.4" # Génération de QR (hôte) — équivalent CoreImage.CIFilter.qrCodeGenerator(),
+zxingCore = "3.5.4" # Génération de QR (créateur) — équivalent CoreImage.CIFilter.qrCodeGenerator(),
 # aucun système d'encodage QR natif sur Android (contrairement à iOS).
 cameraX = "1.6.2" # Aperçu caméra intégré à l'écran Rejoindre (permet un bouton Compose flottant
 # par-dessus, contrairement à play-services-code-scanner qui affiche son propre écran opaque).

@@ -22,7 +22,7 @@ import java.util.UUID
 /**
  * Doc 16, phase C — miroir de `MatchConnectionCoordinator.swift` : côté participant d'une session
  * en ligne. Rejoindre, c'est résoudre le code, rattraper le journal serveur, puis écouter le canal :
- * plus de poignée de main avec un hôte, qui n'a plus besoin d'être allumé. Retient la session
+ * aucune poignée de main avec le créateur, qui n'a pas besoin d'être allumé. Retient la session
  * ([PersistedOnlineSession]) : après un arrêt complet du processus, la partie suivie reprend sans
  * redemander le code. Une session terminée (arrêtée par le créateur, ou après 6 h sans activité,
  * doc 16) ne laisse pas de bandeau de reprise derrière elle.

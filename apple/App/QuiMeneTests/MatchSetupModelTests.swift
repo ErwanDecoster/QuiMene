@@ -5,18 +5,17 @@ import Testing
 
 @testable import QuiMene
 
-/// Doc 15 « Reste au plan — Phase C » : `MatchSetupModel` porte les règles de sélection des
-/// joueurs (effectif min/max, équipes complètes) avant de créer une partie — comportement que le
-/// portage Android (doc 11) devra reproduire à l'identique, jamais deviné depuis l'écran seul.
+/// `MatchSetupModel` porte les règles de sélection des joueurs (effectif min/max, équipes
+/// complètes) avant de créer une partie — comportement que `MatchSetupViewModel` reproduit à
+/// l'identique côté Android (doc 11).
 @MainActor
 @Suite("MatchSetupModel", .serialized)
 struct MatchSetupModelTests {
-  /// Doc utilisateur — voir `LiveMatchModelTests.makeModel` : renvoie le `ModelContainer` lui-
-  /// même, pas seulement son contexte. SwiftData invalide un `ModelContext` dès que le
-  /// conteneur qui le possède est désalloué ; l'appelant doit donc le garder en vie
-  /// (`withExtendedLifetime`) pour toute la durée du test. `cloudKitDatabase: .none` explicite,
-  /// nécessaire en hébergé (`TEST_HOST`) pour ne pas tenter CloudKit malgré l'entitlement réel
-  /// de `QuiMene.app`.
+  /// Voir `LiveMatchModelTests.makeModel` : renvoie le `ModelContainer` lui-même, pas seulement son
+  /// contexte. SwiftData invalide un `ModelContext` dès que le conteneur qui le possède est
+  /// désalloué ; l'appelant doit donc le garder en vie (`withExtendedLifetime`) pour toute la durée
+  /// du test. `cloudKitDatabase: .none` explicite, nécessaire en hébergé (`TEST_HOST`) pour ne pas
+  /// tenter CloudKit malgré l'entitlement réel de `QuiMene.app`.
   private func makeContainer() throws -> ModelContainer {
     let schema = Schema(QuiMeneSchemaV1.models)
     let config = ModelConfiguration(

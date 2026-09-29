@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test
  * "intéressante" (`Rollercoaster` passe souvent devant `Sniper`/`Boulet` dans l'ordre de rareté
  * dès qu'un écart-type élevé accompagne un tour extrême) — les fixtures ci-dessous vérifient le
  * badge **final** réellement résolu, pas une classification isolée par construction. La
- * couverture par golden file/propriété exhaustive est l'étape C (doc 10), pas cette session.
+ * couverture exhaustive vient des golden files (doc 10).
  */
 class StatsEngineTest {
     private val engine = StatsEngine()

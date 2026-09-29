@@ -36,13 +36,14 @@ import java.util.UUID
 
 /**
  * Miroir de `LiveMatchModel.swift` — porte l'état de la manche en cours, rien n'est écrit tant
- * qu'elle n'est pas validée. **Hôte** de sa propre partie : écrit toujours directement en local
+ * qu'elle n'est pas validée. **Créateur** de sa propre partie : écrit toujours directement en local
  * ([MatchRepository]) — sauf si elle est partagée en ligne (doc 16, phase C) : chaque événement
- * passe alors d'abord par le journal de la session, et la copie locale n'en est que le miroir. Implémente [LiveRoundEntryState] : les 4 écrans de saisie dédiés
- * (Belote/Tarot/Wizard/Yams) et [GenericRoundEntry] ne le savent jamais distinctement d'un
- * `SharedMatchViewModel` contributeur, exactement comme `ScoreBoardView.swift` côté Apple.
- * Le partage en direct (pairage, pairs connectés) vit dans [LiveShareCoordinator], injecté
- * plutôt que construit ici — une seule session par appareil, pas une par écran.
+ * passe alors d'abord par le journal de la session, et la copie locale n'en est que le miroir.
+ * Implémente [LiveRoundEntryState] : les 4 écrans de saisie dédiés (Belote/Tarot/Wizard/Yams) et
+ * [GenericRoundEntry] ne le savent jamais distinctement d'un `SharedMatchViewModel` contributeur,
+ * exactement comme `ScoreBoardView.swift` côté Apple. Le partage en direct (code d'appairage,
+ * appareils connectés) vit dans [LiveShareCoordinator], injecté plutôt que construit ici — une
+ * seule session par appareil, pas une par écran.
  */
 class LiveMatchViewModel(
     private var match: MatchEntity,
@@ -159,9 +160,9 @@ class LiveMatchViewModel(
 
     val isConcluded: Boolean get() = state.status == MatchStatus.Ended || state.status == MatchStatus.Abandoned
 
-    /** Doc utilisateur — quel que soit le jeu, on doit pouvoir arrêter une partie quand on veut,
-     * pas seulement ceux qui déclarent `manualStop` : une seule manche jouée suffit à produire un
-     * classement qui a du sens. */
+    /** Quel que soit le jeu, on doit pouvoir arrêter une partie quand on veut, pas seulement ceux
+     * qui déclarent `manualStop` : une seule manche jouée suffit à produire un classement qui a du
+     * sens. */
     val canEndManually: Boolean get() = state.rounds.isNotEmpty()
 
     fun endManually() {
@@ -194,9 +195,8 @@ class LiveMatchViewModel(
         pendingScores = pendingScores - participantID
     }
 
-    /** Doc utilisateur — les scores ne sont jamais annoncés dans l'ordre des sièges : chaque
-     * champ se remplit par un tap direct. `activeSeatIndex` ne sert qu'à mettre en valeur le
-     * champ actuellement focus. */
+    /** Les scores ne sont jamais annoncés dans l'ordre des sièges : chaque champ se remplit par un
+     * tap direct. `activeSeatIndex` ne sert qu'à mettre en valeur le champ actuellement focus. */
     override fun focus(participantID: UUID) {
         val index = participants.indexOfFirst { it.id == participantID }
         if (index >= 0) activeSeatIndex = index

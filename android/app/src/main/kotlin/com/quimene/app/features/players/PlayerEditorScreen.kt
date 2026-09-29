@@ -120,9 +120,9 @@ private fun PlayerEditorContent(
     val nicknameFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Doc utilisateur — remontée : à la création d'un joueur, le champ de saisie du pseudo
-    // doit déjà être prêt à recevoir la frappe, comme sur Apple. Pas au moment de modifier un
-    // joueur existant : ouvrirait le clavier sans y avoir été invité, pour une fiche déjà remplie.
+    // À la création d'un joueur, le champ de saisie du pseudo doit déjà être prêt à recevoir la
+    // frappe, comme sur Apple. Pas au moment de modifier un joueur existant : ouvrirait le clavier
+    // sans y avoir été invité, pour une fiche déjà remplie.
     LaunchedEffect(Unit) {
         if (!viewModel.isEditing) {
             nicknameFocusRequester.requestFocus()

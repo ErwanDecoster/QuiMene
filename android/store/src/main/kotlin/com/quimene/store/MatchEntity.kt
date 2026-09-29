@@ -24,11 +24,12 @@ data class MatchEntity(
     /** Masque la partie de l'onglet Historique sans y toucher — les statistiques de profil
      * continuent de l'inclure, au même titre que l'archivage d'un [PlayerEntity]. */
     val isArchived: Boolean = false,
-    /** Identifiant d'appareil créateur — utile en sync (étape F), placeholder en attendant. */
+    /** `"local"` pour une partie jouée sur cet appareil, `"received"` pour une partie jouée sur
+     * un autre appareil puis enregistrée ici (doc 16, phase E). */
     val deviceOrigin: String = "local",
     val eventLogData: ByteArray = ByteArray(0),
-    /** Doc 14, phase 2 — `true` dès la conclusion si au moins un participant est lié à
-     * l'installation d'un ami, jusqu'à ce que le résumé lui soit poussé avec succès. */
+    /** Doc 14 « Historique partagé » — `true` dès la conclusion si au moins un participant est lié
+     * à un ami, jusqu'à ce que la partie ait été déposée dans sa boîte aux lettres. */
     val pendingSharedProfileSync: Boolean = false,
     /** Cette partie n'a pas été jouée sur cet appareil : c'est un résumé reçu de l'installation
      * d'un ami. Pas de journal d'événements exploitable — seuls `finalRank`/`finalScore` des

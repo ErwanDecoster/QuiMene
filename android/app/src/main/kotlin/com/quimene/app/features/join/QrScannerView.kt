@@ -133,9 +133,9 @@ private fun CameraPreview(
     )
 }
 
-/** Doc utilisateur — `imageProxy.close()` dans TOUS les chemins (succès, échec, image nulle) :
- * CameraX ne fournit l'image suivante qu'une fois la précédente refermée
- * (`STRATEGY_KEEP_ONLY_LATEST`) — l'oublier gèle l'aperçu après la première image. */
+/** `imageProxy.close()` dans TOUS les chemins (succès, échec, image nulle) : CameraX ne fournit
+ * l'image suivante qu'une fois la précédente refermée (`STRATEGY_KEEP_ONLY_LATEST`) — l'oublier
+ * gèle l'aperçu après la première image. */
 @OptIn(markerClass = [ExperimentalGetImage::class])
 private fun analyzeFrame(
     scanner: BarcodeScanner,

@@ -22,10 +22,9 @@ import kotlinx.serialization.json.put
 /**
  * Miroir du `Codable` synthétisé par Swift pour `MatchEvent` (enum à cas associés) — **pas** le
  * polymorphisme à discriminant par défaut de kotlinx.serialization (`{"type": "roundCommitted",
- * ...}`), jamais vérifié bit-à-bit avant l'étape F (voir golden files du dossier `spec/wire`, doc
- * 09).
- * Swift encode chaque cas comme `{"<nomDuCas>": {<champs>}}` ; un unique paramètre **non nommé**
- * (`roundCommitted(RoundDraft)`) reçoit la clé synthétique `_0` ; un cas sans paramètre
+ * ...}`). Vérifié bit-à-bit contre les fichiers de référence croisés (dossier `spec/session`,
+ * doc 17). Swift encode chaque cas comme `{"<nomDuCas>": {<champs>}}` ; un unique paramètre **non
+ * nommé** (`roundCommitted(RoundDraft)`) reçoit la clé synthétique `_0` ; un cas sans paramètre
  * (`matchEndedManually`) encode un objet vide `{}`, jamais `null` ni une chaîne nue.
  */
 object MatchEventSerializer : KSerializer<MatchEvent> {

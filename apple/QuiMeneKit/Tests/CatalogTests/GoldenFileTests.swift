@@ -4,7 +4,7 @@ import Testing
 @testable import Catalog
 @testable import Domain
 
-/// Doc 09 « Les golden files » — un test paramétré : ajouter un golden au dossier ajoute un
+/// Doc 10 « Les golden files » — un test paramétré : ajouter un golden au dossier ajoute un
 /// cas, sans toucher au code de test. Vérifié après CHAQUE manche, pas seulement à la fin
 /// (une erreur qui se compense entre deux manches doit être attrapée).
 @Suite("Golden files")

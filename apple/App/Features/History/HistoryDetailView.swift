@@ -10,10 +10,10 @@ import SwiftUI
 /// podium, faits marquants, courbe et détail manche par manche sont les mêmes qu'à la sortie
 /// d'une partie tout juste terminée.
 ///
-/// Doc 14 « Profils partagés », phase 2 — une partie reçue de l'appareil d'un ami
-/// (`MatchRecord.isImportedSummary`) n'a pas de journal d'événements exploitable : la rejouer
-/// planterait (`MatchEngineError.missingMatchCreated`). `ReceivedMatchDetailView` s'appuie
-/// uniquement sur les *snapshots* déjà matérialisés (`finalRank`/`finalScore`), sans rejeu.
+/// Doc 14 — une partie reçue de l'appareil d'un ami (`MatchRecord.isImportedSummary`) n'a pas de
+/// journal d'événements exploitable : la rejouer planterait
+/// (`MatchEngineError.missingMatchCreated`). `ReceivedMatchDetailView` s'appuie uniquement sur les
+/// *snapshots* déjà matérialisés (`finalRank`/`finalScore`), sans rejeu.
 struct HistoryDetailView: View {
   private let match: MatchRecord
   private let catalog: GameCatalog
@@ -37,10 +37,10 @@ struct HistoryDetailView: View {
     }
 
     let repository = MatchRepository(context: context)
-    // Doc utilisateur (audit qualité, 15) — une version de règles disparue du catalogue après
-    // mise à jour de l'app, ou un journal d'événements devenu illisible, ne doit pas empêcher
-    // de consulter le reste de l'historique. `try?` plutôt que `try!` ; `body` retombe sur un
-    // `EmptyState` quand l'un des trois échoue, au lieu de planter en ouvrant cet écran.
+    // Une version de règles disparue du catalogue après mise à jour de l'app, ou un journal
+    // d'événements devenu illisible, ne doit pas empêcher de consulter le reste de l'historique.
+    // `try?` plutôt que `try!` ; `body` retombe sur un `EmptyState` quand l'un des trois échoue, au
+    // lieu de planter en ouvrant cet écran.
     if let rules = try? catalog.rules(for: match.gameID, version: match.rulesVersion),
       let loadedDefinition = try? catalog.definition(
         for: match.gameID, version: match.rulesVersion),

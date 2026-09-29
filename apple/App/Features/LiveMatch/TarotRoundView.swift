@@ -15,8 +15,8 @@ struct TarotRoundView: View {
   ]
   private let poigneeNames: [LocalizedStringResource] = ["Aucune", "Simple", "Double", "Triple"]
 
-  /// Doc utilisateur (audit qualité, 15) — même garantie que `LiveMatchView` : `MatchPlayView`
-  /// ne route ici qu'après avoir vérifié que `definition` résout.
+  /// Même garantie que `LiveMatchView` : `MatchPlayView` ne route ici qu'après avoir vérifié que
+  /// `definition` résout.
   init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
     _model = State(
       initialValue: try! TarotRoundModel(match: match, context: context, catalog: catalog))

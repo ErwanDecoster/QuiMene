@@ -5,17 +5,17 @@ import SwiftUI
   import UIKit
 #endif
 
-/// Doc utilisateur — demande d'ajout d'un jeu : l'app reste volontairement simple (pas de
-/// formulaire ni de backend dédié), un `mailto:` pré-rempli suffit. Point d'entrée unique
-/// partagé par la recherche sans résultat (`GamesTabView`) et les réglages (`SettingsView`), pour
-/// que les deux chemins produisent exactement le même sujet/corps.
+/// Demande d'ajout d'un jeu : l'app reste volontairement simple (pas de formulaire ni de backend
+/// dédié), un `mailto:` pré-rempli suffit. Point d'entrée unique partagé par la recherche sans
+/// résultat (`GamesTabView`) et les réglages (`SettingsView`), pour que les deux chemins produisent
+/// exactement le même sujet/corps.
 enum GameRequestMail {
   static let recipient = "contact@erwan-decoster.com"
 
-  /// Doc utilisateur — tente d'ouvrir un client mail préempli ; retourne `false` si aucun n'est
-  /// disponible (app Mail supprimée, aucun compte configuré…) — `canOpenURL` renvoie alors
-  /// `false` plutôt que d'échouer silencieusement au moment d'`open`, ce qui laisse l'appelant
-  /// proposer un repli (voir `gameRequestMailFallback`) au lieu d'un tap sans effet visible.
+  /// Tente d'ouvrir un client mail préempli ; retourne `false` si aucun n'est disponible (app Mail
+  /// supprimée, aucun compte configuré…) — `canOpenURL` renvoie alors `false` plutôt que d'échouer
+  /// silencieusement au moment d'`open`, ce qui laisse l'appelant proposer un repli (voir
+  /// `gameRequestMailFallback`) au lieu d'un tap sans effet visible.
   @MainActor
   @discardableResult
   static func open(searchTerm: String? = nil) -> Bool {
@@ -55,9 +55,9 @@ enum GameRequestMail {
 }
 
 extension View {
-  /// Doc utilisateur — repli affiché quand `GameRequestMail.open()` échoue : montre l'adresse et
-  /// permet de la copier, plutôt qu'un tap sur « Demander ce jeu » qui ne produirait aucun effet
-  /// visible sur un appareil sans client mail configuré.
+  /// Repli affiché quand `GameRequestMail.open()` échoue : montre l'adresse et permet de la copier,
+  /// plutôt qu'un tap sur « Demander ce jeu » qui ne produirait aucun effet visible sur un appareil
+  /// sans client mail configuré.
   func gameRequestMailFallback(isPresented: Binding<Bool>) -> some View {
     alert("Aucune messagerie configurée", isPresented: isPresented) {
       Button("Copier l'adresse") {

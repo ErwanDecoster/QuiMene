@@ -2,10 +2,9 @@ import Domain
 import Foundation
 import SwiftData
 
-/// Doc 06 « Statistiques de groupe » (roadmap « après la v1 ») — classement des joueurs sur un
-/// jeu donné, à travers toutes leurs parties terminées. Même politique que `ProfileRepository` :
-/// calcul à la demande, rien de pré-agrégé (« un agrégat stocké est un agrégat qui finira
-/// désynchronisé »).
+/// Doc 06 « Classement par jeu » — classement des joueurs sur un jeu donné, à travers toutes leurs
+/// parties terminées. Même politique que `ProfileRepository` : calcul à la demande, rien de
+/// pré-agrégé (« un agrégat stocké est un agrégat qui finira désynchronisé »).
 @MainActor
 public struct LeaderboardRepository {
   private let context: ModelContext

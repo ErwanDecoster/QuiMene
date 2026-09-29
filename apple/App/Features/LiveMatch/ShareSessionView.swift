@@ -2,15 +2,15 @@ import DesignSystem
 import SwiftUI
 import Sync
 
-/// Doc 09 — l'hôte annonce la session (une ou plusieurs parties, doc 09 « Fin de partie »),
+/// Doc 09 — le créateur ouvre la session (une ou plusieurs parties, doc 09 « Session »),
 /// affiche le code d'appairage et la liste des appareils connectés. Fermer cette feuille n'arrête
 /// pas le partage : c'est une fenêtre sur une session qui continue en arrière-plan, jusqu'à
-/// « Arrêter le partage » explicite (doc 09 « Dégradation » — le partage est un supplément, jamais
-/// un prérequis pour continuer à jouer).
+/// « Arrêter le partage » explicite — le partage est un supplément, jamais un prérequis pour
+/// continuer à jouer.
 ///
 /// Découplée de `LiveMatchModel` (lit `LiveShareCoordinator.shared` directement) pour rester
 /// utilisable même hors d'un écran de partie — depuis `GamesTabView`, entre deux parties d'une
-/// même session (doc 09 « Fin de partie »). `startAction` n'est fourni que par `LiveMatchView` :
+/// même session (doc 09 « Session »). `startAction` n'est fourni que par `LiveMatchView` :
 /// c'est ce qui distingue « ouvrir cet écran pour démarrer un tout nouveau partage » de « ouvrir
 /// cet écran pour observer/arrêter une session déjà en cours ».
 struct ShareSessionView: View {
@@ -18,9 +18,8 @@ struct ShareSessionView: View {
   @Environment(\.dismiss) private var dismiss
   @State private var errorMessage: String?
   @State private var isStopping = false
-  /// Doc utilisateur P9 — remontée : pouvoir imposer « observateur uniquement » à la création
-  /// (ou en cours) du partage. Ne rétrograde pas un contributeur déjà connecté, seulement les
-  /// appareils qui rejoignent ensuite.
+  /// Pouvoir imposer « observateur uniquement » à la création (ou en cours) du partage. Ne
+  /// rétrograde pas un contributeur déjà connecté, seulement les appareils qui rejoignent ensuite.
   @State private var allowsContributors = true
   private var coordinator: LiveShareCoordinator { .shared }
 
@@ -128,7 +127,7 @@ struct ShareSessionView: View {
       ProgressView("Démarrage du partage…")
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     } else {
-      // Doc 09 « Fin de partie » — ouvert depuis `GamesTabView` (`startAction == nil`) alors
+      // Doc 09 « Session » — ouvert depuis `GamesTabView` (`startAction == nil`) alors
       // que la session vient de s'arrêter (ex. tap sur « Arrêter le partage » juste avant que
       // cette feuille ne se ferme) : rien à démarrer depuis ici, seul un état de repli le
       // temps que le bouton qui a ouvert cet écran disparaisse à son tour.

@@ -6,19 +6,19 @@ import XCTest
 /// c'est le scénario « soirée perdue » de la vision produit.
 @MainActor
 final class QuiMeneUITests: XCTestCase {
-  /// Doc utilisateur (audit qualité, 15) — remontée en écrivant ces tests : quand plusieurs
-  /// méthodes tournent dans la même invocation `xcodebuild test`, la toute première ne respecte
-  /// pas toujours `-AppleLanguages (fr)`/`-AppleLocale fr_FR` à son premier lancement (l'écran
-  /// affiche « Add a player » au lieu de « Ajouter un joueur ») alors que les lancements
-  /// suivants, dans la même invocation, l'appliquent correctement — vraisemblablement une
-  /// course avec l'installation initiale de l'app sur le simulateur. Un cycle lancement/arrêt
-  /// « à blanc » avant toute méthode de test (une fois par classe, pas par test) fait passer
-  /// cette installation avant que la logique des tests ne s'appuie sur la langue forcée.
+  /// Constaté en écrivant ces tests : quand plusieurs méthodes tournent dans la même invocation
+  /// `xcodebuild test`, la toute première ne respecte pas toujours `-AppleLanguages
+  /// (fr)`/`-AppleLocale fr_FR` à son premier lancement (l'écran affiche « Add a player » au lieu
+  /// de « Ajouter un joueur ») alors que les lancements suivants, dans la même invocation,
+  /// l'appliquent correctement — vraisemblablement une course avec l'installation initiale de l'app
+  /// sur le simulateur. Un cycle lancement/arrêt « à blanc » avant toute méthode de test (une fois
+  /// par classe, pas par test) fait passer cette installation avant que la logique des tests ne
+  /// s'appuie sur la langue forcée.
   override class func setUp() {
     super.setUp()
-    // Doc utilisateur — les rappels de cycle de vie `XCTestCase` (dont ce `class func setUp()`,
-    // hérité `nonisolated`) tournent déjà sur le fil principal ; `assumeIsolated` l'affirme au
-    // compilateur sans re-sauter de fil, `XCUIApplication` exigeant `@MainActor`.
+    // Les rappels de cycle de vie `XCTestCase` (dont ce `class func setUp()`, hérité `nonisolated`)
+    // tournent déjà sur le fil principal ; `assumeIsolated` l'affirme au compilateur sans re-sauter
+    // de fil, `XCUIApplication` exigeant `@MainActor`.
     MainActor.assumeIsolated {
       let app = XCUIApplication()
       app.launchArguments += [
@@ -48,15 +48,14 @@ final class QuiMeneUITests: XCTestCase {
 
   // MARK: - Parcours 2 : partie de Skyjo à 3 joueurs jusqu'aux résultats
 
-  /// Doc utilisateur (audit qualité, 15) — **bloqué**, pas écrit : la mise en place (créer 3
-  /// joueurs, ouvrir Skyjo, les sélectionner, démarrer) fonctionne de façon fiable et reste
-  /// ci-dessous. La saisie des manches, elle, bute systématiquement sur la même ligne de
-  /// `ScoreBoardView` (la dernière visible à l'écran, juste au-dessus du clavier) : un tap
-  /// synthétisé dessus n'y déplace jamais le focus clavier, quel que soit le joueur qui s'y
-  /// trouve après retri par rang — confirmé par `app.debugDescription` à chaque tentative (le
-  /// focus restait sur le champ précédent, sans qu'aucune erreur ne remonte au moment du tap
-  /// lui-même). Six stratégies essayées, dans l'ordre, toutes identiquement bloquées sur cette
-  /// même ligne :
+  /// **bloqué**, pas écrit : la mise en place (créer 3 joueurs, ouvrir Skyjo, les sélectionner,
+  /// démarrer) fonctionne de façon fiable et reste ci-dessous. La saisie des manches, elle, bute
+  /// systématiquement sur la même ligne de `ScoreBoardView` (la dernière visible à l'écran, juste
+  /// au-dessus du clavier) : un tap synthétisé dessus n'y déplace jamais le focus clavier, quel que
+  /// soit le joueur qui s'y trouve après retri par rang — confirmé par `app.debugDescription` à
+  /// chaque tentative (le focus restait sur le champ précédent, sans qu'aucune erreur ne remonte au
+  /// moment du tap lui-même). Six stratégies essayées, dans l'ordre, toutes identiquement bloquées
+  /// sur cette même ligne :
   /// 1. Tap par élément (`XCUIElement.tap()`) sur le `TextField`, indexé par position.
   /// 2. Double tap sur le même élément.
   /// 3. Tap par coordonnées (`coordinate(withNormalizedOffset:).tap()`) sur le centre du champ.
@@ -127,11 +126,10 @@ final class QuiMeneUITests: XCTestCase {
 
   // MARK: - Aides
 
-  /// Doc utilisateur (audit qualité, 15) — deux réglages de lancement, indépendants de la
-  /// machine qui exécute les tests :
+  /// Deux réglages de lancement, indépendants de la machine qui exécute les tests :
   /// - `-AppleLanguages (fr) -AppleLocale fr_FR` force le français, quel que soit le réglage
-  ///   région/langue du simulateur hôte — sans ça, ce simulateur résout l'anglais (traductions
-  ///   ajoutées par la Phase G) et les assertions sur des libellés français échouent (« Ajouter
+  ///   région/langue du simulateur hôte — sans ça, ce simulateur peut résoudre l'anglais et les
+  ///   assertions sur des libellés français échouent (« Ajouter
   ///   un joueur » introuvable, l'écran affichant « Add a player »).
   /// - `-uitesting-reset` (`resettingState: true`, le cas par défaut — premier lancement d'un
   ///   test) fait repartir `QuiMeneApp` sur un magasin vide, dédié aux tests d'interface (voir
@@ -147,9 +145,9 @@ final class QuiMeneUITests: XCTestCase {
     return app
   }
 
-  /// Doc utilisateur — le catalogue est trié alphabétiquement (`GamesTabView.games`) : Skyjo
-  /// n'est pas visible sans défiler dans une liste à 16 jeux. La barre de recherche filtre
-  /// directement dessus plutôt que de deviner combien de fois balayer l'écran.
+  /// Le catalogue est trié alphabétiquement (`GamesTabView.games`) : Skyjo n'est pas visible sans
+  /// défiler dans une liste à 16 jeux. La barre de recherche filtre directement dessus plutôt que
+  /// de deviner combien de fois balayer l'écran.
   private func openSkyjoSetup(in app: XCUIApplication) {
     app.tabBars.buttons["Jeux"].tap()
     let searchField = app.searchFields["Rechercher un jeu"]
@@ -162,12 +160,12 @@ final class QuiMeneUITests: XCTestCase {
     skyjoRow.tap()
   }
 
-  /// Doc utilisateur — `MatchSetupModel.init` présélectionne automatiquement les joueurs les
-  /// plus récemment créés, dans la limite du nombre maximum du jeu (`recentPlayersForThisGame`
-  /// vide sur un magasin de test tout juste réinitialisé). Comme chaque test crée exactement
-  /// les joueurs dont il a besoin, sur un magasin vide, ils sont déjà tous cochés en ouvrant
-  /// cet écran — taper sur leurs lignes les décocherait au lieu de les sélectionner. On se
-  /// contente donc de vérifier que la présélection a bien fait son travail.
+  /// `MatchSetupModel.init` présélectionne automatiquement les joueurs les plus récemment créés,
+  /// dans la limite du nombre maximum du jeu (`recentPlayersForThisGame` vide sur un magasin de
+  /// test tout juste réinitialisé). Comme chaque test crée exactement les joueurs dont il a besoin,
+  /// sur un magasin vide, ils sont déjà tous cochés en ouvrant cet écran — taper sur leurs lignes
+  /// les décocherait au lieu de les sélectionner. On se contente donc de vérifier que la
+  /// présélection a bien fait son travail.
   private func ensurePlayersSelected(_ names: [String], in app: XCUIApplication) {
     let startButton = app.buttons["Commencer"]
     XCTAssertTrue(startButton.waitForExistence(timeout: 5))
@@ -186,9 +184,8 @@ final class QuiMeneUITests: XCTestCase {
   /// ont chacun besoin de joueurs frais pour ne pas dépendre de l'état laissé par un test
   /// précédent.
   private func createPlayer(named nickname: String, in app: XCUIApplication) {
-    // Doc utilisateur — liste vide : le bouton de la barre d'outils et celui de l'EmptyState
-    // portent le même libellé et coexistent tous les deux à l'écran, d'où `firstMatch` plutôt
-    // qu'une correspondance unique.
+    // Liste vide : le bouton de la barre d'outils et celui de l'EmptyState portent le même libellé
+    // et coexistent tous les deux à l'écran, d'où `firstMatch` plutôt qu'une correspondance unique.
     let addButton = app.buttons["Ajouter un joueur"].firstMatch
     XCTAssertTrue(addButton.waitForExistence(timeout: 10))
     addButton.tap()

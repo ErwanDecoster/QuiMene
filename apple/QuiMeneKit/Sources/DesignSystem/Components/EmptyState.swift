@@ -1,8 +1,7 @@
 import SwiftUI
 
-/// Charte graphique §12.2 — un constat + une action. L'illustration dessinée (trait 2 px +
-/// aplat `brand/brass`, §10) n'existe pas encore : un SF Symbol tient sa place en attendant
-/// (voir README « Actions manuelles en attente »).
+/// Charte graphique §12.2 — un constat + une action. L'illustration est un SF Symbol plutôt que
+/// le dessin décrit par la charte (§10 : trait 2 px + aplat `brand/brass`).
 public struct EmptyState: View {
   private let icon: String
   private let message: LocalizedStringResource
@@ -30,12 +29,11 @@ public struct EmptyState: View {
         .font(.bodyText)
         .foregroundStyle(.textSecondary)
         .multilineTextAlignment(.center)
-        // Doc utilisateur (audit qualité, 15) — remontée en testant l'italien : sans ça, le
-        // `maxHeight: 160` ci-dessous propose une hauteur trop courte pour un message de deux
-        // lignes (traduction plus longue, ou français en Dynamic Type AX5) et le texte tronque
-        // en silence (« Aggiungi un g… ») plutôt que de passer à la ligne. `fixedSize` force ce
-        // texte précis à réclamer sa hauteur naturelle ; le VStack grandit au-delà de 160 si
-        // besoin plutôt que de couper le message.
+        // Constaté en testant l'italien : sans ça, le `maxHeight: 160` ci-dessous propose une
+        // hauteur trop courte pour un message de deux lignes (traduction plus longue, ou français
+        // en Dynamic Type AX5) et le texte tronque en silence (« Aggiungi un g… ») plutôt que de
+        // passer à la ligne. `fixedSize` force ce texte précis à réclamer sa hauteur naturelle ; le
+        // VStack grandit au-delà de 160 si besoin plutôt que de couper le message.
         .fixedSize(horizontal: false, vertical: true)
       if let actionTitle, let action {
         Button(actionTitle, action: action)

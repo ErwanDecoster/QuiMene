@@ -3,13 +3,13 @@ package com.quimene.app.livesync
 import androidx.core.net.toUri
 
 /**
- * Miroir de `JoinLink.swift` — le lien encodé dans le QR de partage (`QrCodeView` côté hôte) et
- * décodé au scan (`QrScannerView` côté pair). Contenu minimal : le code d'appairage lui-même,
- * `SupabaseSessionBackend.resolve(code)`
- * résout tout le reste — ce lien ne fait que remplacer la frappe des 6 chiffres. Même schéma
- * personnalisé `quimene://join?code=XXXXXX` qu'Apple, pas un lien universel `https://` (même
- * raison : pas de nom de domaine à posséder/vérifier) — un code généré par l'un ou l'autre app
- * reste scannable par l'autre plateforme.
+ * Miroir de `JoinLink.swift` — le lien encodé dans le QR de partage (`QrCodeView` côté créateur) et
+ * décodé au scan (`QrScannerView` côté participant). Contenu minimal : le code d'appairage
+ * lui-même, `SupabaseSessionBackend.resolve(code)` résout tout le reste — ce lien ne fait que
+ * remplacer la frappe des 6 chiffres. Même schéma personnalisé `quimene://join?code=XXXXXX`
+ * qu'Apple, pas un lien universel `https://` (même raison : pas de nom de domaine à
+ * posséder/vérifier) — un code généré par l'un ou l'autre app reste scannable par l'autre
+ * plateforme.
  */
 object JoinLink {
     private const val SCHEME = "quimene"

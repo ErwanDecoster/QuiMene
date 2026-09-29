@@ -24,11 +24,10 @@ struct SettingsView: View {
           )
         }
 
-        // Doc utilisateur (audit qualité, 15) — iOS ne permet pas à une app tierce de changer sa
-        // propre langue en direct : le seul levier est le sélecteur système par app (Réglages >
-        // Qui Mène ? > Langue), qui n'existe que parce que le projet déclare plusieurs langues
-        // (`knownRegions`). Ce bouton ouvre directement cette page plutôt que de laisser deviner
-        // où chercher dans l'app Réglages.
+        // IOS ne permet pas à une app tierce de changer sa propre langue en direct : le seul levier
+        // est le sélecteur système par app (Réglages > Qui Mène ? > Langue), qui n'existe que parce
+        // que le projet déclare plusieurs langues (`knownRegions`). Ce bouton ouvre directement
+        // cette page plutôt que de laisser deviner où chercher dans l'app Réglages.
         Section {
           Button {
             if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -122,10 +121,11 @@ struct SettingsView: View {
         ? "https://quimene.vercel.app/confidentialite" : "https://quimene.vercel.app/en/privacy")!
   }
 
-  /// Doc utilisateur — `Bundle.main.preferredLocalizations` (même résolution que
+  /// `Bundle.main.preferredLocalizations` (même résolution que
   /// `GameDefinition.LocalizedText.localized`) plutôt que `Locale.current`, pour refléter le
-  /// réglage par app plutôt que la langue système. `Locale.current.localizedString(forLanguageCode:)`
-  /// donne le nom dans la langue *actuellement affichée* — cohérent avec le reste de l'écran.
+  /// réglage par app plutôt que la langue système.
+  /// `Locale.current.localizedString(forLanguageCode:)` donne le nom dans la langue *actuellement
+  /// affichée* — cohérent avec le reste de l'écran.
   private var currentLanguageDisplayName: String {
     let code = Bundle.main.preferredLocalizations.first ?? "fr"
     return Locale.current.localizedString(forLanguageCode: code)?.capitalized(with: Locale.current)

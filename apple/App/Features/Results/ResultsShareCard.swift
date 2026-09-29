@@ -9,9 +9,9 @@ struct ResultsShareCard: View {
   let gameName: String
   let standings: [Standing]
   let recordByID: [Participant.ID: ParticipantRecord]
-  /// Doc utilisateur — remontée : la carte partagée ne disait presque rien de la partie qui
-  /// vient de se jouer. Le badge du podium, le nombre de manches et la date en disent davantage
-  /// à qui reçoit l'image sans avoir suivi la partie en direct.
+  /// La carte partagée ne disait presque rien de la partie qui vient de se jouer. Le badge du
+  /// podium, le nombre de manches et la date en disent davantage à qui reçoit l'image sans avoir
+  /// suivi la partie en direct.
   let badgeByParticipant: [Participant.ID: Badge]
   let roundCount: Int
   let playedAt: Date

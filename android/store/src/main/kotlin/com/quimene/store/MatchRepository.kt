@@ -231,8 +231,8 @@ class MatchRepository(
         return counts
     }
 
-    /** Doc 14, phase 2 — parties conclues avec au moins un participant lié, dont le résumé n'a
-     * pas encore été confirmé poussé. */
+    /** Doc 14 — parties conclues avec au moins un participant lié, pas encore déposées dans la
+     * boîte aux lettres de chaque ami. */
     suspend fun matchesPendingSharedProfileSync(): List<MatchEntity> =
         matchDao.getAll().filter { it.pendingSharedProfileSync }
 

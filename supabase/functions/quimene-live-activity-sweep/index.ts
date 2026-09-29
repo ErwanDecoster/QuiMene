@@ -1,6 +1,6 @@
-// Doc 09 « Fin de partie » — termine une Live Activity restée inactive plus de 30 minutes (aucune
-// manche, aucun changement de partie) : remontée utilisateur, l'écran verrouillé restait affiché
-// des heures après l'arrêt réel du jeu (`markStale` grise le contenu mais ne le retire jamais).
+// Doc 09 « Session » — termine une Live Activity restée inactive plus de 30 minutes (aucune
+// manche, aucun changement de partie), sans quoi l'écran verrouillé resterait affiché des heures
+// après l'arrêt réel du jeu (`markStale` grise le contenu mais ne le retire jamais).
 // Rien côté app ne peut le faire de façon fiable pendant que le processus est suspendu
 // (`Task.sleep` ne survit pas à la mise en veille) — seul un push déclenché depuis l'extérieur le
 // peut, exactement comme les mises à jour de score (`quimene-live-activity-push`).
@@ -8,23 +8,22 @@
 // Appelée uniquement par un déclencheur planifié (Cron Trigger Supabase, toutes les 5-10 min),
 // jamais par l'app.
 //
-// Doc utilisateur — le code de signature APNs est dupliqué avec `quimene-live-activity-push`
-// plutôt que factorisé dans un dossier `_shared` : un import relatif hors du dossier de la
-// fonction n'est pas fiable selon la méthode de déploiement (constaté en recette — le bundler
-// distant échoue à résoudre `../_shared/apns.ts`), alors que chaque fonction reste déployable
-// isolément une fois autonome.
+// Le code de signature APNs est dupliqué avec `quimene-live-activity-push` plutôt que factorisé
+// dans un dossier `_shared` : un import relatif hors du dossier de la fonction n'est pas fiable
+// selon la méthode de déploiement (constaté au déploiement — le bundler distant échoue à résoudre
+// `../_shared/apns.ts`), alors que chaque fonction reste déployable isolément une fois autonome.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const APNS_KEY_ID = Deno.env.get("APNS_KEY_ID")!;
 const APNS_TEAM_ID = Deno.env.get("APNS_TEAM_ID")!;
 const APNS_PRIVATE_KEY = Deno.env.get("APNS_PRIVATE_KEY")!;
 const APNS_BUNDLE_ID = Deno.env.get("APNS_BUNDLE_ID") ?? "com.quimene.app";
-// Doc utilisateur — un jeton ActivityKit n'est valide que sur le serveur APNs de l'environnement
-// qui l'a émis : sandbox pour une app lancée depuis Xcode, production pour TestFlight et l'App
-// Store (Xcode réécrit `aps-environment` à l'export, l'entitlement du repo reste "development").
-// Les deux coexistent en permanence (l'auteur en debug, les testeurs et le public en production),
-// donc par défaut ("auto") on tente la production puis on retombe sur le sandbox quand Apple
-// répond `BadDeviceToken`. "production" ou "development" forcent un seul serveur.
+// Un jeton ActivityKit n'est valide que sur le serveur APNs de l'environnement qui l'a émis :
+// sandbox pour une app lancée depuis Xcode, production pour TestFlight et l'App Store (Xcode
+// réécrit `aps-environment` à l'export, l'entitlement du repo reste "development"). Les deux
+// coexistent en permanence (l'auteur en debug, les testeurs et le public en production), donc par
+// défaut ("auto") on tente la production puis on retombe sur le sandbox quand Apple répond
+// `BadDeviceToken`. "production" ou "development" forcent un seul serveur.
 const APNS_ENVIRONMENT = Deno.env.get("APNS_ENVIRONMENT") ?? "auto";
 const APNS_HOSTS = APNS_ENVIRONMENT === "production"
   ? ["api.push.apple.com"]
@@ -37,8 +36,8 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const INACTIVITY_THRESHOLD_MINUTES = 30;
 
 let cachedKey: CryptoKey | null = null;
-// Doc utilisateur — Apple recommande de réutiliser le même jeton fournisseur ~55 min plutôt que
-// d'en resigner un par requête (limite de fréquence documentée par Apple sur ces jetons).
+// Apple recommande de réutiliser le même jeton fournisseur ~55 min plutôt que d'en resigner un par
+// requête (limite de fréquence documentée par Apple sur ces jetons).
 let cachedProviderToken: { token: string; issuedAt: number } | null = null;
 
 function base64URLFromBytes(bytes: Uint8Array): string {
@@ -99,9 +98,9 @@ async function sendToToken(pushToken: string, body: { event: "update" | "end"; c
     event: body.event,
     "content-state": body.contentState,
   };
-  // Doc utilisateur — remontée « la Live Activity ne disparaît jamais » : sans `dismissal-date`,
-  // iOS garde une activité terminée sur l'écran verrouillé jusqu'à 4 heures. Une date déjà
-  // atteinte la retire immédiatement, comme `dismissalPolicy: .immediate` côté app.
+  // Sans `dismissal-date`, iOS garde une activité terminée sur l'écran verrouillé jusqu'à
+  // 4 heures. Une date déjà atteinte la retire immédiatement, comme `dismissalPolicy: .immediate`
+  // côté app.
   if (body.event === "end") aps["dismissal-date"] = now;
   const payload: Record<string, unknown> = { aps };
   let response: Response | null = null;
@@ -118,14 +117,14 @@ async function sendToToken(pushToken: string, body: { event: "update" | "end"; c
       body: JSON.stringify(payload),
     });
     if (response.ok) return { ok: true, shouldForget: false };
-    // Doc utilisateur — la raison d'Apple est la seule piste quand un écran verrouillé ne suit
-    // plus : visible dans les logs de la fonction (tableau de bord Supabase).
+    // La raison d'Apple est la seule piste quand un écran verrouillé ne suit plus : visible dans
+    // les logs de la fonction (tableau de bord Supabase).
     reason = (await response.json().catch(() => ({})))?.reason;
     console.warn(`APNs ${host} status=${response.status} reason=${reason} token=${pushToken.slice(0, 8)}…`);
-    // Doc utilisateur — un jeton de l'autre environnement ne produit pas toujours
-    // `BadDeviceToken` : une clé APNs restreinte à un seul environnement répond 403
-    // `BadEnvironmentKeyInToken` sur l'autre serveur. On ne s'arrête donc que sur 410
-    // (`Unregistered` : bon serveur, jeton mort) ; le coût d'un essai inutile est un appel de plus.
+    // Un jeton de l'autre environnement ne produit pas toujours `BadDeviceToken` : une clé APNs
+    // restreinte à un seul environnement répond 403 `BadEnvironmentKeyInToken` sur l'autre serveur.
+    // On ne s'arrête donc que sur 410 (`Unregistered` : bon serveur, jeton mort) ; le coût d'un
+    // essai inutile est un appel de plus.
     if (response.status === 410) break;
   }
   if (!response) return { ok: false, shouldForget: false };

@@ -7,11 +7,10 @@ import SwiftData
 @MainActor
 @Observable
 final class HistoryListModel {
-  /// Doc utilisateur — identifie une entrée du filtre joueur. `.player(UUID)` pour une fiche
-  /// encore existante (stable même si elle est renommée) ; `.deletedPlayer(nickname:)` pour un
-  /// participant dont la fiche a été supprimée — regroupé par pseudo plutôt que par id de
-  /// participation, sinon la même personne supprimée apparaît une fois par partie jouée
-  /// (doublons remontés en recette).
+  /// Identifie une entrée du filtre joueur. `.player(UUID)` pour une fiche encore existante (stable
+  /// même si elle est renommée) ; `.deletedPlayer(nickname:)` pour un participant dont la fiche a
+  /// été supprimée — regroupé par pseudo plutôt que par id de participation, sinon la même personne
+  /// supprimée apparaîtrait une fois par partie jouée.
   enum PlayerFilterID: Hashable {
     case player(UUID)
     case deletedPlayer(nickname: String)

@@ -42,7 +42,7 @@ data class AppColors(
         return players[index - 1]
     }
 
-    /** Variante haute lisibilité du joueur 1..10 — pas encore câblée à un réglage (étape G). */
+    /** Variante haute lisibilité du joueur 1..10 — aucun réglage de l'app ne la sélectionne. */
     fun playerHighContrast(index: Int): Color {
         require(index in 1..10) { "player index must be in 1..10, was $index" }
         return playersHighContrast[index - 1]

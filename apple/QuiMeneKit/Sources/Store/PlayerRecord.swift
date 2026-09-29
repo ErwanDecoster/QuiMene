@@ -17,22 +17,21 @@ public final class PlayerRecord {
   public var createdAt: Date = Date()
   public var isArchived: Bool = false
   public var sortIndex: Int = 0
-  /// Doc 14 « Profils partagés » — identifiant permanent, partagé avec la fiche d'un ami sur
-  /// son propre appareil (jamais régénéré une fois posé : un lien déjà distribué en QR doit
-  /// rester valable). `nil` tant que cette fiche n'a jamais été partagée ni liée.
+  /// Doc 14 — identifiant permanent, partagé avec la fiche d'un ami sur son propre appareil (jamais
+  /// régénéré une fois posé : un lien déjà distribué en QR doit rester valable). `nil` tant que
+  /// cette fiche n'a jamais été partagée ni liée.
   public var sharedProfileID: UUID?
-  /// Doc 14, phase 4 — `true` uniquement pour la fiche qu'on a soi-même partagée (« Partager ce
-  /// profil » l'a générée) : par construction, une seule fiche par appareil peut l'être
-  /// (`PlayerRepository.sharedProfileID(for:)` refuse d'en désigner une seconde) — c'est donc
-  /// *la* fiche qui représente l'utilisateur de cet appareil, jamais une fiche qui suit un ami
-  /// (liée en scannant *son* code, `sharedProfileIsMine` reste `false`). Distingue « tout ce qui
-  /// m'est poussé m'intéresse » de « seulement ce qui me concerne, moi » côté synchronisation
-  /// (`SharedProfileSyncCoordinator`).
+  /// Doc 14 — `true` uniquement pour la fiche de mon profil : par construction, une seule fiche
+  /// par appareil peut l'être (`PlayerRepository.sharedProfileID(for:)` refuse d'en désigner une
+  /// seconde) — c'est donc *la* fiche qui représente l'utilisateur de cet appareil, jamais une
+  /// fiche qui suit un ami (liée en scannant *son* code, `sharedProfileIsMine` reste `false`).
+  /// Distingue « tout ce qui m'est poussé m'intéresse » de « seulement ce qui me concerne, moi »
+  /// côté synchronisation (`SharedProfileSyncCoordinator`).
   public var sharedProfileIsMine: Bool = false
-  /// Doc 14, phase 3 — pseudo tel que scanné au moment de la liaison (jamais mis à jour
-  /// ensuite) : cet appareil n'a aucun moyen de savoir si l'ami a changé de pseudo depuis.
-  /// `nil` pour une fiche jamais liée par scan (y compris une fiche seulement *partagée*, dont
-  /// l'appareil d'origine ne sait jamais qui l'a réclamée — doc 14 « Limites de confiance »).
+  /// Doc 14 — pseudo tel que scanné au moment de la liaison (jamais mis à jour ensuite) : cet
+  /// appareil n'a aucun moyen de savoir si l'ami a changé de pseudo depuis. `nil` pour une fiche
+  /// jamais liée par scan (y compris une fiche seulement *partagée*, dont l'appareil d'origine ne
+  /// sait jamais qui l'a réclamée — doc 14 « Limites de confiance »).
   public var sharedProfileLinkedName: String?
   public var sharedProfileLinkedAt: Date?
 

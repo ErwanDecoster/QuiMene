@@ -21,12 +21,11 @@ struct LiveMatchView: View {
   @Environment(DeepLinkRouter.self) private var deepLinkRouter
   @Environment(\.modelContext) private var modelContext
 
-  /// Doc utilisateur (audit qualité, 15) — `MatchPlayView` a déjà vérifié que `definition`
-  /// résout avant de router ici (sinon il affiche un `EmptyState` sans jamais construire cette
-  /// vue), donc les deux lookups catalogue internes à `LiveMatchModel.init` refont le même
-  /// calcul déterministe et ne peuvent pas échouer à nouveau. Risque résiduel accepté, pas
-  /// couvert : un journal d'événements corrompu ferait échouer `repository.loadState` malgré
-  /// tout — pas encore de parcours de secours pour ce cas précis.
+  /// `MatchPlayView` a déjà vérifié que `definition` résout avant de router ici (sinon il affiche
+  /// un `EmptyState` sans jamais construire cette vue), donc les deux lookups catalogue internes à
+  /// `LiveMatchModel.init` refont le même calcul déterministe et ne peuvent pas échouer à nouveau.
+  /// Risque résiduel accepté, pas couvert : un journal d'événements corrompu ferait échouer
+  /// `repository.loadState` malgré tout — pas encore de parcours de secours pour ce cas précis.
   init(match: MatchRecord, context: ModelContext, catalog: GameCatalog) {
     _model = State(
       initialValue: try! LiveMatchModel(match: match, context: context, catalog: catalog))
@@ -168,11 +167,11 @@ struct LiveMatchView: View {
         }
       }
     }
-    // Doc utilisateur — posé au niveau de l'écran, pas dans `ScoreBoardView` : un enfant de
-    // liste qui porte lui-même `.safeAreaInset` faisait dupliquer tout le rendu (voir la note
-    // en tête de `ScoreBoardView.swift`). Même barre que l'écran d'une partie rejointe
-    // (`SharedMatchView`) plutôt que la barre native du clavier : boutons en verre flottant
-    // au-dessus du clavier, identiques des deux côtés.
+    // Posé au niveau de l'écran, pas dans `ScoreBoardView` : un enfant de liste qui porte lui-même
+    // `.safeAreaInset` faisait dupliquer tout le rendu (voir la note en tête de
+    // `ScoreBoardView.swift`). Même barre que l'écran d'une partie rejointe (`SharedMatchView`)
+    // plutôt que la barre native du clavier : boutons en verre flottant au-dessus du clavier,
+    // identiques des deux côtés.
     .safeAreaInset(edge: .bottom) {
       if keyboardObserver.isVisible {
         ScoreBoardView.keyboardBar(
@@ -199,7 +198,7 @@ struct LiveMatchView: View {
       guard let newValue else { return }
       model.focus(on: newValue)
     }
-    // Doc 09 « Fin de partie » — une manche acceptée d'un contributeur distant n'est plus
+    // Doc 09 « Session » — une manche acceptée d'un contributeur distant n'est plus
     // reçue directement par ce modèle (portée par `LiveShareCoordinator`, qui survit à cet
     // écran) : ce jeton republié à chaque événement distant est ce qui déclenche le rechargement.
     .onChange(of: LiveShareCoordinator.shared.remoteEventToken) { _, _ in
@@ -232,10 +231,10 @@ struct LiveMatchView: View {
         "Le classement final sera calculé à partir des manches jouées. Cette action ne peut pas être annulée."
       )
     }
-    // Doc utilisateur — remontée : ouvrir cet écran alors qu'une session partage déjà une
-    // *autre* partie encore en cours substituait ce que voient les pairs connectés sans
-    // prévenir. Ne s'affiche jamais pour l'enchaînement volontaire (doc 09) — seulement
-    // quand la partie remplacée est, elle aussi, encore en cours.
+    // Ouvrir cet écran alors qu'une session partage déjà une *autre* partie encore en cours
+    // remplacerait ce que voient les participants connectés : on demande d'abord. Ne s'affiche
+    // jamais pour l'enchaînement volontaire (doc 09) — seulement quand la partie remplacée est,
+    // elle aussi, encore en cours.
     .confirmationDialog(
       "Remplacer la partie partagée ?",
       isPresented: $isConfirmingShareSwitch,
@@ -262,10 +261,10 @@ struct LiveMatchView: View {
       RoundHistoryView(
         state: model.state, definition: model.definition, myParticipantID: model.myParticipantID)
     }
-    // Doc utilisateur — sans ça, la manche d'un contributeur distant se contente de faire
-    // monter les totaux (déjà animés juste au-dessus) sans qu'on comprenne pourquoi. Le
-    // bandeau nomme l'appareil, le retour haptique attire l'œil même sans le regarder. Même
-    // bandeau pour l'explication d'un score modifié par une règle (doublement Skyjo…).
+    // Sans ça, la manche d'un contributeur distant se contente de faire monter les totaux (déjà
+    // animés juste au-dessus) sans qu'on comprenne pourquoi. Le bandeau nomme l'appareil, le retour
+    // haptique attire l'œil même sans le regarder. Même bandeau pour l'explication d'un score
+    // modifié par une règle (doublement Skyjo…).
     .overlay(alignment: .top) {
       VStack(spacing: Space.sm) {
         if let message = model.roundExplanationMessage {
@@ -310,9 +309,9 @@ struct LiveMatchView: View {
     }
   }
 
-  /// Doc utilisateur — les joueurs n'annoncent jamais leur score dans l'ordre des sièges :
-  /// « Terminé » est donc toujours disponible et valide directement la manche avec ce qui a
-  /// été saisi, plutôt que d'avancer champ par champ jusqu'au dernier joueur.
+  /// Les joueurs n'annoncent jamais leur score dans l'ordre des sièges : « Terminé » est donc
+  /// toujours disponible et valide directement la manche avec ce qui a été saisi, plutôt que
+  /// d'avancer champ par champ jusqu'au dernier joueur.
   ///
   /// Doc 16, phase C — dans une partie partagée en ligne, la manche passe d'abord par le serveur :
   /// la saisie n'est effacée qu'une fois acceptée ; devancée ou hors ligne, elle reste en place.

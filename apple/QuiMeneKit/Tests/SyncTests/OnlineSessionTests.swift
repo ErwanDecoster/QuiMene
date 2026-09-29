@@ -166,9 +166,10 @@ struct OnlineSessionTests {
 
   @Test("Une partie publiée garde son identifiant : celui de son matchCreated local")
   func publishedMatchKeepsItsID() async throws {
-    // Remontée : le créateur ré-horodatait son journal local avec de nouveaux identifiants ;
-    // `MatchEngine` tirant l'identifiant de partie du `matchCreated`, les participants
-    // écrivaient ensuite leurs manches sous un autre identifiant — invisibles pour tous.
+    // Régression couverte : si le créateur ré-horodatait son journal local avec de nouveaux
+    // identifiants, `MatchEngine` tirant l'identifiant de partie du `matchCreated`, les
+    // participants écriraient ensuite leurs manches sous un autre identifiant — invisibles pour
+    // tous.
     let backend = InMemorySessionBackend()
     let sessionID = UUID()
     let local = StampedEvent(lamport: 1, deviceID: "erwan", occurredAt: Date(), event: created())
@@ -217,8 +218,7 @@ struct OnlineSessionTests {
 }
 
 extension GameCatalog {
-  /// Catalogue minimal pour rejouer un journal dans ces tests (même patron que
-  /// `LiveSessionTests`).
+  /// Catalogue minimal pour rejouer un journal dans ces tests.
   fileprivate static var testing: GameCatalog {
     let definition = GameDefinition(
       id: "dummy",

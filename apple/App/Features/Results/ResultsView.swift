@@ -15,10 +15,9 @@ struct ResultsView: View {
   /// Doc 16 — ma place, quand les fiches ne le disent pas (partie suivie depuis un autre
   /// appareil : fiches en mémoire, sans lien vers mon profil).
   var myParticipantID: Participant.ID? = nil
-  /// Doc utilisateur — date réelle de la partie pour la carte partagée, quand elle est connue
-  /// (`HistoryDetailView`, rejouant une partie ancienne). `nil` juste après la fin d'une partie
-  /// (`LiveMatchView` et consorts) : la carte retombe alors sur la date du jour, qui est déjà la
-  /// bonne dans ce cas.
+  /// Date réelle de la partie pour la carte partagée, quand elle est connue (`HistoryDetailView`,
+  /// rejouant une partie ancienne). `nil` juste après la fin d'une partie (`LiveMatchView` et
+  /// consorts) : la carte retombe alors sur la date du jour, qui est déjà la bonne dans ce cas.
   var playedAt: Date? = nil
 
   private let statsEngine = StatsEngine()
@@ -126,7 +125,7 @@ struct ResultsView: View {
             in: .rect(cornerRadius: Radius.md)
           )
           // Doc 08 « Accessibilité » — même regroupement de ligne que `ScoreBoardView` ; le
-          // podium n'anime rien aujourd'hui, rien à gérer côté Reduce Motion pour l'instant.
+          // podium n'est pas animé, rien à gérer côté Reduce Motion.
           .accessibleScoreRow(
             name: record.nicknameSnapshot, rank: standing.rank, score: standing.score)
         }
@@ -223,7 +222,7 @@ struct ResultsView: View {
       .joined(separator: " · ")
   }
 
-  /// Doc 01 « détail manche par manche » — le journal d'événements est la source de vérité
+  /// Détail manche par manche (doc 01) — le journal d'événements est la source de vérité
   /// (doc 04), donc ce tableau se contente de le relire ; rien n'est recalculé ici.
   @ViewBuilder
   private var roundByRoundSection: some View {

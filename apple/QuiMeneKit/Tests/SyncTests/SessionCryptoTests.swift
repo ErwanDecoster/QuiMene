@@ -3,7 +3,7 @@ import Testing
 
 @testable import Sync
 
-@Suite("SessionCrypto (doc 09 « Appairage et chiffrement »)")
+@Suite("SessionCrypto (doc 09 « Format d'un événement »)")
 struct SessionCryptoTests {
   @Test("Un message chiffré puis déchiffré avec la même clé redonne l'original")
   func encryptDecryptRoundTrips() throws {
