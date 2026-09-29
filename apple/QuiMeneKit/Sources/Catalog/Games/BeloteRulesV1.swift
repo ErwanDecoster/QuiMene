@@ -1,10 +1,9 @@
 import Domain
 
-/// Doc 05 « Belote » — premier jeu par équipes. Simplification assumée pour cette V1(validée
-/// avec l'auteur du projet) : « Belote classique », sans annonce de contrat chiffrée — le
-/// preneur réussit s'il dépasse 81 points (majorité de 162), sinon la défense encaisse 162 à
-/// plat. La coinche/contrée (annonces chiffrées, multiplicateurs ×2/×4) reste, comme documenté,
-/// une variante de la v1.2.
+/// Doc 05 « Belote » — premier jeu par équipes. Simplification assumée : « Belote classique »,
+/// sans annonce de contrat chiffrée — le preneur réussit s'il dépasse 81 points (majorité de
+/// 162), sinon la défense encaisse 162 à plat. La coinche/contrée (annonces chiffrées,
+/// multiplicateurs ×2/×4) n'est pas prise en charge.
 ///
 /// Astuce d'implémentation : chaque coéquipier reçoit une entrée **identique** (même
 /// `computedValue`, le score de l'équipe) plutôt qu'une entrée par équipe. `endCheck` et

@@ -26,16 +26,16 @@ class QuiMeneApplication :
     lateinit var container: AppContainer
         private set
 
-    // Doc utilisateur — remontée : changer la langue par app (Réglages > Qui Mène ? > Langue)
-    // n'avait aucun effet visible. `GameDefinition.LocalizedText.localized` (`:domain`, module
-    // JVM pur sans dépendance Android — ADR-0002) lit `Locale.getDefault()`, jamais la
-    // `Configuration` Android — et rien ne synchronisait les deux. Une langue par app change la
-    // `Configuration` (observable par Compose via `LocalConfiguration`, donc le reste de l'UI
-    // suit), mais PAS le `Locale` par défaut de la JVM tant qu'on ne le fait pas explicitement soi-
-    // même (contrairement à `AppCompatDelegate`, absent de ce projet — ADR-0012, zéro dépendance
-    // tierce évitable). `attachBaseContext` couvre le redémarrage de processus (cas le plus
-    // courant après un changement de langue par app) ; `onConfigurationChanged` couvre le cas où
-    // le système ne recrée que les `Activity` sans tuer le processus.
+    // Changer la langue par app (Réglages > Qui Mène ? > Langue) n'avait aucun effet visible.
+    // `GameDefinition.LocalizedText.localized` (`:domain`, module JVM pur sans dépendance Android —
+    // ADR-0002) lit `Locale.getDefault()`, jamais la `Configuration` Android — et rien ne
+    // synchronisait les deux. Une langue par app change la `Configuration` (observable par Compose
+    // via `LocalConfiguration`, donc le reste de l'UI suit), mais PAS le `Locale` par défaut de la
+    // JVM tant qu'on ne le fait pas explicitement soi-même (contrairement à `AppCompatDelegate`,
+    // absent de ce projet — ADR-0012, zéro dépendance tierce évitable). `attachBaseContext` couvre
+    // le redémarrage de processus (cas le plus courant après un changement de langue par app) ;
+    // `onConfigurationChanged` couvre le cas où le système ne recrée que les `Activity` sans tuer
+    // le processus.
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         syncDefaultLocale(base.resources.configuration)

@@ -32,23 +32,22 @@ final class LiveMatchModel {
   private let repository: MatchRepository
   private let catalog: GameCatalog
 
-  // MARK: - Doc 09 « Partie partagée » — cet appareil est toujours l'hôte quand il partage,
-  // puisque `LiveMatchModel` n'existe que pour une partie qui a un `MatchRecord` local. Un pair
+  // MARK: - Doc 09 « Partie partagée » — cet appareil est toujours le créateur quand il partage,
+  // puisque `LiveMatchModel` n'existe que pour une partie qui a un `MatchRecord` local. Un appareil
   // qui rejoint utilise `SharedMatchModel`, pas celui-ci. Le partage lui-même est porté par
-  // `LiveShareCoordinator` (doc 09 « Fin de partie », révisé) — il survit à ce modèle, qui se
-  // recrée à chaque nouvelle partie, plutôt que de mourir avec lui.
+  // `LiveShareCoordinator` (doc 09 « Session ») — il survit à ce modèle, qui se recrée à chaque
+  // nouvelle partie, plutôt que de mourir avec lui.
   private var shareCoordinator: LiveShareCoordinator { .shared }
 
-  /// Doc utilisateur : sans ça, une manche saisie par un contributeur distant se contente de
-  /// faire monter les totaux sans qu'on comprenne pourquoi — l'hôte doit être notifié, pas
-  /// seulement voir les chiffres bouger. `nil` la plupart du temps ; la vue l'efface elle-même
-  /// après quelques secondes.
+  /// Sans ça, une manche saisie par un contributeur distant se contente de faire monter les totaux
+  /// sans qu'on comprenne pourquoi — le créateur doit être notifié, pas seulement voir les chiffres
+  /// bouger. `nil` la plupart du temps ; la vue l'efface elle-même après quelques secondes.
   private(set) var remoteActivityMessage: String?
   private var remoteActivityClearTask: Task<Void, Never>?
 
-  /// Doc utilisateur — un score modifié par une règle (doublement Skyjo, bonus…) se contente
-  /// autrement de changer silencieusement dans le total : la manche vient d'être validée, c'est
-  /// le seul moment où l'explication (`ScoreEntry.explanation`) a une chance d'être vue.
+  /// Un score modifié par une règle (doublement Skyjo, bonus…) se contente autrement de changer
+  /// silencieusement dans le total : la manche vient d'être validée, c'est le seul moment où
+  /// l'explication (`ScoreEntry.explanation`) a une chance d'être vue.
   private(set) var roundExplanationMessage: String?
   private var roundExplanationClearTask: Task<Void, Never>?
 
@@ -60,11 +59,10 @@ final class LiveMatchModel {
   /// Doc 16 — partie partagée et hors ligne : la saisie est bloquée jusqu'au retour du réseau.
   var isOfflineShared: Bool { isSharing && !shareCoordinator.isReachable }
 
-  /// Doc utilisateur — `true` seulement quand rattacher cette partie remplacerait, pour les
-  /// pairs déjà connectés, une *autre* partie encore en cours : jamais vrai pour l'enchaînement
-  /// volontaire déjà documenté (doc 09 « Fin de partie », la partie précédente est alors
-  /// conclue). `LiveMatchView` demande confirmation avant `confirmShareSwitch()` uniquement
-  /// dans ce cas.
+  /// `true` seulement quand rattacher cette partie remplacerait, pour les participants déjà
+  /// connectés, une *autre* partie encore en cours : jamais vrai pour l'enchaînement volontaire
+  /// déjà documenté (doc 09 « Session », la partie précédente est alors conclue). `LiveMatchView`
+  /// demande confirmation avant `confirmShareSwitch()` uniquement dans ce cas.
   var needsShareSwitchConfirmation: Bool {
     shareCoordinator.isSharing
       && shareCoordinator.attachedMatchID != match.id
@@ -82,14 +80,14 @@ final class LiveMatchModel {
     self.rules = try catalog.rules(for: match.gameID, version: match.rulesVersion)
     self.state = try repository.loadState(match, catalog: catalog)
     refreshLiveActivity()
-    // Doc utilisateur — remontée : rattacher automatiquement ici, sans condition, substituait
-    // silencieusement ce que voient les pairs connectés dès qu'on rouvrait l'écran d'une
-    // *autre* partie encore en cours pendant qu'une session en diffusait déjà une. Le
-    // rattachement se fait maintenant depuis la vue (`attachToActiveSessionIfNeeded()`),
-    // seulement quand `needsShareSwitchConfirmation` est faux.
+    // Pas de rattachement automatique ici : il remplacerait silencieusement ce que voient les
+    // participants connectés si l'on rouvre l'écran d'une *autre* partie encore en cours
+    // pendant qu'une session en diffuse déjà une. Le rattachement se fait depuis la vue
+    // (`attachToActiveSessionIfNeeded()`), seulement quand `needsShareSwitchConfirmation` est
+    // faux.
   }
 
-  /// Doc 09 « Fin de partie » — donne à `MatchLiveActivityController` la clé d'Activity qui
+  /// Doc 09 « Session » — donne à `MatchLiveActivityController` la clé d'Activity qui
   /// convient : celle de la session en cours si cette partie lui est attachée (survit à un
   /// changement de partie), sinon celle de la partie elle-même (solo, comportement inchangé).
   private func refreshLiveActivity(isAuthoritative: Bool = true) {
@@ -129,14 +127,14 @@ final class LiveMatchModel {
   var finalStandings: [Standing] { currentStandings }
 
   /// `.ended` (fin normale) et `.abandoned` (abandon volontaire) affichent tous deux
-  /// `ResultsView` — seule une partie encore réellement jouable montre le pavé numérique.
+  /// `ResultsView` — seule une partie encore réellement jouable montre la saisie.
   var isConcluded: Bool {
     state.status == .ended || state.status == .abandoned
   }
 
-  /// Doc utilisateur — quel que soit le jeu, on doit pouvoir arrêter une partie quand on veut
-  /// plutôt que seulement ceux qui déclarent `manualStop` (Scrabble, Qwirkle…) : une seule manche
-  /// jouée suffit à produire un classement qui a du sens.
+  /// Quel que soit le jeu, on doit pouvoir arrêter une partie quand on veut plutôt que seulement
+  /// ceux qui déclarent `manualStop` (Scrabble, Qwixx…) : une seule manche jouée suffit à produire
+  /// un classement qui a du sens.
   var canEndManually: Bool {
     !state.rounds.isEmpty
   }
@@ -172,9 +170,9 @@ final class LiveMatchModel {
     pendingScores.removeValue(forKey: participantID)
   }
 
-  /// Doc utilisateur — les scores ne sont jamais annoncés dans l'ordre des sièges autour de la
-  /// table : chaque champ se remplit par un tap direct, dans n'importe quel ordre. `activeSeatIndex`
-  /// ne sert plus qu'à mettre en valeur le champ actuellement focus, plus à séquencer la saisie.
+  /// Les scores ne sont jamais annoncés dans l'ordre des sièges autour de la table : chaque champ
+  /// se remplit par un tap direct, dans n'importe quel ordre. `activeSeatIndex` ne sert qu'à mettre
+  /// en valeur le champ actuellement focus, pas à séquencer la saisie.
   func focus(on participantID: Participant.ID) {
     guard let index = participants.firstIndex(where: { $0.id == participantID }) else { return }
     activeSeatIndex = index
@@ -333,20 +331,20 @@ final class LiveMatchModel {
     Task { await shareCoordinator.attach(match: match, context: context) }
   }
 
-  /// Doc utilisateur P9 — s'applique aux appareils qui rejoignent ensuite ; un contributeur déjà
-  /// connecté le reste (son rôle est fixé en rejoignant, `MatchConnectionCoordinator`).
+  /// S'applique aux appareils qui rejoignent ensuite ; un contributeur déjà connecté le reste (son
+  /// rôle est fixé en rejoignant, `MatchConnectionCoordinator`).
   func setAllowsContributors(_ allowed: Bool) async {
     await shareCoordinator.setAllowsContributors(allowed)
   }
 
-  /// Doc 09 « Fin de partie » — arrête toute la session de partage, pas seulement cette partie :
-  /// c'est le seul geste qui la termine désormais (elle ne s'arrête plus automatiquement à la
-  /// fin d'une partie).
+  /// Doc 09 « Session » — arrête toute la session de partage, pas seulement cette partie : une
+  /// session ne s'arrête pas à la fin d'une partie, seulement par ce geste ou après 6 h sans
+  /// activité.
   func stopSharing() async {
     await shareCoordinator.stopSharing()
   }
 
-  /// Doc 09 « Fin de partie » — `LiveMatchView` appelle ceci sur `.onChange` du jeton republié
+  /// Doc 09 « Session » — `LiveMatchView` appelle ceci sur `.onChange` du jeton republié
   /// par `LiveShareCoordinator` à chaque manche acceptée d'un contributeur distant. Recharge
   /// l'état depuis le repository (déjà persisté par le coordinateur) seulement si l'événement
   /// concerne bien la partie affichée par ce modèle — plusieurs `LiveMatchModel` peuvent
@@ -365,10 +363,9 @@ final class LiveMatchModel {
     }
   }
 
-  /// Doc utilisateur — signale qu'une manche vient d'un contributeur distant plutôt que de
-  /// laisser les totaux changer sans explication. `LiveShareCoordinator` ne republie jamais les
-  /// propres manches de l'hôte via ce chemin (`session.events` ne porte que les propositions
-  /// acceptées d'un pair, jamais les écritures locales), donc pas de filtre à refaire ici.
+  /// Signale qu'une manche vient d'un contributeur distant plutôt que de laisser les totaux changer
+  /// sans explication. `LiveShareCoordinator` ne republie que les événements ajoutés par un autre
+  /// appareil, jamais les écritures locales, donc pas de filtre à refaire ici.
   private func announceIfRemote(deviceID: String) {
     let name =
       connectedPeers.first { $0.deviceID == deviceID }?.deviceName

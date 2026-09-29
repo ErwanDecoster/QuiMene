@@ -73,9 +73,9 @@ final class YamsSheetModel {
   }
 
   func submit(rawValue: Int, participantID: Participant.ID, categoryID: String) {
-    // Doc utilisateur (audit qualité, 15) — `try!` volontaire : `YamsCategoryDetail` n'a
-    // qu'une propriété `String`, `JSONEncoder` ne peut pas échouer dessus (pas de `Double`
-    // non fini, pas de type exotique). Même convention que `GameCatalog+Embedded.swift`.
+    // `try!` volontaire : `YamsCategoryDetail` n'a qu'une propriété `String`, `JSONEncoder` ne peut
+    // pas échouer dessus (pas de `Double` non fini, pas de type exotique). Même convention que
+    // `GameCatalog+Embedded.swift`.
     let detail = ScoreDetail(
       payload: try! JSONEncoder().encode(YamsCategoryDetail(categoryID: categoryID)))
     let draft = RoundDraft(

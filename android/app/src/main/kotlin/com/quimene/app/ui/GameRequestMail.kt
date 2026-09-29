@@ -7,10 +7,10 @@ import androidx.core.net.toUri
 import com.quimene.app.R
 
 /**
- * Doc utilisateur — demande d'ajout d'un jeu : pas de formulaire ni de backend dédié, un e-mail
- * préempli suffit. Miroir de `GameRequestMail.swift`, adapté à l'idiome Android (`ACTION_SENDTO`
- * + extras plutôt qu'une URL `mailto:` reconstruite à la main). `context.getString(...)`, pas
- * `stringResource()` (Compose) — cet objet n'est jamais appelé depuis un contexte composable.
+ * Demande d'ajout d'un jeu : pas de formulaire ni de backend dédié, un e-mail préempli suffit.
+ * Miroir de `GameRequestMail.swift`, adapté à l'idiome Android (`ACTION_SENDTO` + extras plutôt
+ * qu'une URL `mailto:` reconstruite à la main). `context.getString(...)`, pas `stringResource()`
+ * (Compose) — cet objet n'est jamais appelé depuis un contexte composable.
  */
 object GameRequestMail {
     const val RECIPIENT = "contact@erwan-decoster.com"

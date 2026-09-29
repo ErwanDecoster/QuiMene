@@ -1,0 +1,27 @@
+Copyright © 2026 Erwan Decoster. Tous droits réservés.
+
+Le code source, la documentation, les éléments graphiques (dont le nom « Qui Mène ? », le logo et
+les icônes) et les textes de ce dépôt sont publiés pour consultation uniquement. Aucune licence
+n'est accordée : toute reproduction, modification, distribution, publication ou utilisation, en
+tout ou partie, est interdite sans l'autorisation écrite préalable de l'auteur.
+
+Les composants tiers conservent leur propre licence : la police Outfit (SIL Open Font License,
+voir Licenses/Outfit-OFL.txt) et les bibliothèques déclarées dans
+apple/QuiMeneKit/Package.resolved et android/gradle/libs.versions.toml.
+
+Contact : contact@erwan-decoster.com
+
+---
+
+Copyright © 2026 Erwan Decoster. All rights reserved.
+
+The source code, documentation, graphic assets (including the name "Qui Mène ?", the logo and
+the icons) and texts in this repository are published for reference only. No license is
+granted: any reproduction, modification, distribution, publication or use, in whole or in part,
+is prohibited without the author's prior written permission.
+
+Third-party components remain under their own licenses: the Outfit typeface (SIL Open Font
+License, see Licenses/Outfit-OFL.txt) and the libraries declared in
+apple/QuiMeneKit/Package.resolved and android/gradle/libs.versions.toml.
+
+Contact: contact@erwan-decoster.com

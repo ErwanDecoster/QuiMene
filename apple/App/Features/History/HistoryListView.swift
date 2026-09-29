@@ -96,8 +96,8 @@ struct HistoryListView: View {
     }
   }
 
-  /// Doc utilisateur — arrivée depuis « Meilleurs joueurs » (`GameLeaderboardView`) : la partie
-  /// commencée par un swipe sur l'onglet Jeux se termine ici, déjà filtrée sur ce jeu.
+  /// Arrivée depuis « Meilleurs joueurs » (`GameLeaderboardView`) : la partie commencée par un
+  /// swipe sur l'onglet Jeux se termine ici, déjà filtrée sur ce jeu.
   private func consumePendingHistoryFilter() {
     guard let gameID = deepLinkRouter.pendingHistoryGameID else { return }
     deepLinkRouter.pendingHistoryGameID = nil
@@ -119,6 +119,7 @@ struct HistoryListView: View {
         row(for: match)
       }
       .buttonStyle(.plain)
+      .accessibilityIdentifier("history-match")
     }
   }
 
@@ -230,9 +231,9 @@ struct HistoryListView: View {
     )
   }
 
-  /// Doc utilisateur — tous les participants, pas seulement le vainqueur : empilés avec un
-  /// léger recouvrement (motif « pile d'avatars » classique) pour rester compact même à 8
-  /// joueurs, plutôt que de s'étaler sur toute la largeur de la ligne.
+  /// Tous les participants, pas seulement le vainqueur : empilés avec un léger recouvrement (motif
+  /// « pile d'avatars » classique) pour rester compact même à 8 joueurs, plutôt que de s'étaler sur
+  /// toute la largeur de la ligne.
   private func participantAvatars(for match: MatchRecord) -> some View {
     HStack(spacing: -10) {
       ForEach(match.participants.sorted { $0.seatIndex < $1.seatIndex }, id: \.id) { participant in

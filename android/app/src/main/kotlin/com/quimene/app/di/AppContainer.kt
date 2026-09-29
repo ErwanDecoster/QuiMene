@@ -22,6 +22,9 @@ import kotlinx.coroutines.CoroutineScope
 class AppContainer(
     context: Context,
     applicationScope: CoroutineScope,
+    /** `false` pour les captures des stores (`StoreScreenshotsTest`) : l'historique partagé ne
+     * touche pas la base de production. */
+    syncsSharedProfiles: Boolean = true,
 ) {
     val catalog: GameCatalog = GameCatalogEmbedded.embedded
 
@@ -59,5 +62,6 @@ class AppContainer(
 
     /** Doc 14 — poussé au lancement et à chaque retour au premier plan (voir
      * [com.quimene.app.QuiMeneApplication]), pas par un minuteur propre. */
-    val sharedProfileSyncCoordinator = SharedProfileSyncCoordinator(matchRepository, playerRepository, catalog)
+    val sharedProfileSyncCoordinator =
+        SharedProfileSyncCoordinator(matchRepository, playerRepository, catalog, isEnabled = syncsSharedProfiles)
 }

@@ -120,7 +120,7 @@ private data class LiveMatchSetup(
  * Contrairement à Apple (5 barres d'outils différentes — les 4 écrans dédiés n'ont ni Terminer ni
  * Partager), cette coquille unique s'applique aux 5 formes : plutôt que d'appauvrir Android pour
  * copier l'incohérence d'Apple entre ses propres écrans, tous les jeux gagnent un accès uniforme
- * ici (doc utilisateur — cohérence *au sein* d'Android, pas seulement avec Apple). */
+ * ici (cohérence *au sein* d'Android, pas seulement avec Apple). */
 @Composable
 private fun LiveMatchScaffold(
     viewModel: LiveMatchViewModel,

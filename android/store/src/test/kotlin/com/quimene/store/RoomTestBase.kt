@@ -11,10 +11,10 @@ import org.robolectric.annotation.Config
 
 /**
  * Base commune des tests Room — Robolectric fait tourner une vraie base SQLite en JVM pur, sans
- * émulateur ni appareil connecté (aucun n'était disponible pendant cette session). `@Config(sdk
- * = [34])` : Robolectric n'embarque pas encore de shadows pour des niveaux d'API aussi récents
- * que `compileSdk` (37) au moment de l'écriture — 34 est un niveau stable largement supporté,
- * sans rapport avec `minSdk`/`compileSdk` du module lui-même.
+ * émulateur ni appareil connecté. `@Config(sdk = [34])` : Robolectric n'embarque pas encore de
+ * shadows pour des niveaux d'API aussi récents que `compileSdk` (37) au moment de l'écriture — 34
+ * est un niveau stable largement supporté, sans rapport avec `minSdk`/`compileSdk` du module
+ * lui-même.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [34])

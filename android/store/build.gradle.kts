@@ -39,8 +39,7 @@ kotlin {
 }
 
 // Room versionne son schéma en JSON à chaque changement (room.schemaLocation) — nécessaire pour
-// tester les migrations plus tard (étape D, doc 03 « Migrations »), même avec un plan encore
-// vide à la v1.
+// tester les migrations (étape D, doc 03 « Migrations »), même avec un plan encore vide.
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
 }

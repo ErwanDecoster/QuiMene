@@ -26,6 +26,7 @@ final class SharedProfileSyncCoordinator {
 
   /// Une demande pendant un passage en cours n'est pas perdue : un passage de plus suit.
   func sync(context: ModelContext) async {
+    guard !StoreScreenshots.isActive else { return }
     guard !isSyncing else {
       needsAnotherPass = true
       return

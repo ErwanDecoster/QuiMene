@@ -21,13 +21,13 @@ public struct GameDefinition: Identifiable, Sendable, Codable, Equatable {
       self.it = it
     }
 
-    /// Doc utilisateur — résolution de présentation, pas de calcul : ne porte sur aucune valeur
-    /// que rejoue un golden file (qui ne vérifie que les nombres du domaine), donc ne remet pas
-    /// en cause le déterminisme protégé par ADR-0002 malgré la lecture de `Bundle.main` ici.
+    /// Résolution de présentation, pas de calcul : ne porte sur aucune valeur que rejoue un golden
+    /// file (qui ne vérifie que les nombres du domaine), donc ne remet pas en cause le déterminisme
+    /// protégé par ADR-0002 malgré la lecture de `Bundle.main` ici.
     /// `Bundle.main.preferredLocalizations` respecte à la fois les langues déclarées par l'app
-    /// (`knownRegions`) et le réglage de langue par app d'iOS (Réglages > Qui Mène ? > Langue),
-    /// contrairement à `Locale.current` qui ignore ce réglage par app. Repli sur le français —
-    /// la langue source, toujours renseignée — si la traduction demandée est absente.
+    /// (`knownRegions`) et le réglage de langue par app d'iOS (Réglages > Qui Mène ? > Langue),
+    /// contrairement à `Locale.current` qui ignore ce réglage par app. Repli sur le français — la
+    /// langue source, toujours renseignée — si la traduction demandée est absente.
     public var localized: String {
       switch Bundle.main.preferredLocalizations.first {
       case "en": en ?? fr
@@ -38,16 +38,15 @@ public struct GameDefinition: Identifiable, Sendable, Codable, Equatable {
       }
     }
 
-    /// Doc utilisateur — remontée : la recherche de jeux ne doit pas dépendre de la langue
-    /// affichée par l'app. Contrairement à `localized` (une seule traduction, celle à
-    /// afficher), ceci compare `term` à *toutes* les traductions déclarées (fr toujours
-    /// présente, les autres si fournies) — un jeu reste trouvable même si son nom cherché
-    /// correspond à une langue différente de celle actuellement affichée.
+    /// La recherche de jeux ne doit pas dépendre de la langue affichée par l'app. Contrairement à
+    /// `localized` (une seule traduction, celle à afficher), ceci compare `term` à *toutes* les
+    /// traductions déclarées (fr toujours présente, les autres si fournies) — un jeu reste
+    /// trouvable même si son nom cherché correspond à une langue différente de celle actuellement
+    /// affichée.
     ///
-    /// Doc utilisateur — remontée : les espaces (y compris internes, pas seulement en début/fin)
-    /// ne doivent pas compter — « petit bac », « petitbac » et « petit  bac » doivent tous
-    /// trouver le même jeu. Les deux côtés de la comparaison sont donc dépouillés de leurs
-    /// espaces avant le `contains`.
+    /// Les espaces (y compris internes, pas seulement en début/fin) ne doivent pas compter — «
+    /// petit bac », « petitbac » et « petit bac » doivent tous trouver le même jeu. Les deux côtés
+    /// de la comparaison sont donc dépouillés de leurs espaces avant le `contains`.
     public func matches(_ term: String) -> Bool {
       let strippedTerm = term.filter { !$0.isWhitespace }
       for candidate in [fr, en, es, de, it].compactMap({ $0 }) {
@@ -492,9 +491,9 @@ public struct GameDefinition: Identifiable, Sendable, Codable, Equatable {
       try container.decodeIfPresent([String].self, forKey: .statsProfiles) ?? ["standard"]
   }
 
-  /// Doc utilisateur — un seul endroit pour ce prédicat (Skyjo : qui a fermé la manche), repris
-  /// à l'identique par `LiveMatchModel` et `SharedMatchModel` plutôt que dupliqué à chaque écran
-  /// qui affiche la sélection.
+  /// Un seul endroit pour ce prédicat (Skyjo : qui a fermé la manche), repris à l'identique par
+  /// `LiveMatchModel` et `SharedMatchModel` plutôt que dupliqué à chaque écran qui affiche la
+  /// sélection.
   public var requiresCloserSelection: Bool {
     scoring.modifiers.contains { $0.kind == .exclusiveFlag && $0.required }
   }

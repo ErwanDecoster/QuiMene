@@ -18,11 +18,11 @@ import com.quimene.designsystem.tokens.Space
 /**
  * Miroir du `List`/`Section` système d'Apple (charte §5.5, « Ligne de liste ») — un seul panneau
  * `elev/1` (tonal 1 dp + ombre L1, comme [Card]) autour d'un groupe de lignes, séparées par
- * [ListRowDivider], plutôt qu'une carte individuellement élevée par ligne. Doc utilisateur —
- * remontée : le fond ajouté à [Card] devait vivre sur le conteneur de la liste, pas sur chaque
- * élément. Utilisé pour Joueurs, Jeux (parties en cours + catalogue) et Historique — les listes
- * denses d'un seul type de ligne ; [Card] reste pertinent pour du contenu isolé (podium, faits
- * marquants) qui n'est pas un groupe de lignes homogènes.
+ * [ListRowDivider], plutôt qu'une carte individuellement élevée par ligne : le fond de [Card] vit
+ * sur le conteneur de la liste, pas sur chaque élément. Utilisé pour Joueurs, Jeux (parties en
+ * cours + catalogue) et Historique — les listes denses d'un seul type de ligne ; [Card] reste
+ * pertinent pour du contenu isolé (podium, faits marquants) qui n'est pas un groupe de lignes
+ * homogènes.
  */
 @Composable
 fun ListContainer(

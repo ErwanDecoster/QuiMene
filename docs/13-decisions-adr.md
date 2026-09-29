@@ -129,8 +129,8 @@ n'est pas prioritaire pour un premier lancement.
 
 **Décision.** Le schéma respecte **dès le départ** toutes les contraintes CloudKit : aucune
 contrainte d'unicité, valeurs par défaut partout, relations optionnelles avec inverse,
-pas de règle `.deny`, ordre explicite. La synchronisation elle-même est activée en P6 et reste
-désactivable par l'utilisateur.
+pas de règle `.deny`, ordre explicite. La synchronisation elle-même reste désactivable par
+l'utilisateur.
 
 **Alternatives.** Concevoir un schéma libre et l'adapter plus tard — c'est une migration lourde
 sur des données de production, pour un gain nul à l'écriture.
@@ -256,7 +256,7 @@ maquette et meilleur à l'usage. Les échelles typographiques iOS et Android dif
 
 ## ADR-0012 — Aucune dépendance tierce côté Apple
 
-**Statut** : Acceptée · **Date** : 2026-07-29
+**Statut** : Acceptée, amendée par [ADR-0016](#adr-0016--remplacer-le-transport-wi-fi-et-bluetooth-le-par-supabase-realtime) · **Date** : 2026-07-29
 
 **Contexte.** L'application est hors ligne, sans compte, sans serveur, et ne fait ni réseau
 distant ni rendu complexe. Tous ses besoins ont un équivalent système.
@@ -268,14 +268,14 @@ exige un nouvel ADR.
 graphiques) — chacune ajoute une surface de mise à jour à chaque version d'iOS, pour remplacer
 quelque chose que le système fournit déjà.
 
-**Conséquences.** Compilation rapide, mises à jour d'OS sans risque de rupture, aucune
-vérification de licence. Deux exceptions actées, de nature différente. **Vico**, côté Android
-seulement : Compose n'a pas d'équivalent natif à Swift Charts, c'est un écart d'écosystème propre
-à cette plateforme. **Supabase** ([ADR-0016](#adr-0016--remplacer-le-transport-wi-fi-et-bluetooth-le-par-supabase-realtime)),
-côté Apple **et** Android symétriquement (`supabase-swift`/`supabase-kt`) : le transport de la
-partie partagée en direct s'appuie sur le même service géré des deux côtés plutôt que sur du
-code réseau natif propre à chaque plateforme — ce n'est pas un écart entre les deux versions,
-c'est une dépendance partagée, acceptée pour la même raison des deux côtés.
+**Conséquences.** Compilation rapide, mises à jour d'OS sans risque de rupture, peu de
+licences à suivre. Une exception actée : **Supabase**
+([ADR-0016](#adr-0016--remplacer-le-transport-wi-fi-et-bluetooth-le-par-supabase-realtime)),
+côté Apple **et** Android symétriquement (`supabase-swift`/`supabase-kt`) : les fonctions en
+ligne s'appuient sur le même service géré des deux côtés plutôt que sur du code réseau propre à
+chaque plateforme. Côté Android, les bibliothèques Jetpack jouent le rôle du système ; la lecture
+et la génération de QR codes s'appuient sur ML Kit et ZXing, faute d'équivalent dans le SDK. Les
+graphiques sont dessinés à la main (`Canvas` Compose) plutôt qu'avec une bibliothèque.
 
 ---
 
@@ -314,8 +314,8 @@ le pavé numérique.
 
 **Statut** : Remplacée par [ADR-0016](#adr-0016--remplacer-le-transport-wi-fi-et-bluetooth-le-par-supabase-realtime) · **Date** : 2026-07-30
 
-**Contexte.** La Phase 8 (partie partagée) était conçue autour de MultipeerConnectivity côté
-Apple et de Nearby Connections en équivalent Android (doc [11](11-portage-android.md)). Ce sont
+**Contexte.** La partie partagée était conçue autour de MultipeerConnectivity côté Apple et de
+Nearby Connections en équivalent Android. Ce sont
 deux protocoles fermés, chacun propre à sa plateforme : un iPhone en MultipeerConnectivity ne
 peut structurellement pas rejoindre un pair en Nearby Connections. Le doc 09 initial actait ce
 non-interop comme « hors périmètre v1 ». La compatibilité Android étant désormais un objectif
@@ -353,8 +353,7 @@ sans jamais transiter sur le réseau.
   fréquent (un Wi-Fi commun existe) pour protéger le cas le plus rare.
 
 **Conséquences.** Deux transports à construire, tester et maintenir au lieu d'un framework
-système clé en main — la Phase 8 passe de 2 à 3 semaines, et l'étape F du portage Android
-(doc 11) de 1,5 à 3 semaines. Le rôle périphérique BLE (`BluetoothGattServer`) est à valider tôt
+système clé en main. Le rôle périphérique BLE (`BluetoothGattServer`) est à valider tôt
 sur le parc Android cible, son support variant selon les fabricants davantage que côté Apple.
 En contrepartie, aucune dépendance tierce n'est ajoutée d'aucun côté (`Network.framework` et
 `CoreBluetooth` sont système côté Apple ; `NsdManager`, `Socket` et `BluetoothGatt*` font partie
@@ -459,10 +458,9 @@ d'un rapport coût/bénéfice mauvais, pas d'un dernier bug à trouver.
   « aucun réseau local commun », sans exiger de reconstruire un mécanisme de secours séparé.
 
 **Conséquences.** Amende ADR-0012 (« aucune dépendance tierce côté Apple ») : `supabase-swift`
-est désormais une exception explicite — mais, contrairement à Vico (Android seulement), une
-exception **symétrique** : la même famille de dépendance (`supabase-swift`/`supabase-kt`) est
-voulue des deux côtés dès le départ, pas seulement côté Apple aujourd'hui avec un équivalent
-Android à inventer plus tard. Aucune divergence de transport n'est acceptée entre les deux
+est désormais une exception explicite — mais une exception **symétrique** : la même famille de
+dépendance (`supabase-swift`/`supabase-kt`) est voulue des deux côtés dès le départ, pas
+seulement côté Apple avec un équivalent Android à inventer plus tard. Aucune divergence de transport n'est acceptée entre les deux
 plateformes : Android reprendra exactement le même modèle canal/presence/broadcast, jamais un
 mécanisme natif Android alternatif. La fiabilité de connexion/reconnexion est déléguée à un SDK
 websocket mature plutôt qu'à du code réseau/Bluetooth maison, qui s'est montré structurellement
@@ -496,8 +494,8 @@ tous les appareils, créateur compris :
 - chaque appareil valide sa saisie avec le même moteur de règles, écrit directement dans le
   journal et met à jour les écrans verrouillés ;
 - saisie bloquée hors ligne (pas de file d'attente) ; seul le créateur arrête la session, qui
-  s'arrête sinon d'elle-même après 6 h sans activité (ajouté le 28 septembre 2026) ; n'importe
-  quel participant lance la partie suivante ;
+  s'arrête sinon d'elle-même après 6 h sans activité ; n'importe quel participant lance la
+  partie suivante ;
 - événements scellés (AES-GCM, clé dérivée du code d'appairage) ; identités (« Qui es-tu ? ») dans
   le même journal ;
 - historique partagé par **boîte aux lettres chiffrée par profil** (parties complètes), à la place

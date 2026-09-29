@@ -43,16 +43,15 @@ final class PlayerEditorModel {
 
   var photoData: Data?
 
-  /// Doc 14 « Profils partagés » — `nil` tant que cette fiche n'a jamais été partagée ni liée
-  /// à l'installation d'un ami.
+  /// Doc 14 — `nil` tant que cette fiche n'a jamais été partagée ni liée à l'installation d'un ami.
   private(set) var sharedProfileID: UUID?
-  /// Doc 14, phase 3 — pseudo connu au moment de la liaison (jamais mis à jour ensuite) : la
+  /// Doc 14 — pseudo connu au moment de la liaison (jamais mis à jour ensuite) : la
   /// seule trace locale de qui est de l'autre côté du lien, tant qu'aucun registre serveur
   /// n'existe (« Limites de confiance »). `nil` si cette fiche a seulement été *partagée*
   /// (généré un identifiant), jamais liée par scan.
   private(set) var linkedProfileName: String?
   private(set) var linkedProfileDate: Date?
-  /// Doc 14, phase 4 — `true` si *cette* fiche est celle que cet appareil partage comme la
+  /// Doc 14 — `true` si *cette* fiche est celle que cet appareil partage comme la
   /// sienne (mon profil, doc 16) par opposition à une fiche qui suit un ami.
   private(set) var isMyOwnSharedProfile = false
 

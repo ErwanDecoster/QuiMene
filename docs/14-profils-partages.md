@@ -1,9 +1,8 @@
 # 14 — Profils, amis et historique partagé
 
-Réécrite après la doc [16](16-sessions-en-ligne-et-profils.md) (septembre 2026). Remplace le
-mécanisme d'origine (liaison de fiches par QR, résumés de classement poussés en clair), dont
-l'historique de conception reste dans git. Le partage en direct est décrit en
-[09](09-partie-partagee.md).
+Profil sans compte, amis liés et historique partagé entre appareils. Le partage en direct est
+décrit en [09](09-partie-partagee.md), les raisons de ces choix en
+[16](16-sessions-en-ligne-et-profils.md).
 
 ## Mon profil
 

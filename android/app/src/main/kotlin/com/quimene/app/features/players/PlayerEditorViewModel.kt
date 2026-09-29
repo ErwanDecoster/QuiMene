@@ -50,8 +50,8 @@ class PlayerEditorViewModel(
 
     private var isRegeneratingProgrammatically = false
 
-    /** Doc 14 « Profils partagés » — `null` tant que cette fiche n'a jamais été partagée ni liée
-     * à l'installation d'un ami. */
+    /** Doc 14 — `null` tant que cette fiche n'a jamais été partagée ni liée à l'installation d'un
+     * ami. */
     var sharedProfileID by mutableStateOf<UUID?>(null)
         private set
 
@@ -199,9 +199,9 @@ class PlayerEditorViewModel(
         }
     }
 
-    /** Doc utilisateur — un pseudo commence toujours par une majuscule à chaque mot, imposé (pas
-     * juste suggéré par le clavier) : ne force que la première lettre de chaque mot, laisse le
-     * reste de la saisie intact (« McDonald » reste « McDonald », pas « Mcdonald »). */
+    /** Un pseudo commence toujours par une majuscule à chaque mot, imposé (pas juste suggéré par le
+     * clavier) : ne force que la première lettre de chaque mot, laisse le reste de la saisie intact
+     * (« McDonald » reste « McDonald », pas « Mcdonald »). */
     private fun capitalizeEachWord(value: String): String {
         val builder = StringBuilder(value.length)
         var capitalizeNext = true

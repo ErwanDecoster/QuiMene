@@ -8,9 +8,8 @@ import SwiftUI
 @Observable
 final class MatchSetupModel {
   let definition: GameDefinition
-  /// Doc utilisateur — les habitués en tête de la liste, comme sur culnugame : sans ça, un
-  /// groupe de 8+ joueurs doit chercher les mêmes 4-5 noms dans une liste triée arbitrairement à
-  /// chaque nouvelle partie.
+  /// Les habitués en tête de la liste : sans ça, un groupe de 8+ joueurs doit chercher les mêmes
+  /// 4-5 noms dans une liste triée arbitrairement à chaque nouvelle partie.
   let orderedAvailablePlayers: [PlayerRecord]
   var selectedPlayers: [PlayerRecord] = []
   /// Doc 05 : chaque jeu déclare ses propres variantes (`skyjo.json` a `threshold` et
@@ -50,8 +49,8 @@ final class MatchSetupModel {
       if l != r { return l > r }
       return lhs.sortIndex < rhs.sortIndex
     }
-    // Doc utilisateur — la fiche que cet appareil partage comme la sienne (doc 14, phase 4)
-    // reste en tête ici aussi, avant même les habitués les plus fréquents.
+    // La fiche que cet appareil partage comme la sienne (doc 14) reste en tête ici aussi, avant
+    // même les habitués les plus fréquents.
     if let mineIndex = sorted.firstIndex(where: { $0.sharedProfileIsMine }), mineIndex != 0 {
       var reordered = sorted
       let mine = reordered.remove(at: mineIndex)

@@ -81,6 +81,7 @@
     <string name="archiver_ce_joueur">Archivia questo giocatore</string>
     <string name="ardoise">Ardesia</string>
     <string name="arreter_le_partage">Interrompi la condivisione</string>
+    <string name="assistance">Assistenza</string>
     <string name="aucun_ami_lie_pour_l_instant">Nessun amico collegato per ora.</string>
     <string name="aucun_jeu_ne_correspond_a_ta_recherche">Nessun gioco corrisponde alla tua ricerca.</string>
     <string name="aucun_joueur_archive">Nessun giocatore archiviato.</string>
@@ -206,6 +207,7 @@
     <string name="obtenu_count1">Ottenuto (%1$d)</string>
     <string name="olive">Oliva</string>
     <string name="ou_c_est_une_de_mes_fiches">Oppure è una delle mie schede</string>
+    <string name="ouvre_la_page_dans_ton_navigateur">Apre la pagina nel tuo browser.</string>
     <string name="ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app">Apre le impostazioni di sistema per scegliere la lingua dell\'app.</string>
     <string name="par_jeu">Per gioco</string>
     <string name="partager_en_direct">Condividi in diretta</string>
@@ -229,6 +231,7 @@
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Punti dell\'attaccante: %1$d</string>
     <string name="points_invalides_0_a_count1">Punti non validi (da 0 a %1$d).</string>
+    <string name="politique_de_confidentialite">Informativa sulla privacy</string>
     <string name="preneur">Attaccante</string>
     <string name="profil">Profilo</string>
     <string name="pseudo">Nickname</string>

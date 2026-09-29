@@ -1,50 +1,44 @@
 # 05 — Catalogue de jeux
 
-20 jeux dans le catalogue (`spec/games/`). Chaque fiche précise ce dont le moteur a besoin :
-sens du score, forme de la saisie, condition de fin, départage.
+20 jeux, définis dans `spec/games/`. Chaque définition précise ce dont le moteur a besoin : sens
+du score, forme de la saisie, condition de fin, départage, variantes. Noms, descriptions et
+libellés y sont traduits dans les cinq langues de l'app.
 
 ## Vue d'ensemble
 
-| Jeu | Sens | Saisie | Fin de partie | Moteur | Vague |
+| Jeu | Joueurs | Sens | Saisie | Fin de partie (variantes) | Moteur |
 |---|---|---|---|---|---|
-| **Jeu libre** | au choix | entier | au choix | `generic.sum.v1` | v1 |
-| **Skyjo** | le plus bas gagne | entier + « a fermé » | un joueur ≥ 100 | `skyjo.v1` | v1 |
-| **Yams** | le plus haut gagne | grille 13 catégories | toutes les grilles remplies | `yams.v1` | v1 |
-| **Belote** | le plus haut gagne | points par équipe + annonces | une équipe ≥ 1000 | `belote.v1` | v1 |
-| **Rami** | le plus bas gagne | entier (pénalités) | un joueur ≥ 251 | `generic.sum.v1` | v1 |
-| **6 qui prend** | le plus bas gagne | entier (têtes de bœuf) | un joueur ≥ 66 | `generic.sum.v1` | v1 |
-| **Tarot** | le plus haut gagne | contrat + bouts + points | nombre de donnes fixé | `tarot.v1` | v1.1 |
-| **Wizard** | le plus haut gagne | annonce + plis réalisés | 60 / nb joueurs manches | `wizard.v1` | v1.1 |
-| **Mölkky** | atteindre 50 exactement | entier 0–12 | un joueur = 50 | `molkky.v1` | v1.1 |
-| **Scrabble** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | v1.1 |
-| **Triominos** | le plus haut gagne | entier | un joueur ≥ 400 | `generic.sum.v1` | v1.2 |
-| **Cornhole** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
-| **Flip 7** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
-| **Odin (Odin's Ravens)** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
-| **Pétanque** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
-| **Pictionary** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
-| **Qwixx** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
-| **Rummikub** | le plus bas gagne | entier (pénalités) | arrêt manuel | `generic.sum.v1` | hors plan initial |
-| **Time's Up** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
-| **Trivial Pursuit** | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` | hors plan initial |
+| **Belote** | 4 (2 équipes) | le plus haut gagne | points de l'équipe preneuse + capot, belote-rebelote | une équipe ≥ 1000 (501, 2000) | `belote.v1` |
+| **Cornhole** | 2–4 | le plus haut gagne | entier 0–12 | un joueur ≥ 21 | `generic.sum.v1` |
+| **Flip 7** | 2–12 | le plus haut gagne | entier | un joueur ≥ 200 (150, 250) | `generic.sum.v1` |
+| **Jeu libre** | 1–12 | le plus haut gagne | entier, négatifs admis | arrêt manuel | `generic.sum.v1` |
+| **Mölkky** | 2–8 | atteindre 50 exactement | entier 0–12 | un joueur à 50, ou un seul joueur en lice | `molkky.v1` |
+| **Odin** | 2–6 | le plus bas gagne | entier 0–9 | un joueur ≥ 15 (10, 20) | `generic.sum.v1` |
+| **Pétanque** | 2–6 | le plus haut gagne | entier 0–6 | un joueur ≥ 13 | `generic.sum.v1` |
+| **Pictionary** | 2–12 | le plus haut gagne | entier | un joueur ≥ 20 (15, 25) | `generic.sum.v1` |
+| **Qwixx** | 2–5 | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` |
+| **Rami** | 2–8 | le plus bas gagne | entier 0–150 (pénalités) | un joueur ≥ 251 (100, 500) | `generic.sum.v1` |
+| **Rummikub** | 2–6 | le plus haut gagne | entier, négatifs admis | arrêt manuel | `generic.sum.v1` |
+| **Scrabble** | 2–4 | le plus haut gagne | entier | arrêt manuel | `generic.sum.v1` |
+| **6 qui prend** | 2–10 | le plus bas gagne | entier (têtes de bœuf) | un joueur ≥ 66 | `generic.sum.v1` |
+| **Skyjo** | 2–8 | le plus bas gagne | entier −24 à 156 + « a fermé la manche » | un joueur ≥ 100 (50, 150, 200) | `skyjo.v1` |
+| **Tarot** | 3–5 | le plus haut gagne | contrat, bouts, points du preneur, poignée, petit au bout, chelem | 2 donnes par joueur (1, 3) | `tarot.v1` |
+| **Time's Up !** | 4–12 | le plus haut gagne | entier (cartes devinées) | 3 manches | `generic.sum.v1` |
+| **Triominos** | 2–6 | le plus haut gagne | entier | un joueur ≥ 400 (300, 500) | `generic.sum.v1` |
+| **Trivial Pursuit** | 2–6 | le plus haut gagne | entier 0–6 (camemberts) | un joueur à 6 | `generic.sum.v1` |
+| **Wizard** | 3–6 | le plus haut gagne | annonce + plis réalisés | 60 / nombre de joueurs manches | `wizard.v1` |
+| **Yams** | 1–8 | le plus haut gagne | grille de 13 catégories | toutes les grilles remplies | `yams.v1` |
 
 Six moteurs impératifs (`skyjo`, `yams`, `belote`, `tarot`, `wizard`, `molkky`) plus le moteur
-générique déclaratif `generic.sum.v1` — sept au total — pour 20 jeux : 14 se contentent de
-`generic.sum.v1`, sans aucun code spécifique.
+générique `generic.sum.v1` : 14 jeux sur 20 se contentent de leur définition JSON, sans aucun
+code spécifique.
 
-**Écart avec le plan initial** : le catalogue n'a pas suivi les trois vagues prévues à la
-lettre. Cinq jeux planifiés n'ont finalement jamais été construits — **Uno**, **1000 Bornes**
-(`mille.v1`), **Phase 10** (`phase10.v1`), **Qwirkle**, **Président** (`rank.v1`) : ces trois
-moteurs n'existent nulle part dans `GameCatalog+Embedded.swift`, ils sont restés à l'état de
-plan. Neuf jeux hors plan initial ont été ajoutés à la place, tous sur `generic.sum.v1` (aucun
-n'a eu besoin d'un moteur dédié).
+Sauf mention contraire, une partie à seuil se termine **à la fin du tour de table** où le seuil
+est atteint, pour que chacun ait joué le même nombre de manches. Les ex æquo partagent leur rang.
 
-## Critère de priorisation
-
-Vague 1 = popularité élevée × diversité de moteurs. Les six jeux de la v1 exercent
-délibérément quatre familles de saisie différentes (entier nu, entier + drapeau, grille
-structurée, saisie par équipe). Si l'architecture tient sur ces quatre-là, les dix suivants
-sont de l'application de recette.
+Les quatre familles de saisie — entier nu, entier + drapeau, grille structurée, saisie par
+équipe — ont chacune leur écran : saisie générique (`LiveMatchView`), grille Yams
+(`YamsSheetView`), et écrans dédiés pour la Belote, le Tarot et le Wizard.
 
 ---
 
@@ -52,11 +46,13 @@ sont de l'application de recette.
 
 ### Skyjo — `skyjo.v1`
 
-Détaillé dans [04 — Moteur de règles](04-moteur-de-regles.md). Points saillants :
+Détaillé dans [04 — Moteur de règles](04-moteur-de-regles.md#le-cas-skyjo-en-détail). Points
+saillants :
 
 - Le joueur qui ferme la manche voit son score **doublé** s'il n'est pas strictement le plus
-  bas — l'égalité ne protège pas. Doublement uniquement si le score est > 0.
-- Seuil de fin : 100 (variantes 150 / 200).
+  bas — l'égalité ne protège pas. Doublement uniquement si le score est > 0. Désactivable
+  (variante « Doublement du score »).
+- Seuil de fin : 100 (variantes 50, 150, 200).
 - Départage : meilleure manche unique, puis nombre de manches fermées, puis ex æquo.
 - Saisie : un entier de −24 à 156 par joueur, plus exactement un drapeau « a fermé la manche ».
 
@@ -69,7 +65,7 @@ homogène ».
 | Section haute | Valeur |
 |---|---|
 | As … Six | somme des dés de la valeur |
-| **Bonus** | **+35 si la section haute ≥ 63** |
+| **Bonus** | **+35 si la section haute atteint le seuil** (63, variante 60) |
 
 | Section basse | Valeur |
 |---|---|
@@ -83,37 +79,37 @@ homogène ».
 
 - Fin : `allSheetsComplete` — les 13 cases de chaque joueur sont remplies (une case barrée
   compte comme remplie, à 0).
-- Variantes : Yams supplémentaire (+100), section haute assistée (saisie du nombre de dés
-  plutôt que du total).
+- Saisie contextuelle par catégorie : nombre de dés pour la section haute, somme pour
+  brelan/carré/chance, obtenu ou raté pour les figures.
 - Départage : total de section basse, puis ex æquo.
-- La saisie assistée est ici un vrai gain : on tape « trois 4 » et l'app écrit 12.
 
 ### Belote — `belote.v1`
 
 Premier jeu **par équipes** : les participants sont regroupés, le classement porte sur les
 équipes. Le domaine gère cela par un champ `teamID` optionnel sur `Participant`, `nil` pour
-tous les jeux individuels.
+tous les jeux individuels. Chaque coéquipier reçoit une entrée identique (le score de l'équipe) :
+la fin de partie et le classement génériques s'appliquent alors sans code spécifique.
 
-- 162 points distribués par donne, dix de der inclus.
-- Saisie : points de l'équipe preneuse ; le complément est déduit automatiquement.
-- Annonces : belote-rebelote (+20), capot (250), dedans (le preneur chute → l'adversaire
-  encaisse 162 + le contrat).
-- Fin : première équipe à 1000 (variantes 501 / 2000).
-- Départage : pas d'ex æquo possible au-delà du seuil ; en cas d'égalité exacte, une donne
-  supplémentaire.
-- Une variante « coinche / contrée » est prévue en v1.2 : contrat annoncé, multiplicateurs
-  ×2 et ×4.
+Belote classique, sans contrat chiffré :
+
+- 162 points distribués par donne, dix de der inclus. On saisit l'équipe preneuse et ses points ;
+  la défense reçoit le complément.
+- Le preneur réussit s'il marque plus de 81 points ; sinon il **chute** et la défense encaisse
+  162.
+- Capot : 250 à l'équipe qui fait tous les plis, 0 à l'autre.
+- Belote-rebelote : +20 à l'équipe qui l'annonce.
+- Fin : première équipe à 1000 (variantes 501, 2000).
 
 ### Rami — `generic.sum.v1`
 
 - Le joueur qui sort marque 0 ; les autres cumulent la valeur des cartes en main.
-- Le plus bas gagne, fin à 251 (variantes 100 / 500).
+- Le plus bas gagne, fin à 251 (variantes 100, 500).
 - Aucun code spécifique : le JSON déclaratif suffit intégralement.
 
 ### 6 qui prend — `generic.sum.v1`
 
 - On accumule des têtes de bœuf, le plus bas gagne.
-- Fin : un joueur atteint 66 (variante : nombre de manches fixé).
+- Fin : un joueur atteint 66.
 - Sert de démonstration que deux jeux très différents partagent le même moteur.
 
 ### Tarot — `tarot.v1`
@@ -155,8 +151,9 @@ score      = base × multiplicateur + poignée + chelem
 La somme des scores d'une donne est toujours nulle : c'est un **invariant testé** à chaque
 manche, et le meilleur garde-fou contre une erreur de formule.
 
-- Fin : nombre de donnes fixé (multiple du nombre de joueurs, pour l'équité de la donne).
-- Le preneur peut être « personne » (donne passée) : tous à 0.
+- Fin : nombre de donnes fixé, multiple du nombre de joueurs pour l'équité de la donne
+  (2 donnes par joueur par défaut, variantes 1 et 3).
+- Une donne peut être passée (personne ne prend) : tous à 0.
 
 ### Wizard — `wizard.v1`
 
@@ -169,7 +166,7 @@ manche, et le meilleur garde-fou contre une erreur de formule.
 
 ### Mölkky — `molkky.v1`
 
-- Un quille tombée → sa valeur ; plusieurs quilles → leur nombre. Saisie 0 à 12.
+- Une quille tombée → sa valeur ; plusieurs quilles → leur nombre. Saisie 0 à 12.
 - **Dépasser 50 ramène à 25.** C'est la seule règle de « score non monotone » du catalogue.
 - Trois échecs consécutifs (score 0) → joueur éliminé.
 - Fin : `targetReached` dès qu'un joueur atteint exactement 50, ou `elimination` s'il ne reste
@@ -178,58 +175,12 @@ manche, et le meilleur garde-fou contre une erreur de formule.
   `EndCheck` renvoie `.ended` sans passer par `.finalRound` — le cas qui justifie que les deux
   soient distincts dans l'énumération.
 
-### 1000 Bornes — `mille.v1` — non construit
-
-Ne figure pas dans `spec/games/` ni dans `GameCatalog+Embedded.swift` — resté à l'état de plan.
-Fiche conservée telle quelle pour une reprise éventuelle.
-
-Saisie par grille de primes plutôt que par nombre :
-
-| Prime | Points |
-|---|---|
-| Distance parcourue | 1 / km |
-| Manche terminée (1000 km) | 400 |
-| Chaque botte | 100 |
-| Les quatre bottes | +300 |
-| Chaque coup-fourré | 300 |
-| Trajet sans carte 200 | 300 |
-| Capot (adversaire à 0 km) | 500 |
-| Allonge (700 → 1000) | 200 |
-
-- Fin : première équipe à 5000.
-- Bon candidat à une saisie par steppers et interrupteurs plutôt que par pavé numérique.
-
-### Phase 10 — `phase10.v1` — non construit
-
-Ne figure pas dans `spec/games/` ni dans `GameCatalog+Embedded.swift` — resté à l'état de plan.
-Fiche conservée telle quelle pour une reprise éventuelle.
-
-Double critère : la progression en phases prime, les points départagent.
-
-- Chaque manche : phase franchie ou non (booléen) + points de pénalité des cartes restantes.
-- Fin : un joueur termine la phase 10.
-- Classement : phase atteinte décroissante, puis points croissants.
-- Le seul jeu du catalogue dont le classement n'est pas un simple tri sur le cumul — il
-  valide que `standings()` soit bien un point d'extension du protocole et pas une fonction
-  générique.
-
-### Président — `rank.v1` — non construit
-
-Ne figure pas dans `spec/games/` ni dans `GameCatalog+Embedded.swift` — resté à l'état de plan.
-Fiche conservée telle quelle pour une reprise éventuelle.
-
-- Saisie : un rang par joueur (Président, Vice-président, Neutre, Vice-trouduc, Trouduc).
-- Barème par défaut : 5 / 3 / 2 / 1 / 0, ajustable en variante.
-- Fin : nombre de manches fixé.
-- Validation : les rangs doivent former une permutation complète.
-
 ### Les 14 jeux sur `generic.sum.v1`
 
-Aucun code. Uniquement un JSON déclaratif qui change le sens du score, le seuil et les libellés
-(voir la table en tête de document pour la liste complète — Jeu libre, Rami, 6 qui prend,
-Scrabble, Triominos et neuf jeux ajoutés hors plan initial). Uno et Qwirkle, prévus sur ce même
-moteur, ne figurent pas dans `spec/games/` — jamais construits, comme 1000 Bornes/Phase 10/
-Président ci-dessus.
+Aucun code. Uniquement un JSON déclaratif qui fixe le sens du score, les bornes de saisie, la
+fin de partie et les libellés (voir la table en tête de document). Les jeux sans condition de
+fin naturelle (Scrabble, Qwixx, Rummikub, Jeu libre) se terminent par un bouton « Terminer la
+partie ».
 
 ---
 
@@ -237,14 +188,14 @@ Président ci-dessus.
 
 Procédure, dans cet ordre strict :
 
-1. Écrire `spec/games/<id>.json`, valider contre le JSON Schema.
+1. Écrire `spec/games/<id>.json`, valider contre le JSON Schema, traduire nom et libellés dans
+   les cinq langues.
 2. Écrire au moins un `spec/golden/<id>-*.json` couvrant un cas nominal **et** le cas limite
    qui rend le jeu particulier (le doublement, le bonus, la chute…).
-3. Si `engine` ≠ `generic.sum.v1`, implémenter `GameRules` côté Swift jusqu'à ce que les
-   golden files passent.
-4. Ajouter l'entrée à la table `engineID -> GameRules`.
-5. Traduire nom et libellés dans `Localizable.xcstrings`.
-6. Côté Android, à la vague de portage : rejouer les mêmes golden files.
+3. Si `engine` ≠ `generic.sum.v1`, implémenter `GameRules` en Swift et en Kotlin jusqu'à ce que
+   les golden files passent sur les deux plateformes.
+4. Ajouter l'entrée à la table `engineID -> GameRules` de chaque catalogue.
+5. Recopier `spec/` dans ses copies Apple (`Scripts/check-spec-sync.sh` vérifie l'égalité).
 
-Écrire le golden **avant** l'implémentation n'est pas un dogme de TDD ici : c'est ce qui rend
-la ré-implémentation Kotlin possible sans relire le Swift.
+Écrire le golden **avant** l'implémentation n'est pas un dogme de TDD ici : c'est ce qui permet
+d'écrire la seconde plateforme sans relire le code de la première.

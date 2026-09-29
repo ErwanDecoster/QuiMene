@@ -26,6 +26,8 @@ class SharedProfileSyncCoordinator(
     private val matchRepository: MatchRepository,
     private val playerRepository: PlayerRepository,
     private val catalog: GameCatalog,
+    /** `false` pour les captures des stores (`StoreScreenshotsTest`) : aucun appel au serveur. */
+    private val isEnabled: Boolean = true,
 ) {
     private val transport = MatchMailboxTransport()
     private val mutex = Mutex()
@@ -33,6 +35,7 @@ class SharedProfileSyncCoordinator(
 
     /** Une demande pendant un passage en cours n'est pas perdue : un passage de plus suit. */
     suspend fun sync() {
+        if (!isEnabled) return
         if (!mutex.tryLock()) {
             needsAnotherPass.set(true)
             return

@@ -18,19 +18,19 @@ public final class MatchRecord {
   /// Masque la partie de l'onglet Historique sans y toucher — les statistiques de profil
   /// continuent de l'inclure, au même titre que l'archivage d'un `PlayerRecord`.
   public var isArchived: Bool = false
-  /// Identifiant d'appareil créateur — utile en sync (Phase 8), placeholder en attendant. Doc 16,
-  /// phase E — `MatchRecord.receivedOrigin` pour une partie jouée sur un autre appareil et
-  /// enregistrée ici ensuite (suivie dans une session, ou reçue d'un ami) : voir `isReceived`.
+  /// `"local"` pour une partie jouée sur cet appareil ; `MatchRecord.receivedOrigin` (doc 16,
+  /// phase E) pour une partie jouée sur un autre appareil et enregistrée ici ensuite (suivie
+  /// dans une session, ou reçue d'un ami) : voir `isReceived`.
   public var deviceOrigin: String = "local"
   public var eventLogData: Data = Data()
-  /// Doc 14 « Profils partagés », phase 2 — `true` dès la conclusion si au moins un participant
-  /// est lié à l'installation d'un ami, jusqu'à ce que le résumé lui soit poussé avec succès.
+  /// Doc 14 « Historique partagé » — `true` dès la conclusion si au moins un participant est lié
+  /// à un ami, jusqu'à ce que la partie ait été déposée dans sa boîte aux lettres.
   public var pendingSharedProfileSync: Bool = false
   /// Doc 14 — cette partie n'a pas été jouée sur cet appareil : c'est un résumé reçu de
-  /// l'installation d'un ami (ancien mécanisme du doc 14, retiré en doc 16 phase H : les parties
-  /// déjà reçues ainsi restent affichées). Pas de journal
-  /// d'événements exploitable (`eventLogData` est un tableau vide valide, jamais rejoué) —
-  /// seuls `ParticipantRecord.finalRank`/`finalScore` portent le résultat.
+  /// l'installation d'un ami par un ancien mécanisme de partage, retiré depuis (doc 16, phase H) ;
+  /// les parties déjà reçues ainsi restent affichées. Pas de journal d'événements exploitable
+  /// (`eventLogData` est un tableau vide valide, jamais rejoué) — seuls
+  /// `ParticipantRecord.finalRank`/`finalScore` portent le résultat.
   public var isImportedSummary: Bool = false
 
   // CloudKit exige que les relations vers plusieurs soient elles-mêmes optionnelles (au-delà

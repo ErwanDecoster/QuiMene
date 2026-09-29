@@ -19,11 +19,10 @@ val CardGutter: Dp = 12.dp
 
 /**
  * Miroir de `Card.swift` : `elev/1` (charte §5.2, colonne Android) = `surfaceContainerLow`,
- * tonal 1 dp + ombre L1 — pas un simple remplissage plat. Remontée utilisateur : les listes ne se
- * détachaient pas du fond d'écran, surtout en couleur dynamique (Material You), où `neutral/bg`
- * et `neutral/surface` peuvent devenir presque identiques puisque les deux dérivent du même fond
- * d'écran système ([com.quimene.designsystem.theme.QuiMeneTheme]) — un simple `Modifier
- * .background()` ne garantissait alors plus aucune séparation visuelle. `Surface` avec
+ * tonal 1 dp + ombre L1 — pas un simple remplissage plat. En couleur dynamique (Material You),
+ * `neutral/bg` et `neutral/surface` peuvent devenir presque identiques puisque les deux dérivent
+ * du même fond d'écran système ([com.quimene.designsystem.theme.QuiMeneTheme]) : un simple
+ * `Modifier.background()` ne garantirait alors plus aucune séparation visuelle. `Surface` avec
  * `tonalElevation`/`shadowElevation` garantit une différence perceptible quelles que soient les
  * couleurs effectives, dynamiques ou fixes. Bordure 1 dp supplémentaire **seulement en mode
  * sombre** : une ombre portée est peu visible sur un fond déjà sombre.

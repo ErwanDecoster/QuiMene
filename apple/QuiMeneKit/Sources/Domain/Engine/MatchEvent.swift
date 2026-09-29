@@ -7,7 +7,7 @@ public enum MatchEvent: Sendable, Codable, Equatable {
   case roundAmended(index: Int, draft: RoundDraft)
   case roundRemoved(index: Int)
   case matchAbandoned(at: Date)
-  /// Doc 05 « Jeu libre » et tout jeu à `manualStop` (Scrabble, Qwirkle…) : `endCheck` ne
+  /// Doc 05 « Jeu libre » et tout jeu à `manualStop` (Scrabble, Qwixx…) : `endCheck` ne
   /// peut pas détecter cette fin tout seul, elle n'est déclenchée que par une action
   /// explicite du joueur — contrairement à `matchAbandoned`, elle produit un statut `.ended`
   /// normal (classement final écrit, comptée dans les statistiques de profil).

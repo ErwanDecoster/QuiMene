@@ -14,12 +14,12 @@ struct ProfileView: View {
 
   @Environment(\.modelContext) private var modelContext
   @State private var stats: ProfileStats = .empty
-  /// Doc 06 « Statistiques de groupe » — jeux où ce joueur est en tête du classement
+  /// Doc 06 « Classement par jeu » — jeux où ce joueur est en tête du classement
   /// (`LeaderboardRepository`), pour la mention « Meilleur joueur » dans `byGameSection`.
   @State private var topGameIDs: Set<String> = []
   @State private var isPresentingEditor = false
-  /// Doc utilisateur — le mois en cours par défaut, l'année en un tap : `stats.activity`
-  /// couvre déjà 12 mois (doc 06), rien à recalculer, seule la présentation change.
+  /// Le mois en cours par défaut, l'année en un tap : `stats.activity` couvre déjà 12 mois (doc
+  /// 06), rien à recalculer, seule la présentation change.
   @State private var isShowingFullYear = false
 
   private var catalog: GameCatalog { .embedded }
@@ -73,9 +73,9 @@ struct ProfileView: View {
     topGameIDs = computeTopGameIDs(for: newStats)
   }
 
-  /// Doc utilisateur — « voir facilement dans quel jeu on est le meilleur » : un jeu ne compte
-  /// que si au moins un autre joueur l'a aussi joué (classement de 1, sinon, ne veut rien dire —
-  /// même logique de seuil que la Némésis, doc 06).
+  /// « voir facilement dans quel jeu on est le meilleur » : un jeu ne compte que si au moins un
+  /// autre joueur l'a aussi joué (classement de 1, sinon, ne veut rien dire — même logique de seuil
+  /// que la Némésis, doc 06).
   private func computeTopGameIDs(for stats: ProfileStats) -> Set<String> {
     let repository = LeaderboardRepository(context: modelContext)
     var result: Set<String> = []

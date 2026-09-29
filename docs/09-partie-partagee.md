@@ -1,10 +1,10 @@
 # 09 — Partie partagée en ligne
 
-Réécrite après la doc [16](16-sessions-en-ligne-et-profils.md) (septembre 2026), qui a remplacé le
-modèle « hôte autoritaire » d'origine (ADR-0008, ADR-0014, ADR-0016) par des **sessions stockées
-côté serveur** (ADR-0017). L'historique de conception reste dans git et dans la doc 16. Les
-identités (« Qui es-tu ? ») et l'historique partagé sont détaillés en [14](14-profils-partages.md) ;
-la recette croisée iOS ↔ Android en [17](17-recette-croisee.md).
+Une partie partagée repose sur une **session stockée côté serveur** (Supabase), dont le journal
+fait foi pour tous les appareils ([ADR-0017](13-decisions-adr.md)). Les raisons de ce choix sont
+dans la doc [16](16-sessions-en-ligne-et-profils.md) ; les identités (« Qui es-tu ? ») et
+l'historique partagé sont détaillés en [14](14-profils-partages.md) ; la recette croisée
+iOS ↔ Android en [17](17-recette-croisee.md).
 
 ## Cas d'usage
 

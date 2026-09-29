@@ -3364,6 +3364,34 @@
         }
       }
     },
+    "Assistance" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hilfe"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ayuda"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assistenza"
+          }
+        }
+      }
+    },
     "Aucun" : {
       "localizations" : {
         "de" : {
@@ -7615,6 +7643,34 @@
         }
       }
     },
+    "Ouvre la page dans ton navigateur." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffnet die Seite in deinem Browser."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opens the page in your browser."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre la página en tu navegador."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apre la pagina nel tuo browser."
+          }
+        }
+      }
+    },
     "Ouvre les réglages système pour choisir la langue de l'app." : {
       "localizations" : {
         "de" : {
@@ -8491,6 +8547,34 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Punti non validi (da 0 a %lld)."
+          }
+        }
+      }
+    },
+    "Politique de confidentialité" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenschutzerklärung"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Policy"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Política de privacidad"
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Informativa sulla privacy"
           }
         }
       }

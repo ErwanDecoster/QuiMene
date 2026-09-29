@@ -1,11 +1,11 @@
-// Doc utilisateur P9 — seul moyen fourni par Apple de mettre à jour une Live Activity (écran
-// verrouillé / Dynamic Island) pendant que l'app est suspendue en arrière-plan : un push APNs
-// dédié (`apns-push-type: liveactivity`), envoyé ici depuis un serveur plutôt que depuis l'app
-// elle-même (qui ne tourne justement plus). Doc 16, phase F — appelée par l'appareil qui vient
-// d'enregistrer une manche dans la session (créateur ou participant, iOS ou Android), jamais par
-// ceux qui la reçoivent : les écrans verrouillés suivent même quand le créateur est éteint.
+// Seul moyen fourni par Apple de mettre à jour une Live Activity (écran verrouillé / Dynamic
+// Island) pendant que l'app est suspendue en arrière-plan : un push APNs dédié (`apns-push-type:
+// liveactivity`), envoyé ici depuis un serveur plutôt que depuis l'app elle-même (qui ne tourne
+// justement plus). Doc 16, phase F — appelée par l'appareil qui vient d'enregistrer une manche dans
+// la session (créateur ou participant, iOS ou Android), jamais par ceux qui la reçoivent : les
+// écrans verrouillés suivent même quand le créateur est éteint.
 //
-// Doc 09 « Fin de partie » — routée par `activityKey` (session de partage si active, sinon
+// Doc 09 « Session » — routée par `activityKey` (session de partage si active, sinon
 // partie), pas par `matchID` : c'est ce qui permet à un changement de partie au sein d'une même
 // session d'atteindre un appareil suspendu déjà enregistré sous cette clé, sans qu'il ait besoin
 // de créer une nouvelle Live Activity pour la nouvelle partie.
@@ -16,11 +16,10 @@
 // fait exception (voir plus bas) : conservé uniquement pour permettre à
 // `quimene-live-activity-sweep` de clore proprement une Activity inactive.
 //
-// Doc utilisateur — le code de signature APNs est dupliqué avec `quimene-live-activity-sweep`
-// plutôt que factorisé dans un dossier `_shared` : un import relatif hors du dossier de la
-// fonction n'est pas fiable selon la méthode de déploiement (constaté en recette — le bundler
-// distant échoue à résoudre `../_shared/apns.ts`), alors que chaque fonction reste déployable
-// isolément une fois autonome.
+// Le code de signature APNs est dupliqué avec `quimene-live-activity-sweep` plutôt que factorisé
+// dans un dossier `_shared` : un import relatif hors du dossier de la fonction n'est pas fiable
+// selon la méthode de déploiement (constaté au déploiement — le bundler distant échoue à résoudre
+// `../_shared/apns.ts`), alors que chaque fonction reste déployable isolément une fois autonome.
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 interface Standing {
@@ -48,12 +47,12 @@ const APNS_KEY_ID = Deno.env.get("APNS_KEY_ID")!;
 const APNS_TEAM_ID = Deno.env.get("APNS_TEAM_ID")!;
 const APNS_PRIVATE_KEY = Deno.env.get("APNS_PRIVATE_KEY")!;
 const APNS_BUNDLE_ID = Deno.env.get("APNS_BUNDLE_ID") ?? "com.quimene.app";
-// Doc utilisateur — un jeton ActivityKit n'est valide que sur le serveur APNs de l'environnement
-// qui l'a émis : sandbox pour une app lancée depuis Xcode, production pour TestFlight et l'App
-// Store (Xcode réécrit `aps-environment` à l'export, l'entitlement du repo reste "development").
-// Les deux coexistent en permanence (l'auteur en debug, les testeurs et le public en production),
-// donc par défaut ("auto") on tente la production puis on retombe sur le sandbox quand Apple
-// répond `BadDeviceToken`. "production" ou "development" forcent un seul serveur.
+// Un jeton ActivityKit n'est valide que sur le serveur APNs de l'environnement qui l'a émis :
+// sandbox pour une app lancée depuis Xcode, production pour TestFlight et l'App Store (Xcode
+// réécrit `aps-environment` à l'export, l'entitlement du repo reste "development"). Les deux
+// coexistent en permanence (l'auteur en debug, les testeurs et le public en production), donc par
+// défaut ("auto") on tente la production puis on retombe sur le sandbox quand Apple répond
+// `BadDeviceToken`. "production" ou "development" forcent un seul serveur.
 const APNS_ENVIRONMENT = Deno.env.get("APNS_ENVIRONMENT") ?? "auto";
 const APNS_HOSTS = APNS_ENVIRONMENT === "production"
   ? ["api.push.apple.com"]
@@ -65,8 +64,8 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 let cachedKey: CryptoKey | null = null;
-// Doc utilisateur — Apple recommande de réutiliser le même jeton fournisseur ~55 min plutôt que
-// d'en resigner un par requête (limite de fréquence documentée par Apple sur ces jetons).
+// Apple recommande de réutiliser le même jeton fournisseur ~55 min plutôt que d'en resigner un par
+// requête (limite de fréquence documentée par Apple sur ces jetons).
 let cachedProviderToken: { token: string; issuedAt: number } | null = null;
 
 function base64URLFromBytes(bytes: Uint8Array): string {
@@ -109,9 +108,9 @@ async function providerToken(): Promise<string> {
   const header = base64URLFromString(JSON.stringify({ alg: "ES256", kid: APNS_KEY_ID }));
   const claims = base64URLFromString(JSON.stringify({ iss: APNS_TEAM_ID, iat: now }));
   const unsigned = `${header}.${claims}`;
-  // Doc utilisateur — `crypto.subtle.sign` avec ECDSA/P-256 rend directement la signature au
-  // format brut R||S (64 octets) qu'attend un JWT ES256 (RFC 7518), pas le DER que produit
-  // OpenSSL par défaut : aucune conversion supplémentaire n'est nécessaire ici.
+  // `crypto.subtle.sign` avec ECDSA/P-256 rend directement la signature au format brut R||S (64
+  // octets) qu'attend un JWT ES256 (RFC 7518), pas le DER que produit OpenSSL par défaut : aucune
+  // conversion supplémentaire n'est nécessaire ici.
   const signature = await crypto.subtle.sign(
     { name: "ECDSA", hash: "SHA-256" },
     key,
@@ -130,9 +129,9 @@ async function sendToToken(pushToken: string, body: { event: "update" | "end"; c
     event: body.event,
     "content-state": body.contentState,
   };
-  // Doc utilisateur — remontée « la Live Activity ne disparaît jamais » : sans `dismissal-date`,
-  // iOS garde une activité terminée sur l'écran verrouillé jusqu'à 4 heures. Une date déjà
-  // atteinte la retire immédiatement, comme `dismissalPolicy: .immediate` côté app.
+  // Sans `dismissal-date`, iOS garde une activité terminée sur l'écran verrouillé jusqu'à
+  // 4 heures. Une date déjà atteinte la retire immédiatement, comme `dismissalPolicy: .immediate`
+  // côté app.
   if (body.event === "end") aps["dismissal-date"] = now;
   const payload: Record<string, unknown> = { aps };
   let response: Response | null = null;
@@ -149,21 +148,22 @@ async function sendToToken(pushToken: string, body: { event: "update" | "end"; c
       body: JSON.stringify(payload),
     });
     if (response.ok) return { ok: true, shouldForget: false };
-    // Doc utilisateur — la raison d'Apple est la seule piste quand un écran verrouillé ne suit
-    // plus : visible dans les logs de la fonction (tableau de bord Supabase).
+    // La raison d'Apple est la seule piste quand un écran verrouillé ne suit plus : visible dans
+    // les logs de la fonction (tableau de bord Supabase).
     reason = (await response.json().catch(() => ({})))?.reason;
     console.warn(`APNs ${host} status=${response.status} reason=${reason} token=${pushToken.slice(0, 8)}…`);
-    // Doc utilisateur — un jeton de l'autre environnement ne produit pas toujours
-    // `BadDeviceToken` : une clé APNs restreinte à un seul environnement répond 403
-    // `BadEnvironmentKeyInToken` sur l'autre serveur. On ne s'arrête donc que sur 410
-    // (`Unregistered` : bon serveur, jeton mort) ; le coût d'un essai inutile est un appel de plus.
+    // Un jeton de l'autre environnement ne produit pas toujours `BadDeviceToken` : une clé APNs
+    // restreinte à un seul environnement répond 403 `BadEnvironmentKeyInToken` sur l'autre serveur.
+    // On ne s'arrête donc que sur 410 (`Unregistered` : bon serveur, jeton mort) ; le coût d'un
+    // essai inutile est un appel de plus.
     if (response.status === 410) break;
   }
   if (!response) return { ok: false, shouldForget: false };
-  // Doc utilisateur — un jeton révoqué/expiré ne redeviendra jamais valide : autant nettoyer
-  // `quimene_live_activity_tokens` tout de suite plutôt que de le retenter indéfiniment à chaque manche.
-  // Seulement sur ces deux verdicts : toute autre erreur 400 (payload, horodatage…) ne dit rien du
-  // jeton, et le supprimer figeait l'écran verrouillé du pair pour le reste de la session.
+  // Un jeton révoqué/expiré ne redeviendra jamais valide : autant nettoyer
+  // `quimene_live_activity_tokens` tout de suite plutôt que de le retenter indéfiniment à chaque
+  // manche. Seulement sur ces deux verdicts : toute autre erreur 400 (payload, horodatage…) ne dit
+  // rien du jeton, et le supprimer figerait l'écran verrouillé d'un participant pour le reste de la
+  // session.
   const shouldForget = response.status === 410 || reason === "BadDeviceToken";
   return { ok: false, shouldForget };
 }
@@ -213,7 +213,7 @@ Deno.serve(async (request) => {
   const sent = results.filter((r) => r.status === "fulfilled" && r.value).length;
   const failed = results.length - sent;
 
-  // Doc 09 « Fin de partie » — repère d'activité pour `quimene-live-activity-sweep` : seul un
+  // Doc 09 « Session » — repère d'activité pour `quimene-live-activity-sweep` : seul un
   // push « update » réussi compte comme signe de vie (une partie qui vient de se terminer n'a pas
   // besoin d'être « tenue en vie » par son propre événement de fin). `last_content_state` permet
   // au balayage de renvoyer un contenu final valide plutôt que d'inventer un contenu vide.

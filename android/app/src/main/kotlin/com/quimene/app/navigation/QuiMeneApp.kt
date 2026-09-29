@@ -57,9 +57,9 @@ import com.quimene.designsystem.tokens.Space
 
 /** Hauteur réellement occupée par l'îlot flottant de [RootNavigationBar] (mesurée à l'exécution,
  * marge + barre de geste système incluses) — à ajouter au padding bas du contenu défilant de
- * chaque écran pour qu'il puisse défiler *derrière* l'îlot (doc utilisateur) sans que son dernier
- * élément reste durablement caché dessous. `0.dp` tant que la barre n'a pas encore été mesurée
- * (première composition). */
+ * chaque écran pour qu'il puisse défiler *derrière* l'îlot sans que son dernier élément reste
+ * durablement caché dessous. `0.dp` tant que la barre n'a pas encore été mesurée (première
+ * composition). */
 val LocalFloatingNavBarHeight = compositionLocalOf { 0.dp }
 
 /** Racine de l'UI — barre de navigation flottante à 4 onglets (Joueurs, Jeux, Historique,
@@ -224,10 +224,9 @@ private fun NavHostController.navigateToRoot(root: RootDestination) {
 }
 
 /** Barre de navigation flottante — îlot arrondi, séparé des bords de l'écran et surélevé (ombre),
- * plutôt qu'une barre pleine largeur collée en bas (doc utilisateur). Dessinée par-dessus le
- * `NavHost` (même `Box`, ajoutée en second) plutôt que dans un `Scaffold.bottomBar` : le contenu
- * défilant de chaque écran doit pouvoir passer *derrière* elle, pas s'arrêter au-dessus (voir
- * [LocalFloatingNavBarHeight]).
+ * plutôt qu'une barre pleine largeur collée en bas. Dessinée par-dessus le `NavHost` (même `Box`,
+ * ajoutée en second) plutôt que dans un `Scaffold.bottomBar` : le contenu défilant de chaque écran
+ * doit pouvoir passer *derrière* elle, pas s'arrêter au-dessus (voir [LocalFloatingNavBarHeight]).
  *
  * [onIslandHeightMeasured] rapporte la hauteur de l'îlot **seul** (marge + contenu), mesurée
  * *après* avoir consommé l'inset système (`windowInsetsPadding`, plus bas dans la chaîne de
@@ -273,13 +272,13 @@ private fun RootNavigationBar(
                 NavigationBarItem(
                     selected = selected,
                     onClick = {
-                        // Doc utilisateur — retaper l'onglet courant (même en profondeur dans un
-                        // écran poussé depuis sa racine, ex. le profil d'un joueur) doit revenir à
-                        // la première page de cet onglet, sur les 4 onglets. `popBackStack` ne
-                        // pop que si la racine de l'onglet est déjà quelque part sur la pile
-                        // actuelle (donc seulement quand on est *dans* cet onglet) ; sinon (on
-                        // change réellement d'onglet), repli sur le patron standard qui préserve
-                        // l'état de chaque onglet entre deux sélections.
+                        // Retaper l'onglet courant (même en profondeur dans un écran poussé depuis
+                        // sa racine, ex. le profil d'un joueur) doit revenir à la première page de
+                        // cet onglet, sur les 4 onglets. `popBackStack` ne pop que si la racine de
+                        // l'onglet est déjà quelque part sur la pile actuelle (donc seulement quand
+                        // on est *dans* cet onglet) ; sinon (on change réellement d'onglet), repli
+                        // sur le patron standard qui préserve l'état de chaque onglet entre deux
+                        // sélections.
                         navController.navigateToRoot(root)
                     },
                     icon = { Icon(root.icon, contentDescription = null) },

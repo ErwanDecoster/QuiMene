@@ -7,18 +7,18 @@ import SwiftUI
 import Sync
 import UIKit
 
-/// Écran « Rejoindre », présenté en plein écran depuis la racine (`DeepLinkRouter.isPresentingJoin`)
-/// — c'était un onglet jusqu'à la doc 16 (phase A), où Profil l'a remplacé. Doc utilisateur :
-/// réduire le nombre de taps pour rejoindre une partie — l'ouvrir affiche directement la caméra,
-/// prête à scanner. « Fermer » masque l'écran sans quitter la partie suivie (bandeau de reprise
-/// dans Jeux) ; seuls « Quitter la partie » et la fin de la session (doc 16) déconnectent.
+/// Écran « Rejoindre », présenté en plein écran depuis la racine
+/// (`DeepLinkRouter.isPresentingJoin`) (doc 16, phase A). Pour réduire le nombre de taps pour
+/// rejoindre une partie, l'ouvrir affiche directement la caméra, prête à scanner. « Fermer » masque
+/// l'écran sans quitter la partie suivie (bandeau de reprise dans Jeux) ; seuls « Quitter la
+/// partie » et la fin de la session (doc 16) déconnectent.
 ///
-/// Le rôle n'est plus choisi ici : ce n'est pas à la personne qui rejoint de décider si elle peut
-/// modifier la partie, mais à l'hôte (`ShareSessionView`, « Autoriser les contributeurs »). On
-/// demande donc toujours le rôle le plus capable (`.contributor`) — l'hôte le rétrograde en
-/// observateur si besoin (`MatchConnectionCoordinator.rejoin`, doc 09 « l'hôte peut assigner un
-/// rôle différent de celui demandé »), et `SharedMatchView` reflète déjà le rôle réellement
-/// accordé une fois connecté.
+/// Le rôle n'est pas choisi ici : ce n'est pas à la personne qui rejoint de décider si elle peut
+/// modifier la partie, mais au créateur (`ShareSessionView`, « Autoriser les contributeurs »,
+/// doc 09 « Rôles et saisie »). On demande donc toujours le rôle le plus capable (`.contributor`),
+/// ramené à observateur si la session n'autorise pas les contributeurs
+/// (`MatchConnectionCoordinator.rejoin`) ; `SharedMatchView` reflète le rôle réellement accordé une
+/// fois connecté.
 struct JoinTabView: View {
   @Environment(DeepLinkRouter.self) private var deepLinkRouter
   @Environment(\.dismiss) private var dismiss
@@ -132,9 +132,9 @@ struct JoinTabView: View {
     .presentationDetents([.medium])
   }
 
-  /// Doc utilisateur — un lien `quimene://join` (appareil photo système, Messages…) ou un QR
-  /// scanné avant que cet onglet n'existe encore doit être consommé dès qu'il apparaît, comme
-  /// les autres signaux de `DeepLinkRouter`.
+  /// Un lien `quimene://join` (appareil photo système, Messages…) ou un QR scanné avant que cet
+  /// onglet n'existe encore doit être consommé dès qu'il apparaît, comme les autres signaux de
+  /// `DeepLinkRouter`.
   private func consumePendingJoin() {
     guard let payload = deepLinkRouter.pendingJoin else { return }
     deepLinkRouter.pendingJoin = nil
@@ -159,14 +159,14 @@ struct JoinTabView: View {
     }
   }
 
-  /// Doc utilisateur — reprise après une connexion perdue, déclenchée par le bouton
-  /// « Se reconnecter » de `SharedMatchView`.
+  /// Reprise après une connexion perdue, déclenchée par le bouton « Se reconnecter » de
+  /// `SharedMatchView`.
   private func reconnect() async -> Bool {
     await coordinator.reconnectNow()
   }
 
   /// Code introuvable (erroné, expiré, session arrêtée) ou échec réseau : deux causes, deux
-  /// messages. Plus d'hôte qui doit répondre (doc 16, phase C).
+  /// messages (doc 16, phase C).
   private static func describe(_ error: Error) -> String {
     switch error {
     case OnlineSessionError.sessionNotFound:

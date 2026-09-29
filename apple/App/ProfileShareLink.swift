@@ -1,11 +1,11 @@
 import Foundation
 
-/// Doc 14 « Profils partagés » — lien qui transporte l'identifiant permanent liant deux fiches
-/// joueur sur deux appareils différents. Contrairement à `JoinLink` (un code d'appairage
-/// éphémère, valable une soirée), l'identifiant transporté ici ne périme jamais : une fois liée,
-/// une fiche reste liée jusqu'à délier explicitement.
+/// Doc 14 — lien qui transporte l'identifiant permanent liant deux fiches joueur sur deux appareils
+/// différents. Contrairement à `JoinLink` (un code d'appairage éphémère, valable une soirée),
+/// l'identifiant transporté ici ne périme jamais : une fois liée, une fiche reste liée jusqu'à
+/// délier explicitement.
 ///
-/// Doc 14, phase 3 — transporte aussi l'avatar (pas seulement le pseudo, jusqu'ici jamais montré
+/// Doc 14 — transporte aussi l'avatar (pas seulement le pseudo, jusqu'ici jamais montré
 /// à qui scannait) : celui qui lie peut choisir d'adopter le pseudo et l'avatar de la personne
 /// représentée plutôt que de garder ceux, potentiellement approximatifs, qu'il avait choisis à
 /// la création de sa propre fiche. Une photo ne peut pas transiter par un QR (poids, densité de

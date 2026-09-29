@@ -12,8 +12,8 @@ import UIKit
 /// (`OnlineSession`), le canal temps réel (`SessionChannel`), le rattrapage à chaque notification
 /// ou retour au premier plan, l'état du réseau, et l'ajout d'un événement.
 ///
-/// Plus d'hôte qui arbitre : chaque appareil valide sa saisie contre l'état à jour, et le serveur
-/// garantit l'ordre (numéro attendu). Le créateur n'a donc plus besoin d'être allumé.
+/// Aucun appareil n'arbitre : chaque appareil valide sa saisie contre l'état à jour, et le serveur
+/// garantit l'ordre (numéro attendu). Le créateur n'a donc pas besoin d'être allumé.
 @MainActor
 @Observable
 final class SessionLink {
@@ -202,8 +202,7 @@ final class SessionLink {
 }
 
 /// Doc 16, phase C — ce qu'un appareil retient d'une session pour la reprendre après un
-/// redémarrage de l'app, créateur compris (auparavant, une app tuée en arrière-plan côté hôte
-/// perdait le partage).
+/// redémarrage de l'app, créateur compris : une app tuée en arrière-plan ne perd pas le partage.
 struct PersistedOnlineSession: Codable, Equatable {
   enum Role: String, Codable {
     case owner, participant

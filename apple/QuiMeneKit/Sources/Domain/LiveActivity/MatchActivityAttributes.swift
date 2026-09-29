@@ -2,15 +2,14 @@
   import ActivityKit
   import Foundation
 
-  /// Doc utilisateur — Live Activity (roadmap P9) : le score de la partie en cours sur l'écran
-  /// verrouillé et la Dynamic Island. Défini dans `Domain` (pas dans l'app) pour que la cible
-  /// widget et la cible app partagent exactement le même type sans dupliquer de fichier entre les
-  /// deux projets Xcode — les deux dépendent déjà du package `QuiMeneKit`. `ActivityAttributes`
-  /// n'existe pas sur macOS (`Package.swift` déclare aussi cette plateforme, doc roadmap « Après la
-  /// v1 ») — tout le fichier est donc exclu de ce côté plutôt que de casser le build macOS du
-  /// package pour un type que rien n'y consomme.
+  /// Live Activity : le score de la partie en cours sur l'écran verrouillé et la Dynamic Island.
+  /// Défini dans `Domain` (pas dans l'app) pour que la cible widget et la cible app partagent
+  /// exactement le même type sans dupliquer de fichier entre les deux projets Xcode — les deux
+  /// dépendent déjà du package `QuiMeneKit`. `ActivityAttributes` n'existe pas sur macOS
+  /// (`Package.swift` déclare aussi cette plateforme) — tout le fichier est donc exclu de ce côté
+  /// plutôt que de casser le build macOS du package pour un type que rien n'y consomme.
   ///
-  /// Doc 09 « Fin de partie » — `matchID`/`gameName`/`gameSymbol` vivent dans `ContentState`, pas
+  /// Doc 09 « Session » — `matchID`/`gameName`/`gameSymbol` vivent dans `ContentState`, pas
   /// dans les attributs fixes : ActivityKit ne permet aucune modification des attributs après
   /// `Activity.request`, alors qu'une session de partage peut désormais enchaîner plusieurs parties
   /// (voire plusieurs jeux) sans jamais recréer l'Activity — seul un `ContentState` mutable permet
@@ -23,8 +22,8 @@
       public let gameSymbol: String
       public let roundNumber: Int
       public let standings: [Standing]
-      /// Doc utilisateur — remontée : côté pair, la connexion à l'hôte peut tomber (app en
-      /// arrière-plan…) sans que la partie soit terminée ; l'affichage se figeait alors sur le
+      /// Sur un appareil qui suit la partie, la connexion à la session peut tomber (app en
+      /// arrière-plan…) sans que la partie soit terminée ; l'affichage se figerait alors sur le
       /// dernier score reçu sans le dire. `true` signale que ce n'est plus mis à jour, plutôt
       /// que de laisser croire à un score en direct qui ne l'est plus.
       public let isStale: Bool

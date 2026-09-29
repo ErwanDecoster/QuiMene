@@ -15,7 +15,7 @@ const faq = [
   },
   {
     id: 'lock-screen',
-    q: 'The score does not show on the Lock Screen',
+    q: 'The score does not show on the iPhone Lock Screen',
     a: `Check that “Live Activities” is on in Settings › ${site.name}. The display ends by itself 30 minutes after the last round.`,
   },
   {
@@ -26,7 +26,7 @@ const faq = [
   {
     id: 'new-device',
     q: 'Get your games on a new device',
-    a: 'Turn on “iCloud Sync” in the app’s Settings (Profile tab), on both devices, with the same Apple Account.',
+    a: 'On iPhone and iPad: turn on “iCloud Sync” in the app’s Settings (Profile tab), on both devices, with the same Apple Account. On Android: restore the old phone’s backup while setting up the new one.',
   },
   {
     id: 'received-match',
@@ -62,8 +62,8 @@ const faq = [
     <h2>Contact</h2>
     <p>
       For a problem, a suggestion or a question about your data:
-      <a href={`mailto:${site.email}`}>{site.email}</a>. Mentioning your device model and iOS
-      version helps us answer faster.
+      <a href={`mailto:${site.email}`}>{site.email}</a>. Mentioning your device model and iOS or
+      Android version helps us answer faster.
     </p>
   </article>
 </Base>

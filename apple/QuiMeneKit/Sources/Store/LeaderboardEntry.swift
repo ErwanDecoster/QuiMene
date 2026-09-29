@@ -1,9 +1,8 @@
 import Foundation
 
-/// Doc 06 « Statistiques de groupe » (roadmap « après la v1 ») — un joueur dans le classement
-/// d'un jeu donné. Champs à plat plutôt qu'une référence à `PlayerRecord` : même choix que
-/// `ProfileStats.Nemesis`, pour rester `Sendable` sans faire fuiter un modèle SwiftData hors de
-/// `Store`.
+/// Doc 06 « Classement par jeu » — un joueur dans le classement d'un jeu donné. Champs à plat
+/// plutôt qu'une référence à `PlayerRecord` : même choix que `ProfileStats.Nemesis`, pour rester
+/// `Sendable` sans faire fuiter un modèle SwiftData hors de `Store`.
 public struct LeaderboardEntry: Sendable, Equatable, Identifiable {
   public let playerID: UUID
   public let name: String

@@ -1,8 +1,7 @@
 import CoreImage.CIFilterBuiltins
 import SwiftUI
 
-/// Doc utilisateur — encodé via CoreImage (`CIFilter.qrCodeGenerator()`), système, zéro
-/// dépendance tierce (ADR-0012).
+/// Encodé via CoreImage (`CIFilter.qrCodeGenerator()`), système, zéro dépendance tierce (ADR-0012).
 struct QRCodeView: View {
   let url: URL
 

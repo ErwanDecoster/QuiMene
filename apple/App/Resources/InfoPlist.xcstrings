@@ -1,0 +1,42 @@
+{
+  "sourceLanguage" : "fr",
+  "strings" : {
+    "NSCameraUsageDescription" : {
+      "comment" : "Privacy - Camera Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qui Mène ? verwendet die Kamera, um einen Kopplungscode für ein Spiel oder ein geteiltes Profil zu scannen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qui Mène ? uses the camera to scan a pairing code for a game or a shared profile."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qui Mène ? usa la cámara para escanear un código de emparejamiento de una partida o de un perfil compartido."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qui Mène ? utilise l'appareil photo pour scanner un code d'appairage de partie ou de profil partagé."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Qui Mène ? usa la fotocamera per scansionare un codice di abbinamento di una partita o di un profilo condiviso."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

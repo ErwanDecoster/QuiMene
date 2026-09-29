@@ -17,17 +17,16 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 /**
- * Miroir de `MatchSetupModel.swift`. **Le partage/la partie partagée en direct (doc 09,
- * `JoinTabView`/`QRScannerView`) ne sont pas portés** : dépendent de `:sync` (étape F). Seule la
- * mise en place d'une partie locale est couverte ici.
+ * Miroir de `MatchSetupModel.swift` : mise en place d'une partie locale. Le partage en direct
+ * (doc 09) vit ailleurs ([com.quimene.app.livesync.LiveShareCoordinator], écran Rejoindre).
  */
 class MatchSetupViewModel(
     val definition: GameDefinition,
     availablePlayers: List<PlayerEntity>,
     private val repository: MatchRepository,
 ) : ViewModel() {
-    /** Doc utilisateur — les habitués en tête de la liste : sans ça, un groupe de 8+ joueurs
-     * doit chercher les mêmes 4-5 noms dans une liste triée arbitrairement à chaque partie. */
+    /** Les habitués en tête de la liste : sans ça, un groupe de 8+ joueurs doit chercher les mêmes
+     * 4-5 noms dans une liste triée arbitrairement à chaque partie. */
     var orderedAvailablePlayers: List<PlayerEntity> = availablePlayers
         private set
 

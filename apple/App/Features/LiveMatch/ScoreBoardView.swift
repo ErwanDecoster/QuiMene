@@ -3,21 +3,18 @@ import Domain
 import Store
 import SwiftUI
 
-/// Doc utilisateur — remontée : `LiveMatchView` (hôte) et `SharedMatchView` (pair) affichaient la
-/// même chose — classement, lignes de score, sélection du joueur qui ferme, validation — via deux
-/// implémentations indépendantes qui avaient fini par diverger (classement absent côté pair,
-/// bouton de signe manquant côté pair, aucune validation locale avant l'envoi côté contributeur).
-/// Un seul composant, utilisé par les deux écrans : une différence de comportement entre hôte et
-/// pair devient impossible par construction, plutôt qu'un correctif à refaire des deux côtés.
+/// Classement, lignes de score, sélection du joueur qui ferme et validation, partagés par
+/// `LiveMatchView` (créateur) et `SharedMatchView` (appareil qui a rejoint). Un seul composant pour
+/// les deux écrans : une différence de comportement entre eux devient impossible par construction,
+/// plutôt qu'un correctif à refaire des deux côtés.
 ///
-/// Doc utilisateur — remontée : porte uniquement du contenu de liste (`Section`/lignes), jamais
-/// `.toolbar`/`.safeAreaInset`. Cette vue est utilisée comme *contenu* d'un `List` parent
-/// (`List { ScoreBoardView(...) }`) — lui poser ces deux modificateurs faisait dupliquer tout le
-/// rendu (liste *et* barre de clavier) : SwiftUI matérialise deux fois une vue-contenu de liste
-/// qui porte elle-même un `.toolbar`/`.safeAreaInset`, une fois comme ligne, une fois pour en
-/// extraire les préférences de chrome d'écran. Le clavier/la barre de validation restent donc
-/// posés par l'écran appelant, via les fonctions statiques ci-dessous — mêmes boutons, mêmes
-/// libellés, sans le bug.
+/// Porte uniquement du contenu de liste (`Section`/lignes), jamais `.toolbar`/`.safeAreaInset`.
+/// Cette vue est utilisée comme *contenu* d'un `List` parent (`List { ScoreBoardView(...) }`) — lui
+/// poser ces deux modificateurs fait dupliquer tout le rendu (liste *et* barre de clavier) :
+/// SwiftUI matérialise deux fois une vue-contenu de liste qui porte elle-même un
+/// `.toolbar`/`.safeAreaInset`, une fois comme ligne, une fois pour en extraire les préférences de
+/// chrome d'écran. Le clavier/la barre de validation restent donc posés par l'écran appelant, via
+/// les fonctions statiques ci-dessous — mêmes boutons, mêmes libellés, sans duplication.
 struct ScoreBoardView: View {
   let participants: [Participant]
   let totals: [Participant.ID: Int]
@@ -26,8 +23,8 @@ struct ScoreBoardView: View {
   /// `false` pour un observateur : lecture seule, aucun champ de score.
   let canEdit: Bool
   let validationMessage: String?
-  /// Doc utilisateur — « Tu observes cette partie… » : n'a de sens que côté pair, `nil` pour
-  /// l'hôte.
+  /// « Tu observes cette partie… » : n'a de sens que pour un appareil qui a rejoint, `nil` pour
+  /// le créateur.
   let readOnlyMessage: String?
   /// Doc 16 — « Moi » sur la place qui correspond à mon profil, et un lien sur celles de mes amis.
   var profileBadges: [Participant.ID: ProfileBadge] = [:]
@@ -145,8 +142,8 @@ struct ScoreBoardView: View {
       .padding(.horizontal, Space.md)
       .frame(width: 88, height: ButtonHeight.medium)
       .background(.neutralFill, in: .rect(cornerRadius: Radius.sm))
-      // Doc 08 « Accessibilité — Contrôle vocal » : un libellé lié au pseudo pour que VoiceOver
-      // annonce ce champ précis au focus, indépendamment du regroupement de ligne ci-dessus.
+      // Doc 08 « Accessibilité » : un libellé lié au pseudo pour que VoiceOver annonce ce champ
+      // précis au focus, indépendamment du regroupement de ligne ci-dessus.
       .accessibilityLabel(String(localized: "\(participant.displayName), score"))
       .overlay {
         RoundedRectangle(cornerRadius: Radius.sm)
@@ -232,11 +229,11 @@ extension ScoreBoardView {
     }
   }
 
-  /// Doc utilisateur — la barre d'accessoires du clavier (juste au-dessus) disparaît avec lui :
-  /// sur iPad notamment, le bouton natif de fermeture du clavier laissait l'écran sans aucun
-  /// moyen de valider la manche en cours (bug remonté). Ce bouton prend le relais, mais
-  /// uniquement quand le clavier est masqué — sinon il doublonne celui déjà présent au-dessus.
-  /// Posée par l'écran appelant sur son propre `.safeAreaInset`, jamais par `ScoreBoardView`.
+  /// La barre d'accessoires du clavier (juste au-dessus) disparaît avec lui : sur iPad notamment,
+  /// le bouton natif de fermeture du clavier laissait l'écran sans aucun moyen de valider la manche
+  /// en cours (bug remonté). Ce bouton prend le relais, mais uniquement quand le clavier est masqué
+  /// — sinon il doublonne celui déjà présent au-dessus. Posée par l'écran appelant sur son propre
+  /// `.safeAreaInset`, jamais par `ScoreBoardView`.
   @ViewBuilder
   static func submitBar(
     isKeyboardVisible: Bool, submitLabel: LocalizedStringResource, onSubmit: @escaping () -> Void

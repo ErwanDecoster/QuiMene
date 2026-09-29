@@ -29,10 +29,10 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import java.util.UUID
 
-/** Doc utilisateur P9 — clé **anon/publique** Supabase : conçue pour être embarquée dans un
- * client (l'accès aux tables passe par des fonctions SQL qui exigent un code ou un identifiant,
- * pas par le secret). Le contenu des parties partagées reste protégé par [SessionCrypto]. Même
- * projet que l'app Apple (`SupabaseSyncConfig.swift`). */
+/** Clé **anon/publique** Supabase : conçue pour être embarquée dans un client (l'accès aux tables
+ * passe par des fonctions SQL qui exigent un code ou un identifiant, pas par le secret). Le contenu
+ * des parties partagées reste protégé par [SessionCrypto]. Même projet que l'app Apple
+ * (`SupabaseSyncConfig.swift`). */
 object SupabaseSyncConfig {
     const val PROJECT_URL = "https://hcjehnnvqmkdwirgpcgu.supabase.co"
     const val ANON_KEY = "sb_publishable_YhV5A3mH3aUCejLx1QC2OQ_Hc18SA_b"
@@ -208,7 +208,7 @@ class SessionChannel(
             }
         jobs += scope.launch { channel.presenceChangeFlow().collect(::apply) }
         // `track()` n'est jamais rejoué par un ré-abonnement du SDK : le refaire à chaque
-        // passage à SUBSCRIBED (même remontée que côté Apple).
+        // passage à SUBSCRIBED (même comportement que côté Apple).
         jobs +=
             scope.launch {
                 channel.status.collect { status ->

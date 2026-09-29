@@ -3,7 +3,7 @@ import Testing
 
 @testable import Domain
 
-/// Doc 09 « Invariants et tests de propriété » — sept vérités qui doivent tenir pour *toute*
+/// Doc 10 « Invariants et tests de propriété » — sept vérités qui doivent tenir pour *toute*
 /// partie, pas seulement les cas écrits à la main. `DummyRules` ne fait rien de plus que
 /// `GenericSumRules` (Catalog) : elle exerce les mêmes défauts de `GameRules`, sans faire
 /// dépendre `DomainTests` de `Catalog`.

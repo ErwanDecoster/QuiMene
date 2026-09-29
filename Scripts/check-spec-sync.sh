@@ -3,8 +3,7 @@
 # embarquée diverge de spec/ : games/ -> Catalog/GameDefinitions (l'app), golden/ -> CatalogTests
 # (les tests ne peuvent pas référencer spec/ directement, SwiftPM exige des ressources locales à la
 # cible), session/ -> SyncTests/SessionResources (fichiers de référence iOS <-> Android, doc 16 ;
-# le lanceur de tests du simulateur ne peut pas lire ~/Documents directement). spec/wire/ (ancien
-# protocole hôte/pair, doc 09) n'existe plus depuis la doc 16, phase C.
+# le lanceur de tests du simulateur ne peut pas lire ~/Documents directement).
 set -eu
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"

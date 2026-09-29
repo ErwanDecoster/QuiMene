@@ -12,8 +12,10 @@ spec/
 ├── schema/game-definition.schema.json   contrat de format (JSON Schema 2020-12)
 ├── games/*.json                         définitions déclaratives des jeux
 ├── golden/*.json                        parties complètes + résultats attendus
-└── session/*.json                       événements de session en ligne scellés par le code
-                                          Swift (doc 16), à relire à l'identique sur Android
+├── session/*.json                       formats échangés entre appareils, produits par le code
+│                                         réel d'une plateforme et relus par l'autre (doc 17)
+└── screenshots/demo-data.json           joueurs et parties de démo des captures des stores
+                                          (Scripts/store-screenshots.sh, doc 10)
 ```
 
 ## Règle d'or
@@ -50,28 +52,23 @@ continuent de tourner.
 ## Synchronisation avec le code
 
 Les définitions sont embarquées dans les applications, jamais téléchargées — l'app fonctionne
-hors ligne. Côté Apple, un script de build copie `games/` vers
-`apple/QuiMeneKit/Sources/Catalog/GameDefinitions/` et **échoue si les deux diffèrent**. `spec/` est
-la source ; la copie n'est jamais éditée à la main. (Le dossier ne s'appelle délibérément pas
-`Resources` : un dossier de ce nom copié tel quel dans un bundle fait planter `codesign` sur
-certaines versions de macOS/Xcode — voir README « Correctif post-Phase 6 ».)
-
-## Jeux en attente de leur moteur
-
-`games/.pending/` contient des définitions écrites en avance mais dont le moteur n'est pas
-encore implémenté (ex. `yams.json`, prévu [Phase 7](../docs/12-roadmap.md)). Volontairement en
-dehors de `games/*.json` pour ne pas casser le test d'exhaustivité du catalogue (« toute règle
-référencée existe »). À déplacer dans `games/` seulement en même temps que ses golden files et
-son moteur, jamais avant.
+hors ligne. Côté Apple, SwiftPM exige des ressources locales à la cible : `games/` est copié dans
+`apple/QuiMeneKit/Sources/Catalog/GameDefinitions/` (et les golden files et fixtures dans les
+dossiers de ressources des tests). `Scripts/check-spec-sync.sh` **échoue si une copie diffère** ;
+la CI le lance des deux côtés. `spec/` est la source ; les copies ne sont jamais éditées à la
+main. (Le dossier ne s'appelle délibérément pas `Resources` : un dossier de ce nom copié tel quel
+dans un bundle fait planter `codesign` sur certaines versions de macOS/Xcode.) Côté Android, une
+tâche Gradle recopie `spec/` à chaque build, sans copie commitée.
 
 ## Ajouter un jeu
 
-1. `games/<id>.json` — valider contre le schéma
-2. Au moins **deux** golden files : une partie nominale, et le cas limite qui fait la
+1. `games/<id>.json` — valider contre le schéma, traduire nom et libellés dans les cinq langues
+2. Des golden files couvrant une partie nominale et, s'il existe, le cas limite qui fait la
    particularité du jeu
-3. Si `engine` ≠ `generic.sum.v1`, implémenter `GameRules` jusqu'à ce que les golden passent
-4. Enregistrer l'`engineID` dans la table du catalogue (un test vérifie l'exhaustivité)
-5. Traduire les libellés dans les catalogues de chaînes de chaque plateforme
+3. Si `engine` ≠ `generic.sum.v1`, implémenter `GameRules` en Swift et en Kotlin jusqu'à ce que
+   les golden passent
+4. Enregistrer l'`engineID` dans la table de chaque catalogue (un test vérifie l'exhaustivité)
+5. Recopier dans les copies Apple (`Scripts/check-spec-sync.sh`)
 
 ## Format d'un golden file
 
@@ -100,7 +97,7 @@ règles, et un golden ne doit pas casser parce qu'un nouvel indicateur a été a
 
 ## Format d'une fixture `session/`
 
-Doc [16](../docs/16-sessions-en-ligne-et-profils.md) — un événement de session en ligne est un
+Doc [09](../docs/09-partie-partagee.md) — un événement de session en ligne est un
 `StampedEvent` en JSON, scellé en AES-GCM avec la clé de session (code d'appairage + identifiant
 de session), puis en base64. `sealed-events.json` est **généré par le code Swift réel**
 (`OnlineSession.seal`) avec un code et une session fixes : `plaintext` est le JSON que produit
@@ -108,21 +105,18 @@ de session), puis en base64. `sealed-events.json` est **généré par le code Sw
 retrouver exactement l'événement décrit par `plaintext`. Le nonce étant aléatoire, l'inverse
 (identité d'octets chiffrés) n'est ni atteignable ni pertinent.
 
-`identity-events.json` (doc 16, phase D) suit le même principe pour les événements d'identité :
+`identity-events.json` suit le même principe pour les événements d'identité :
 `plaintext` est l'enveloppe `{"identity": …}` produite par `JSONEncoder`, régénérée par
 `QUIMENE_WRITE_SPEC=1` sur `SessionIdentityTests` (via `TEST_RUNNER_QUIMENE_WRITE_SPEC=1` avec
 `xcodebuild test`).
 
-`mailbox-package.json` (doc 16, phase E) : une partie complète (`SharedMatchPackage`) scellée
+`mailbox-package.json` : une partie complète (`SharedMatchPackage`) scellée
 pour un profil (`MailboxCrypto`), avec l'adresse de sa boîte (`mailboxKey`, empreinte de
 l'identifiant) : Android doit retrouver la même adresse et le même paquet.
 
-Dans l'autre sens (doc 16, phase G), `android-*.json` sont produits par le code Kotlin réel
+Dans l'autre sens, `android-*.json` sont produits par le code Kotlin réel
 (`AndroidFixturesTest`) et relus par `AndroidFixtureTests` (Swift), qui reconstruit les mêmes
 valeurs indépendamment : événements de partie de toutes les sortes, identités, boîte aux lettres,
 mise à jour d'écran verrouillé. Côté Apple, ces fichiers sont lus depuis leur copie
 `Tests/SyncTests/SessionResources/` (vérifiée par `Scripts/check-spec-sync.sh`). Procédure de
 régénération : doc [17](../docs/17-recette-croisee.md).
-
-Remplace les fixtures `wire/` de l'ancien protocole hôte/pair (doc 09), supprimé des deux
-plateformes par la phase C de la doc 16.

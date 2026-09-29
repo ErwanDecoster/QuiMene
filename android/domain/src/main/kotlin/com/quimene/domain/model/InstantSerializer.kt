@@ -12,15 +12,14 @@ import kotlin.math.roundToLong
 
 /**
  * Représente `Date` (charte de discipline Swift : `UUID`, `Date`, `Data`, `Codable` seulement dans
- * `Domain`) — **pas en ISO-8601** : `JSONEncoder()`/`JSONDecoder()` côté Swift (`WireCodec.swift`,
- * `MatchRepository.swift`) n'y configurent aucune `dateEncodingStrategy` personnalisée, donc la
- * stratégie par défaut de Foundation s'applique (`.deferredToDate`) — un simple nombre à virgule
- * flottante, `timeIntervalSinceReferenceDate` (secondes écoulées depuis le 1er janvier 2001
- * 00:00:00 UTC, la date de référence Foundation — **pas** l'epoch Unix de 1970). Vérifié contre
- * les golden files du protocole applicatif (`occurredAt`, dossier `spec/wire`, étape F) — les
- * golden files de l'étape C (dossier `spec/golden`) n'exercent jamais ce sérialiseur (aucune date
- * dans leur format ad hoc), donc rien à ce niveau ne dépendait du format ISO-8601 initialement
- * choisi ici sans vérification.
+ * `Domain`) — **pas en ISO-8601** : `JSONEncoder()`/`JSONDecoder()` côté Swift
+ * (`OnlineSession.swift`, `MatchRepository.swift`) n'y configurent aucune `dateEncodingStrategy`
+ * personnalisée, donc la stratégie par défaut de Foundation s'applique (`.deferredToDate`) — un
+ * simple nombre à virgule flottante, `timeIntervalSinceReferenceDate` (secondes écoulées depuis le
+ * 1er janvier 2001 00:00:00 UTC, la date de référence Foundation — **pas** l'epoch Unix de 1970).
+ * Vérifié contre les fichiers de référence croisés (`occurredAt`, dossier `spec/session`, doc 17) —
+ * les golden files (dossier `spec/golden`) n'exercent jamais ce sérialiseur (aucune date dans leur
+ * format).
  */
 object InstantSerializer : KSerializer<Instant> {
     /** `Date(timeIntervalSinceReferenceDate: 0)` en secondes depuis l'epoch Unix. */

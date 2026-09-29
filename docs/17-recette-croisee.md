@@ -1,8 +1,8 @@
 # 17 — Recette croisée iOS ↔ Android
 
-Doc [16](16-sessions-en-ligne-et-profils.md), phase G. Les deux applications parlent le même
-protocole : journal de session chiffré, identités, boîte aux lettres, mises à jour d'écran
-verrouillé. Deux garde-fous le vérifient.
+Les deux applications parlent le même protocole : journal de session chiffré, identités, boîte
+aux lettres, mises à jour d'écran verrouillé ([09](09-partie-partagee.md),
+[14](14-profils-partages.md)). Deux garde-fous vérifient qu'elles restent compatibles.
 
 ## 1. Fichiers de référence (automatiques)
 

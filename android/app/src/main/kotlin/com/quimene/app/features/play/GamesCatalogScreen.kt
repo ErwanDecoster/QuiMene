@@ -46,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -76,7 +77,7 @@ import kotlinx.coroutines.launch
  * description courte. Chaque ligne ouvre la mise en place d'une partie ; l'icône de trophée
  * ouvre son classement (remplace l'action de balayage « Meilleurs joueurs » d'iOS, sans
  * équivalent standard côté Android). Au-dessus : les parties en cours à reprendre (doc 01) et,
- * quand une session est déjà partagée, un accès direct à sa gestion (code, pairs, arrêt) sans
+ * quand une session est déjà partagée, un accès direct à sa gestion (code, appareils, arrêt) sans
  * avoir à rouvrir la partie — miroir du bouton `topBarTrailing` d'iOS. */
 @Composable
 fun GamesCatalogScreen(
@@ -334,6 +335,7 @@ private fun ResumeMatchRow(
         modifier =
             Modifier
                 .fillMaxWidth()
+                .testTag("resume-match")
                 .clickable(onClick = onClick)
                 .padding(horizontal = Space.lg, vertical = Space.md),
         verticalAlignment = Alignment.CenterVertically,

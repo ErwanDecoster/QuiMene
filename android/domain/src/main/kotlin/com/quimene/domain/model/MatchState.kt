@@ -49,11 +49,10 @@ data class MatchState internal constructor(
     }
 
     /** Numéro de la prochaine manche : un de plus que le plus grand numéro existant, jamais
-     * `rounds.size`. Le reducer *remplace* une manche de même numéro ; une partie dont les
-     * numéros ont un trou (manche d'un pair perdue en route, acceptée ensuite hors séquence par
-     * un hôte d'avant le contrôle `LiveSession.hostCommitLocked`) voyait sinon chaque nouvelle
-     * manche écraser la dernière — totaux qui bougent, « Manche 8 » figé. Miroir de
-     * `MatchState.nextRoundIndex` côté Apple. */
+     * `rounds.size`. Le reducer *remplace* une manche de même numéro ; une partie dont les numéros
+     * ont un trou (enregistrée par une ancienne version qui acceptait une manche hors séquence)
+     * verrait sinon chaque nouvelle manche écraser la dernière — totaux qui bougent, « Manche 8 »
+     * figé. Miroir de `MatchState.nextRoundIndex` côté Apple. */
     val nextRoundIndex: Int get() = (rounds.maxOfOrNull { it.index } ?: -1) + 1
 
     fun totals(): Map<UUID, Int> {

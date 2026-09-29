@@ -21,8 +21,9 @@ les Notes de l'iPhone. Trois frictions reviennent :
 
 Trois principes non négociables :
 
-- **Hors-ligne d'abord.** Aucune fonctionnalité de la v1 ne requiert Internet. On joue en
-  vacances, dans un chalet, dans un train.
+- **Hors-ligne d'abord.** Tout ce qui se joue sur un seul appareil fonctionne sans Internet.
+  On joue en vacances, dans un chalet, dans un train. Seul le partage entre appareils demande
+  une connexion.
 - **Zéro compte.** Pas d'inscription, pas de mot de passe, pas d'email. Les joueurs sont des
   fiches locales, pas des identités.
 - **Rapide à la saisie.** Entre deux manches, on a 10 secondes d'attention. Trois taps maximum
@@ -45,11 +46,9 @@ manche par manche et l'écran de statistiques existent en grande partie pour lui
 ## Parcours principal
 
 ```
-Accueil
-  └─ « Nouvelle partie »
-       ├─ Choix du jeu ............ catalogue, recherche, « récents »
-       ├─ Choix des joueurs ....... fiches existantes + « invité » ponctuel
-       │                            réorganisation de l'ordre de jeu par glisser-déposer
+Onglet Jeux
+  └─ Choix du jeu ............... catalogue, recherche
+       ├─ Choix des joueurs ....... fiches existantes, ordre de jeu
        ├─ Options de variante ..... seuil de fin, règles optionnelles (pré-remplies)
        └─ « C'est parti »
             │
@@ -65,33 +64,37 @@ Accueil
        Résultats
          · podium animé
          · courbe d'évolution des scores
-         · 4 à 6 faits marquants (« Alice : plus gros tour, 40 points »)
+         · jusqu'à 6 faits marquants (« Alice : plus gros tour, 40 points »)
          · badges décernés
-         · partage d'une image de résumé
+         · partage d'une image de résumé (iOS)
             │
             ▼
        Historique (la partie est sauvegardée automatiquement, dès la manche 1)
 ```
 
-## Périmètre v1
+## Périmètre
 
 **Inclus**
 
 - Fiches joueurs : pseudo, avatar, couleur ; création, édition, archivage
-- Avatars : symbole SF + palette (défaut), emoji, ou photo de la photothèque
-- Catalogue de 6 jeux au lancement (voir [05](05-catalogue-jeux.md) pour la priorisation)
+- Avatars : emoji et couleur dérivés du pseudo (défaut), ou photo de la photothèque
+- Catalogue de 20 jeux, dont un jeu libre (voir [05](05-catalogue-jeux.md))
 - Partie tour par tour : saisie, correction, annulation, détection automatique de la fin
 - Sauvegarde automatique et reprise d'une partie interrompue
 - Écran de résultats avec statistiques et badges
 - Historique des parties, filtrable par jeu et par joueur
 - Fiche de profil par joueur : parties jouées, victoires, records
-- Synchronisation iCloud entre les appareils du propriétaire
-- Partie partagée en direct autour de la table, entre iPhone et Android (Supabase Realtime)
-- Français et anglais, Dynamic Type, VoiceOver, mode sombre
+- Synchronisation iCloud entre les appareils Apple du propriétaire, sauvegarde automatique sur
+  Android
+- Partie partagée en direct entre iPhone et Android, par code ou QR ([09](09-partie-partagee.md))
+- Profil sans compte, amis liés, historique partagé ([14](14-profils-partages.md))
+- Score sur l'écran verrouillé et dans la Dynamic Island (iOS)
+- Français, anglais, espagnol, allemand et italien ; Dynamic Type, VoiceOver, TalkBack, mode
+  sombre
 
-**Explicitement hors périmètre v1**
+**Explicitement hors périmètre**
 
-- Multijoueur à distance, comptes utilisateurs, classements en ligne
+- Comptes utilisateurs, classements publics en ligne
 - Reconnaissance de score par photo / OCR
 - Chronomètre de tour, gestion des mises, mode tournoi à plusieurs tables
 - Règles complètes des jeux (l'app compte, elle n'arbitre pas et n'explique pas comment jouer)
@@ -108,4 +111,4 @@ Accueil
 - **Une partie perdue.** Un crash en milieu de soirée qui efface 40 minutes de scores est
   rédhibitoire. D'où la persistance à chaque manche validée, pas à la fin.
 - **Un catalogue trop mince.** Si le jeu qu'on sort ce soir n'est pas dedans, l'app ne s'ouvre
-  pas. D'où le mode « jeu libre » générique dès la v1, en filet de sécurité.
+  pas. D'où le « jeu libre » générique, en filet de sécurité.

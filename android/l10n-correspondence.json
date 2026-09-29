@@ -791,6 +791,14 @@
     "de": "Freigabe beenden",
     "it": "Interrompi la condivisione"
   },
+  "assistance": {
+    "key": "Assistance",
+    "fr": "Assistance",
+    "en": "Support",
+    "es": "Ayuda",
+    "de": "Hilfe",
+    "it": "Assistenza"
+  },
   "aucun": {
     "key": "Aucun",
     "fr": "Aucun",
@@ -1993,6 +2001,14 @@
     "de": "Oder es ist eine meiner Karten",
     "it": "Oppure è una delle mie schede"
   },
+  "ouvre_la_page_dans_ton_navigateur": {
+    "key": "Ouvre la page dans ton navigateur.",
+    "fr": "Ouvre la page dans ton navigateur.",
+    "en": "Opens the page in your browser.",
+    "es": "Abre la página en tu navegador.",
+    "de": "Öffnet die Seite in deinem Browser.",
+    "it": "Apre la pagina nel tuo browser."
+  },
   "ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app": {
     "key": "Ouvre les réglages système pour choisir la langue de l'app.",
     "fr": "Ouvre les réglages système pour choisir la langue de l'app.",
@@ -2240,6 +2256,14 @@
     "es": "Puntos no válidos (de 0 a %lld).",
     "de": "Ungültige Punkte (0 bis %lld).",
     "it": "Punti non validi (da 0 a %lld)."
+  },
+  "politique_de_confidentialite": {
+    "key": "Politique de confidentialité",
+    "fr": "Politique de confidentialité",
+    "en": "Privacy Policy",
+    "es": "Política de privacidad",
+    "de": "Datenschutzerklärung",
+    "it": "Informativa sulla privacy"
   },
   "preneur": {
     "key": "Preneur",

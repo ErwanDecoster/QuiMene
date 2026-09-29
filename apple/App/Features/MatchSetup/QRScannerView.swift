@@ -1,10 +1,10 @@
 @preconcurrency import AVFoundation
 import SwiftUI
 
-/// Doc utilisateur — scanner intégré plutôt que de dépendre uniquement de l'appareil photo
-/// système. `AVCaptureMetadataOutput` est l'API QR la plus largement compatible (aucune exigence
-/// matérielle au-delà d'une caméra, contrairement à `VisionKit.DataScannerViewController`),
-/// système, zéro dépendance (ADR-0012).
+/// Scanner intégré plutôt que de dépendre uniquement de l'appareil photo système.
+/// `AVCaptureMetadataOutput` est l'API QR la plus largement compatible (aucune exigence matérielle
+/// au-delà d'une caméra, contrairement à `VisionKit.DataScannerViewController`), système, zéro
+/// dépendance (ADR-0012).
 struct QRScannerView: UIViewControllerRepresentable {
   let onScan: (String) -> Void
 
@@ -54,12 +54,11 @@ final class QRScannerViewController: UIViewController, AVCaptureMetadataOutputOb
     updateVideoRotation()
   }
 
-  // Doc utilisateur — remontée : sur iPad, l'aperçu caméra restait dans l'orientation par
-  // défaut du capteur (mis en boîtier en paysage) quel que soit celui de l'écran, y compris
-  // après rotation. `AVCaptureVideoPreviewLayer` ne suit jamais l'orientation de l'interface
-  // tout seul — contrairement à ce qu'on pourrait attendre, il faut le lui dire explicitement
-  // (`videoRotationAngle`, iOS 17+) et le refaire à chaque rotation, pas seulement une fois au
-  // démarrage.
+  // Sur iPad, l'aperçu caméra restait dans l'orientation par défaut du capteur (mis en boîtier en
+  // paysage) quel que soit celui de l'écran, y compris après rotation. `AVCaptureVideoPreviewLayer`
+  // ne suit jamais l'orientation de l'interface tout seul — contrairement à ce qu'on pourrait
+  // attendre, il faut le lui dire explicitement (`videoRotationAngle`, iOS 17+) et le refaire à
+  // chaque rotation, pas seulement une fois au démarrage.
   override func viewWillTransition(
     to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator
   ) {

@@ -16,8 +16,8 @@ final class SharedMatchModel {
   private var rules: (any GameRules)?
   /// Pourquoi la dernière saisie n'a pas été enregistrée (devancée, hors ligne, session arrêtée).
   private(set) var latestRejectionReason: String?
-  /// Doc utilisateur — même bandeau que côté créateur quand une règle modifie un score saisi
-  /// (doublement Skyjo…), recalculé localement par le rejeu.
+  /// Même bandeau que côté créateur quand une règle modifie un score saisi (doublement Skyjo…),
+  /// recalculé localement par le rejeu.
   private(set) var roundExplanationMessage: String?
   private var roundExplanationClearTask: Task<Void, Never>?
   private(set) var isSubmitting = false
@@ -351,7 +351,7 @@ final class SharedMatchModel {
 
   /// Rejoue la partie courante depuis le journal de la session. `isLocalCommit` : la dernière
   /// manche vient de cet appareil, c'est donc à lui d'envoyer la mise à jour des écrans
-  /// verrouillés (doc 16, phase F — plus d'hôte pour le faire).
+  /// verrouillés (doc 16, phase F).
   private func reload(fresh: [SessionEventRecord], isLocalCommit: Bool = false) async {
     guard let matchID = await link.session.currentMatchID() else { return }
     let log = await link.session.events(forMatch: matchID)

@@ -26,7 +26,7 @@ import java.util.UUID
 
 /**
  * Miroir de `BeloteRulesV1Tests.swift` — complète le golden `belote-01-equipes-et-seuil` (qui ne
- * couvre pas le capot) : doc 05 « Capot (250) ».
+ * couvre pas le capot) : doc 05 « Belote ».
  */
 class BeloteRulesV1Test {
     private fun definition(): GameDefinition =

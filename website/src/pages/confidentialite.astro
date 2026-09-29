@@ -16,10 +16,14 @@ import { site } from '../site';
       <p><strong>En résumé</strong></p>
       <ul>
         <li>Aucun compte à créer, aucune publicité, aucune mesure d’audience, aucun pistage.</li>
-        <li>Les parties, les joueurs et l’historique restent sur l’appareil et dans votre iCloud.</li>
+        <li>
+          Les parties, les joueurs et l’historique restent sur l’appareil et dans sa sauvegarde :
+          iCloud sur iPhone et iPad, sauvegarde Google sur Android.
+        </li>
         <li>
           Trois fonctions facultatives passent par un serveur, pour une durée limitée : les parties
-          partagées en ligne, le score sur l’écran verrouillé et l’historique partagé avec vos amis.
+          partagées en ligne, le score sur l’écran verrouillé de l’iPhone et l’historique partagé
+          avec vos amis.
         </li>
         <li>Aucune donnée n’est vendue ni utilisée à des fins publicitaires.</li>
       </ul>
@@ -34,8 +38,10 @@ import { site } from '../site';
     <h2>Ce qui reste sur votre appareil</h2>
     <p>
       Les parties, les manches, les joueurs, leurs avatars et l’historique sont enregistrés sur
-      l’appareil. Si iCloud est activé, ils sont aussi synchronisés dans votre base iCloud privée,
-      gérée par Apple, entre vos propres appareils. L’éditeur n’y a aucun accès.
+      l’appareil. Sur iPhone et iPad, si iCloud est activé, ils sont aussi synchronisés dans votre
+      base iCloud privée, gérée par Apple, entre vos propres appareils. Sur Android, ils sont inclus
+      dans la sauvegarde automatique de l’appareil, gérée par Google, si elle est activée.
+      L’éditeur n’a accès ni à l’une ni à l’autre.
     </p>
     <p>
       L’appareil photo sert uniquement à scanner un QR code (rejoindre une partie, ajouter un ami).
@@ -66,13 +72,15 @@ import { site } from '../site';
       pseudo de profil de chacun.
     </p>
 
-    <h3>Score sur l’écran verrouillé (Activité en direct)</h3>
+    <h3>Score sur l’écran verrouillé de l’iPhone (Activité en direct)</h3>
     <p>
-      Pour mettre à jour l’écran verrouillé et la Dynamic Island pendant que l’app est en
-      arrière-plan, le serveur conserve le jeton de notification fourni par Apple, un identifiant
+      Pour mettre à jour l’écran verrouillé et la Dynamic Island d’un iPhone pendant que l’app est
+      en arrière-plan, le serveur conserve le jeton de notification fourni par Apple, un identifiant
       d’appareil aléatoire créé par l’app, et le dernier classement affiché (pseudos et scores des
-      quatre premiers). La mise à jour est acheminée par le service de notifications d’Apple. Cette
-      fonction se désactive dans Réglages › {site.name} › Activités en direct.
+      quatre premiers). Dans une partie partagée, l’appareil qui saisit une manche, iPhone ou
+      Android, envoie ce classement au serveur pour mettre à jour l’écran des autres iPhone. La mise
+      à jour est acheminée par le service de notifications d’Apple. Cette fonction se désactive sur
+      l’iPhone dans Réglages › {site.name} › Activités en direct.
     </p>
 
     <h3>Historique partagé avec vos amis</h3>
@@ -96,7 +104,7 @@ import { site } from '../site';
             <td>24 heures après la fin de la session, qui s’arrête d’elle-même après 6 heures sans activité</td>
           </tr>
           <tr>
-            <td>Écran verrouillé</td>
+            <td>Écran verrouillé de l’iPhone</td>
             <td>Au plus tard 30 minutes après la dernière manche</td>
           </tr>
           <tr>
@@ -104,8 +112,8 @@ import { site } from '../site';
             <td>Dès sa récupération, et au plus tard après 14 jours</td>
           </tr>
           <tr>
-            <td>Données sur l’appareil et dans iCloud</td>
-            <td>Quand vous les supprimez, ou en supprimant l’app et ses données iCloud</td>
+            <td>Données sur l’appareil et dans sa sauvegarde</td>
+            <td>Quand vous les supprimez, ou en supprimant l’app et ses données iCloud ou sa sauvegarde Google</td>
           </tr>
         </tbody>
       </table>
@@ -121,7 +129,8 @@ import { site } from '../site';
     <h2>Destinataires</h2>
     <ul>
       <li>Supabase, pour l’hébergement des données transitoires décrites ci-dessus.</li>
-      <li>Apple, pour iCloud et l’acheminement des mises à jour de l’écran verrouillé.</li>
+      <li>Apple, pour iCloud et l’acheminement des mises à jour de l’écran verrouillé de l’iPhone.</li>
+      <li>Google, pour la sauvegarde automatique d’Android, si vous l’avez activée.</li>
     </ul>
     <p>Aucun autre tiers ne reçoit de données.</p>
 

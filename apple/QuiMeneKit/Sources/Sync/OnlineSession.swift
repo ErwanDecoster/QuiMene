@@ -4,11 +4,11 @@ import Foundation
 import Supabase
 
 /// Doc 16, phase C — client des sessions en ligne (`quimene_session_*`, migration
-/// `create_quimene_sessions`). Remplace le protocole « hôte autoritaire » de `LiveSession` : le
-/// journal de la session vit sur le serveur et fait foi pour tous les appareils, créateur compris.
+/// `create_quimene_sessions`). Le journal de la session vit sur le serveur et fait foi pour tous
+/// les appareils, créateur compris.
 ///
-/// Format d'un événement stocké, commun à iOS et Android : le `StampedEvent` encodé en JSON (même
-/// encodeur que `WireCodec`), scellé en AES-GCM avec la clé de session (`SessionCrypto
+/// Format d'un événement stocké, commun à iOS et Android : le `StampedEvent` encodé en JSON
+/// (`JSONEncoder` par défaut), scellé en AES-GCM avec la clé de session (`SessionCrypto
 /// .deriveKey`, code d'appairage + `session_id`), puis en base64. Son `lamport` vaut le numéro de
 /// séquence attribué par le serveur : l'ordre de rejeu (`MatchEngine.replay`) est donc exactement
 /// l'ordre du serveur.

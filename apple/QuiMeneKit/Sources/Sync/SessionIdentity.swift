@@ -137,7 +137,7 @@ public struct ActiveClaim: Sendable, Equatable {
 ///   profil, sans revendication ;
 /// - une revendication annulée ne compte plus (annulation par le créateur ou par son auteur) ;
 /// - premier arrivé, premier servi : une place déjà revendiquée par un autre profil, ou reliée à
-///   un autre profil par le créateur, ne peut pas l'être (doc 16, « sans accord ») ;
+///   un autre profil par le créateur, ne peut pas l'être (doc 16, décision « Confiance ») ;
 /// - un profil n'occupe qu'une place : une nouvelle revendication remplace la précédente, **y
 ///   compris sa place reliée par le créateur**, qui devient alors libre (reconnu d'office sur la
 ///   mauvaise fiche, on peut toujours changer de place).

@@ -11,7 +11,7 @@ import com.quimene.domain.model.ScoreInput
 
 /**
  * Miroir de `BeloteRoundModel.swift` — une donne = une entrée par équipe (2 toujours), le moteur
- * (`BeloteRulesV1`) redistribue à chaque coéquipier. Enveloppe [LiveRoundEntryState] (hôte ou
+ * (`BeloteRulesV1`) redistribue à chaque coéquipier. Enveloppe [LiveRoundEntryState] (créateur ou
  * contributeur, voir cette interface) plutôt que de recharger la partie soi-même : seul l'état
  * de brouillon de la donne en cours est propre à ce ViewModel.
  */

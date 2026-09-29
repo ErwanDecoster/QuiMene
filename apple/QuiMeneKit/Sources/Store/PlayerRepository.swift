@@ -1,15 +1,13 @@
 import Foundation
 import SwiftData
 
-/// Doc 14, phase 4 — une seule fiche par appareil peut être « la sienne » (celle qu'on partage) ;
+/// Doc 14 — une seule fiche par appareil peut être « la sienne » (celle qu'on partage) ;
 /// tenter d'en partager une seconde est un vrai refus, pas un cas silencieusement ignoré.
 public enum PlayerRepositoryError: Error, Sendable, Equatable {
   case alreadySharingAnotherProfile(nickname: String)
-  /// Doc 14, phase 4 — remontée : une fiche déjà liée à l'identifiant d'un ami (elle *suit*
-  /// quelqu'un) pouvait quand même être « partagée » — `sharedProfileID(for:)` retournait tout
-  /// simplement l'identifiant déjà présent, celui de l'ami, sans jamais vérifier qu'il
-  /// s'agissait bien du sien. Ça permettait de rediffuser l'identité d'un ami comme si c'était
-  /// la sienne propre.
+  /// Doc 14 — une fiche déjà liée à l'identifiant d'un ami (elle *suit* quelqu'un) ne peut pas
+  /// devenir mon profil : `sharedProfileID(for:)` rediffuserait sinon l'identité de l'ami comme
+  /// si c'était la mienne.
   case cannotShareALinkedProfile
 }
 
@@ -66,13 +64,13 @@ public struct PlayerRepository {
     try context.save()
   }
 
-  /// Doc 14, phase 4 — génère l'identifiant partageable de cette fiche s'il n'existe pas
-  /// encore, et la désigne comme *la* fiche de cet appareil (`sharedProfileIsMine`). Une seule
-  /// fiche par appareil peut porter cette désignation : la partager en désignerait une seconde,
-  /// ce que `SharedProfileSyncCoordinator` ne saurait pas départager (laquelle des deux
-  /// représente vraiment l'utilisateur ?) — refusé explicitement plutôt que de laisser
-  /// l'ambiguïté s'installer. Jamais régénéré une fois posé : un QR déjà distribué à un ami doit
-  /// rester valable tant que la fiche n'est pas explicitement déliée.
+  /// Doc 14 — génère l'identifiant partageable de cette fiche s'il n'existe pas encore, et la
+  /// désigne comme *la* fiche de cet appareil (`sharedProfileIsMine`). Une seule fiche par appareil
+  /// peut porter cette désignation : la partager en désignerait une seconde, ce que
+  /// `SharedProfileSyncCoordinator` ne saurait pas départager (laquelle des deux représente
+  /// vraiment l'utilisateur ?) — refusé explicitement plutôt que de laisser l'ambiguïté
+  /// s'installer. Jamais régénéré une fois posé : un QR déjà distribué à un ami doit rester valable
+  /// tant que la fiche n'est pas explicitement déliée.
   @discardableResult
   public func sharedProfileID(for player: PlayerRecord) throws -> UUID {
     if let existing = player.sharedProfileID {
@@ -112,7 +110,7 @@ public struct PlayerRepository {
     try context.save()
   }
 
-  /// Doc 14, phase 4 — la fiche que cet appareil partage comme la sienne, s'il y en a une.
+  /// Doc 14 — la fiche que cet appareil partage comme la sienne, s'il y en a une.
   public func myOwnSharedPlayer() throws -> PlayerRecord? {
     var descriptor = FetchDescriptor<PlayerRecord>(predicate: #Predicate { $0.sharedProfileIsMine })
     descriptor.fetchLimit = 1
@@ -121,10 +119,10 @@ public struct PlayerRepository {
 
   /// Lie cette fiche à l'identifiant scanné depuis l'appareil d'un ami (doc 14) — écrase un
   /// éventuel identifiant précédent, cette fiche ne peut être liée qu'à une seule personne à
-  /// la fois. `name` est celui du QR au moment du scan (doc 14, phase 3 « Limites de
-  /// confiance ») : la seule trace locale de qui est de l'autre côté, jamais mise à jour
-  /// ensuite. `sharedProfileIsMine` reste `false` : lier, contrairement à partager, ne désigne
-  /// jamais cette fiche comme celle de l'utilisateur de cet appareil — c'est le suivi d'un ami.
+  /// la fois. `name` est celui du QR au moment du scan (doc 14 « Limites de confiance ») : la seule
+  /// trace locale de qui est de l'autre côté, jamais mise à jour ensuite. `sharedProfileIsMine`
+  /// reste `false` : lier, contrairement à partager, ne désigne jamais cette fiche comme celle de
+  /// l'utilisateur de cet appareil — c'est le suivi d'un ami.
   public func linkSharedProfile(_ id: UUID, name: String, for player: PlayerRecord) throws {
     player.sharedProfileID = id
     player.sharedProfileIsMine = false
@@ -142,7 +140,7 @@ public struct PlayerRepository {
   }
 
   /// La première fiche locale liée à cet identifiant, si elle existe — sert à retrouver quel
-  /// joueur *local* correspond à une entrée du classement reçu (doc 14, phase 2).
+  /// joueur *local* correspond à un participant d'une partie reçue (doc 14).
   public func player(withSharedProfileID id: UUID) throws -> PlayerRecord? {
     var descriptor = FetchDescriptor<PlayerRecord>(
       predicate: #Predicate { $0.sharedProfileID == id })

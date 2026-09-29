@@ -17,10 +17,13 @@ import { site } from '../../site';
       <p><strong>In short</strong></p>
       <ul>
         <li>No account, no ads, no analytics, no tracking.</li>
-        <li>Games, players and history stay on your device and in your iCloud.</li>
+        <li>
+          Games, players and history stay on your device and in its backup: iCloud on iPhone and
+          iPad, Google backup on Android.
+        </li>
         <li>
           Three optional features go through a server, for a limited time: games shared online, the
-          score on the Lock Screen, and the history shared with your friends.
+          score on the iPhone Lock Screen, and the history shared with your friends.
         </li>
         <li>No data is sold or used for advertising.</li>
       </ul>
@@ -34,9 +37,10 @@ import { site } from '../../site';
 
     <h2>What stays on your device</h2>
     <p>
-      Games, rounds, players, their avatars and your history are stored on the device. If iCloud is
-      turned on, they also sync to your private iCloud database, managed by Apple, across your own
-      devices. The publisher has no access to it.
+      Games, rounds, players, their avatars and your history are stored on the device. On iPhone
+      and iPad, if iCloud is turned on, they also sync to your private iCloud database, managed by
+      Apple, across your own devices. On Android, they are included in the device’s automatic
+      backup, managed by Google, if it is turned on. The publisher has access to neither.
     </p>
     <p>
       The camera is only used to scan a QR code (to join a game or add a friend). No image is
@@ -66,13 +70,14 @@ import { site } from '../../site';
       profile nicknames.
     </p>
 
-    <h3>Score on the Lock Screen (Live Activity)</h3>
+    <h3>Score on the iPhone Lock Screen (Live Activity)</h3>
     <p>
-      To update the Lock Screen and the Dynamic Island while the app is in the background, the
+      To update an iPhone’s Lock Screen and Dynamic Island while the app is in the background, the
       server keeps the notification token provided by Apple, a random device identifier created by
-      the app, and the latest standings shown (nicknames and scores of the top four). The update is
-      delivered by Apple’s notification service. You can turn this off in Settings › {site.name} ›
-      Live Activities.
+      the app, and the latest standings shown (nicknames and scores of the top four). In a shared
+      game, the device that enters a round, iPhone or Android, sends these standings to the server
+      to update the other iPhones’ screens. The update is delivered by Apple’s notification
+      service. You can turn this off on the iPhone in Settings › {site.name} › Live Activities.
     </p>
 
     <h3>History shared with your friends</h3>
@@ -96,7 +101,7 @@ import { site } from '../../site';
             <td>24 hours after the session ends; it ends on its own after 6 hours without activity</td>
           </tr>
           <tr>
-            <td>Lock Screen</td>
+            <td>iPhone Lock Screen</td>
             <td>At most 30 minutes after the last round</td>
           </tr>
           <tr>
@@ -104,8 +109,8 @@ import { site } from '../../site';
             <td>As soon as it is picked up, and at most after 14 days</td>
           </tr>
           <tr>
-            <td>Data on the device and in iCloud</td>
-            <td>When you delete it, or by deleting the app and its iCloud data</td>
+            <td>Data on the device and in its backup</td>
+            <td>When you delete it, or by deleting the app and its iCloud data or Google backup</td>
           </tr>
         </tbody>
       </table>
@@ -120,7 +125,8 @@ import { site } from '../../site';
     <h2>Recipients</h2>
     <ul>
       <li>Supabase, to host the temporary data described above.</li>
-      <li>Apple, for iCloud and to deliver Lock Screen updates.</li>
+      <li>Apple, for iCloud and to deliver iPhone Lock Screen updates.</li>
+      <li>Google, for Android’s automatic backup, if you turned it on.</li>
     </ul>
     <p>No other third party receives any data.</p>
 

@@ -71,6 +71,7 @@
     <string name="archiver_ce_joueur">Archive this player</string>
     <string name="ardoise">Slate</string>
     <string name="arreter_le_partage">Stop sharing</string>
+    <string name="assistance">Support</string>
     <string name="aucun_ami_lie_pour_l_instant">No linked friends yet.</string>
     <string name="aucun_jeu_ne_correspond_a_ta_recherche">No game matches your search.</string>
     <string name="aucun_joueur_archive">No archived players.</string>
@@ -196,6 +197,7 @@
     <string name="obtenu_count1">Achieved (%1$d)</string>
     <string name="olive">Olive</string>
     <string name="ou_c_est_une_de_mes_fiches">Or it\'s one of my player cards</string>
+    <string name="ouvre_la_page_dans_ton_navigateur">Opens the page in your browser.</string>
     <string name="ouvre_les_reglages_systeme_pour_choisir_la_langue_de_l_app">Opens system settings to choose the app\'s language.</string>
     <string name="par_jeu">By Game</string>
     <string name="partager_en_direct">Share Live</string>
@@ -219,6 +221,7 @@
     <string name="poignee">Poignée</string>
     <string name="points_du_preneur_count1">Taker\'s points: %1$d</string>
     <string name="points_invalides_0_a_count1">Invalid points (0 to %1$d).</string>
+    <string name="politique_de_confidentialite">Privacy Policy</string>
     <string name="preneur">Taker</string>
     <string name="profil">Profile</string>
     <string name="pseudo">Nickname</string>

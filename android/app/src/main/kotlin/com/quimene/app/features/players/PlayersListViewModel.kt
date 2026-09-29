@@ -22,8 +22,8 @@ import java.util.UUID
  * habitués d'abord (pas de réordonnancement manuel) ; les archivés vivent sur un écran séparé
  * ([ArchivedPlayersScreen]), seul leur nombre est porté ici (lien en bas de liste). Mode
  * sélection : miroir de l'`EditButton`/`selectedPlayerIDs` d'Apple, réalisé côté Android comme un
- * mode contextuel de barre de titre plutôt qu'un `EditButton` (aucun équivalent Material) —
- * doc utilisateur, « respecte le style Android ». */
+ * mode contextuel de barre de titre plutôt qu'un `EditButton` (aucun équivalent Material), pour
+ * respecter les conventions Android. */
 class PlayersListViewModel(
     private val repository: PlayerRepository,
     matchRepository: MatchRepository,

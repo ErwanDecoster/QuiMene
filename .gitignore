@@ -34,3 +34,5 @@ android/.idea/
 
 # Supabase
 supabase/.temp/
+# Captures des stores (Scripts/store-screenshots.sh)
+store-screenshots/
