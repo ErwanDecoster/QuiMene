@@ -1,4 +1,4 @@
-# 11 — Portage Android
+# 11 — Android
 
 ## Stratégie
 
@@ -7,14 +7,14 @@
 Aucune couche de partage de code : pas de Kotlin Multiplatform, pas de Swift compilé pour
 Android, pas de moteur JavaScript. Les deux applications sont pleinement idiomatiques sur leur
 plateforme. Ce qu'elles partagent n'est pas du code, c'est **`spec/`** — du JSON, lu et rejoué
-par les deux.
+par les deux ([ADR-0004](13-decisions-adr.md)).
 
 ```
                     spec/                   source de vérité
         ┌──────────────┴──────────────┐
         │  games/*.json               │     définitions déclaratives
         │  golden/*.json              │     parties + résultats attendus
-        │  schema/*.schema.json       │     contrat de format
+        │  session/*.json             │     formats échangés, dans les deux sens
         └──────────────┬──────────────┘
           ┌────────────┴────────────┐
           ▼                         ▼
@@ -26,14 +26,14 @@ par les deux.
      rejoue golden/           rejoue golden/
 ```
 
-**Le coût** : le moteur de règles s'écrit deux fois, soit environ 2 000 lignes dupliquées.
-**Le bénéfice** : zéro compromis d'idiome, zéro outillage croisé (pas de Gradle dans le build
-iOS), et deux apps qui ressemblent chacune à leur plateforme. Sur une application dont
-l'interface représente 80 % du code et dont le moteur est de l'arithmétique pure et stable,
-c'est le bon arbitrage. Décision et alternatives : [ADR-0004](13-decisions-adr.md).
+**Le coût** : le moteur de règles existe en deux exemplaires. **Le bénéfice** : zéro compromis
+d'idiome, zéro outillage croisé (pas de Gradle dans le build iOS), et deux apps qui ressemblent
+chacune à leur plateforme. Sur une application dont l'interface représente l'essentiel du code
+et dont le moteur est de l'arithmétique pure et stable, c'est le bon arbitrage.
 
-**Le garde-fou** : les golden files. Une divergence de calcul entre les deux plateformes est
-impossible à ignorer — elle fait échouer la suite de tests Android.
+**Le garde-fou** : les golden files. Une divergence de calcul entre les deux plateformes fait
+échouer la suite de tests Android ; une divergence de format d'échange fait échouer les tests
+croisés ([17](17-recette-croisee.md)).
 
 ---
 
@@ -41,380 +41,163 @@ impossible à ignorer — elle fait échouer la suite de tests Android.
 
 | Apple | Android | Note |
 |---|---|---|
-| Swift 6 (concurrence stricte) | Kotlin 2.x + coroutines | `Sendable` → immuabilité + `data class` |
-| SwiftUI | Jetpack Compose | Modèle déclaratif équivalent |
+| Swift 6 (concurrence stricte) | Kotlin 2 + coroutines | `Sendable` → immuabilité + `data class` |
+| SwiftUI | Jetpack Compose, Material 3 | Modèle déclaratif équivalent |
 | `@Observable` | `StateFlow` dans un `ViewModel` | Compose n'a pas d'équivalent d'observation implicite |
 | `@MainActor` | `Dispatchers.Main` | |
 | `struct` / valeur | `data class` (immuable) | Le domaine reste sans mutation |
+| enum à valeur associée | `sealed interface` | |
 | SwiftData | Room + KSP | Voir « Persistance » |
-| CloudKit privé | *(aucun équivalent)* | Voir « Synchronisation » |
-| `supabase-swift` (`RealtimeChannelV2`, Presence, Broadcast) | `supabase-kt` (module Realtime) | Même dépendance des deux côtés, pas une paire d'équivalents natifs — voir [09](09-partie-partagee.md) et [ADR-0016](13-decisions-adr.md). Découverte par `quimene_open_games` (Postgrest, REST) : rien de spécifique à une plateforme, aucune API de découverte réseau à porter. |
-| Swift Testing | JUnit 5 + Kotest | Tests paramétrés des deux côtés |
-| Swift Charts | Vico | Bibliothèque tierce assumée — Compose n'a pas de graphiques natifs |
-| SF Symbols | Material Symbols Rounded | Voir charte §4 |
-| `ImageRenderer` | `GraphicsLayer.toImageBitmap()` | Image de résultats partagée |
-| WidgetKit | Glance | |
-| App Intents | App Actions + `ShortcutService` | |
-| Live Activity | Notification persistante + `MediaStyle` | Équivalent partiel |
+| CloudKit privé | *(aucun équivalent)* | Sauvegarde automatique Android, voir « Synchronisation » |
+| `UserDefaults` | Preferences DataStore | |
+| `supabase-swift` | `supabase-kt` (Realtime, Postgrest) | Même service des deux côtés ([ADR-0017](13-decisions-adr.md)) |
+| `CryptoKit` (AES-GCM, HKDF) | `javax.crypto` | HKDF (RFC 5869) écrit sur `Mac("HmacSHA256")`, sans bibliothèque de crypto |
+| Swift Testing | JUnit 5, Kotest (assertions), Robolectric | Tests paramétrés des deux côtés |
+| Swift Charts | `Canvas` Compose | Courbe dessinée à la main, aucune bibliothèque de graphiques |
+| SF Symbols | Material Icons (Compose) | |
+| `AVCaptureMetadataOutput` / `CIFilter` | CameraX + ML Kit / ZXing | Lecture et génération des QR codes |
+| `ImageRenderer` + `ShareLink` | — | Image de résultats propre à iOS |
+| Live Activity | — | Android envoie les mises à jour aux iPhone de la session, n'en affiche pas |
 | Xcode Cloud | GitHub Actions | |
-| `Localizable.xcstrings` | `strings.xml` | Variations plurielles → `<plurals>` ; une phrase qui accorde plusieurs nombres (substitutions) → un modèle `<string>` et un `<plurals>` par nombre, voir étape G |
+| `Localizable.xcstrings` | `strings.xml` | Généré depuis le catalogue Apple, voir « Localisation » |
 
-**Deux dépendances tierces, de nature différente** (ADR-0012, [ADR-0016](13-decisions-adr.md)).
-Vico est **propre à Android** : Compose n'a pas d'équivalent natif à Swift Charts, c'est l'écart
-d'écosystème le plus concret du projet. Supabase (`supabase-swift`/`supabase-kt`) est en
-revanche **symétrique** : voulue des deux côtés dès le départ pour le transport de la partie
-partagée, pas un choix propre à une plateforme avec un équivalent à inventer sur l'autre.
+## Modules
+
+Gradle multi-module, miroir des cibles de `QuiMeneKit`, avec le même sens de dépendance :
+
+| Module | Type | Dépend de | Rôle |
+|---|---|---|---|
+| `:domain` | Kotlin/JVM pur | — | Types, `MatchEngine`, `GameRules`, `StatsEngine` |
+| `:catalog` | Kotlin/JVM pur | `:domain` | Moteurs des jeux, définitions embarquées |
+| `:store` | bibliothèque Android | `:domain` | Room, repositories, statistiques, identité d'appareil |
+| `:sync` | Kotlin/JVM pur | `:domain`, `supabase-kt` | Sessions en ligne, chiffrement, identités, boîte aux lettres |
+| `:designsystem` | bibliothèque Android (Compose) | — | Thème, tokens, composants |
+| `:app` | application | tous | Écrans, navigation, ViewModels |
+
+`:domain` est un module Kotlin/JVM pur (`kotlin("jvm")`, pas `com.android.library`) : aucune
+dépendance au SDK Android sur le classpath, donc aucun moyen d'y importer `android.*`, même par
+erreur. Les versions sont centralisées dans `gradle/libs.versions.toml`.
+
+Chaque fichier du domaine Kotlin a son pendant Swift, au même nom (`MatchState.kt` /
+`MatchState.swift`, `SkyjoRulesV1.kt` / `SkyjoRulesV1.swift`…) : une relecture croisée est
+possible sans table de correspondance.
+
+## Chargement des définitions
+
+SwiftPM impose une copie des JSON dans la cible Apple, vérifiée par `Scripts/check-spec-sync.sh`.
+Côté Android, une tâche Gradle (`copySpecResources`, branchée sur `processResources`) recopie
+`spec/games/` dans `build/` à chaque build : la copie n'est jamais commitée et ne peut donc pas
+diverger. Les tests rejouent `spec/golden/` de la même façon.
 
 ## Persistance
 
-Room remplace SwiftData, avec deux différences à anticiper :
+Room remplace SwiftData. Trois entités, miroir un pour un des modèles SwiftData
+([03](03-modele-de-donnees.md)) : `PlayerEntity`, `MatchEntity`, `ParticipantEntity`, avec le
+même mapping vers le domaine. `eventLogData` reste **la source de vérité** : la reprise après
+relance rejoue ce journal, jamais un total mis en cache.
+
+Deux différences :
 
 - **Pas de synchronisation intégrée.** SwiftData+CloudKit fait gratuitement ce que Room ne fait
   pas du tout.
-- **Les relations sont explicites.** Room impose `@Relation` et des requêtes ; SwiftData les
-  résout seul. En pratique cela avantage Android : l'ordre des collections y est déterministe
-  par `ORDER BY`, alors que SwiftData impose les champs `index` explicites décrits en
-  [03](03-modele-de-donnees.md).
+- **Les relations sont explicites.** Les participants d'une partie se lisent par
+  `ParticipantDao`, dans un ordre déterministe (`ORDER BY`), alors que SwiftData impose des
+  champs d'ordre explicites et un tri à la lecture.
 
-Les entités sont transposées une pour une (`PlayerRecord` → `PlayerEntity`, etc.), avec le même
-mapping vers le domaine. Le domaine Kotlin est identique au domaine Swift, au vocabulaire près.
+Les DAO exposent des `Flow`, équivalent du rafraîchissement automatique de `@Query`. L'identité
+d'appareil vit dans Preferences DataStore.
 
 ## Synchronisation
 
-La partie partagée en direct **n'est pas un point de divergence** ([ADR-0016](13-decisions-adr.md)) : Apple et Android parlent le même protocole (`WireMessage`) sur le même transport, Supabase
-Realtime (canal par session, presence + broadcast) — pas deux implémentations qui s'interopèrent,
-la même dépendance des deux côtés. Un iPhone et un Android rejoignent la même partie. Le seul vrai
-point de divergence fonctionnel reste la synchronisation entre les appareils **du même
-propriétaire**, hors partie en direct :
-
 | Fonction | Apple | Android |
 |---|---|---|
-| **Partie partagée en direct** | Supabase Realtime — protocole et transport communs | idem, `supabase-kt` |
-| **Sync entre appareils du propriétaire** | CloudKit privé, transparent | **Absent en v1** |
-| **Sauvegarde** | iCloud | Android Auto Backup (quota 25 Mo, suffisant) |
-| **Export / import** | fichier `.quimene` | fichier `.quimene` |
+| **Partie partagée en direct** | Supabase — protocole et format communs | idem, `supabase-kt` |
+| **Historique partagé entre amis** | boîte aux lettres chiffrée | idem |
+| **Sync entre appareils du propriétaire** | CloudKit privé | **absente** |
+| **Sauvegarde** | iCloud | sauvegarde automatique Android (`allowBackup`, `dataExtractionRules`) |
 
-Il n'existe pas d'équivalent Android à CloudKit : pas de stockage privé, gratuit, lié au compte
-système et synchronisé sans serveur. Les options seraient Google Drive App Data (API lourde,
-nécessite OAuth) ou un backend maison (contredit « sans serveur »).
-
-**Décision** : la v1 Android n'a pas de synchronisation multi-appareils. Elle propose à la
-place un **export/import de fichier**, qui existe aussi côté Apple et sert de pont entre les
-deux écosystèmes. Le format `.quimene` est simplement le journal d'événements sérialisé — donc
-déjà spécifié, déjà testé, et fusionnable par la même fonction de rejeu.
+La partie partagée **n'est pas un point de divergence** : un iPhone et un Android rejoignent la
+même session, avec les mêmes messages chiffrés ([09](09-partie-partagee.md)). Le seul vrai point
+de divergence est la synchronisation entre les appareils **d'un même propriétaire** : il n'existe
+pas d'équivalent Android à CloudKit (stockage privé, gratuit, lié au compte système et
+synchronisé sans serveur). Les options seraient Google Drive App Data (API lourde, OAuth) ou un
+backend maison, contraire au principe « sans compte ».
 
 ## Charte graphique sur Android
 
 La [charte](07-charte-graphique.md) est écrite pour être bi-plateforme : chaque token y porte
-déjà sa colonne Android. Les points d'attention au portage :
+déjà sa colonne Android.
 
 | Sujet | Règle |
 |---|---|
-| **Couleurs** | Valeurs hexadécimales **identiques**, injectées dans un `ColorScheme` Material 3 custom. On n'utilise **pas** `dynamicColor` (Material You) : il écraserait la palette de marque et casserait les contrastes vérifiés. |
-| **Typographie** | Échelle **Material 3**, pas les tailles iOS. La hiérarchie est partagée, la mesure ne l'est pas — voir charte §2.2. `letterSpacing` doit être posé explicitement, contrairement à iOS. |
-| **Espacements et rayons** | Valeurs identiques, en `dp`. 1 pt iOS ≈ 1 dp Android. |
-| **Élévation** | Rendu Material (tonal + ombre), pas de verre. C'est l'inverse exact d'iOS et c'est voulu — [ADR-0010](13-decisions-adr.md). |
-| **Icônes** | Material Symbols Rounded, `weight 400`, `grade 0`, `optical size 24`, `fill 0/1`. |
-| **Zone tactile** | **48 dp** (Android), pas 44 pt. Le pavé numérique reste à 56 dp. |
-| **Navigation** | `NavigationBar` Material en bas, pas la tab bar flottante iOS. Bouton retour système géré par `BackHandler`. |
-| **Toasts** | `Snackbar` Material en bas, pas de bandeau en haut. |
+| **Couleurs** | Sur Android 12+ (API 31), l'app suit les **couleurs dynamiques** du téléphone (Material You) pour les rôles Material 3 ; en dessous, `ColorScheme` construit depuis les hex de la charte. Les couleurs sémantiques et la palette des dix joueurs restent **toujours** celles de la charte : l'identité visuelle d'un joueur doit être stable d'un appareil à l'autre. |
+| **Typographie** | Échelle **Material 3**, pas les tailles iOS. La hiérarchie est partagée, la mesure ne l'est pas — voir charte §2.2. `letterSpacing` est posé explicitement. |
+| **Espacements et rayons** | Valeurs identiques, en `dp` (`Space.kt`, `Radius.kt`, `Motion.kt`… mêmes noms que côté Swift). |
+| **Élévation** | Rendu Material (tonal + ombre), pas de verre. C'est l'inverse d'iOS et c'est voulu — [ADR-0010](13-decisions-adr.md). |
+| **Zone tactile** | **48 dp** (Android), pas 44 pt. |
+| **Navigation** | Barre de navigation Material en îlot flottant : Joueurs · Jeux · Historique · Profil. Bouton retour système. |
+| **Bandeaux** | `Snackbar` Material en bas, pas de bandeau en haut. |
 | **Mouvement** | Mêmes durées, courbes Material (`emphasizedDecelerate` / `emphasizedAccelerate`). |
 
 Le **logo** est identique : même SVG, mêmes déclinaisons, mêmes zones de protection. L'icône
-d'application, elle, doit être fournie en **icône adaptative** (couche de fond + couche de
-premier plan, zone sûre de 66 dp sur 108) — le masque Android est plus agressif que celui
-d'iOS et rogne les angles de la marque si elle est fournie à plat.
+d'application est une **icône adaptative** (fond + premier plan, zone sûre de 66 dp sur 108,
+couche monochrome pour les icônes thématiques) : le masque Android est plus agressif que celui
+d'iOS et rognerait la marque si elle était fournie à plat.
 
-## Règles de discipline côté Swift
+## Règles de discipline du domaine
 
-Pour que le portage reste mécanique, le code Swift respecte quelques contraintes dès
-maintenant. Elles ne coûtent rien à l'écriture et évitent une réécriture plus tard.
+Pour que les deux domaines restent comparables ligne à ligne :
 
-1. **Le domaine n'utilise que des types transposables** : `Int`, `String`, `Bool`, `UUID`,
-   `Date`, tableaux, dictionnaires, `enum`, `struct`. Pas de `Measurement`, pas de
+1. **Le domaine n'utilise que des types transposables** : entiers, chaînes, booléens, `UUID`,
+   dates, listes, dictionnaires, énumérations, structures. Pas de `Measurement`, pas de
    `NSAttributedString`, pas de `KeyPath` dans une signature publique.
-2. **Aucune date implicite.** Le domaine ne fait jamais `Date()` : l'instant est toujours passé
-   en paramètre. Cela rend les tests déterministes et supprime la question des fuseaux au
-   portage.
+2. **Aucune date implicite.** Le domaine ne lit jamais l'horloge : l'instant est toujours passé
+   en paramètre. Cela rend les tests déterministes et supprime la question des fuseaux.
 3. **Pas d'arithmétique de dates dans le domaine.** Les calculs de calendrier restent dans la
    couche présentation.
 4. **Les noms sont partagés.** `MatchState`, `RoundDraft`, `EndCheck`, `Standing` s'appellent
-   pareil en Kotlin. Une relecture croisée doit être possible sans table de correspondance.
+   pareil en Kotlin.
 5. **Le JSON est la seule frontière.** Le domaine encode et décode exactement les structures
-   de `spec/schema/`. Aucun format de sérialisation propriétaire, aucun `NSKeyedArchiver`.
-6. **Pas de `Foundation` au-delà du strict nécessaire** dans `Domain` : `UUID`, `Date`, `Data`
-   et `Codable`. Rien d'autre.
+   de `spec/`. Aucun format de sérialisation propriétaire.
+6. **Aucun texte d'interface dans le domaine** : les moteurs renvoient des raisons typées, que
+   chaque app rédige ([04](04-moteur-de-regles.md#validationresult)).
 
-## Plan de portage
+## Localisation
 
-| Étape | Contenu | Estimation |
+- **Contenu des jeux** (`spec/games/*.json`, champs `fr`/`en`/`es`/`de`/`it`) : partagé tel quel,
+  lu directement par `:catalog`.
+- **Interface** : `Scripts/extract-android-strings.py` génère `values*/strings.xml` depuis
+  `Localizable.xcstrings`. La clé source étant le texte français, un nom de ressource stable est
+  attribué une fois pour toutes dans `android/l10n-correspondence.json`. Le script convertit les
+  spécificateurs (`%1$@` → `%1$s`, `%lld` → `%d`), échappe le XML et produit des `<plurals>` avec
+  les quantités CLDR (« many » en français, espagnol et italien). Seules les chaînes référencées
+  par le Kotlin (`R.string.<nom>`) sont écrites. `values/` porte le **français**, langue source.
+- **Textes propres à Android** (permission caméra, recherche…) : `values*/strings_android.xml`,
+  maintenus à la main dans les 5 langues ; ceux du design system dans ses propres ressources.
+- Les messages produits par un ViewModel sont des `UiText` (ressource + arguments), résolus à
+  l'affichage.
+- La CI vérifie que `strings.xml` est à jour par rapport au catalogue Apple.
+- Choix de la langue par application : `Settings.ACTION_APP_LOCALE_SETTINGS` (Android 13+).
+
+## Accessibilité
+
+Mêmes exigences que sur iOS ([08](08-design-system.md#accessibilité)) : une ligne de tableau de
+scores = un seul arrêt TalkBack (`accessibleScoreRow`, `:designsystem`), libellés explicites sur
+les contrôles sans texte, échelle de police jusqu'à ×2 sans troncature, zones tactiles de 48 dp.
+
+## Repères
+
+Les commentaires du code Android renvoient aux étapes dans lesquelles l'app a été construite :
+
+| Étape | Sujet | Section |
 |---|---|---|
-| **A** | Projet Compose, thème Material 3 issu de la charte, composants de base | 1,5 sem |
-| **B** | Domaine Kotlin — types, `MatchEngine`, `GameRules` génériques | 1,5 sem |
-| **C** | **Golden files verts** — tous les jeux du catalogue | 1 sem |
-| **D** | Room, repositories, mapping | 1 sem |
-| **E** | Écrans : joueurs, configuration, partie, résultats, historique | 3 sem |
-| **F** | Transport partagé — client `supabase-kt` (canal/presence/broadcast), appairage/chiffrement (`javax.crypto`), export/import | 1,5 sem |
-| **G** | Accessibilité (TalkBack, échelle de police), localisation, recette | 1 sem |
-| | **Total** | **~10,5 semaines** |
-
-L'étape C est le jalon de vérité : à partir du moment où les golden files passent en Kotlin,
-les deux applications calculent **prouvablement** la même chose, et le reste du portage ne
-touche plus au métier.
-
-### A — Projet Compose et thème · 1,5 semaine
-
-- `android/` naît à la racine du mono repo, au même niveau que `apple/`, `spec/`, `docs/`,
-  `supabase/`, `Licenses/`, `Scripts/`, `ci_scripts/`.
-- Gradle multi-module, miroir des 5 cibles `QuiMeneKit` + le module app :
-  - `android/settings.gradle.kts` — `include(":app", ":domain", ":catalog", ":store", ":sync", ":designsystem")`.
-  - `android/gradle/libs.versions.toml` — catalogue de versions unique (Kotlin, Compose BOM,
-    Room, KSP, `supabase-kt`, Material 3, Navigation Compose, Vico), même rôle qu'une seule
-    épingle de version par dépendance que joue `Package.swift` côté Apple.
-  - `:domain` — Kotlin/JVM pur (`kotlin("jvm")`, pas `com.android.library`) : aucune dépendance
-    au SDK Android sur le classpath, donc aucun moyen d'y importer `android.*` même par erreur.
-    La contrainte « `Domain` ne connaît aucune implémentation concrète de `GameRules` » (doc 04)
-    devient vérifiable par construction du module, pas seulement par convention.
-  - `:catalog` — Kotlin/JVM pur, dépend de `:domain`.
-  - `:store` — `com.android.library`, dépend de `:domain` (Room a besoin d'un `Context`).
-  - `:sync` — Kotlin/JVM pur, dépend de `:domain` + `supabase-kt` + `ktor-client-okhttp` (le
-    moteur HTTP de Ktor est un artefact JVM ordinaire, pas Android-spécifique — même contrainte
-    que côté Swift où `Sync` ne dépend que de `Domain` + `supabase-swift`).
-  - `:designsystem` — `com.android.library`, Compose activé, zéro dépendance vers `:domain`
-    (comme `DesignSystem` dans `Package.swift`).
-  - `:app` — `com.android.application`, dépend des 5 modules ci-dessus.
-  - Sens de dépendance identique à `Package.swift` : `app → {domain, catalog, store, sync,
-    designsystem}` ; `catalog → domain` ; `store → domain` ; `sync → domain` ; `designsystem →`
-    rien.
-- `:designsystem` — thème Material 3 à partir de la charte : `Space.kt`, `Radius.kt`, `Motion.kt`,
-  `IconSize.kt`, `Touch.kt`, `ButtonHeight.kt` (mêmes noms que `DesignSystem/Tokens/*.swift`, en
-  `dp`), `Color.kt` (`ColorScheme` custom depuis les hex de la charte §14, pas de
-  `dynamicColor`), `Typography.kt` (échelle Material 3, pas un report de `Font+Tokens.swift`).
-- Composants de base, mêmes noms où ça a du sens (`PrimaryButton.kt`, `SecondaryButton.kt`,
-  `TertiaryButton.kt`, `ScoreField.kt`, `Card.kt`, `Chip.kt`, `Banner.kt`, `AvatarView.kt`,
-  `EmptyState.kt`), implémentation idiomatique Compose.
-- CI : nouveau `.github/workflows/android-ci.yml` (le dépôt n'a pas de `.github/` aujourd'hui —
-  Xcode Cloud reste propre à Apple, cohérent avec la ligne « Xcode Cloud → GitHub Actions » du
-  tableau d'équivalences).
-
-**Fini quand** : le projet Gradle compile à vide, une galerie de previews Compose montre chaque
-composant en clair/sombre, l'app se lance sur écran blanc sur émulateur et appareil réel, la CI
-est verte.
-
-### B — Domaine Kotlin · 1,5 semaine
-
-- `:domain`, un fichier Kotlin pour un fichier Swift : `Model/Participant.kt`, `ScoreInput.kt`,
-  `RoundDraft.kt`, `ScoreEntry.kt`, `Round.kt`, `MatchState.kt`, `MatchStatus.kt`,
-  `ModifierID.kt`, `ScoreDetail.kt`, `ValidationResult.kt`, `VariantSelection.kt` ;
-  `Engine/MatchEngine.kt`, `MatchEvent.kt` (`sealed interface` à 6 cas, `data class
-  StampedEvent`) ; `Rules/GameCatalog.kt`, `GameDefinition.kt`, `GameRules.kt` (`interface` à 4
-  méthodes, valeurs par défaut couvrant `generic.sum.v1`) ; `Stats/StatsEngine.kt`, `Insight.kt`,
-  `Badge.kt`, `ParticipantSeries.kt`. `data class` immuable partout, `sealed interface`/`sealed
-  class` pour les énumérations à valeur associée (pas d'équivalent natif en Kotlin).
-- `:catalog` : `GameCatalogEmbedded.kt` (miroir de `GameCatalog+Embedded.swift`), table
-  moteur→ID à 7 entrées (voir étape C).
-- **Chargement des ressources — la contrainte SwiftPM ne s'applique pas telle quelle.**
-  `Scripts/check-spec-sync.sh` existe parce que SwiftPM exige des ressources locales à la cible,
-  forçant une copie physique commitée que le script vérifie. Un `sourceSet` Gradle peut pointer
-  vers n'importe quel chemin relatif hors module (`resources.srcDir("../../spec/games")`) —
-  `:catalog` pourrait donc en théorie lire `spec/` directement, sans copie ni script.
-  **Décision retenue** : une tâche Gradle (`copySpecResources`, câblée sur `processResources`)
-  qui régénère une copie de `spec/games/` dans `build/generated/resources/` à chaque build,
-  jamais commitée — reproduit le geste Swift (copie locale au module) sans le risque de dérive
-  qu'un `check-spec-sync.sh` étendu au monde Android devrait surveiller : la copie ne peut pas
-  diverger puisqu'elle est régénérée, jamais maintenue à la main.
-- Vérification golden-file-driven : `GoldenFileTests.kt` (`:catalog`, JUnit 5), même patron que
-  `GoldenFile.swift`/`GoldenFileTests.swift` — décodage `spec/golden/*.json` (kotlinx.serialization),
-  rejeu par `MatchEngine.replay`, comparaison stricte des totaux/`Standing`/`Insight`.
-
-**Fini quand** : `:domain`/`:catalog` compilent, `GameCatalogEmbedded` charge les 20 définitions
-sans exception, la table moteur→ID est exhaustive (test dédié, miroir du test Swift qui échoue
-si un JSON référence un moteur absent).
-
-### C — Golden files verts · 1 semaine ◆ jalon de vérité
-
-- Catalogue réel (`spec/games/`, 20 fichiers — voir [05](05-catalogue-jeux.md)) : 14 jeux sur
-  `generic.sum.v1`, aucun code (Jeu libre, Rami, 6 qui prend, Scrabble, Triominos, Cornhole,
-  Flip 7, Odin, Pétanque, Pictionary, Qwixx, Rummikub, Time's Up, Trivial Pursuit) ; 6 jeux sur
-  un moteur impératif dédié, un fichier Kotlin par jeu, même nom que côté Swift :
-  `SkyjoRulesV1.kt`, `YamsRulesV1.kt`, `BeloteRulesV1.kt`, `MolkkyRulesV1.kt`, `TarotRulesV1.kt`,
-  `WizardRulesV1.kt`.
-- Les 24 golden files existants dans `spec/golden/` sont rejoués tels quels — rien de nouveau à
-  écrire, ils sont déjà la spécification exécutable.
-- Tests d'invariants portés en Kotlin (ex. somme nulle au Tarot à chaque donne), `SeededGenerator.kt`
-  miroir de `SeededGenerator.swift`.
-
-**Fini quand** : les 24 golden files passent en Kotlin, les invariants de propriété tiennent sur
-des entrées générées — à partir de là, les deux plateformes calculent prouvablement la même
-chose, et aucune étape suivante ne retouche le métier.
-
-### D — Room, repositories, mapping · 1 semaine
-
-- Trois entités, miroir un-pour-un des modèles SwiftData (`QuiMeneSchemaV1`) :
-  - `PlayerEntity.kt` — mêmes champs que `PlayerRecord.swift` (`id`, `nickname`, `avatarKind`,
-    `avatarValue`, `avatarPhoto: ByteArray?`, `paletteID`, `createdAt`, `isArchived`,
-    `sortIndex`, `sharedProfileID`, `sharedProfileIsMine`, `sharedProfileLinkedName`,
-    `sharedProfileLinkedAt`).
-  - `MatchEntity.kt` — miroir de `MatchRecord.swift` (`id`, `gameID`, `rulesVersion`,
-    `variantsData: ByteArray`, `startedAt`, `endedAt`, `status`, `endReasonRaw`, `isArchived`,
-    `deviceOrigin`, `eventLogData: ByteArray` — **la source de vérité**, exactement comme côté
-    Swift : la reprise après relance rejoue ce journal, jamais un total en cache —,
-    `pendingSharedProfileSync`, `isImportedSummary`).
-  - `ParticipantEntity.kt` — miroir de `ParticipantRecord.swift` (`id`, `playerId: UUID?` FK
-    `ON DELETE SET NULL`, `nicknameSnapshot`, `avatarKindSnapshot`, `avatarValueSnapshot`,
-    `paletteIDSnapshot`, `seatIndex`, `teamID: String?`, `finalRank`, `finalScore`, `matchId` FK
-    `ON DELETE CASCADE`).
-- Pas de classe `@Relation` : les participants d'une partie se lisent par `ParticipantDao`.
-  Ordre déterministe par `ORDER BY sortIndex`/`seatIndex` en requête — l'avantage que la
-  section « Persistance » ci-dessus note déjà pour Room.
-- `PlayerDao.kt`, `MatchDao.kt`, `ParticipantDao.kt` — requêtes `Flow<...>`, équivalent du
-  rafraîchissement automatique SwiftData.
-- Repositories, mêmes noms que côté Swift : `PlayerRepository.kt`, `MatchRepository.kt`,
-  `LeaderboardRepository.kt`, `ProfileRepository.kt`. `DeviceIdentity.kt`, `AppSettings.kt` —
-  Preferences DataStore au lieu d'UserDefaults/Keychain.
-- Pas d'équivalent CloudKit (déjà tranché ci-dessus, section « Synchronisation »). Sauvegarde :
-  Android Auto Backup — `allowBackup="true"` + `dataExtractionRules.xml` incluant la base Room
-  (quota 25 Mo).
-- Widget non porté : la ligne `WidgetKit → Glance` du tableau d'équivalences n'a plus de
-  correspondant à construire ici — le widget d'écran d'accueil Apple a été construit puis
-  retiré, jugé sans intérêt réel face à la Live Activity (docs 15/12, P9).
-
-**Fini quand** : on crée dix joueurs, dix parties, on relance l'app, tout est là ; une partie
-interrompue reprend en rejouant `eventLogData`, jamais un total mis en cache.
-
-### E — Écrans · 3 semaines
-
-Inventaire réel (`apple/App/Features/`, 8 dossiers) — sert à ne rien oublier, pas un modèle à
-recopier : `LiveMatch/` (`LiveMatchModel`/`View`, `ScoreBoardView`, `RoundHistoryView`, + 4
-écrans de saisie dédiés — `BeloteRoundView`, `TarotRoundView`, `WizardRoundView`,
-`YamsSheetView` — Skyjo/Mölkky utilisent le pavé générique + drapeaux ; `ShareSessionView`/
-`SharedMatchView`/`QRCodeView`) · `MatchSetup/` (`GamesTabView`, `JoinTabView`,
-`MatchSetupModel`/`View`, `QRScannerView`) · `Players/` · `Results/` · `History/` (+
-`ReceivedMatchDetailView`, doc 14) · `Leaderboard/` · `Profile/` · `Settings/`.
-
-Proposition Compose, idiomatique, pas un calque (voir « Ce qui n'est pas partagé » ci-dessous) :
-
-- `NavigationBar` Material en bas (charte : pas la tab bar flottante iOS). Destinations racines
-  proposées, à valider une fois les écrans en main : **Jouer** (catalogue + rejoindre),
-  **Historique**, **Classements**, **Profil** — `Settings` atteint depuis Profil, convention
-  Android courante, pas une destination de barre séparée.
-- Un écran = un `@Composable` + un `ViewModel` (`StateFlow`), même préfixe que le Model Swift :
-  `LiveMatchScreen.kt`/`LiveMatchViewModel.kt`, `MatchSetupScreen.kt`/`MatchSetupViewModel.kt`,
-  `PlayerEditorScreen.kt`, `HistoryListScreen.kt`, `ResultsScreen.kt`, `ProfileScreen.kt`,
-  `SettingsScreen.kt`, `GameLeaderboardScreen.kt`.
-- Écrans de saisie dédiés, mêmes 4 jeux : `BeloteRoundScreen.kt`, `TarotRoundScreen.kt`,
-  `WizardRoundScreen.kt`, `YamsSheetScreen.kt`. Le reste partage `ScoreBoardScreen.kt` (pavé
-  numérique + drapeaux).
-- Pavé numérique et enchaînement de saisie (objectif produit P4 : 5 scores en < 15 s, doc 12) à
-  revalider sur Android — pas un simple portage visuel.
-- `ResultsShareCard` → `GraphicsLayer.toImageBitmap()`. Courbe d'évolution → Vico (seule
-  dépendance UI tierce Android, déjà actée ADR-0012/0016).
-
-**Fini quand** : une partie de chaque famille de saisie (entier nu, entier + drapeau, grille, par
-équipe — doc 05) se joue de bout en bout jusqu'aux résultats sur appareil réel, et la reprise
-après relance fonctionne.
-
-### F — Transport partagé · 1,5 semaine
-
-Cette étape est un portage assez mécanique d'un client SDK déjà écrit une fois (`SupabaseTransport.swift`),
-pas la construction de deux transports bas niveau (mDNS/socket, GATT) que l'ancienne architecture
-Wi-Fi/BLE exigeait — l'estimation en tient compte. Timebox court en tête d'étape pour vérifier la
-parité `supabase-kt`/`supabase-swift` sur canal/presence/broadcast avant de s'engager sur le
-reste de l'estimation.
-
-- `Transport.kt` — `interface TransportSession` (`incoming: Flow<ByteArray>`, `suspend fun
-  send`, `suspend fun close`), miroir de `TransportSession`. `DiscoveredHost.kt`.
-- `SupabaseTransport.kt` — client `supabase-kt` (modules Realtime + Postgrest), même modèle
-  canal/presence/broadcast que `SupabaseTransport.swift` : canal par session, presence
-  connexion/déconnexion, broadcast pour `WireMessage` chiffré, requête Postgrest sur
-  `quimene_open_games` pour la découverte par code.
-- `WireMessage.kt` — `data class` + `sealed interface Kind`, les 8 cas exacts de
-  `WireMessage.swift` (`Hello`, `Welcome`, `Events`, `MatchChanged`, `Proposal`, `Rejection`,
-  `Heartbeat`, `Goodbye`), sérialisation kotlinx.serialization polymorphe. `WireCodec.kt`,
-  `Role.kt`, `LamportClock.kt`.
-- `SessionCrypto.kt` — AES-GCM direct (`Cipher.getInstance("AES/GCM/NoPadding")` couvre
-  exactement `AES.GCM.seal`/`open`). **HKDF n'a pas de primitive JDK prête à l'emploi**
-  (contrairement à `CryptoKit.HKDF<SHA256>`) : réimplémenter RFC 5869 à la main sur
-  `javax.crypto.Mac("HmacSHA256")` (~20 lignes) plutôt qu'importer une bibliothèque de crypto
-  entière (Tink/Bouncy Castle) pour un seul primitif — cohérent avec l'esprit « zéro dépendance
-  tierce » d'ADR-0012.
-- `LiveSession.kt` — **pas d'équivalent direct à l'`actor` Swift.** À trancher en tête d'étape :
-  `Mutex` (kotlinx.coroutines.sync) enveloppant chaque fonction publique, ou dispatcher
-  mono-thread dédié (`Dispatchers.Default.limitedParallelism(1)`). C'est la seule vraie décision
-  d'architecture de cette étape — le reste est un portage mécanique d'un client déjà écrit une
-  fois.
-- `SharedProfileTransport.kt` (doc 14) — priorité basse : sa phase 3 (copie rejouable) n'est pas
-  faite côté Apple non plus.
-- Hors périmètre v1 : `LiveActivityPushClient` — Live Activity est Apple-only, aucune
-  notification persistante à construire dans cette étape.
-- `WireGoldenTest.kt` (`:sync`, JVM) — même patron que `WireGoldenTests.swift` : décode les 8
-  fixtures de `spec/wire/*.json`, vérifie le round-trip, vérifie que les 8 cas de `Kind` ont
-  chacun leur fixture.
-
-**Fini quand** : un iPhone et un Android suivent la même partie via Supabase Realtime en recette
-croisée manuelle sur appareils réels, et l'un des deux perd puis retrouve sa connexion sans
-perdre l'état.
-
-### G — Accessibilité, localisation, recette · 1 semaine
-
-Réutilise la portée de la Phase H Apple (doc 15) plutôt que de la redécouvrir — mêmes 8 zones +
-les 4 écrans de saisie dédiés :
-
-- `AccessibleMotion.kt` (`:designsystem`) — lit `Settings.Global.ANIMATOR_DURATION_SCALE` via
-  `ContentResolver`, exposé en `CompositionLocal<Boolean>` (`LocalReducedMotion`), miroir de
-  `Motion+Accessible.swift` : `snap()` au lieu de `tween()` quand actif.
-- `AccessibleScoreRow.kt` — `Modifier.semantics(mergeDescendants = true) { contentDescription =
-  ... }`, un seul arrêt TalkBack par ligne, même principe que `AccessibleScoreRow.swift`.
-- `Chip.kt` — zone tactile `Touch.minimum` (48 dp, charte Android), `Modifier.semantics {
-  selected = ... }`.
-- `Banner.kt` — `Modifier.semantics { liveRegion = LiveRegionMode.Polite }`, équivalent
-  Compose-natif de `UIAccessibility.post`/`Banner.announce(_:)`.
-- Contraste augmenté des couleurs `player/1`…`player/10` : pas de signal système Android aussi
-  net que le trait `.increaseContrast` d'iOS à cette date — réglage explicite dans l'app plutôt
-  qu'un signal système incertain, mêmes paires vérifiées WCAG ≥ 4,5. `ContrastTests.kt`
-  (`:designsystem`, JVM pur — l'arithmétique de contraste ne dépend d'aucune API Android), même
-  volume que les 20 cas ajoutés en Phase H côté Apple.
-- Échelle de police : Compose respecte `fontScale` (jusqu'à ×2.0) automatiquement sur `sp` — le
-  travail réel est la vérification visuelle qu'aucun écran ne tronque à `fontScale = 2.0`
-  (équivalent AX5).
-- Traversée manuelle TalkBack sur appareil réel, mêmes 8 zones + 4 écrans dédiés — jugement
-  humain, rien d'automatisable ici (même constat que la traversée VoiceOver Apple).
-- **Localisation — chemin d'extraction mécanique, pas une retraduction.** Deux sources
-  distinctes : (1) **contenu des jeux** (`spec/games/*.json`, champs `fr`/`en`/`es`/`de`/`it`) —
-  déjà partagé tel quel via `spec/`, lu directement par `:catalog` au runtime, rien à traduire
-  ni extraire. (2) **chrome d'interface** (`Localizable.xcstrings`, 232 clés) — script
-  d'extraction ponctuel vers `res/values{,-en,-es,-de,-it}/strings.xml` : synthétiser un nom de
-  ressource stable (la clé source est le texte français lui-même, pas un identifiant symbolique
-  — table de correspondance committée pour ne pas se réordonner à chaque régénération) ;
-  convertir les spécificateurs positionnels (`%1$@`→`%1$s`, `%lld`/`%ld`→`%d`) ; échapper le
-  XML ; pluriels (variations `.xcstrings`) vers `<plurals>`, avec les quantités CLDR que
-  demande Android (« many » en français, espagnol et italien) ; `values/` (sans qualificatif) porte le
-  **français**, cohérent avec `sourceLanguage: fr` et le repli déjà choisi côté
-  `GameDefinition.LocalizedText.localized`. Repasse humaine légère après coup (conventions
-  Android, débordements de texte propres à Compose), pas une retraduction.
-
-  **Chaîne en place (audit du 2026-09-25, [15](15-plan-qualite-code.md))** :
-  `Scripts/extract-android-strings.py` génère `values*/strings.xml` depuis le catalogue Apple.
-  Un nom de ressource déjà attribué (`android/l10n-correspondence.json`) ne change jamais, et
-  seules les chaînes référencées par le Kotlin (`R.string.<nom>`) sont écrites — aucune chaîne
-  inutilisée dans l'APK. Pour utiliser un texte du catalogue : chercher son nom dans la table,
-  le référencer, relancer le script. Les textes propres à Android (permission caméra, mode
-  sélection, recherche…) vivent dans `values*/strings_android.xml`, maintenus à la main dans
-  les 5 langues ; ceux des composants de `:designsystem` (bouton retour, libellés TalkBack des
-  lignes de score) dans ses propres `values*/strings.xml`. Les messages produits par un
-  ViewModel sont des `UiText` (ressource + arguments), résolus à l'affichage ; les modules purs
-  (`:domain`, `:catalog`) ne produisent que des raisons typées (doc 04). La CI GitHub vérifie
-  que `strings.xml` est à jour par rapport au catalogue.
-- Raccourci de langue : `Settings.ACTION_APP_LOCALE_SETTINGS` (API 33+), équivalent
-  d'`UIApplication.openSettingsURLString`.
-- Recette finale : Play Internal Testing track (équivalent TestFlight), fiche Play Store
-  (captures, section « Sécurité des données » — équivalent de l'étiquette de confidentialité
-  iOS).
-
-**Fini quand** : TalkBack traverse les 8 zones + 4 écrans dédiés sans blocage, `fontScale = 2.0`
-n'écrête aucun écran, les 5 langues s'affichent correctement, la check-list « définition de
-terminé » (variante Android de doc 10) passe sur tous les écrans, l'app est installable via Play
-Internal Testing.
+| A | Projet Gradle multi-module, thème Material 3, composants de base, CI | Modules, Charte graphique sur Android |
+| B | Domaine Kotlin, chargement des définitions | Modules, Chargement des définitions |
+| C | Golden files verts sur tous les jeux | [10](10-tests-et-qualite.md#les-golden-files) |
+| D | Room, repositories, mapping | Persistance |
+| E | Écrans | Charte graphique sur Android |
+| F | Sessions en ligne, chiffrement | Synchronisation, [09](09-partie-partagee.md) |
+| G | Accessibilité, localisation | Localisation, Accessibilité |
 
 ## Ce qui n'est pas partagé, et c'est voulu
 

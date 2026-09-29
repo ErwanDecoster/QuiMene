@@ -1,4 +1,4 @@
-# 09 — Tests & qualité
+# 10 — Tests et qualité
 
 ## Ce qu'on cherche à empêcher
 
@@ -10,71 +10,55 @@ l'effort porte sur le domaine, très peu sur l'interface.
 ## Pyramide
 
 ```
-        ╱  XCUITest — 3 parcours     ╲       lents, fragiles, indispensables
-       ╱     création joueur          ╲      quand même
-      ╱      partie Skyjo complète     ╲
-     ╱       reprise après relance      ╲
-    ╱─────────────────────────────────────╲
-   ╱  Intégration — Store, Sync            ╲   base en mémoire,
-  ╱     mapping, migrations, convergence     ╲  transport simulé
- ╱───────────────────────────────────────────╲
-╱  Unitaires — Domain, Catalog, Stats         ╲  ~80 % de l'effort
-│  ▸ golden files rejoués                      │ < 1 s au total
-│  ▸ invariants, propriétés                    │
-└───────────────────────────────────────────────┘
+        ╱  Interface — 3 parcours     ╲       lents, fragiles, indispensables
+       ╱     création joueur           ╲      quand même
+      ╱      partie Skyjo complète      ╲
+     ╱       reprise après relance       ╲
+    ╱──────────────────────────────────────╲
+   ╱  Intégration — Store, Sync             ╲   base en mémoire,
+  ╱     repositories, schéma, sessions        ╲  serveur simulé
+ ╱────────────────────────────────────────────╲
+╱  Unitaires — Domain, Catalog, Stats          ╲  l'essentiel de l'effort
+│  ▸ golden files rejoués                       │ < 1 s au total
+│  ▸ invariants, propriétés                     │
+└────────────────────────────────────────────────┘
 ```
 
-**Swift Testing**, pas XCTest — sauf pour XCUITest, qui reste sur XCTest.
+**Swift Testing** côté Apple (XCTest pour les tests d'interface), **JUnit 5** et Robolectric
+côté Android.
 
 ## Les golden files
 
-C'est la pièce maîtresse, et le pivot de la stratégie Android.
+C'est la pièce maîtresse, et le pivot de la cohérence entre les deux plateformes.
 
-Un golden file décrit une partie complète et ses résultats attendus, en JSON, sans une ligne de
-Swift ni de Kotlin. Les deux plateformes le chargent, le rejouent, et comparent.
+Un golden file (`spec/golden/`) décrit une partie complète et ses résultats attendus, en JSON,
+sans une ligne de Swift ni de Kotlin. Les deux plateformes le chargent, le rejouent, et
+comparent (`GoldenFileTests.swift`, `GoldenFileTest.kt`). Le principe :
 
 ```swift
-@Suite("Golden files")
-struct GoldenTests {
-    @Test(arguments: GoldenFile.all)      // découverte automatique du dossier
-    func replay(_ golden: GoldenFile) throws {
-        let catalog = GameCatalog.embedded
-        let rules = try catalog.rules(for: golden.gameID, version: golden.rulesVersion)
-        let definition = try catalog.definition(for: golden.gameID, version: golden.rulesVersion)
-
-        var state = MatchState(from: golden)
-        for round in golden.rounds {
-            state = MatchEngine().reduce(state, .roundCommitted(round.draft),
-                                         rules: rules, definition: definition)
-            let expected = golden.expected.roundResults[round.index]
-            #expect(state.totals() == expected.cumulative)
-            #expect(state.status == expected.status)
-        }
-
-        #expect(state.endReason == golden.expected.final.reason)
-        #expect(rules.standings(state, definition: definition) == golden.expected.final.standings)
-
-        let stats = StatsEngine().insights(for: state, definition: definition)
-        #expect(stats.matches(golden.expected.insights))
-    }
+@Test(arguments: GoldenFile.all)          // découverte automatique du dossier
+func replay(_ golden: GoldenFile) throws {
+    // rejoue chaque manche avec le moteur du jeu (catalogue embarqué)…
+    // …et vérifie après CHAQUE manche : scores calculés, cumuls, statut
+    // puis à la fin : raison de fin, classement, faits marquants attendus
 }
 ```
 
 Un test paramétré : ajouter un golden au dossier ajoute un cas, sans toucher au code de test.
-Un échec nomme le fichier fautif.
+Un échec nomme le fichier fautif. Vérifier l'état après chaque manche, et pas seulement à la fin,
+est délibéré : une erreur qui se compense entre deux manches passerait sinon inaperçue.
 
-**Couverture exigée par jeu** : au minimum deux golden files —
-
-1. une partie nominale, du début à la fin ;
-2. le cas limite qui fait la particularité du jeu (doublement Skyjo, bonus de 63 au Yams,
-   chute du preneur au Tarot, dépassement de 50 au Mölkky, ex æquo au sommet).
-
-Un jeu sans golden ne sort pas.
+**Couverture par jeu** : au moins un golden file par jeu, et pour les jeux à moteur propre le
+cas limite qui fait leur particularité (doublement Skyjo, bonus du Yams, preneur à 3, 4 ou
+5 joueurs au Tarot, dépassement de 50 au Mölkky, ex æquo au sommet). Les branches qu'un golden
+n'atteint pas sont couvertes par des tests unitaires ciblés (départage Yams, capot Belote, fin
+manuelle).
 
 ## Invariants et tests de propriété
 
 Certaines vérités doivent tenir pour *toute* partie, pas seulement pour les cas écrits à la
-main. Swift Testing permet de les exprimer sur des entrées générées.
+main. Elles sont vérifiées sur des entrées générées par un générateur reproductible
+(`SeededGenerator`, même graine = mêmes tirages).
 
 | Invariant | Portée |
 |---|---|
@@ -84,28 +68,37 @@ main. Swift Testing permet de les exprimer sur des entrées générées.
 | `standings()` est un ordre total, ex æquo compris | tous les jeux |
 | `total(joueur) == Σ computedValue` de ses entrées | tous les jeux |
 | `endCheck` ne repasse jamais de `.ended` à `.continue` | monotonie — évite une partie qui « redémarre » |
-| Un `MatchState` encodé puis décodé est identique | `Codable`, transport réseau |
+| Un `MatchState` encodé puis décodé est identique | `Codable`, échange entre appareils |
 
 Ces sept lignes attrapent en pratique plus de bugs que cinquante tests d'exemple.
 
 ## Tests d'intégration
 
-**Store** — `ModelConfiguration(isStoredInMemoryOnly: true)` : aller-retour domaine ↔
-persistance, préservation de l'ordre des manches (le piège SwiftData), suppression en cascade,
-comportement d'une fiche joueur supprimée alors qu'elle apparaît dans l'historique.
+**Store** — `ModelConfiguration(isStoredInMemoryOnly: true)` (Room en mémoire côté Android) :
+aller-retour domaine ↔ persistance, préservation de l'ordre, suppression en cascade, fiche
+joueur supprimée alors qu'elle apparaît dans l'historique, statistiques de profil et
+classements. `CloudKitSchemaTests` ouvre le vrai schéma avec un container CloudKit actif.
 
-**Migrations** — un magasin de test figé par version publiée, ouvert par la version courante.
-Ajouté dès qu'une V2 du schéma existe ; le test échoue si une migration perd une donnée.
+**Migrations** — dès qu'une V2 du schéma existe : un magasin de test figé par version publiée,
+ouvert par la version courante ; le test échoue si une migration perd une donnée.
 
-**Sync** — deux `LiveSession` reliées par un `Transport` en mémoire, sans réseau réel.
-Convergence, reconnexion, rejet d'une proposition invalide, ordre d'arrivée inversé.
+**Sessions** — `OnlineSessionTests` / `OnlineSessionTest` sur un serveur en mémoire qui applique
+les mêmes règles que le SQL (numérotation, `stale_seq`, idempotence, lots) ; tests SQL dans
+`supabase/tests/` ; chiffrement, identités et boîte aux lettres testés séparément.
+
+**Compatibilité croisée** — chaque format échangé a un fichier de référence produit par le code
+réel d'une plateforme et relu par les tests de l'autre, dans les deux sens (`spec/session/`,
+doc [17](17-recette-croisee.md)).
+
+**Modèles de flux** — `QuiMeneTests` (Apple) et les tests de ViewModel (Android) couvrent la
+saisie, la configuration de partie, l'éditeur de joueur et l'accord des pluriels.
 
 ## Tests d'interface
 
-Trois parcours seulement, sur le chemin critique :
+Trois parcours seulement, sur le chemin critique (`QuiMeneUITests`) :
 
-1. Créer un joueur avec un avatar, le retrouver dans la liste.
-2. Partie de Skyjo à 3 joueurs, jusqu'à la fin, vérifier le vainqueur à l'écran de résultats.
+1. Créer un joueur, le retrouver dans la liste.
+2. Partie de Skyjo jusqu'à la fin, vérifier l'écran de résultats.
 3. Démarrer une partie, tuer l'app, la relancer, vérifier que la partie est proposée en reprise.
 
 Le troisième est le plus important : il couvre le scénario « soirée perdue », identifié comme
@@ -116,59 +109,40 @@ rédhibitoire dans la [vision produit](01-vision-produit.md).
 Assumé explicitement, pour ne pas dépenser l'effort au mauvais endroit :
 
 - L'apparence. Pas de tests de capture d'écran : Liquid Glass et Dynamic Type les rendraient
-  instables à chaque version d'iOS pour un bénéfice faible. Les previews Xcode, déclinées en
-  clair/sombre, en AX5 **et dans les deux rendus iOS 18-25 / iOS 26+** pour tout composant
-  concerné par l'amélioration progressive Liquid Glass ([ADR-0015](13-decisions-adr.md)), jouent
-  ce rôle en revue.
-- Transport Supabase Realtime sur appareils réels, y compris entre iPhone et Android — check-list
-  de recette manuelle, Phase 7.
-- La sync CloudKit — nécessite deux appareils et un compte réel ; check-list manuelle,
-  Phase 5.
+  instables à chaque version d'iOS pour un bénéfice faible. Les galeries de previews du design
+  system jouent ce rôle en revue.
+- Le partage en direct sur appareils réels, entre iPhone et Android : scénarios de recette de la
+  doc [17](17-recette-croisee.md).
+- La synchronisation CloudKit, qui nécessite deux appareils et un compte réel.
 
 ## Qualité de code
 
-- **Mode langage Swift 6, concurrence stricte**, sur toutes les cibles. Aucune exception,
-  aucun `@unchecked Sendable`, aucun `@preconcurrency import`. Ces trois interdits sont
-  vérifiés par une règle de revue, pas par un outil.
-
-  **Exception actée** (audit qualité, [15](15-plan-qualite-code.md)) : `apple/App/Features/MatchSetup/QRScannerView.swift`
-  importe `AVFoundation` avec `@preconcurrency`. `AVCaptureMetadataOutputObjectsDelegate` est une
-  API pré-Swift-concurrency non auditée `Sendable` par Apple — retirer l'import casse la
-  compilation sans qu'aucun changement côté projet ne puisse le corriger ; c'est le fix-it que
-  Xcode lui-même propose pour ce cas précis. Le fichier isole déjà le risque au minimum
-  (`nonisolated func metadataOutput`, saut explicite vers `@MainActor` pour toute mutation
-  d'état). Les deux `@unchecked Sendable` trouvés par le même audit (`SupabaseTransport`,
-  `SupabaseTransportSession`) ont en revanche été corrigés pour de vrai plutôt que documentés
-  comme exception — voir [15](15-plan-qualite-code.md).
+- **Mode langage Swift 6, concurrence stricte**, sur toutes les cibles. Ni `@unchecked Sendable`
+  ni `@preconcurrency import`, à une exception près : `QRScannerView.swift` importe
+  `AVFoundation` avec `@preconcurrency`, parce que `AVCaptureMetadataOutputObjectsDelegate` n'est
+  pas annoté `Sendable` par Apple. Le fichier isole le risque (`nonisolated` pour le délégué,
+  retour explicite sur `@MainActor` pour toute mutation d'état).
 - **Avertissements = erreurs** partout : cibles Xcode (`SWIFT_TREAT_WARNINGS_AS_ERRORS`),
-  package (`.treatAllWarnings(as: .error)` dans `Package.swift`, que le réglage Xcode n'atteint
-  pas), et côté Android compilateur Kotlin (`allWarningsAsErrors`) et Android Lint
-  (`warningsAsErrors`, seule exception : les vérifications « nouvelle version disponible »,
-  dépendantes du réseau et de la date). Limite connue : Swift ne
-  promeut pas en erreur certains diagnostics (isolation assouplie par `@preconcurrency`,
-  visibilité des imports de membres) — ils restent à lire dans le journal de build.
-- **swift-format** avec la configuration par défaut d'Apple, appliqué à la validation.
-- Aucune dépendance tierce. Toute proposition d'en ajouter une passe par un ADR.
+  package (`.treatAllWarnings(as: .error)` dans `Package.swift`), compilateur Kotlin
+  (`allWarningsAsErrors`) et Android Lint (`warningsAsErrors`, sauf les vérifications « nouvelle
+  version disponible », dépendantes du réseau et de la date).
+- **Formatage** : swift-format avec la configuration par défaut d'Apple (`.swift-format`,
+  `Scripts/lint.sh`), ktlint côté Android.
+- **Dépendances** : chaque dépendance tierce passe par un ADR ([ADR-0012](13-decisions-adr.md)).
+  Côté Apple, seule `supabase-swift`.
+- **Pas de `print`** : côté Apple, journalisation par `os.Logger`, sans données personnelles ni
+  jetons.
 
-## Intégration continue — Xcode Cloud (Apple) et GitHub Actions (Android)
+## Intégration continue
 
-Côté Android et garde-fous partagés, `.github/workflows/android-ci.yml` : ktlint, build (avec
-Lint et tests unitaires), synchronisation de `spec/` avec ses copies Apple, et `strings.xml`
-à jour par rapport au catalogue Apple. Côté Apple, `ci_scripts/ci_post_clone.sh` fait échouer
-Xcode Cloud tôt sur `spec/` désynchronisé ou un fichier mal formaté (`Scripts/lint.sh`).
+- **GitHub Actions** (`.github/workflows/android-ci.yml`) : ktlint, build avec Android Lint et
+  tests unitaires ; synchronisation de `spec/` avec ses copies Apple ; `strings.xml` à jour par
+  rapport au catalogue Apple.
+- **Xcode Cloud** : `ci_scripts/ci_post_clone.sh` fait échouer le build tôt si `spec/` est
+  désynchronisé ou si un fichier Swift est mal formaté, avant la compilation et les tests.
 
-Choisi par cohérence avec la contrainte « outils Apple » : intégration native à Xcode et à
-App Store Connect, aucune infrastructure à maintenir, signature de code gérée.
-
-| Déclencheur | Actions |
-|---|---|
-| Chaque push sur une branche | build package + tests unitaires et d'intégration |
-| Pull request vers `main` | idem + XCUITest sur simulateur iPhone et iPad |
-| Tag `v*` | build d'archive, TestFlight interne |
-
-Objectif : **moins de 5 minutes** sur un push de branche. Les tests unitaires du domaine se
-comptant en millisecondes, le temps est presque entièrement celui de la compilation — d'où
-l'intérêt d'un `Domain` sans dépendance.
+Les tests unitaires du domaine se comptant en millisecondes, le temps de CI est presque
+entièrement celui de la compilation — d'où l'intérêt d'un `Domain` sans dépendance.
 
 ## Captures des stores
 
@@ -223,12 +197,14 @@ Skyjo en cours), `02-resultats`, `03-jeux`, `04-profil`, `05-historique`, `06-jo
 Un écran ou une fonctionnalité n'est terminé que si :
 
 - [ ] les tests unitaires du domaine concerné passent, golden files inclus ;
-- [ ] la fonctionnalité est traversable **entièrement à VoiceOver**, sans regarder l'écran ;
-- [ ] elle est lisible en Dynamic Type AX5 sans troncature ni chevauchement ;
+- [ ] la fonctionnalité est traversable **entièrement à VoiceOver / TalkBack**, sans regarder
+      l'écran ;
+- [ ] elle est lisible en Dynamic Type AX5 (échelle de police ×2 sur Android) sans troncature
+      ni chevauchement ;
 - [ ] elle est correcte en mode clair et en mode sombre ;
-- [ ] elle est correcte sur iPhone SE et sur iPad en Split View ;
+- [ ] elle est correcte sur petit écran (iPhone SE) et sur tablette ;
 - [ ] toutes les chaînes sont dans le catalogue et traduites dans les 5 langues, libellés
-      VoiceOver/TalkBack compris — aucun texte affiché en dur, ni dans une `String` Swift qui
+      d'accessibilité compris — aucun texte affiché en dur, ni dans une `String` Swift qui
       contourne le catalogue, ni dans un littéral Kotlin ;
 - [ ] aucun nouvel avertissement de compilation ;
 - [ ] le parcours a été fait une fois sur un appareil réel, pas seulement en simulateur.

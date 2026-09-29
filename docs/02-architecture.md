@@ -5,8 +5,7 @@
 > Le calcul des scores ne connaît ni SwiftUI, ni SwiftData, ni le réseau.
 
 Tout ce qui décide d'un score, d'un classement ou d'une fin de partie vit dans un module de
-**fonctions pures sur des structures `Sendable`**. Ce module n'importe rien d'autre que
-`Foundation`. Il en découle trois bénéfices directs :
+**fonctions pures sur des structures `Sendable`**. Il en découle trois bénéfices directs :
 
 - il se teste sans simulateur, sans base, sans horloge, en quelques millisecondes ;
 - il se rejoue à l'identique à partir d'un fichier golden ;
@@ -16,22 +15,22 @@ Tout le reste — persistance, réseau, interface — est un **adaptateur** auto
 
 ## Modules
 
-Un unique package Swift local, `QuiMeneKit`, contenant plusieurs cibles. Un package plutôt
-qu'un projet monolithique parce que les dépendances entre cibles deviennent alors vérifiées à
-la compilation : `Domain` ne *peut pas* importer SwiftUI, le compilateur le refuse.
+Un package Swift local, `QuiMeneKit`, contient plusieurs cibles. Un package plutôt qu'un projet
+monolithique parce que les dépendances entre cibles sont alors vérifiées à la compilation :
+`Domain` ne *peut pas* importer SwiftUI, le compilateur le refuse.
 
 ```
                         ┌──────────────────┐
-                        │   QuiMene.app   │  cible Xcode
-                        │  features + DI   │
+                        │   QuiMene.app    │  cible Xcode
+                        │  écrans + flux   │  (+ widget Live Activity)
                         └────────┬─────────┘
              ┌───────────────┬───┴────┬───────────────┐
              ▼               ▼        ▼               ▼
-      ┌────────────┐  ┌───────────┐ ┌──────┐  ┌──────────────┐
-      │   Store    │  │  Catalog  │ │ Sync │  │ DesignSystem │
-      │ SwiftData  │  │  18 jeux  │ │Realtm│  │   SwiftUI    │
-      └──────┬─────┘  └─────┬─────┘ └──┬───┘  └──────────────┘
-             └──────────────┼──────────┘
+      ┌────────────┐  ┌───────────┐ ┌──────────┐ ┌──────────────┐
+      │   Store    │  │  Catalog  │ │   Sync   │ │ DesignSystem │
+      │ SwiftData  │  │  20 jeux  │ │ Supabase │ │   SwiftUI    │
+      └──────┬─────┘  └─────┬─────┘ └────┬─────┘ └──────────────┘
+             └──────────────┼────────────┘
                             ▼
                     ┌───────────────┐
                     │    Domain     │   Foundation uniquement
@@ -41,94 +40,80 @@ la compilation : `Domain` ne *peut pas* importer SwiftUI, le compilateur le refu
 
 | Cible | Dépend de | Contient | Ne contient jamais |
 |---|---|---|---|
-| **Domain** | `Foundation`¹ | Types du domaine, protocole `GameRules`, `MatchEngine`, `StatsEngine`, chargement des définitions JSON | Aucune I/O, aucun `Date()` implicite, aucun singleton |
-| **Catalog** | Domain | Une implémentation `GameRules` par jeu + les JSON embarqués en ressource | Persistance, UI |
-| **Store** | Domain | Modèles `@Model`, `ModelContainer`, repositories, mapping domaine ↔ persistance | Règles de jeu |
-| **Sync** | Domain | `LiveSession`, protocole `Transport` (implémentation `SupabaseTransport`, [ADR-0016](13-decisions-adr.md)), `WireMessage`, horloge de Lamport | UI, persistance |
-| **DesignSystem** | `SwiftUI` | Tokens, composants réutilisables, avatars, pavé de saisie | Domain (délibérément — composants agnostiques) |
-| **QuiMene.app** | tout | Écrans, navigation, `@Observable` de flux, composition des dépendances | Logique de calcul |
+| **Domain** | `Foundation`¹ | Types du domaine, protocole `GameRules`, `MatchEngine`, `StatsEngine`, définitions de jeux | Aucune I/O, aucun `Date()` implicite, aucun singleton |
+| **Catalog** | Domain | Une implémentation `GameRules` par jeu à moteur propre + les JSON de `spec/games/` embarqués | Persistance, UI |
+| **Store** | Domain | Modèles `@Model`, repositories, statistiques de profil et classements, mapping domaine ↔ persistance | Règles de jeu |
+| **Sync** | Domain, `supabase-swift` | `OnlineSession` (journal de session), `SessionCrypto`, `SessionIdentity`, `SharedMatchMailbox`, `LiveActivityPushClient` | UI, persistance |
+| **DesignSystem** | `SwiftUI` | Tokens, composants réutilisables, avatars, logo | Domain (délibérément : composants agnostiques) |
+| **QuiMene.app** | tout | Écrans, navigation, objets `@Observable` de flux, composition des dépendances | Logique de calcul |
 
-¹ **Exception actée** (audit qualité, [15](15-plan-qualite-code.md)) : `Domain/LiveActivity/MatchActivityAttributes.swift`
-importe aussi `ActivityKit`. Nécessaire — le protocole `ActivityAttributes` doit être visible à la
-fois par `Domain` (qui définit le type) et par le widget (qui l'affiche) — et sans conséquence
-pour le portage Android ([11](11-portage-android.md)) : ActivityKit n'a aucun équivalent Android,
-`MatchActivityAttributes` n'aurait de toute façon jamais été porté tel quel, quel que soit
-l'endroit où il vit côté Apple. N'affecte aucun autre invariant de `Domain` (toujours zéro I/O,
-toujours `Sendable`).
+¹ **Exception** : `Domain/LiveActivity/MatchActivityAttributes.swift` importe aussi `ActivityKit`.
+Le protocole `ActivityAttributes` doit être visible à la fois par `Domain` (qui définit le type)
+et par le widget (qui l'affiche). Sans conséquence pour Android, où ce type n'a pas d'équivalent,
+ni sur les autres invariants de `Domain` (zéro I/O, tout `Sendable`).
 
 `DesignSystem` ne dépend pas de `Domain` volontairement : ses composants prennent des valeurs
 brutes en entrée. Cela évite qu'un bouton finisse par embarquer une règle de jeu, et rend les
 previews Xcode instantanées.
 
+Le projet Android reproduit exactement ce découpage en modules Gradle, avec le même sens de
+dépendance ([11](11-portage-android.md)).
+
 ## Pattern d'interface : MV, pas MVVM
 
-SwiftUI + `@Observable` rendent la couche ViewModel systématique inutile. La règle retenue :
+SwiftUI + `@Observable` rendent la couche ViewModel systématique inutile
+([ADR-0007](13-decisions-adr.md)). La règle retenue :
 
 - **Listes et lectures simples** → `@Query` SwiftData directement dans la vue. Pas
   d'intermédiaire pour afficher l'historique des parties.
-- **Flux avec état** → un objet `@Observable` `@MainActor` qui porte l'état et les intentions.
-  Il y en a peu : `LiveMatchModel`, `MatchSetupModel`, `PlayerEditorModel`. Ce ne sont pas des
-  ViewModels par écran mais **par flux métier**, partagés entre plusieurs vues.
+- **Flux avec état** → un objet `@Observable` `@MainActor` qui porte l'état et les intentions :
+  `LiveMatchModel`, `MatchSetupModel`, `PlayerEditorModel`, `SharedMatchModel`,
+  `HistoryListModel`, et un modèle par écran de saisie dédié (`YamsSheetModel`,
+  `BeloteRoundModel`, `TarotRoundModel`, `WizardRoundModel`). Ce sont des objets **par flux
+  métier**, pas un ViewModel par vue.
 - **Aucun état métier dans `@State` de vue**. `@State` ne porte que du transitoire d'UI
   (feuille présentée, champ focalisé, animation en cours).
 
-```swift
-@MainActor @Observable
-final class LiveMatchModel {
-    private(set) var state: MatchState          // Domain, valeur pure
-    private(set) var pendingRound: RoundDraft   // saisie en cours, non validée
-    private let engine: MatchEngine             // Domain
-    private let store: MatchStore               // Store
-    private let session: LiveSession?           // Sync, nil en solo
-
-    func setScore(_ value: Int, for participant: Participant.ID) { … }
-    func commitRound() async throws { … }       // valide → persiste → diffuse
-    func undoLastRound() async throws { … }
-}
-```
-
 ## Concurrence Swift 6
 
-Le projet est en **mode langage Swift 6, concurrence stricte activée**, sans exception.
+Le projet est en **mode langage Swift 6, concurrence stricte activée**, avertissements traités
+comme des erreurs.
 
 - Tous les types de `Domain` sont des `struct` immuables et `Sendable`. Aucune classe, aucun
   état partagé, donc aucune donnée à isoler.
-- Les moteurs (`MatchEngine`, `StatsEngine`) sont des `struct` sans état : `nonisolated`
-  par nature, appelables depuis n'importe quel contexte.
+- Les moteurs (`MatchEngine`, `StatsEngine`) sont des `struct` sans état : `nonisolated` par
+  nature, appelables depuis n'importe quel contexte.
 - L'UI et les modèles `@Observable` sont `@MainActor`.
-- Les écritures SwiftData volumineuses (import, recalcul d'agrégats) passent par un
-  `@ModelActor` dédié. Les écritures interactives restent sur le `mainContext` : elles portent
-  sur quelques objets, la latence est nulle, et cela évite tout aller-retour d'identifiants.
-- `Sync` expose ses événements entrants par un `AsyncStream<MatchEvent>` consommé dans une
-  `.task` de la vue de partie. Aucun callback, aucun delegate remonté jusqu'à l'UI.
+- Les écritures SwiftData restent sur le `mainContext` : elles portent sur quelques objets, la
+  latence est nulle, et cela évite tout aller-retour d'identifiants entre contextes.
 
-## Arborescence cible
+## Arborescence
 
-Mono repo (doc 11) : `apple/` regroupe tout ce qui est propre à Apple, `android/` accueillera son
-équivalent Kotlin (à venir, doc 11) — le reste de la racine (`spec/`, `docs/`, `supabase/`,
-`Scripts/`, `ci_scripts/`) est partagé entre les deux plateformes ou transverse au dépôt.
+Mono dépôt : `apple/` et `android/` regroupent ce qui est propre à chaque plateforme ; le reste
+de la racine est partagé ou transverse.
 
 ```
-QuiMene/
-├── docs/                      ce plan
+.
+├── docs/                      documentation de conception
 ├── spec/                      source de vérité inter-plateformes (JSON)
-├── supabase/                  migrations + edge functions, backend de la partie partagée (doc 09)
-├── Scripts/                   check-spec-sync.sh, lint.sh — connaissent apple/ (et android/ à venir)
+├── supabase/                  migrations, fonctions Edge et tests SQL (doc 09)
+├── Scripts/                   check-spec-sync.sh, lint.sh, extract-android-strings.py,
+│                              store-screenshots.sh
 ├── ci_scripts/                hook Xcode Cloud (post-clone)
 ├── apple/
-│   ├── QuiMeneKit/           package Swift local
+│   ├── QuiMeneKit/            package Swift local
 │   │   ├── Package.swift
 │   │   ├── Sources/
 │   │   │   ├── Domain/
-│   │   │   │   ├── Model/         Player, Participant, MatchState, Round, ScoreEntry…
-│   │   │   │   ├── Rules/         GameDefinition, GameRules, EndCheck, Standing
-│   │   │   │   ├── Engine/        MatchEngine, EventLog, LamportClock
+│   │   │   │   ├── Model/         Participant, MatchState, ScoreEntry, ValidationResult…
+│   │   │   │   ├── Rules/         GameDefinition, GameRules, GameCatalog
+│   │   │   │   ├── Engine/        MatchEngine, MatchEvent
 │   │   │   │   ├── Stats/         StatsEngine, Insight, Badge
-│   │   │   │   └── LiveActivity/  MatchActivityAttributes (exception ActivityKit, voir tableau ci-dessus)
+│   │   │   │   └── LiveActivity/  MatchActivityAttributes (exception ActivityKit)
 │   │   │   ├── Catalog/
-│   │   │   │   ├── Games/         SkyjoRulesV1.swift, YamsRulesV1.swift, TarotRulesV1.swift…
-│   │   │   │   ├── GenericRules/  GenericSumRules…
-│   │   │   │   └── GameDefinitions/  copie synchronisée de spec/games/*.json
+│   │   │   │   ├── Games/            SkyjoRulesV1, YamsRulesV1, BeloteRulesV1, TarotRulesV1…
+│   │   │   │   ├── GenericRules/     GenericSumRules
+│   │   │   │   └── GameDefinitions/  copie de spec/games/*.json
 │   │   │   ├── Store/
 │   │   │   ├── Sync/
 │   │   │   └── DesignSystem/
@@ -136,7 +121,7 @@ QuiMene/
 │   │       ├── DomainTests/
 │   │       ├── CatalogTests/       ← rejoue spec/golden/*.json
 │   │       ├── StoreTests/
-│   │       ├── SyncTests/          ← rejoue spec/wire/*.json
+│   │       ├── SyncTests/          ← relit spec/session/*.json
 │   │       └── DesignSystemTests/
 │   └── App/
 │       ├── QuiMene.xcodeproj
@@ -144,42 +129,42 @@ QuiMene/
 │       ├── Features/
 │       │   ├── Players/  MatchSetup/  LiveMatch/  Results/  History/  Leaderboard/  Profile/
 │       │   └── Settings/
-│       ├── Resources/             Assets, Localizable.xcstrings, Info.plist
-│       ├── QuiMeneWidget/         Live Activity (widget d'écran d'accueil retiré, doc 15/P9)
-│       ├── QuiMeneTests/          tests unitaires hébergés (@testable import QuiMene)
-│       └── QuiMeneUITests/
-└── android/                    à venir — projet Gradle/Compose, plan détaillé en doc 11
+│       ├── Resources/             Assets, Localizable.xcstrings
+│       ├── QuiMeneWidget/         Live Activity (écran verrouillé, Dynamic Island)
+│       ├── QuiMeneTests/          tests unitaires des modèles de flux
+│       └── QuiMeneUITests/        parcours critiques, captures des stores
+├── android/                   projet Gradle/Compose (doc 11)
+├── website/                   site vitrine (Astro)
+└── store/                     textes et slides des fiches des stores
 ```
 
-Les JSON de `Catalog/GameDefinitions/` sont une copie de `spec/games/`. `Scripts/check-spec-sync.sh`
-(appelé par `ci_scripts/ci_post_clone.sh`) vérifie l'égalité : si les deux divergent, la
-compilation échoue en CI. `spec/` reste la source, jamais l'inverse.
+Les JSON de `Catalog/GameDefinitions/` sont une copie de `spec/games/` : SwiftPM exige des
+ressources locales à la cible. `Scripts/check-spec-sync.sh` (appelé par
+`ci_scripts/ci_post_clone.sh` et par la CI GitHub) vérifie l'égalité : si les deux divergent,
+la CI échoue. `spec/` reste la source, jamais l'inverse.
 
 ## Flux de données d'une manche validée
 
 ```
  Vue de saisie
-     │ setScore(12, for: alice)
+     │ saisie des scores
      ▼
- LiveMatchModel.pendingRound        (brouillon, rien n'est encore acté)
-     │ commitRound()
+ LiveMatchModel                     brouillon, rien n'est encore acté
+     │ valider
      ▼
  GameRules.validate(draft, in: state)          ─ refus possible, message affiché
      │ ok
      ▼
  MatchEvent.roundCommitted(...)     événement horodaté (Lamport), signé du deviceID
      │
-     ├──▶ EventLog.append          → MatchEngine.reduce(state, event) → nouvel état
-     │                               │
-     │                               ├─▶ GameRules.endCheck(state)
-     │                               │     .continue / .finalRound / .ended
-     │                               └─▶ UI mise à jour
+     ├──▶ MatchEngine.reduce(state, event) → nouvel état
+     │         ├─▶ GameRules.endCheck(state)   .continue / .finalRound / .ended
+     │         └─▶ UI mise à jour
      │
-     ├──▶ MatchStore.persist(event, state)      SwiftData, immédiat
+     ├──▶ MatchRepository               journal persisté (SwiftData), immédiatement
      │
-     └──▶ LiveSession.propose(event)            transport actif (Supabase Realtime), si partagée —
-                                                 diffusion immédiate si hôte, sinon proposition
-                                                 à l'hôte (doc 09)
+     └──▶ SessionLink → OnlineSession   si la partie est partagée : ajout au journal de la
+                                        session sur le serveur (doc 09)
 ```
 
 Un point important : `reduce` est une fonction pure `(MatchState, MatchEvent) -> MatchState`.
@@ -191,16 +176,7 @@ Voir [04 — Moteur de règles](04-moteur-de-regles.md) pour le détail des type
 
 ## Injection de dépendances
 
-Pas de conteneur DI, pas de framework. Les dépendances sont passées à l'initialisation depuis
-`QuiMeneApp`, et exposées aux vues profondes par `@Environment` avec des clés typées :
-
-```swift
-extension EnvironmentValues {
-    @Entry var gameCatalog: GameCatalog = .live
-    @Entry var matchStore: MatchStore = .live
-}
-```
-
-`@Entry` (Swift 5.10+) évite le boilerplate `EnvironmentKey`. Chaque dépendance a une valeur
-`.live` et une valeur `.preview` déterministe, ce qui rend toutes les previews Xcode
-fonctionnelles sans base de données.
+Pas de conteneur DI, pas de framework. Le `ModelContainer` est créé dans `QuiMeneApp` ; les vues
+construisent leurs repositories à partir du `modelContext` de l'environnement
+(`PlayerRepository(context:)`, `MatchRepository(context:)`), et les objets `@Observable` partagés
+par toute l'app (`AppSettings`, `DeepLinkRouter`) passent par `.environment(_:)`.

@@ -24,9 +24,9 @@ npm run build    # génère dist/
 2. **Root Directory : `website`** (le dépôt est un monorepo). Le preset Astro est détecté seul.
 3. Le site est servi sur le sous-domaine `*.vercel.app` choisi à la création du projet.
 
-## Avant publication
+## Réglages
 
-Dans `src/site.ts` :
-- `supabaseRegion` : région du projet Supabase (tableau de bord › Project Settings › General),
-  affichée dans la politique de confidentialité.
-- `appStoreUrl` : lien App Store, une fois l'app publiée (remplace « Bientôt sur l'App Store »).
+`src/site.ts` rassemble ce qui change au lancement : éditeur et contact, région d'hébergement
+Supabase affichée par la politique de confidentialité, date de mise à jour de cette politique,
+liste des jeux, et `appStoreUrl` (`null` tant que l'app n'est pas publiée : la page affiche alors
+« Bientôt sur l'App Store »).

@@ -3,7 +3,18 @@
 Un fichier par langue, avec les champs propres à chaque langue, prêts à coller :
 [fr-FR](fr-FR.md) · [en-US](en-US.md) · [es-ES](es-ES.md) · [de-DE](de-DE.md) · [it-IT](it-IT.md).
 Les images viennent de `Scripts/store-screenshots.sh`, dans `store-screenshots/slides/`
-(doc 10 « Captures des stores »). Leurs légendes se trouvent dans `store/slides/captions.json`.
+([doc 10](../../docs/10-tests-et-qualite.md#captures-des-stores)). Leurs légendes se trouvent dans
+`store/slides/captions.json`.
+
+| Langue | Nom | Sous-titre App Store |
+|---|---|---|
+| fr | Qui Mène ? – Scores de jeux | Tarot, Belote, Yams et plus |
+| en | Qui Mène ? – Score Keeper | Scores for card & board games |
+| es | Qui Mène ? – Marcador | Puntos de juegos de mesa |
+| de | Qui Mène ? – Punktezähler | Spielstand für Karten & Würfel |
+| it | Qui Mène ? – Segnapunti | Punteggi di carte e giochi |
+
+Le nom est le même sur le Play Store. Sous l'icône, l'app s'affiche toujours « Qui Mène ? ».
 
 Les deux descriptions ne sont pas identiques, parce que les apps diffèrent :
 
@@ -85,15 +96,9 @@ The camera is only used to scan these QR codes. Game names in the catalog belong
 - image de présentation 1024 × 500 : `<langue>/feature-graphic.png` ;
 - captures : `<langue>/phone/`, `<langue>/tablet-7/`, `<langue>/tablet-10/`.
 
-## Avant de publier
+## Marques
 
-1. **Marques.** Les noms de jeux déposés (Skyjo, Mölkky, Yahtzee, Kniffel, Scrabble…)
-   n'apparaissent que dans les descriptions, accompagnés de la mention de non-affiliation.
-   Ils ne figurent jamais dans le nom, le sous-titre ni les mots-clés : Apple le refuse
-   (règle 2.3.7) et Google aussi. Les mots-clés ne contiennent que des noms génériques
-   (tarot, belote, rami, pétanque).
-2. **Site :** la politique de confidentialité et l'assistance distinguent maintenant iPhone et
-   Android (sauvegarde Google, écran verrouillé propre à l'iPhone). Ces pages ne sont à jour en
-   ligne qu'une fois déployées sur Vercel.
-3. **Nom sur l'App Store :** « Qui Mène ? – Scores de jeux » doit être libre, car les noms
-   sont uniques sur l'App Store. Sous l'icône, l'app s'affiche toujours « Qui Mène ? ».
+Les noms de jeux déposés (Skyjo, Mölkky, Yahtzee, Kniffel, Scrabble…) n'apparaissent que dans
+les descriptions, accompagnés de la mention de non-affiliation. Ils ne figurent jamais dans le
+nom, le sous-titre ni les mots-clés : Apple le refuse (règle 2.3.7) et Google aussi. Les
+mots-clés ne contiennent que des noms génériques (tarot, belote, rami, pétanque).

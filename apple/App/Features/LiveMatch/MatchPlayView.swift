@@ -9,7 +9,7 @@ import SwiftUI
 /// grille dédiée, tout le reste réutilise le pavé numérique de `LiveMatchView`. Centralisé ici
 /// pour qu'un futur jeu `structured`/`rank` n'ait qu'un cas à ajouter, à un seul endroit.
 ///
-/// Doc utilisateur (audit qualité, [15](../../../docs/15-plan-qualite-code.md)) — le `default:`
+/// Doc utilisateur (audit qualité) — le `default:`
 /// d'origine routait aussi bien les jeux à pavé numérique que le cas où `definition` est `nil`
 /// (version de règles disparue du catalogue après une mise à jour de l'app) vers `LiveMatchView`,
 /// qui plantait alors sur son propre `try!` en reconstruisant le même lookup. Le switch est

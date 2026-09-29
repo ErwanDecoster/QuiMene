@@ -5,18 +5,20 @@ Deux modèles coexistent, délibérément :
 | | Domaine (`Domain`) | Persistance (`Store`) |
 |---|---|---|
 | Nature | `struct` immuables, `Sendable` | `final class @Model` SwiftData |
-| Rôle | calcul, règles, transport réseau | stockage disque + sync iCloud |
+| Rôle | calcul, règles, échange entre appareils | stockage disque + sync iCloud |
 | Durée de vie | le temps d'un calcul | des années |
-| Testé par | golden files | tests de mapping et de migration |
+| Testé par | golden files | tests de repositories et de schéma |
 
-Le mapping entre les deux est explicite (`MatchRecord.toDomain()` / `init(from:)`). C'est une
-centaine de lignes de code ennuyeux, et c'est le prix à payer pour que les règles de jeu ne
-dépendent jamais du schéma disque — donc pour qu'une migration SwiftData ne casse jamais un
-calcul de score, et pour que le portage Android n'ait pas à reproduire SwiftData.
+Le mapping entre les deux est explicite, dans les repositories. C'est le prix à payer pour que
+les règles de jeu ne dépendent jamais du schéma disque — donc pour qu'une migration SwiftData
+ne casse jamais un calcul de score, et pour qu'Android n'ait pas à reproduire SwiftData.
 
 ---
 
 ## Modèle de persistance (SwiftData)
+
+Trois modèles, déclarés dans `QuiMeneSchemaV1` (`Store/Schema.swift`). Android les reproduit un
+pour un en entités Room (`PlayerEntity`, `MatchEntity`, `ParticipantEntity`).
 
 ### PlayerRecord
 
@@ -25,17 +27,20 @@ La fiche joueur, réutilisée d'une partie à l'autre.
 | Champ | Type | Notes |
 |---|---|---|
 | `id` | `UUID` | stable, généré à la création, jamais réattribué |
-| `nickname` | `String` | pseudo affiché, 1–24 caractères |
-| `avatarKind` | `String` | `"symbol"` \| `"emoji"` \| `"photo"` |
-| `avatarValue` | `String` | nom SF Symbol, ou emoji, ou `""` si photo |
+| `nickname` | `String` | pseudo affiché |
+| `avatarKind` | `String` | `"emoji"` \| `"photo"` (`"symbol"` reste lu pour les anciennes fiches) |
+| `avatarValue` | `String` | emoji, ou `""` si photo |
 | `avatarPhoto` | `Data?` | `@Attribute(.externalStorage)`, JPEG 512 px max |
-| `paletteID` | `String` | identifiant de palette, voir [charte §1.5](07-charte-graphique.md#15-palette-des-joueurs) |
+| `paletteID` | `String` | `"1"`…`"10"`, voir [charte §1.5](07-charte-graphique.md#15-palette-des-joueurs) |
 | `createdAt` | `Date` | |
 | `isArchived` | `Bool` | masqué des sélections, conservé dans l'historique |
 | `sortIndex` | `Int` | ordre d'ajout ; départage le tri de la liste (les habitués d'abord) |
+| `sharedProfileID` | `UUID?` | identifiant de profil partageable, jamais régénéré ([14](14-profils-partages.md)) |
+| `sharedProfileIsMine` | `Bool` | `true` pour la fiche qui représente l'utilisateur de l'appareil |
+| `sharedProfileLinkedName` / `sharedProfileLinkedAt` | `String?` / `Date?` | pseudo et date au moment de la liaison à un ami |
 
 Pas de contrainte d'unicité sur `nickname` : deux Alice sont autorisées, la couleur et
-l'avatar les distinguent. Le formulaire prévient d'un doublon sans l'interdire.
+l'avatar les distinguent.
 
 ### MatchRecord
 
@@ -46,18 +51,23 @@ Une partie, du premier tap à l'archivage.
 | `id` | `UUID` | |
 | `gameID` | `String` | ex. `"skyjo"`, référence le catalogue |
 | `rulesVersion` | `Int` | version des règles au moment de la partie — **ne jamais recalculer une vieille partie avec des règles récentes** |
-| `variantsJSON` | `Data` | options choisies, encodées `Codable` |
+| `variantsData` | `Data` | options choisies, encodées en JSON |
 | `startedAt` / `endedAt` | `Date` / `Date?` | |
-| `status` | `String` | `"inProgress"` \| `"finalRound"` \| `"ended"` \| `"abandoned"` |
+| `statusRaw` | `String` | `"inProgress"` \| `"finalRound"` \| `"ended"` \| `"abandoned"`, exposé en `status` |
 | `endReasonRaw` | `String?` | condition de fin déclenchée |
-| `deviceOrigin` | `String` | identifiant d'appareil créateur, utile en sync |
-| `eventLogData` | `Data` | journal d'événements compressé — **la source de vérité** |
+| `isArchived` | `Bool` | masque la partie de l'Historique ; les statistiques la comptent toujours |
+| `deviceOrigin` | `String` | `"local"`, ou `"received"` pour une partie jouée sur un autre appareil |
+| `eventLogData` | `Data` | journal d'événements — **la source de vérité** |
 | `participants` | `[ParticipantRecord]` | cascade |
-| `rounds` | `[RoundRecord]` | cascade — projection matérialisée du journal |
 
-`eventLogData` contient la vérité ; `rounds` en est une projection dénormalisée, présente pour
-que l'historique s'affiche sans rejouer le journal. En cas de divergence détectée à
-l'ouverture, le journal gagne et la projection est reconstruite.
+`eventLogData` contient la vérité : la reprise d'une partie, son détail manche par manche et
+ses résultats rejouent ce journal ([04](04-moteur-de-regles.md#event-sourcing)), ils ne lisent
+jamais un total mis en cache. Seuls `finalRank`/`finalScore` des participants sont écrits à la
+fin, pour que l'historique et les statistiques n'aient pas à rejouer chaque partie.
+
+Deux champs servent la compatibilité avec des parties reçues par un mécanisme antérieur de
+partage : `isImportedSummary` (résumé sans journal, seuls les rangs et scores font foi) et
+`pendingSharedProfileSync`.
 
 ### ParticipantRecord
 
@@ -66,84 +76,55 @@ Un joueur **dans une partie donnée**.
 | Champ | Type | Notes |
 |---|---|---|
 | `id` | `UUID` | |
-| `player` | `PlayerRecord?` | relation, `nil` pour un invité ponctuel |
+| `player` | `PlayerRecord?` | relation, règle de suppression `.nullify` |
 | `nicknameSnapshot` | `String` | figé à la création de la partie |
 | `avatarKindSnapshot` / `avatarValueSnapshot` / `paletteIDSnapshot` | `String` | figés |
 | `seatIndex` | `Int` | ordre de jeu |
+| `teamID` | `String?` | jeux par équipes (Belote), `nil` sinon |
 | `finalRank` | `Int?` | rempli à la fin, rangs ex æquo partagés |
 | `finalScore` | `Int?` | |
+| `match` | `MatchRecord?` | inverse de `MatchRecord.participants` |
 
-Le *snapshot* est essentiel : si Marion renomme « Théo » en « Théo-le-tricheur » en 2027, la
-partie de 2026 doit continuer d'afficher « Théo ». Et si la fiche est supprimée, l'historique
-reste lisible — d'où `player` optionnel avec règle de suppression `.nullify`.
+Le *snapshot* est essentiel : si Marion renomme « Théo » en « Théo-le-tricheur » un an plus
+tard, la partie d'origine doit continuer d'afficher « Théo ». Et si la fiche est supprimée,
+l'historique reste lisible — d'où `player` optionnel avec la règle `.nullify`.
 
-### RoundRecord / ScoreEntryRecord
+### Réglages
 
-| `RoundRecord` | Type |
-|---|---|
-| `id` | `UUID` |
-| `index` | `Int` — 0-based, source de l'ordre |
-| `committedAt` | `Date` |
-| `note` | `String?` — annotation libre |
-| `entries` | `[ScoreEntryRecord]` cascade |
-
-| `ScoreEntryRecord` | Type |
-|---|---|
-| `id` | `UUID` |
-| `participantID` | `UUID` — non pas une relation, un identifiant nu |
-| `rawValue` | `Int` — ce que l'utilisateur a saisi |
-| `computedValue` | `Int` — après application des règles (doublement Skyjo, bonus…) |
-| `detailJSON` | `Data?` — payload structuré (catégories de Yams, contrat de Tarot…) |
-| `modifiersJSON` | `Data?` — drapeaux (`closedRound`, `capot`…) |
-
-Conserver **`rawValue` et `computedValue` séparément** est ce qui permet d'afficher « 12 → 24
-(doublé) » dans l'historique et de corriger une saisie sans perdre l'intention initiale.
-
-### AppSettings
-
-Un unique enregistrement : langue de saisie préférée, retour haptique, palette par défaut,
-consentement à la sync iCloud, dernier jeu utilisé.
+`AppSettings` (consentement à la synchronisation iCloud) vit dans `UserDefaults`, **hors** du
+schéma SwiftData : le container CloudKit ne peut pas porter le réglage qui décide de son
+existence.
 
 ---
 
-## Contraintes CloudKit — à respecter dès la première ligne
+## Contraintes CloudKit — respectées dès la première ligne
 
-SwiftData + CloudKit impose des règles au schéma. Les violer se découvre au *runtime*, en
-production, avec un container qui refuse silencieusement de synchroniser. Elles sont donc
-traitées ici comme des invariants de conception, pas comme un ajustement ultérieur.
+SwiftData + CloudKit impose des règles au schéma. Les violer se découvre au *runtime*, avec un
+container qui refuse de s'ouvrir ou de synchroniser. Elles sont donc traitées comme des
+invariants de conception ([ADR-0006](13-decisions-adr.md)).
 
 1. **Aucun `@Attribute(.unique)`.** CloudKit ne connaît pas les contraintes d'unicité.
    L'unicité de `id` est garantie par la génération d'`UUID`, pas par le schéma.
 2. **Toute propriété a une valeur par défaut, ou est optionnelle.** Sans exception, y compris
    les `Bool` et les `Int`.
-3. **Toute relation est optionnelle** et possède une **relation inverse déclarée**. Une
-   relation sans inverse ne synchronise pas.
+3. **Toute relation est optionnelle et possède une relation inverse déclarée.** Les relations
+   vers plusieurs sont elles-mêmes de type optionnel (`[T]?`) : `participantsStorage` et
+   `participationsStorage` sont exposés par des propriétés calculées non optionnelles, sans
+   changement pour le code appelant. `CloudKitSchemaTests` ouvre le vrai schéma avec un
+   container CloudKit actif et échoue si une règle est enfreinte.
 4. **Pas de règle de suppression `.deny`.** Seules `.cascade` et `.nullify` sont supportées.
 5. **Pas d'ordre implicite dans les collections.** SwiftData ne préserve pas l'ordre d'un
-   `[RoundRecord]`. D'où les champs `index` / `seatIndex` explicites, et un tri systématique à
-   la lecture. C'est la source de bug la plus fréquente sur ce type d'app.
-6. **Les `enum` sont stockés en `String`** (`status`, `avatarKind`), jamais en `Int` brut :
+   tableau de relations. D'où `seatIndex`/`sortIndex` explicites, et un tri systématique à la
+   lecture.
+6. **Les `enum` sont stockés en `String`** (`statusRaw`, `avatarKind`), jamais en `Int` brut :
    une valeur inconnue arrivant d'une version plus récente doit dégrader proprement, pas
    planter.
 
-Configuration :
-
-```swift
-let schema = Schema([PlayerRecord.self, MatchRecord.self,
-                     ParticipantRecord.self, RoundRecord.self,
-                     ScoreEntryRecord.self, AppSettings.self])
-
-let config = ModelConfiguration(
-    schema: schema,
-    isStoredInMemoryOnly: false,
-    cloudKitDatabase: settings.iCloudEnabled
-        ? .private("iCloud.fr.quimene.app")   // ⚠ à remplacer par l'identifiant réel
-        : .none
-)
-```
-
-La sync est **désactivable** : un utilisateur qui refuse iCloud garde une app pleinement
-fonctionnelle. Le basculement recrée le `ModelContainer` ; ce n'est pas une migration.
+Configuration (`QuiMeneApp.loadContainer`) : CloudKit privé (`iCloud.com.quimene.app`) si
+l'utilisateur l'a accepté, sinon stockage local. Le magasin vit dans le conteneur de l'App Group
+(`group.com.quimene.app`). Si l'ouverture échoue, l'app retombe sur un magasin local, puis en
+mémoire, plutôt que de ne pas démarrer. Un changement de réglage s'applique au lancement suivant
+plutôt que par un remplacement à chaud du `ModelContainer`.
 
 ## Résolution de conflits
 
@@ -153,29 +134,31 @@ s'y fiait pour les manches.
 
 C'est précisément pourquoi la vérité est le **journal d'événements** :
 
-- fusionner deux parties = concaténer deux journaux, dédoublonner par `eventID`, trier par
-  `(lamportClock, deviceID)`, rejouer ;
+- fusionner deux journaux = les concaténer, dédoublonner par identifiant d'événement, trier par
+  `(lamport, deviceID)`, rejouer ;
 - l'opération est associative, commutative et idempotente — donc sûre quel que soit l'ordre
   d'arrivée ;
-- `eventLogData` est un `Data` opaque pour CloudKit, mais la fusion est faite par
-  l'application à l'ouverture de la partie, pas par CloudKit.
+- `eventLogData` est un `Data` opaque pour CloudKit ; l'interprétation est faite par
+  l'application, pas par CloudKit.
 
-Détail du protocole dans [09 — Partie partagée](09-partie-partagee.md).
+Pour une partie partagée en ligne, l'ordre est donné par le serveur ([09](09-partie-partagee.md)).
 
 ## Migrations
 
-`VersionedSchema` + `SchemaMigrationPlan` dès la v1, même avec une seule version. Créer le
-plan de migration après coup coûte bien plus cher que de le poser vide au départ.
+`VersionedSchema` + `SchemaMigrationPlan` posés dès la première version, même avec une seule
+version : créer le plan de migration après coup coûte bien plus cher que de le poser vide.
 
 ```swift
-enum QuiMeneSchemaV1: VersionedSchema {
-    static var versionIdentifier = Schema.Version(1, 0, 0)
-    static var models: [any PersistentModel.Type] { [ … ] }
+public enum QuiMeneSchemaV1: VersionedSchema {
+  public static var versionIdentifier: Schema.Version { Schema.Version(1, 0, 0) }
+  public static var models: [any PersistentModel.Type] {
+    [PlayerRecord.self, MatchRecord.self, ParticipantRecord.self]
+  }
 }
 
-enum QuiMeneMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [QuiMeneSchemaV1.self] }
-    static var stages: [MigrationStage] { [] }
+public enum QuiMeneMigrationPlan: SchemaMigrationPlan {
+  public static var schemas: [any VersionedSchema.Type] { [QuiMeneSchemaV1.self] }
+  public static var stages: [MigrationStage] { [] }
 }
 ```
 
@@ -184,12 +167,11 @@ migration lourde, ajouter un champ optionnel et le remplir paresseusement plutô
 le magasin.
 
 `rulesVersion` sur `MatchRecord` joue le même rôle côté métier : les parties anciennes sont
-rejouées avec le moteur de leur époque, conservé dans le catalogue (`SkyjoRulesV1`,
-`SkyjoRulesV2`…). Un score enregistré ne change jamais rétroactivement.
+rejouées avec le moteur de leur époque, conservé dans le catalogue. Un score enregistré ne
+change jamais rétroactivement.
 
 ## Volumétrie
 
-Un usage intensif — 200 parties par an, 6 joueurs, 20 manches — représente environ
-24 000 `ScoreEntryRecord`, soit quelques mégaoctets. Aucune contrainte de performance :
-pas d'index à ajouter, pas de pagination nécessaire avant plusieurs années. Les seules photos
-d'avatar justifient `.externalStorage`.
+Un usage intensif — 200 parties par an, 6 joueurs, 20 manches — représente quelques mégaoctets
+de journaux. Aucune contrainte de performance : pas d'index à ajouter, pas de pagination
+nécessaire. Seules les photos d'avatar justifient `.externalStorage`.

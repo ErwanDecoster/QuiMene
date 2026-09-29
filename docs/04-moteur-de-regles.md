@@ -6,14 +6,15 @@ C'est le cœur de l'application. Tout le reste est de l'habillage.
 
 Les jeux de société se répartissent en deux familles très inégales :
 
-- **~80 % sont triviaux** : on saisit un nombre par joueur et par manche, on cumule, on
-  s'arrête à un seuil ou après N manches. Rami, Scrabble, Triominos, 6 qui prend, Uno…
-- **~20 % ont une arithmétique propre** : le doublement de Skyjo, le bonus de 35 du Yams, la
+- **La grande majorité est triviale** : on saisit un nombre par joueur et par manche, on
+  cumule, on s'arrête à un seuil ou après N manches. Rami, Scrabble, Triominos, 6 qui prend…
+- **Quelques-uns ont une arithmétique propre** : le doublement de Skyjo, le bonus de 35 du Yams, la
   formule du Tarot, l'annonce du Wizard, le retour à 25 du Mölkky.
 
-Écrire une classe par jeu pour les 80 % serait 16 fois le même code. Tout décrire en JSON
-échouerait sur les 20 % — un moteur de règles générique suffisamment expressif pour encoder le
-Tarot devient un langage de programmation mal conçu.
+Écrire une classe par jeu pour les jeux simples reviendrait à écrire quatorze fois le même
+code. Tout décrire en JSON échouerait sur les autres — un moteur de règles générique
+suffisamment expressif pour encoder le Tarot devient un langage de programmation mal conçu
+([ADR-0003](13-decisions-adr.md)).
 
 **Solution retenue : deux couches.**
 
@@ -23,7 +24,7 @@ Tarot devient un langage de programmation mal conçu.
 │  identité, joueurs, sens du score, contraintes de saisie,      │
 │  conditions de fin, départages, variantes                      │
 │  ▸ partagée mot pour mot avec Android                          │
-│  ▸ suffisante seule pour 11 des 16 jeux du catalogue           │
+│  ▸ suffisante seule pour 14 des 20 jeux du catalogue           │
 └──────────────────────────┬─────────────────────────────────────┘
                            │  "engine": "skyjo.v1"
                            ▼
@@ -50,6 +51,7 @@ public struct Participant: Identifiable, Sendable, Codable, Hashable {
     public let id: UUID
     public let displayName: String
     public let seatIndex: Int
+    public let teamID: String?          // jeux par équipes (Belote), nil sinon
 }
 
 // ─── Saisie ──────────────────────────────────────────────────────────────
@@ -183,8 +185,8 @@ Aucun texte d'interface dans le moteur : un refus porte une raison typée
 `ValidationWarning`, une explication de score une `ScoreExplanation`. Chaque app les rédige
 dans la langue de l'utilisateur (`Rules+Messages.swift`, `RulesMessages.kt`) — `Domain` n'a
 accès à aucune ressource de traduction, et `:domain` côté Android encore moins (ADR-0002).
-L'avertissement est calculé mais pas encore affiché par les apps (voir
-[15](15-plan-qualite-code.md), audit du 2026-09-25).
+Les apps n'affichent aujourd'hui que les refus ; les avertissements sont calculés par les
+moteurs.
 
 Distinction volontaire entre *warning* et *invalid*. Un score de 137 au Skyjo est
 mathématiquement possible mais très improbable : on avertit, on n'interdit pas. Deux joueurs
@@ -205,6 +207,7 @@ public enum MatchEvent: Sendable, Codable, Equatable {
     case roundAmended(index: Int, draft: RoundDraft)
     case roundRemoved(index: Int)
     case matchAbandoned(at: Date)
+    case matchEndedManually          // fin décidée par le joueur (jeux à arrêt manuel)
     case noteAdded(roundIndex: Int, text: String)
 }
 
@@ -231,12 +234,12 @@ directement, sans code supplémentaire :
 | Besoin | Comment il est satisfait |
 |---|---|
 | **Annuler / corriger** | on ajoute `roundRemoved` ou `roundAmended`, on rejoue. Pas de logique inverse à écrire. |
-| **Partie partagée** | deux appareils échangent leurs événements et rejouent. |
+| **Partie partagée** | chaque appareil rejoue le journal de la session, dans l'ordre donné par le serveur ([09](09-partie-partagee.md)). |
 | **Conflit iCloud** | fusion de journaux : dédoublonnage par `id`, tri, rejeu. Commutatif et idempotent. |
 | **Test** | un golden file *est* un journal + un état attendu. |
 
-Le coût : rejouer 40 manches à 6 joueurs prend moins d'une milliseconde. Aucune optimisation
-n'est prévue ; si elle devenait nécessaire, un instantané tous les 50 événements suffirait.
+Le coût : rejouer 40 manches à 6 joueurs prend moins d'une milliseconde. Si une optimisation
+devenait nécessaire, un instantané tous les 50 événements suffirait.
 
 **`occurredAt` ne sert jamais à ordonner.** Les horloges murales de deux téléphones divergent
 et un utilisateur peut changer la sienne. Seul `(lamport, deviceID)` fait foi.
@@ -317,9 +320,7 @@ struct SkyjoRulesV1: GameRules {
 ```
 
 Ce qui n'est **pas** dans le code : le retrait des colonnes de trois cartes identiques. C'est
-une règle de table, pas de comptage — l'utilisateur saisit son total final. Une option
-« saisie assistée » (grille 3×4 tapée carte par carte) est envisagée en v2 et calculerait les
-colonnes elle-même ; elle produirait exactement le même `rawValue`, sans toucher au moteur.
+une règle de table, pas de comptage — l'utilisateur saisit son total final.
 
 Golden file correspondant : [`spec/golden/skyjo-01-doublement.json`](../spec/golden/skyjo-01-doublement.json).
 
@@ -348,10 +349,10 @@ Le versionnage suit deux axes distincts :
 
 ## Filet de sécurité : le jeu libre
 
-Un jeu spécial `"freeform"` est présent dès la v1 : nom saisi par l'utilisateur, sens du score
-au choix, condition de fin au choix (seuil, nombre de manches, ou arrêt manuel). Il utilise
-`generic.sum.v1`.
+Le « Jeu libre » (`jeu-libre`) accepte n'importe quel entier, négatif compris, fait gagner le
+score le plus haut et s'arrête quand l'utilisateur le décide (`manualStop`, événement
+`matchEndedManually`). Il utilise `generic.sum.v1`, sans une ligne de code spécifique.
 
-Il coûte presque rien et garantit que l'app est utilisable pour un jeu absent du catalogue —
-c'est le meilleur remède au risque « le jeu de ce soir n'y est pas » identifié dans la
+Il garantit que l'app est utilisable pour un jeu absent du catalogue — c'est le meilleur remède
+au risque « le jeu de ce soir n'y est pas » identifié dans la
 [vision produit](01-vision-produit.md).

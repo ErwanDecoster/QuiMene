@@ -119,9 +119,9 @@ translucide sur fond noir.
 
 ### 1.5 Palette des joueurs
 
-Dix teintes vives, ordonnées de sorte que les **six premières** — le cas courant — restent
-mutuellement distinguables en deutéranopie et en protanopie. Toutes ≥ 3:1 contre `neutral/
-surface` (objets graphiques : lignes de courbe, pastilles, bordures d'avatar).
+Dix teintes vives, ordonnées pour que les **six premières** — le cas courant — soient les plus
+éloignées les unes des autres. Toutes ≥ 3:1 contre `neutral/surface` (objets graphiques : lignes
+de courbe, pastilles, bordures d'avatar).
 
 | # | Nom | Clair | Ratio | Sombre | Ratio | Symbole de courbe |
 |---|---|---|---|---|---|---|
@@ -136,18 +136,10 @@ surface` (objets graphiques : lignes de courbe, pastilles, bordures d'avatar).
 | 9 | Olive | `#6E8C00` | 3,88 | `#D5FF24` | 15,37 | ⬢ hexagone |
 | 10 | Rose | `#FF165F` | 3,80 | `#FF7BAA` | 7,33 | + plus |
 
-Palette resaturée (v2 puis v3) pour un rendu plus vif sur les avatars et la courbe — priorité
-donnée à l'impact visuel plutôt qu'à l'usage en texte. Certaines teintes passent désormais sous
-4,5:1 : **la couleur de joueur n'est plus garantie utilisable en texte** (un pseudo coloré dans
-un tableau redeviendrait un audit à part entière si on le souhaitait un jour). La v3 corrige un
-retour utilisateur (« couleurs trop fades ») : les teintes en clair dont la saturation HSL
-n'était pas déjà à 100 % (Ardoise, Vermillon, Violet, Rose) et les variantes sombres restées à
-55-80 % de saturation (Émeraude, Ardoise, Cyan, Olive) ont été repoussées vers le plein — teinte
-et luminosité inchangées — pour éliminer l'aspect pastel sans jamais retoucher les couleurs déjà
-pleinement saturées. Ardoise reste volontairement sous 100 % (65 %) : au-delà elle devient trop
-proche d'Azur pour rester distinguable. La distinguabilité en daltonisme n'a pas été revérifiée
-par simulation dédiée depuis ce changement — à confirmer avant un usage intensif de la palette
-dans des contextes graphiques denses.
+Palette saturée pour un rendu vif sur les avatars et la courbe — priorité donnée à l'impact
+visuel plutôt qu'à l'usage en texte. Certaines teintes sont sous 4,5:1 : **la couleur de joueur
+n'est pas utilisée pour du texte**. Ardoise reste volontairement à 65 % de saturation : au-delà,
+elle devient trop proche d'Azur pour rester distinguable.
 
 **La couleur n'est jamais le seul porteur d'information.** Chaque joueur possède aussi un
 avatar, une initiale dans le tableau, et un symbole distinct sur la courbe. Un daltonien total
@@ -251,11 +243,9 @@ Base 8, avec un demi-pas à 4 pour les ajustements optiques serrés.
 | Contexte | Marge latérale | Gouttière |
 |---|---|---|
 | iPhone (compact) | `space/lg` = 16 | 12 |
-| iPad (regular), colonne | `space/xl` = 24 | 16 |
-| iPad, mode table plein écran | `space/2xl` = 32 | 24 |
+| iPad (regular) | `space/xl` = 24 | 16 |
 
-Grille de 4 colonnes en compact, 8 en regular. Les cartes de jeu du catalogue occupent
-2 colonnes en compact (2 par ligne), 2 colonnes en regular (4 par ligne).
+Grille de 4 colonnes en compact, 8 en regular.
 
 ### 3.3 Paddings internes standards
 
@@ -288,9 +278,9 @@ Grille de 4 colonnes en compact, 8 en regular. Les cartes de jeu du catalogue oc
 | Règle | Valeur | Justification |
 |---|---|---|
 | Bibliothèque iOS | **SF Symbols 7** | 6 000+ symboles, alignés sur la ligne de base du texte, échelle avec Dynamic Type, variantes de graisse automatiques. Aucune raison de dessiner. |
-| Bibliothèque Android | **Material Symbols Rounded** | Équivalent système, et l'arrondi correspond au SF Rounded des scores. |
+| Bibliothèque Android | **Material Icons** (Compose) | Équivalent système, sans ressource à dessiner. |
 | Grille de dessin | **24 × 24 px**, marge optique 2 px | Standard des deux bibliothèques ; toute icône custom (jaquettes de jeu) s'y conforme. |
-| Épaisseur de trait | **1,75 px sur la grille 24** | Correspond au poids `Regular` de SF Symbols et au `weight 400` de Material Symbols. Constante à toutes les tailles : on met à l'échelle le tracé, jamais l'épaisseur seule. |
+| Épaisseur de trait | **1,75 px sur la grille 24** | Correspond au poids `Regular` de SF Symbols. Constante à toutes les tailles : on met à l'échelle le tracé, jamais l'épaisseur seule. |
 | Style | **Outline par défaut, filled à l'état actif** | L'onglet sélectionné et le badge acquis sont pleins ; tout le reste est en trait. Le contraste plein/vide double le codage de l'état sélectionné, qui n'est donc pas porté par la seule couleur. |
 | Angles | Rayon 2 px sur la grille 24 | Cohérent avec `radius/xs`. Ni carré sec, ni arrondi mou. |
 
@@ -307,9 +297,6 @@ Grille de 4 colonnes en compact, 8 en regular. Les cartes de jeu du catalogue oc
 **Taille minimale lisible : 16 pt.** En dessous, un trait de 1,75 px sur grille 24 tombe sous
 le pixel physique en @2x et devient flou. Aucune icône sous 16 pt, sans exception.
 
-Configuration Material Symbols pour l'équivalence exacte : `weight 400`, `grade 0`,
-`optical size 24`, `fill 0` (inactif) / `fill 1` (actif).
-
 ---
 
 ## 5. Composants
@@ -319,7 +306,7 @@ Configuration Material Symbols pour l'équivalence exacte : `weight 400`, `grade
 | Token | pt | Usage |
 |---|---|---|
 | `radius/xs` | 6 | Badge numérique, puce |
-| `radius/sm` | 10 | Chip, touche de pavé, champ de saisie |
+| `radius/sm` | 10 | Chip, champ de saisie |
 | `radius/md` | 14 | Carte, bouton |
 | `radius/lg` | 20 | Feuille, modale, conteneur en verre |
 | `radius/xl` | 28 | Carte de podium |
@@ -328,10 +315,9 @@ Configuration Material Symbols pour l'équivalence exacte : `weight 400`, `grade
 **Règle des coins concentriques** : un élément imbriqué utilise
 `rayon_parent − padding`, jamais une valeur fixe. Une carte `radius/md` = 14 avec un padding de
 16 contient un champ à `14 − 16 < 0` → donc `radius/sm` = 10, la plus petite valeur cohérente.
-Sur iOS 26+, `.rect(corners: .concentric)` le calcule automatiquement et doit être préféré ; le
-plancher de l'app étant iOS 18 ([ADR-0001](13-decisions-adr.md)), tout appel passe par
-`if #available(iOS 26, *)` avec repli sur le calcul manuel ci-dessus — voir
-[ADR-0015](13-decisions-adr.md).
+Sur iOS 26+, `.rect(corners: .concentric)` le calcule automatiquement ; le plancher de l'app
+étant iOS 18, tout appel passe par `if #available(iOS 26, *)` avec repli sur le calcul manuel
+ci-dessus — voir [ADR-0015](13-decisions-adr.md).
 
 ### 5.2 Élévation
 
@@ -345,7 +331,7 @@ iOS 18-25 — même sémantique, deux rendus Apple en plus du rendu Android. Voi
 |---|---|---|---|---|
 | `elev/0` | Fond d'écran | `neutral/bg`, opaque | `neutral/bg`, opaque | `surface`, tonal 0 dp |
 | `elev/1` | Contenu posé — carte, ligne | `neutral/surface`, opaque, **sans ombre** | `neutral/surface`, opaque, **sans ombre** | `surfaceContainerLow`, tonal 1 dp + ombre L1 |
-| `elev/2` | Flottant — barre d'action, pavé | `.glassEffect()` | `.regularMaterial` | `surfaceContainer`, tonal 3 dp + ombre L2 |
+| `elev/2` | Flottant — barre d'action | `.glassEffect()` | `.regularMaterial` | `surfaceContainer`, tonal 3 dp + ombre L2 |
 | `elev/3` | Superposé — menu, popover | `.regularMaterial` | `.regularMaterial` | `surfaceContainerHigh`, tonal 6 dp + ombre L3 |
 | `elev/4` | Modal — feuille, alerte | feuille système | feuille système | `surfaceContainerHighest`, tonal 8 dp + ombre L4 |
 
@@ -358,15 +344,7 @@ iOS 18-25 — même sémantique, deux rendus Apple en plus du rendu Android. Voi
 | L3 | `0 1 3 rgba(0,0,0,.30)` + `0 4 8 3 rgba(0,0,0,.15)` |
 | L4 | `0 2 3 rgba(0,0,0,.30)` + `0 6 10 4 rgba(0,0,0,.15)` |
 
-**Sur iOS, aucune ombre custom**, à une exception près : la barre d'action flottante du mode
-table iPad, où le verre seul ne suffit pas à décoller l'élément d'un tableau dense.
-
-```
-shadow/floating   clair : 0 4 16 rgba(22,27,36,.10) + 0 1 3 rgba(22,27,36,.08)
-                  sombre: 0 4 16 rgba(0,0,0,.40)    + 0 1 3 rgba(0,0,0,.30)
-```
-
-Poser des ombres Material sur du Liquid Glass (ou sur son repli `regularMaterial` iOS 18-25)
+**Sur iOS, aucune ombre custom.** Poser des ombres Material sur du Liquid Glass (ou sur son repli `regularMaterial` iOS 18-25)
 donne une app qui a l'air d'un portage Android. C'est l'erreur la plus visible qu'on puisse
 commettre sur ce projet.
 
@@ -399,7 +377,7 @@ ne change pas, sinon la mise en page saute et l'utilisateur tape à côté.
 Le message d'erreur est **toujours textuel**, jamais une bordure rouge seule : la couleur seule
 n'est pas un moyen valide de communiquer une erreur (WCAG 1.4.1).
 
-Le champ de score du pavé numérique déroge : fond `neutral/fill`, texte aligné à droite en
+Le champ de score de l'écran de partie déroge : fond `neutral/fill`, texte aligné à droite en
 `type/scoreM`, bordure absente au repos et 2 pt `brand/ink` en focus. Il n'est jamais vide en
 apparence — il affiche `0` en `text/tertiary` tant que rien n'est saisi.
 
@@ -412,7 +390,7 @@ apparence — il affiche `0` en `text/tertiary` tant que rien n'est saisi.
 | **Badge numérique** | Hauteur 20 pt, padding H 6, `radius/full`, `type/caption2` Semibold. Fond `semantic/error`, texte blanc. |
 | **Chip** | Hauteur 32 pt, padding 12/6, `radius/sm`, `type/label`. Non sélectionné : fond `neutral/fill`, texte `text/secondary`. Sélectionné : fond `brand/ink` @ 12 %, texte `brand/ink`, bordure 1,5 pt `brand/ink`. |
 | **Barre de navigation** | Système. Titre `type/h5` inline, `type/h1` en large. Jamais reconstruite à la main. |
-| **Tab bar** | 3 onglets : Accueil · Joueurs · Historique. Icône `icon/base`, outline inactif / filled actif, libellé `type/caption2`. `TabView` système : rendu en barre flottante sur iOS 26+, en barre classique ancrée en bas sur iOS 18-25 — automatique selon l'OS de l'appareil, rien à coder ; `NavigationBar` Material 3 sur Android. |
+| **Tab bar** | 4 onglets : Joueurs · Jeux · Historique · Profil. Icône `icon/base`, outline inactif / filled actif, libellé `type/caption2`. `TabView` système : rendu en barre flottante sur iOS 26+, en barre classique ancrée en bas sur iOS 18-25 — automatique selon l'OS de l'appareil, rien à coder ; `NavigationBar` Material 3 sur Android. |
 | **Modale / feuille** | `elev/4`, `radius/lg` en haut, poignée système. Détentes `.medium` / `.large`. Toujours refermable par glissement — jamais de modale bloquante hors confirmation de suppression. |
 | **Bandeau (toast)** | Hauteur 48 pt, `radius/lg`, `elev/3`, padding 16/12, `type/bodySmall`. Une action maximum. Auto-disparition à 4 s (8 s si une action est proposée). Ancré en haut sur iOS (sous la barre), en bas sur Android (Snackbar Material). |
 | **Bandeau « Dernière manche »** | Pleine largeur, fond `semantic/warning` @ 8 %, bordure gauche 3 pt `semantic/warning`, texte `type/h6` en `semantic/warning`, icône `exclamationmark.circle.fill`. |
@@ -425,16 +403,10 @@ apparence — il affiche `0` en `text/tertiary` tant que rien n'est saisi.
 |---|---|---|
 | Zone tactile minimale | **44 × 44 pt** | **48 × 48 dp** |
 | Espacement minimal entre deux cibles | **8 pt** | **8 dp** |
-| Espacement dans le pavé numérique | **12 pt** | **12 dp** |
 
 La zone tactile est **découplée du visuel** : un chevron de 16 pt garde une cible de 44 pt via
 `.contentShape(.rect)` (iOS) / `minimumInteractiveComponentSize` (Android). On agrandit la
 cible, pas le dessin.
-
-Les touches du pavé numérique sont à **56 × 56 pt**, au-delà du minimum, avec 12 pt d'écart.
-Justification : on tape à bout de bras, de travers, autour d'une table, parfois en parlant à
-quelqu'un d'autre. C'est le seul endroit de l'app où la précision du geste est mauvaise, et
-c'est celui où une erreur coûte le plus cher.
 
 Deux actions destructrices ne sont jamais adjacentes. « Supprimer la partie » est séparé des
 autres actions par 24 pt ou placé dans une section distincte.
@@ -443,28 +415,17 @@ autres actions par 24 pt ou placé dans une section distincte.
 
 ## 7. Responsive et adaptabilité
 
-Piloté par **classes de taille** uniquement. Jamais de test sur le modèle d'appareil : ce
-serait faux en Split View, en Stage Manager et sur les futurs formats.
+Piloté par l'espace disponible, **jamais par le modèle d'appareil** : ce serait faux en Split
+View, en Stage Manager et sur les futurs formats.
 
 | Contexte | Largeur de référence | Comportement |
 |---|---|---|
-| **iPhone SE** | 375 pt | Cas le plus contraint. Le tableau abandonne la colonne « delta de manche », l'avatar passe de 44 à 36 pt. Le pavé reste à 56 pt — c'est le contenu qui cède, jamais la cible tactile. |
+| **iPhone SE** | 375 pt | Cas le plus contraint. C'est le contenu qui cède, jamais la cible tactile. |
 | **iPhone standard** | 393–440 pt | Disposition de référence. |
-| **iPad, colonne** | ≥ 700 pt | `NavigationSplitView`, liste à gauche, détail à droite. Blocs de texte plafonnés à 680 pt. |
-| **iPad, mode table** | plein écran | Colonnes par joueur, scores en `type/scoreXL`, pavé ancré sur le côté long. Lisible à 60 cm par toute la table. |
+| **iPad** | ≥ 700 pt | Mêmes écrans, marges élargies. |
 
-**Portrait / paysage**
-
-- iPhone portrait : pavé en bas, pleine largeur, 4 colonnes de touches.
-- iPhone paysage : pavé ancré à droite sur 40 % de la largeur, tableau à gauche. La hauteur
-  disponible est trop faible pour empiler.
-- iPad : le mode table est disponible dans les deux orientations ; en portrait, le pavé passe
-  en bas.
-- **L'orientation n'est jamais verrouillée** — un téléphone posé sur une table tourne.
-
-Un seuil de repli supplémentaire : au-delà de **6 joueurs**, le tableau devient scrollable
-horizontalement avec la colonne des pseudos épinglée à gauche. Jamais de réduction de la taille
-du texte pour faire tenir plus de colonnes.
+**L'orientation n'est jamais verrouillée** — un téléphone posé sur une table tourne. Jamais de
+réduction de la taille du texte pour faire tenir plus de contenu.
 
 ---
 
@@ -491,8 +452,7 @@ Autres règles :
   `#0B0E14` ne se détache pas assez.
 - Les ombres ne sont **pas** renforcées en sombre : c'est le contraste de surface qui porte
   l'élévation. Une ombre noire sur fond noir n'existe pas.
-- Le mode sombre n'est **jamais forcé**. L'app suit le réglage système, avec une bascule
-  manuelle dans les réglages (clair / sombre / système).
+- Le mode sombre n'est **jamais forcé** : l'app suit le réglage système.
 - Les captures d'écran de résultats partagées via `ImageRenderer` sont générées en **mode
   clair uniquement** : elles finissent dans une conversation dont on ne connaît pas le thème.
 
@@ -537,8 +497,8 @@ positionnement « sobre pendant la partie ».
 - **Reduce Motion** : toutes les durées tombent à `motion/fast`, les mouvements de position et
   d'échelle sont remplacés par des fondus, le podium apparaît d'un coup, la courbe s'affiche
   tracée. Testé systématiquement, au même titre que le mode sombre.
-- L'haptique accompagne mais ne remplace jamais : `.selection` sur touche de pavé, `.success`
-  à la validation d'une manche, `.impact(.heavy)` à la fin de partie. Rien d'autre.
+- L'haptique accompagne mais ne remplace jamais : `.success` à la validation d'une manche,
+  `.impact(.heavy)` à la fin de partie. Rien d'autre.
 
 ---
 
@@ -551,8 +511,7 @@ utilisateurs**, en avatar.
 | Type | Spécification |
 |---|---|
 | **Avatar photo** | Cadrage 1:1, 512 × 512 px, JPEG qualité 0,8, masque circulaire, **aucun filtre**. Bordure 2 pt de la couleur du joueur. Stockage externe SwiftData. |
-| **Avatar symbole** *(défaut)* | SF Symbol `icon/xl` centré sur un disque plein de la couleur du joueur, symbole en blanc ou `neutral/bg` selon le thème. Sélection curatée d'environ 60 symboles : animaux, objets, sports, expressions. |
-| **Avatar emoji** | Un caractère, centré sur un disque `neutral/fill`, taille = 60 % du diamètre. |
+| **Avatar emoji** *(défaut)* | Un caractère dérivé du pseudo, parmi une sélection curatée d'environ 60 (animaux, objets, sports, expressions), centré sur un disque de la couleur du joueur, taille = 60 % du diamètre. |
 | **Illustration d'état vide** | Trait 2 px sur grille 24 (cohérent avec §4), monochrome `text/tertiary` + un unique aplat `brand/brass`. Aucun dégradé, aucune perspective. Hauteur max 160 pt. |
 | **Vignette de jeu** | Ratio 16:9, `radius/md`, aplat de couleur + symbole `icon/xl` centré. Pas de visuel d'éditeur : les droits ne sont pas acquis et le style resterait hétérogène. |
 | **Image de résultats partagée** | 1080 × 1350 px (4:5, format optimal en messagerie et sur les réseaux). Mode clair. Logo horizontal en bas, 8 % de la hauteur. Générée par `ImageRenderer`. |
@@ -670,8 +629,7 @@ l'écran de résultats — le seul endroit où l'app a le droit d'avoir une voix
   (pas « tour » ni « round »), **joueur** (pas « participant » dans l'UI), **score** (pas
   « points » ni « résultat »).
 - Le nom **« Qui Mène ? »** s'écrit toujours ainsi, dans toutes les langues : deux majuscules, l'accent
-  grave, et le point d'interrogation précédé d'une espace insécable (jamais « Qui mène? »). L'ancien
-  nom, « Ça Compte », ne doit plus apparaître.
+  grave, et le point d'interrogation précédé d'une espace insécable (jamais « Qui mène? »).
 
 ---
 
@@ -768,9 +726,6 @@ Directement exploitable en implémentation. Nommage identique dans les deux base
 | `space/2xl` | 32 | | `button/large` | 52 | | `touch/gap` | 8 |
 | `space/3xl` | 48 | | `button/medium` | 44 | | | |
 | `space/4xl` | 64 | | `button/small` | 32 | | | |
-
-Les jetons `keypad/key` et `keypad/gap` ont disparu avec le pavé numérique maison
-([ADR-0013](13-decisions-adr.md#adr-0013--retour-au-clavier-système-plutôt-que-le-pavé-propriétaire)).
 
 ### Mouvement
 
